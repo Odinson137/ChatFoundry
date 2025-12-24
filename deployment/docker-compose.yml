@@ -1,0 +1,76 @@
+﻿version: '3.9'
+services:
+  identity-db:
+    image: postgres:16
+    restart: always
+    container_name: identity_db
+    environment:
+      POSTGRES_USER: foundry
+      POSTGRES_PASSWORD: foundry
+      POSTGRES_DB: foundry_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - identitydata:/var/lib/postgresql/data
+  
+#  workflow-service:
+#    container_name: workflow_service
+#    build:
+#      context: .
+#      dockerfile: ./src/WorkflowService.Api/Dockerfile
+#    ports:
+#      - "5000:8080"
+#    depends_on:
+#      - workflow-db
+#      - redis
+#    environment:
+#      ASPNETCORE_ENVIRONMENT: "Development"
+#      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5433;Username=workflow;Password=workflow;Database=workflowdb"
+#      CacheSettings__Host: "redis"
+#      CacheSettings__Port: "6379"
+  
+  workflow-db:
+    image: postgres:16
+    container_name: workflow_db
+    restart: always
+    environment:
+      POSTGRES_DB: foundry_db
+      POSTGRES_USER: foundry
+      POSTGRES_PASSWORD: foundry
+    ports:
+      - "5433:5432"
+    volumes:
+      - workflow_pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis
+    container_name: workflow-redis
+    restart: always
+    ports:
+      - "6380:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - workflow_redis:/data
+        
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    ports:
+      - "2181:2181"
+    
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      
+volumes:
+  identitydata:
+  workflow_pgdata:
+  workflow_redis:
