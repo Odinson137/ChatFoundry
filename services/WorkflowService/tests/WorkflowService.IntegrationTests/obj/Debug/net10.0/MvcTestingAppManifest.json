@@ -1,0 +1,6 @@
+{
+  "Shared.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "C:\\Users\\buryy\\RiderProjects\\ChatFoundry\\shared\\src\\Shared.Application",
+  "Shared.Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "C:\\Users\\buryy\\RiderProjects\\ChatFoundry\\shared\\src\\Shared.Domain",
+  "Shared.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "C:\\Users\\buryy\\RiderProjects\\ChatFoundry\\shared\\src\\Shared.Infrastructure",
+  "WorkflowService, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "C:\\Users\\buryy\\RiderProjects\\ChatFoundry\\services\\WorkflowService\\src\\WorkflowService"
+}
