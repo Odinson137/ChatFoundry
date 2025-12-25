@@ -114,3 +114,4 @@ C:\Users\buryy\RiderProjects\ChatFoundry\services\WorkflowService\src\WorkflowSe
 C:\Users\buryy\RiderProjects\ChatFoundry\services\WorkflowService\src\WorkflowService\bin\Debug\net10.0\MassTransit.dll
 C:\Users\buryy\RiderProjects\ChatFoundry\services\WorkflowService\src\WorkflowService\bin\Debug\net10.0\MassTransit.Abstractions.dll
 C:\Users\buryy\RiderProjects\ChatFoundry\services\WorkflowService\src\WorkflowService\bin\Debug\net10.0\MassTransit.KafkaIntegration.dll
+C:\Users\buryy\RiderProjects\ChatFoundry\services\WorkflowService\src\WorkflowService\obj\Debug\net10.0\WorkflowService.sourcelink.json

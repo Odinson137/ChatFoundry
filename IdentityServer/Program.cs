@@ -1,58 +1,64 @@
 using IdentityServer.Data;
 using IdentityServer.Entities;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Identity;
 using OpenIddict.Abstractions;
+using OpenIddict.Server;
+using OpenIddict.Server.AspNetCore;
 using Shared.Infrastructure.DependencyInjection;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
+var services = builder.Services;
 
-builder.Services.AddPostgreSql<IdentityDbContext>(builder.Configuration);
+services.AddControllers();
+services.AddEndpointsApiExplorer();
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(opt => {
+services.AddPostgreSql<IdentityDbContext>(builder.Configuration);
+
+services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(opt =>
+    {
         opt.Password.RequireNonAlphanumeric = false;
         opt.Password.RequireDigit = false;
         opt.Password.RequiredLength = 2;
         opt.Password.RequireUppercase = false;
-        opt.Password.RequireLowercase = false;;
+        opt.Password.RequireLowercase = false;
     })
     .AddEntityFrameworkStores<IdentityDbContext>()
     .AddDefaultTokenProviders();
 
 
-builder.Services.AddOpenIddict()
-    .AddCore(options => {
-        options.UseEntityFrameworkCore().UseDbContext<IdentityDbContext>();
-    })
-    .AddServer(options => {
+services.AddOpenIddict()
+    .AddCore(options => { options.UseEntityFrameworkCore().UseDbContext<IdentityDbContext>(); })
+    .AddServer(options =>
+    {
         options.SetTokenEndpointUris("/connect/token");
+        //options.AllowAuthorizationCodeFlow();
         options.AllowPasswordFlow();
+        options.AllowRefreshTokenFlow();
         options.AllowClientCredentialsFlow();
-        options.AcceptAnonymousClients(); // demo only
-        options.RegisterScopes("api");
+        
+        //options.AcceptAnonymousClients(); // demo only
+        options.RegisterScopes("workflow");
+        
+        options.AddDevelopmentEncryptionCertificate()
+            .AddDevelopmentSigningCertificate();
+
         options.UseAspNetCore().EnableTokenEndpointPassthrough();
-    })
-    .AddValidation(options => {
-        options.UseLocalServer();
-        options.UseAspNetCore();
     });
 
 
-builder.Services.AddAuthentication(options => {
-    options.DefaultScheme = IdentityConstants.ApplicationScheme;
-});
-
+services.AddAuthentication(options => { options.DefaultScheme = IdentityConstants.ApplicationScheme; });
 
 var app = builder.Build();
 
-
-app.UseDeveloperExceptionPage();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapControllers();
 
 app.MapGet("/", () => "IdentityServer sample running");
+
 
 using (var scope = app.Services.CreateScope())
 {
@@ -67,11 +73,16 @@ using (var scope = app.Services.CreateScope())
         {
             ClientId = "client",
             ClientSecret = "secret",
-            Permissions = {
+            Permissions =
+            {
                 OpenIddictConstants.Permissions.Endpoints.Token,
+
                 OpenIddictConstants.Permissions.GrantTypes.Password,
-                OpenIddictConstants.Permissions.GrantTypes.ClientCredentials,
-                OpenIddictConstants.Permissions.Prefixes.Scope + "api"
+                OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
+                OpenIddictConstants.Permissions.Prefixes.Scope + "workflow",
+                OpenIddictConstants.Permissions.Prefixes.Scope + "offline_access",
+
+                OpenIddictConstants.Permissions.ResponseTypes.Token,
             }
         });
     }

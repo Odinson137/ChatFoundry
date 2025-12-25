@@ -1,5 +1,6 @@
 using Confluent.Kafka;
 using MassTransit;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Shared.Application.Events;
 using Shared.Infrastructure.DependencyInjection;
 using WorkflowService.Actions.Executors;
@@ -17,6 +18,16 @@ var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 services.AddControllers();
 services.AddEndpointsApiExplorer();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(opt =>
+    {
+        opt.Authority = "http://identity:8080";
+        opt.Audience = "workflow";
+        opt.RequireHttpsMetadata = false;
+    });
+
+builder.Services.AddAuthorization();
 
 services.AddScoped<IWorkflowRepository, WorkflowRepository>();
 services.AddScoped<IActionRepository, ActionRepository>();
@@ -97,6 +108,13 @@ var app = builder.Build();
 
 app.MapControllers();
 
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapGet("/", () => "Workflow Service is running");
+
+app.MapGet("/run", () => "Workflow executed")
+    .RequireAuthorization();
 
 app.Run();
