@@ -16,7 +16,7 @@ public class SessionResolver(
         BotIncomingMessage message,
         CancellationToken ct)
     {
-        var session = await sessionRepository.FindActiveAsync(message.ClientId, message.Channel, ct);
+        var session = await sessionRepository.FindActiveAsync(message.ExternalUserId, message.Channel, ct);
         if (session != null)
             return session;
 
@@ -28,7 +28,7 @@ public class SessionResolver(
         session = new Session
         {
             Workflow = workflow,
-            ClientId = message.ClientId,
+            ClientId = message.ExternalUserId,
             Channel = message.Channel,
             CurrentNodeId = node.Id,
             Status = SessionStatus.Active,

@@ -1,6 +1,5 @@
 ﻿using MassTransit;
 using Shared.Application.Events;
-using Shared.Domain.Constants;
 using TelegramService.Interfaces;
 
 namespace TelegramService.Consumers;

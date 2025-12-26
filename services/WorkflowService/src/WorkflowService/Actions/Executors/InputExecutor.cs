@@ -31,6 +31,6 @@ public class InputExecutor(ITopicProducer<ActionCompletedEvent> producer, ISessi
             await sessionRepository.SaveAsync(session, ct);
         }
         
-        await producer.Produce(new ActionCompletedEvent(message.Channel, message.ClientId), ct);
+        await producer.Produce(new ActionCompletedEvent(message.Channel, message.ExternalUserId), ct);
     }
 }

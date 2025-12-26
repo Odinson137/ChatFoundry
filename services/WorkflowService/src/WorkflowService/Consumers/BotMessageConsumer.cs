@@ -38,7 +38,7 @@ public class BotMessageConsumer(
             ct);
         await actionRepository.AddAsync(action, ct);
 
-        await producer.Produce(new ExecuteActionCommand(action.Id, msg.ClientId, msg.Channel), ct);
+        await producer.Produce(new ExecuteActionCommand(action.Id, msg.ExternalUserId, msg.Channel), ct);
         
         Console.WriteLine($"Bot message finished: {msg.Payload}");
     }

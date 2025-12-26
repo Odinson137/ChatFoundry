@@ -1,7 +1,7 @@
 ﻿using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Application.Events;
-using Shared.Domain.Constants;
+using Shared.Domain.Enums;
 using WorkflowService.Data;
 using WorkflowService.Entities;
 using WorkflowService.IntegrationTests.Services;
@@ -60,9 +60,15 @@ namespace WorkflowService.IntegrationTests.Tests
 
             var incoming = new BotIncomingMessage(
                 botId,
-                ClientId: "test-chat",
+                ExternalUserId: "test-chat",
                 Channel: DefaultChannels.Telegram,
-                Payload: "hello");
+                Payload: "hello",
+                MessageExternalId: "1",
+                new Dictionary<MessageParameter, string>
+                {
+                    [MessageParameter.FirstName] = "Yuri",
+                    [MessageParameter.UserName] = "Yuri123",
+                });
 
             await producer.Produce(incoming);
 
@@ -71,9 +77,15 @@ namespace WorkflowService.IntegrationTests.Tests
 
             var ackIncoming = new BotIncomingMessage(
                 botId,
-                ClientId: "test-chat",
+                ExternalUserId: "test-chat",
                 Channel: DefaultChannels.Telegram,
-                Payload: "order1");
+                Payload: "order",
+                MessageExternalId: "2",
+                new Dictionary<MessageParameter, string>
+                {
+                    [MessageParameter.FirstName] = "Yuri",
+                    [MessageParameter.UserName] = "Yuri123",
+                });
             
             await producer.Produce(ackIncoming);
             

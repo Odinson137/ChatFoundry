@@ -13,6 +13,6 @@ public class StartActionExecutor(ITopicProducer<ActionCompletedEvent> producer) 
     public async Task ExecuteAsync(ActionEntity action, ExecuteActionCommand message, CancellationToken ct)
     {
         Console.WriteLine("StartActionExecutor");
-        await producer.Produce(new ActionCompletedEvent(message.Channel, message.ClientId), ct);
+        await producer.Produce(new ActionCompletedEvent(message.Channel, message.ExternalUserId), ct);
     }
 }

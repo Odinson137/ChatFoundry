@@ -116,3 +116,14 @@ C:\Users\buryy\RiderProjects\ChatFoundry\TelegramService\obj\Debug\net10.0\Teleg
 C:\Users\buryy\RiderProjects\ChatFoundry\TelegramService\obj\Debug\net10.0\TelegramService.genruntimeconfig.cache
 C:\Users\buryy\RiderProjects\ChatFoundry\TelegramService\obj\Debug\net10.0\ref\TelegramService.dll
 C:\Users\buryy\RiderProjects\ChatFoundry\TelegramService\obj\Debug\net10.0\TelegramService.sourcelink.json
+C:\Users\buryy\RiderProjects\ChatFoundry\TelegramService\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\buryy\RiderProjects\ChatFoundry\TelegramService\bin\Debug\net10.0\Microsoft.AspNetCore.OpenApi.dll
+C:\Users\buryy\RiderProjects\ChatFoundry\TelegramService\bin\Debug\net10.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\buryy\RiderProjects\ChatFoundry\TelegramService\bin\Debug\net10.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\buryy\RiderProjects\ChatFoundry\TelegramService\bin\Debug\net10.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\buryy\RiderProjects\ChatFoundry\TelegramService\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.dll
+C:\Users\buryy\RiderProjects\ChatFoundry\TelegramService\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Users\buryy\RiderProjects\ChatFoundry\TelegramService\bin\Debug\net10.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\buryy\RiderProjects\ChatFoundry\TelegramService\bin\Debug\net10.0\Microsoft.OpenApi.dll
+C:\Users\buryy\RiderProjects\ChatFoundry\TelegramService\bin\Debug\net10.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\buryy\RiderProjects\ChatFoundry\TelegramService\obj\Debug\net10.0\TelegramService.MvcApplicationPartsAssemblyInfo.cs

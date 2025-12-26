@@ -1,6 +1,5 @@
 ﻿using MassTransit;
 using Shared.Application.Events;
-using Shared.Domain.Constants;
 using WorkflowService.Entities;
 using WorkflowService.Events;
 using WorkflowService.Interfaces;
@@ -30,7 +29,7 @@ public class MessageSender(
         await producer.Produce(
             new TelegramSendMessageEvent
             {
-                ChatId = message.ClientId,
+                ChatId = message.ExternalUserId,
                 Text = text
             },
             ct
