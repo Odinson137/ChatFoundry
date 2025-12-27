@@ -8,7 +8,7 @@ namespace WorkflowService.Repositories;
 
 public class SessionRepository(WorkflowDbContext db) : ISessionRepository
 {
-    public Task<Session?> FindActiveAsync(string clientId, string channel, CancellationToken ct)
+    public Task<Session?> FindActiveAsync(string clientId, DefaultChannels channel, CancellationToken ct)
     {
         return db.Sessions.Include(c => c.Workflow)
             .FirstOrDefaultAsync(c => c.ClientId == clientId && c.Channel == channel && c.Status == SessionStatus.Active, ct);

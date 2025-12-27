@@ -1,16 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Shared.Infrastructure.EntityTypeConfiguration;
 using WorkflowService.Entities;
 
 namespace WorkflowService.Data.Configurations;
 
-public class ActionEntityConfiguration : IEntityTypeConfiguration<ActionEntity>
+public class ActionEntityConfiguration : BaseEntityTypeConfiguration<ActionEntity>
 {
-    public void Configure(EntityTypeBuilder<ActionEntity> builder)
+    public override void Configure(EntityTypeBuilder<ActionEntity> builder)
     {
-        builder.ToTable("actions");
-
-        builder.HasKey(x => x.Id);
+        base.Configure(builder);
 
         builder.Property(x => x.NodeId)
             .IsRequired()
@@ -19,10 +18,6 @@ public class ActionEntityConfiguration : IEntityTypeConfiguration<ActionEntity>
         builder.Property(x => x.Payload)
             .HasMaxLength(1000);
         
-        builder.Property(x => x.Status)
-            .IsRequired()
-            .HasConversion<int>();
-
         builder.Property(x => x.Status)
             .IsRequired()
             .HasConversion<int>();

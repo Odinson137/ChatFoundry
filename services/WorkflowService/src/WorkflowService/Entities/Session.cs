@@ -11,7 +11,7 @@ public class Session : EntityBase
     public Workflow Workflow { get; set; } = null!;
 
     public string ClientId { get; set; } = null!;
-    public string Channel { get; set; } = null!;
+    public DefaultChannels Channel { get; set; }
 
     // Убрать потом TODO
     public Guid? CurrentNodeId { get; set; }
@@ -24,7 +24,7 @@ public class Session : EntityBase
 
     public List<ActionEntity> Actions { get; set; } = [];
 
-    // TODO потом сделать отдельную таблицу для их хранения. Возможно даже событичную бд взять (так как всё время данные будут добавляться)
+    // TODO потом сделать отдельную таблицу для их хранения. Возможно даже событичную бд взять (так как всё время данные будут только добавляться)
     public string VariablesJson { get; private set; } = "{}";
     
     public void SetVariable(string key, object? value)

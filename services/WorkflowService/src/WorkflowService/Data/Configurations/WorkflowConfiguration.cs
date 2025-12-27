@@ -1,16 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Shared.Infrastructure.EntityTypeConfiguration;
 using WorkflowService.Entities;
 
 namespace WorkflowService.Data.Configurations;
 
-public class WorkflowConfiguration : IEntityTypeConfiguration<Workflow>
+public class WorkflowConfiguration : BaseEntityTypeConfiguration<Workflow>
 {
-    public void Configure(EntityTypeBuilder<Workflow> builder)
+    public override void Configure(EntityTypeBuilder<Workflow> builder)
     {
-        builder.ToTable("workflows");
-
-        builder.HasKey(x => x.Id);
+        base.Configure(builder);
 
         builder.Property(x => x.SchemaJson)
             .HasColumnType("jsonb")

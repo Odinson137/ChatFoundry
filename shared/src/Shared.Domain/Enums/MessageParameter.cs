@@ -5,4 +5,6 @@ public enum MessageParameter
     UserName,
     FirstName,
     LastName,
+    Mail,
+    Phone,
 }

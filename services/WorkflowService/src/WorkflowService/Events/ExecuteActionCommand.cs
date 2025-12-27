@@ -1,3 +1,5 @@
-﻿namespace WorkflowService.Events;
+﻿using Shared.Domain.Enums;
 
-public record ExecuteActionCommand(Guid ActionId, string ExternalUserId, string Channel);
+namespace WorkflowService.Events;
+
+public record ExecuteActionCommand(Guid ActionId, string ExternalUserId, DefaultChannels Channel);

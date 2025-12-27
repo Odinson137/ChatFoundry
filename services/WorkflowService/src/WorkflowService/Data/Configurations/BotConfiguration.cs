@@ -1,17 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Shared.Infrastructure.EntityTypeConfiguration;
 using WorkflowService.Entities;
 
 namespace WorkflowService.Data.Configurations;
 
 
-public class BotConfiguration : IEntityTypeConfiguration<Bot>
+public class BotConfiguration : BaseEntityTypeConfiguration<Bot>
 {
-    public void Configure(EntityTypeBuilder<Bot> builder)
+    public override void Configure(EntityTypeBuilder<Bot> builder)
     {
-        builder.ToTable("bots");
-
-        builder.HasKey(x => x.Id);
+        base.Configure(builder);
 
         builder.Property(x => x.Name)
             .IsRequired()

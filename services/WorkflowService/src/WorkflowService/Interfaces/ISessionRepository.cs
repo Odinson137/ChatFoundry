@@ -1,11 +1,12 @@
-﻿using WorkflowService.Entities;
+﻿using Shared.Domain.Enums;
+using WorkflowService.Entities;
 
 namespace WorkflowService.Interfaces;
 
 public interface ISessionRepository
 {
     Task<Session?> FindActiveAsync(string clientId,
-        string channel,
+        DefaultChannels channel,
         CancellationToken ct);
 
     Task<Session?> GetAsync(Guid sessionId, CancellationToken ct = default);

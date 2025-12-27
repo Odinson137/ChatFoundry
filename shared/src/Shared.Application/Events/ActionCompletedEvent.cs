@@ -1,3 +1,5 @@
-﻿namespace Shared.Application.Events;
+﻿using Shared.Domain.Enums;
 
-public record ActionCompletedEvent(string Channel, string ClientId);
+namespace Shared.Application.Events;
+
+public record ActionCompletedEvent(DefaultChannels Channel, string ClientId);

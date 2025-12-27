@@ -1,24 +1,23 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Shared.Infrastructure.EntityTypeConfiguration;
 using WorkflowService.Entities;
 
 namespace WorkflowService.Data.Configurations;
 
-public class SessionConfiguration : IEntityTypeConfiguration<Session>
+public class SessionConfiguration : BaseEntityTypeConfiguration<Session>
 {
-    public void Configure(EntityTypeBuilder<Session> builder)
+    public override void Configure(EntityTypeBuilder<Session> builder)
     {
-        builder.ToTable("sessions");
-
-        builder.HasKey(x => x.Id);
-
+        base.Configure(builder);
+        
         builder.Property(x => x.ClientId)
             .IsRequired()
             .HasMaxLength(200);
 
         builder.Property(x => x.Channel)
             .IsRequired()
-            .HasMaxLength(50);
+            .HasConversion<int>(); 
 
         builder.Property(x => x.CurrentNodeId)
             .IsRequired()
@@ -26,7 +25,7 @@ public class SessionConfiguration : IEntityTypeConfiguration<Session>
 
         builder.Property(x => x.Status)
             .IsRequired()
-            .HasConversion<int>(); // или int
+            .HasConversion<int>(); 
 
         builder.Property(x => x.CompletedAt);
 

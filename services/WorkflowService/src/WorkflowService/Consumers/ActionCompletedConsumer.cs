@@ -24,9 +24,12 @@ public class ActionCompletedConsumer(
         if (lastUserAction == null)
             return;
         
-        lastUserAction.MarkCompleted();
 
         var session = lastUserAction.Session;
+        
+        lastUserAction.MarkCompleted();
+        session.CompletedAt = DateTime.UtcNow;
+        
         var graph = workflowGraphParser.Parse(session.Workflow.SchemaJson);
 
         var nextNode = graph.GetNextNode(lastUserAction.NodeId, session);
