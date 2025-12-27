@@ -1,41 +1,39 @@
 ﻿using ClientService.Entities;
+using ClientService.Interfaces;
 using MassTransit;
-using Microsoft.EntityFrameworkCore;
 using Shared.Application.Events;
 using Shared.Domain.Enums;
-using WorkflowService.Data;
 
 namespace ClientService.Consumers;
 
-public class BotIncomingMessageConsumer(ClientHubDbContext db) : IConsumer<BotIncomingMessage>
+public class BotIncomingMessageConsumer(
+    IClientRepository clientRepository,
+    IClientChannelRepository channelRepository,
+    IMessageRepository messageRepository) : IConsumer<BotIncomingMessage>
 {
     public async Task Consume(ConsumeContext<BotIncomingMessage> context)
     {
         var msg = context.Message;
-
+        var ct = context.CancellationToken;
         var channel = msg.Channel;
 
-        var clientChannel = await db.ClientChannels
-            .Include(x => x.Client)
-            .FirstOrDefaultAsync(x =>
-                x.Channel == channel &&
-                x.ExternalUserId == msg.ExternalUserId);
-
-        Client client;
+        var clientChannel = await channelRepository
+            .FindAsync(channel, msg.ExternalUserId, ct);
 
         var userName = msg.Parameters.GetValueOrDefault(MessageParameter.UserName);
         var mail = msg.Parameters.GetValueOrDefault(MessageParameter.Mail);
         var phone = msg.Parameters.GetValueOrDefault(MessageParameter.Phone);
-        
+
+        Client client;
+
         if (clientChannel == null)
         {
-           
             client = new Client
             {
                 DisplayName = userName
             };
 
-            db.Clients.Add(client);
+            await clientRepository.AddAsync(client, ct);
 
             clientChannel = new ClientChannel
             {
@@ -47,7 +45,7 @@ public class BotIncomingMessageConsumer(ClientHubDbContext db) : IConsumer<BotIn
                 Phone = phone
             };
 
-            db.ClientChannels.Add(clientChannel);
+            await channelRepository.AddAsync(clientChannel, ct);
         }
         else
         {
@@ -63,14 +61,14 @@ public class BotIncomingMessageConsumer(ClientHubDbContext db) : IConsumer<BotIn
         var message = new Message
         {
             Direction = MessageDirection.Incoming,
-            MessageKind = MessageKind.Text,
+            MessageKind = msg.MessageKind,
             Payload = msg.Payload,
             CreatedBy = clientChannel,
             InternalMessageId = msg.MessageExternalId
         };
 
-        db.Messages.Add(message);
+        await messageRepository.AddAsync(message, ct);
 
-        await db.SaveChangesAsync();
+        await clientRepository.SaveAsync(ct);
     }
 }

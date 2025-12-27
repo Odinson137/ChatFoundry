@@ -37,6 +37,7 @@
     <projectFile>services/IdentityServer/src/IdentityServer.Domain/IdentityServer.Domain.csproj</projectFile>
     <projectFile>services/IdentityServer/src/IdentityServer.Infrastructure/IdentityServer.Infrastructure.csproj</projectFile>
     <projectFile profileName="http">services/IdentityServer/src/IdentityServer/IdentityServer.csproj</projectFile>
+    <projectFile profileName="https">services/IdentityServer/src/IdentityServer/IdentityServer.csproj</projectFile>
     <projectFile kind="Docker">services/TelegramService/src/TelegramService/TelegramService.csproj</projectFile>
     <projectFile profileName="http">services/TelegramService/src/TelegramService/TelegramService.csproj</projectFile>
     <projectFile>services/WebApplication1/WebApplication1.csproj</projectFile>
@@ -53,144 +54,74 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a15b5d9a-05b2-4a37-b1f5-4840a0f64271" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/ClientService.csproj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/shared/src/Shared.Domain/Enums/MessageDirection.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/EntityTypeConfiguration/BaseEntityTypeConfiguration.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/Interfaces/IClientChannelRepository.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/Interfaces/IClientRepository.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/Interfaces/IMessageRepository.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/Repositories/ClientChannelRepository.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/Repositories/ClientRepository.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/Repositories/MessageRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ChatFoundry/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ChatFoundry/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ChatFoundry.sln" beforeDir="false" afterPath="$PROJECT_DIR$/ChatFoundry.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/Controllers/AuthController.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/Controllers/TokenController.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/Data/IdentityDbContext.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/Entities/ApplicationUser.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/IdentityServer.csproj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/Program.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/Properties/launchSettings.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/appsettings.Development.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/appsettings.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/bin/Debug/net10.0/BuildHost-net472/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.exe.config" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/bin/Debug/net10.0/BuildHost-netcore/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.deps.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/bin/Debug/net10.0/BuildHost-netcore/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.dll.config" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/bin/Debug/net10.0/BuildHost-netcore/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.runtimeconfig.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/bin/Debug/net10.0/IdentityServer.deps.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/bin/Debug/net10.0/IdentityServer.runtimeconfig.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/bin/Debug/net10.0/IdentityServer.staticwebassets.endpoints.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/bin/Debug/net10.0/appsettings.Development.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/bin/Debug/net10.0/appsettings.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/bin/Debug/net10.0/runtimes/linux-arm64/native/librdkafka.so" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/bin/Debug/net10.0/runtimes/linux-x64/native/alpine-librdkafka.so" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/bin/Debug/net10.0/runtimes/linux-x64/native/centos8-librdkafka.so" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/bin/Debug/net10.0/runtimes/linux-x64/native/librdkafka.so" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/bin/Debug/net10.0/runtimes/osx-arm64/native/librdkafka.dylib" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/bin/Debug/net10.0/runtimes/osx-x64/native/librdkafka.dylib" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/obj/Debug/net10.0/Identity.FDBE6C83.Up2Date" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/obj/Debug/net10.0/IdentityServer.AssemblyInfo.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/obj/Debug/net10.0/IdentityServer.GeneratedMSBuildEditorConfig.editorconfig" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/obj/Debug/net10.0/IdentityServer.GlobalUsings.g.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/obj/Debug/net10.0/IdentityServer.MvcApplicationPartsAssemblyInfo.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/obj/Debug/net10.0/IdentityServer.csproj.FileListAbsolute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/obj/Debug/net10.0/IdentityServer.sourcelink.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/obj/Debug/net10.0/rpswa.dswa.cache.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/obj/Debug/net10.0/staticwebassets.build.endpoints.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/obj/Debug/net10.0/staticwebassets.build.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/obj/IdentityServer.csproj.nuget.dgspec.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/obj/IdentityServer.csproj.nuget.g.props" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/obj/IdentityServer.csproj.nuget.g.targets" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/obj/project.assets.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/obj/project.packagespec.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/obj/rider.project.model.nuget.info" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IdentityServer/obj/rider.project.restore.info" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/Consumers/SendTelegramMessageConsumer.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/Consumers/SetTelegramWebhookConsumer.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/Controllers/TelegramHookController.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/Interfaces/ITelegramClient.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/Models/Models.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/Program.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/Properties/launchSettings.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/Services/TelegramClient.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/TelegramService.csproj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/appsettings.Development.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/appsettings.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/bin/Debug/net10.0/BuildHost-net472/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.exe.config" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/bin/Debug/net10.0/BuildHost-netcore/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.deps.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/bin/Debug/net10.0/BuildHost-netcore/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.dll.config" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/bin/Debug/net10.0/BuildHost-netcore/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.runtimeconfig.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/bin/Debug/net10.0/TelegramService.deps.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/bin/Debug/net10.0/TelegramService.runtimeconfig.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/bin/Debug/net10.0/TelegramService.staticwebassets.endpoints.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/bin/Debug/net10.0/appsettings.Development.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/bin/Debug/net10.0/appsettings.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/bin/Debug/net10.0/runtimes/linux-arm64/native/librdkafka.so" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/bin/Debug/net10.0/runtimes/linux-x64/native/alpine-librdkafka.so" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/bin/Debug/net10.0/runtimes/linux-x64/native/centos8-librdkafka.so" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/bin/Debug/net10.0/runtimes/linux-x64/native/librdkafka.so" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/bin/Debug/net10.0/runtimes/osx-arm64/native/librdkafka.dylib" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/bin/Debug/net10.0/runtimes/osx-x64/native/librdkafka.dylib" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/obj/Debug/net10.0/Telegram.6481907D.Up2Date" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/obj/Debug/net10.0/TelegramService.AssemblyInfo.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/obj/Debug/net10.0/TelegramService.GeneratedMSBuildEditorConfig.editorconfig" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/obj/Debug/net10.0/TelegramService.GlobalUsings.g.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/obj/Debug/net10.0/TelegramService.MvcApplicationPartsAssemblyInfo.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/obj/Debug/net10.0/TelegramService.csproj.FileListAbsolute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/obj/Debug/net10.0/TelegramService.sourcelink.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/obj/Debug/net10.0/rpswa.dswa.cache.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/obj/Debug/net10.0/staticwebassets.build.endpoints.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/obj/Debug/net10.0/staticwebassets.build.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/obj/TelegramService.csproj.nuget.dgspec.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/obj/TelegramService.csproj.nuget.g.props" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/obj/TelegramService.csproj.nuget.g.targets" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/obj/project.assets.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/obj/project.packagespec.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/obj/rider.project.model.nuget.info" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TelegramService/obj/rider.project.restore.info" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientHubService/src/ClientHub/ClientHub.csproj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientHubService/src/ClientHub/ClientHub.http" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientHubService/src/ClientHub/Consumers/BotIncomingMessageConsumer.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientHubService/src/ClientHub/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientHubService/src/ClientHub/Program.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientHubService/src/ClientHub/Properties/launchSettings.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientHubService/src/ClientHub/appsettings.Development.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientHubService/src/ClientHub/appsettings.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientHubService/src/ClientHub/obj/ClientHub.csproj.nuget.dgspec.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientHubService/src/ClientHub/obj/ClientHub.csproj.nuget.g.props" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientHubService/src/ClientHub/obj/ClientHub.csproj.nuget.g.targets" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientHubService/src/ClientHub/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientHubService/src/ClientHub/obj/Debug/net10.0/ClientHub.AssemblyInfo.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientHubService/src/ClientHub/obj/Debug/net10.0/ClientHub.GeneratedMSBuildEditorConfig.editorconfig" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientHubService/src/ClientHub/obj/Debug/net10.0/ClientHub.GlobalUsings.g.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientHubService/src/ClientHub/obj/project.assets.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientHubService/src/ClientHub/obj/project.packagespec.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientHubService/src/ClientHub/obj/rider.project.model.nuget.info" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientHubService/src/ClientHub/obj/rider.project.restore.info" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/ClientHub.http" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/Consumers/BotIncomingMessageConsumer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/Consumers/BotIncomingMessageConsumer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/Data/ClientHubDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/Data/ClientHubDbContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/appsettings.Development.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/appsettings.Development.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/ClientService.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/ClientService.csproj.nuget.dgspec.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.AssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.csproj.FileListAbsolute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/project.assets.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/rider.project.model.nuget.info" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/rider.project.restore.info" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/Debug/net10.0/Gateway.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/Debug/net10.0/Gateway.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Consumers/ActionCompletedConsumer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Consumers/ActionCompletedConsumer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Data/Configurations/ActionEntityConfiguration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Data/Configurations/ActionEntityConfiguration.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Data/Configurations/BotConfiguration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Data/Configurations/BotConfiguration.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Data/Configurations/SessionConfiguration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Data/Configurations/SessionConfiguration.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Data/Configurations/WorkflowConfiguration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Data/Configurations/WorkflowConfiguration.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Entities/Session.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Entities/Session.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Events/ExecuteActionCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Events/ExecuteActionCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Interfaces/IActionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Interfaces/IActionRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Interfaces/ISessionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Interfaces/ISessionRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Repositories/ActionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Repositories/ActionRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Repositories/SessionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Repositories/SessionRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/Gateway.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/Gateway.csproj.nuget.dgspec.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/project.assets.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/rider.project.model.nuget.info" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/rider.project.restore.info" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/IdentityServer.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/IdentityServer.AssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/IdentityServer.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/IdentityServer.csproj.nuget.dgspec.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/project.assets.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/rider.project.model.nuget.info" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/rider.project.restore.info" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Controllers/TelegramHookController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Controllers/TelegramHookController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Models/Models.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Models/Models.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Services/TelegramClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Services/TelegramClient.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/bin/Debug/net10.0/TelegramService.deps.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/bin/Debug/net10.0/TelegramService.deps.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.AssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.MvcApplicationPartsAssemblyInfo.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.csproj.FileListAbsolute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.sourcelink.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/TelegramService.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/TelegramService.csproj.nuget.dgspec.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/project.assets.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/rider.project.model.nuget.info" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/rider.project.restore.info" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/WorkflowService.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/WorkflowService.AssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/WorkflowService.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/WorkflowService.csproj.nuget.dgspec.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/project.assets.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/rider.project.model.nuget.info" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/rider.project.restore.info" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/Debug/net10.0/WorkflowService.IntegrationTests.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/Debug/net10.0/WorkflowService.IntegrationTests.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Application/Events/ActionCompletedEvent.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Application/Events/ActionCompletedEvent.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/WorkflowService.IntegrationTests.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/WorkflowService.IntegrationTests.csproj.nuget.dgspec.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/project.assets.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/rider.project.model.nuget.info" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/rider.project.restore.info" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/Shared.Application/obj/Debug/net10.0/Shared.Application.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Application/obj/Debug/net10.0/Shared.Application.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/Shared.Application/obj/Debug/net10.0/Shared.Application.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Application/obj/Debug/net10.0/Shared.Application.sourcelink.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Domain/Entities/EntityBase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Domain/Entities/EntityBase.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Domain/Enums/MessageParameter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Domain/Enums/MessageParameter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Domain/Enums/MessageKind.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Domain/Enums/MessageKind.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/Shared.Domain/obj/Debug/net10.0/Shared.Domain.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Domain/obj/Debug/net10.0/Shared.Domain.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/Shared.Domain/obj/Debug/net10.0/Shared.Domain.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Domain/obj/Debug/net10.0/Shared.Domain.sourcelink.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/Shared.Infrastructure.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/Shared.Infrastructure.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/bin/Debug/net10.0/Shared.Infrastructure.deps.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/bin/Debug/net10.0/Shared.Infrastructure.deps.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.sourcelink.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Shared.Infrastructure.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Shared.Infrastructure.csproj.nuget.dgspec.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/project.assets.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/project.packagespec.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/project.packagespec.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/rider.project.model.nuget.info" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/rider.project.restore.info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -255,6 +186,8 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/bd1d5c50194fea68ff3559c160230b0ab50f5acf4ce3061bffd6d62958e2182/ExceptionDispatchInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d7e2ce30531b7a2d56142411c5e51c3d516aafcb44e7628167b959660a65c/ServiceProvider.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/da80a5ddeae0d314fda4dd6dc030f3f4e43bc13d787dcb406cf472466af03863/KeyedKafkaProducer.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Consumers/BotMessageConsumer.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
@@ -269,47 +202,36 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET Launch Settings Profile.IdentityServer: https.executor&quot;: &quot;Debug&quot;,
-    &quot;.NET Launch Settings Profile.TelegramService: http.executor&quot;: &quot;Debug&quot;,
-    &quot;.NET Launch Settings Profile.TelegramService: https.executor&quot;: &quot;Debug&quot;,
-    &quot;.NET Launch Settings Profile.WorkflowService: http.executor&quot;: &quot;Debug&quot;,
-    &quot;Docker.deployment.kafka-ui: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.deployment: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;XThreadsFramesViewSplitterKey&quot;: &quot;0.4485437&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET Launch Settings Profile.ClientService: https.executor": "Debug",
+    ".NET Launch Settings Profile.IdentityServer: https.executor": "Debug",
+    ".NET Launch Settings Profile.TelegramService: http.executor": "Debug",
+    ".NET Launch Settings Profile.TelegramService: https.executor": "Debug",
+    ".NET Launch Settings Profile.WorkflowService: http.executor": "Debug",
+    "Docker.deployment.client-db: Compose Deployment.executor": "Run",
+    "Docker.deployment.kafka-ui: Compose Deployment.executor": "Run",
+    "Docker.deployment.kafka: Compose Deployment.executor": "Run",
+    "Docker.deployment: Compose Deployment.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "XThreadsFramesViewSplitterKey": "0.4485437",
+    "deletionFromPopupRequiresConfirmation": "false",
+    "git-widget-placeholder": "main",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected=".NET Launch Settings Profile.TelegramService: https">
     <configuration name="ClientHubService: http" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/services/ClientService/src/ClientService/ClientService.csproj" />
       <option name="LAUNCH_PROFILE_TFM" value="net10.0" />
       <option name="LAUNCH_PROFILE_NAME" value="http" />
-      <option name="USE_EXTERNAL_CONSOLE" value="0" />
-      <option name="USE_MONO" value="0" />
-      <option name="RUNTIME_ARGUMENTS" value="" />
-      <option name="GENERATE_APPLICATIONHOST_CONFIG" value="1" />
-      <option name="SHOW_IIS_EXPRESS_OUTPUT" value="0" />
-      <option name="SEND_DEBUG_REQUEST" value="1" />
-      <option name="ADDITIONAL_IIS_EXPRESS_ARGUMENTS" value="" />
-      <method v="2">
-        <option name="Build" />
-      </method>
-    </configuration>
-    <configuration name="ClientHubService: https" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
-      <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/services/ClientService/src/ClientService/ClientService.csproj" />
-      <option name="LAUNCH_PROFILE_TFM" value="net10.0" />
-      <option name="LAUNCH_PROFILE_NAME" value="https" />
       <option name="USE_EXTERNAL_CONSOLE" value="0" />
       <option name="USE_MONO" value="0" />
       <option name="RUNTIME_ARGUMENTS" value="" />
@@ -338,6 +260,21 @@
     </configuration>
     <configuration name="ClientHub: https" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/services/ClientHubService/src/ClientHubService/ClientHubService.csproj" />
+      <option name="LAUNCH_PROFILE_TFM" value="net10.0" />
+      <option name="LAUNCH_PROFILE_NAME" value="https" />
+      <option name="USE_EXTERNAL_CONSOLE" value="0" />
+      <option name="USE_MONO" value="0" />
+      <option name="RUNTIME_ARGUMENTS" value="" />
+      <option name="GENERATE_APPLICATIONHOST_CONFIG" value="1" />
+      <option name="SHOW_IIS_EXPRESS_OUTPUT" value="0" />
+      <option name="SEND_DEBUG_REQUEST" value="1" />
+      <option name="ADDITIONAL_IIS_EXPRESS_ARGUMENTS" value="" />
+      <method v="2">
+        <option name="Build" />
+      </method>
+    </configuration>
+    <configuration name="ClientService: https" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
+      <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/services/ClientService/src/ClientService/ClientService.csproj" />
       <option name="LAUNCH_PROFILE_TFM" value="net10.0" />
       <option name="LAUNCH_PROFILE_NAME" value="https" />
       <option name="USE_EXTERNAL_CONSOLE" value="0" />
@@ -426,8 +363,8 @@
         <option name="Build" />
       </method>
     </configuration>
-    <configuration name="IdentityServer: https" type="LaunchSettings" factoryName=".NET Launch Settings Profile" temporary="true">
-      <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/IdentityServer/IdentityServer.csproj" />
+    <configuration name="IdentityServer: https" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
+      <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/IdentityServer.csproj" />
       <option name="LAUNCH_PROFILE_TFM" value="net10.0" />
       <option name="LAUNCH_PROFILE_NAME" value="https" />
       <option name="USE_EXTERNAL_CONSOLE" value="0" />
@@ -441,23 +378,8 @@
         <option name="Build" />
       </method>
     </configuration>
-    <configuration name="TelegramService: http" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
+    <configuration name="TelegramService: https" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/services/TelegramService/src/TelegramService/TelegramService.csproj" />
-      <option name="LAUNCH_PROFILE_TFM" value="net10.0" />
-      <option name="LAUNCH_PROFILE_NAME" value="http" />
-      <option name="USE_EXTERNAL_CONSOLE" value="0" />
-      <option name="USE_MONO" value="0" />
-      <option name="RUNTIME_ARGUMENTS" value="" />
-      <option name="GENERATE_APPLICATIONHOST_CONFIG" value="1" />
-      <option name="SHOW_IIS_EXPRESS_OUTPUT" value="0" />
-      <option name="SEND_DEBUG_REQUEST" value="1" />
-      <option name="ADDITIONAL_IIS_EXPRESS_ARGUMENTS" value="" />
-      <method v="2">
-        <option name="Build" />
-      </method>
-    </configuration>
-    <configuration name="TelegramService: https" type="LaunchSettings" factoryName=".NET Launch Settings Profile" temporary="true">
-      <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/TelegramService/TelegramService.csproj" />
       <option name="LAUNCH_PROFILE_TFM" value="net10.0" />
       <option name="LAUNCH_PROFILE_NAME" value="https" />
       <option name="USE_EXTERNAL_CONSOLE" value="0" />
@@ -610,6 +532,22 @@
     <configuration name="deployment: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
       <deployment type="docker-compose.yml">
         <settings>
+          <option name="envFilePath" value="" />
+          <option name="commandLineOptions" value="--build" />
+          <option name="sourceFilePath" value="deployment/docker-compose.yml" />
+        </settings>
+      </deployment>
+      <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />
+      <method v="2" />
+    </configuration>
+    <configuration name="deployment.client-db: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="services">
+            <list>
+              <option value="client-db" />
+            </list>
+          </option>
           <option name="sourceFilePath" value="deployment/docker-compose.yml" />
         </settings>
       </deployment>
@@ -630,20 +568,33 @@
       <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />
       <method v="2" />
     </configuration>
+    <configuration name="deployment.kafka: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="services">
+            <list>
+              <option value="kafka" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="deployment/docker-compose.yml" />
+        </settings>
+      </deployment>
+      <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />
+      <method v="2" />
+    </configuration>
     <list>
+      <item itemvalue=".NET Launch Settings Profile.IdentityServer: https" />
       <item itemvalue=".NET Launch Settings Profile.ClientHubService: http" />
-      <item itemvalue=".NET Launch Settings Profile.ClientHubService: https" />
+      <item itemvalue=".NET Launch Settings Profile.ClientService: https" />
       <item itemvalue=".NET Launch Settings Profile.IdentityServer: http" />
-      <item itemvalue=".NET Launch Settings Profile.TelegramService: http" />
+      <item itemvalue=".NET Launch Settings Profile.TelegramService: https" />
       <item itemvalue=".NET Launch Settings Profile.ClientHub: http" />
       <item itemvalue=".NET Launch Settings Profile.ClientHub: https" />
       <item itemvalue=".NET Launch Settings Profile.Gateway: http" />
       <item itemvalue=".NET Launch Settings Profile.Gateway: https" />
       <item itemvalue=".NET Launch Settings Profile.GatewayServer: http" />
       <item itemvalue=".NET Launch Settings Profile.GatewayServer: https" />
-      <item itemvalue=".NET Launch Settings Profile.IdentityServer: https" />
       <item itemvalue=".NET Launch Settings Profile.WorkflowService: https" />
-      <item itemvalue=".NET Launch Settings Profile.TelegramService: https" />
       <item itemvalue="Docker.ClientHubService/Dockerfile" />
       <item itemvalue="Docker.ClientHubService/Dockerfile (1)" />
       <item itemvalue="Docker.ClientService/Dockerfile" />
@@ -651,16 +602,18 @@
       <item itemvalue="Docker.ClientHub/Dockerfile" />
       <item itemvalue="Docker.Gateway/Dockerfile" />
       <item itemvalue="Docker.GatewayServer/Dockerfile" />
+      <item itemvalue="Docker.deployment.client-db: Compose Deployment" />
+      <item itemvalue="Docker.deployment.kafka: Compose Deployment" />
       <item itemvalue="Docker.deployment.kafka-ui: Compose Deployment" />
       <item itemvalue="Docker.deployment: Compose Deployment" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue=".NET Launch Settings Profile.TelegramService: https" />
-        <item itemvalue="Docker.deployment.kafka-ui: Compose Deployment" />
         <item itemvalue="Docker.deployment: Compose Deployment" />
+        <item itemvalue="Docker.deployment.kafka: Compose Deployment" />
+        <item itemvalue="Docker.deployment.client-db: Compose Deployment" />
+        <item itemvalue="Docker.deployment.kafka-ui: Compose Deployment" />
         <item itemvalue=".NET Launch Settings Profile.WorkflowService: https" />
-        <item itemvalue=".NET Launch Settings Profile.IdentityServer: https" />
       </list>
     </recent_temporary>
   </component>
@@ -706,6 +659,8 @@
       <workItem from="1766659753119" duration="17789000" />
       <workItem from="1766762713014" duration="8387000" />
       <workItem from="1766830856052" duration="7246000" />
+      <workItem from="1766838644257" duration="692000" />
+      <workItem from="1766848159003" duration="9587000" />
     </task>
     <task id="LOCAL-00005" summary="add registration, receiving bearer token, refreshing token">
       <option name="closed" value="true" />
@@ -731,7 +686,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766773198288</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="add base client service models, refactoring">
+      <option name="closed" value="true" />
+      <created>1766839139022</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1766839139022</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -758,7 +721,8 @@
     <MESSAGE value="add registration, receiving bearer token, refreshing token" />
     <MESSAGE value="add gateway service" />
     <MESSAGE value="add clienthub service, refactoring telegram service" />
-    <option name="LAST_COMMIT_MESSAGE" value="add clienthub service, refactoring telegram service" />
+    <MESSAGE value="add base client service models, refactoring" />
+    <option name="LAST_COMMIT_MESSAGE" value="add base client service models, refactoring" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -810,14 +774,7 @@
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/TelegramService/Consumers/SetTelegramWebhookConsumer.cs</url>
           <line>13</line>
-          <properties documentPath="C:\Users\buryy\RiderProjects\ChatFoundry\TelegramService\Consumers\SetTelegramWebhookConsumer.cs" containingFunctionPresentation="Method 'Consume'">
-            <startOffsets>
-              <option value="393" />
-            </startOffsets>
-            <endOffsets>
-              <option value="427" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="C:\Users\buryy\RiderProjects\ChatFoundry\TelegramService\Consumers\SetTelegramWebhookConsumer.cs" containingFunctionPresentation="Method 'Consume'" />
           <option name="timeStamp" value="85" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
@@ -862,14 +819,7 @@
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/TelegramService/Consumers/SendTelegramMessageConsumer.cs</url>
           <line>14</line>
-          <properties documentPath="C:\Users\buryy\RiderProjects\ChatFoundry\TelegramService\Consumers\SendTelegramMessageConsumer.cs" containingFunctionPresentation="Method 'Consume'">
-            <startOffsets>
-              <option value="448" />
-            </startOffsets>
-            <endOffsets>
-              <option value="478" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="C:\Users\buryy\RiderProjects\ChatFoundry\TelegramService\Consumers\SendTelegramMessageConsumer.cs" containingFunctionPresentation="Method 'Consume'" />
           <option name="timeStamp" value="105" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
@@ -927,15 +877,47 @@
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/TelegramService/Controllers/TelegramHookController.cs</url>
           <line>24</line>
-          <properties documentPath="C:\Users\buryy\RiderProjects\ChatFoundry\TelegramService\Controllers\TelegramHookController.cs" containingFunctionPresentation="Method 'ReceivedMessage'">
+          <properties documentPath="C:\Users\buryy\RiderProjects\ChatFoundry\TelegramService\Controllers\TelegramHookController.cs" containingFunctionPresentation="Method 'ReceivedMessage'" />
+          <option name="timeStamp" value="112" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/services/ClientService/src/ClientService/Consumers/BotIncomingMessageConsumer.cs</url>
+          <line>15</line>
+          <properties documentPath="C:\Users\buryy\RiderProjects\ChatFoundry\services\ClientService\src\ClientService\Consumers\BotIncomingMessageConsumer.cs" containingFunctionPresentation="Method 'Consume'">
             <startOffsets>
-              <option value="667" />
+              <option value="471" />
             </startOffsets>
             <endOffsets>
-              <option value="713" />
+              <option value="497" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="112" />
+          <option name="timeStamp" value="114" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/services/TelegramService/src/TelegramService/Controllers/TelegramHookController.cs</url>
+          <line>28</line>
+          <properties documentPath="C:\Users\buryy\RiderProjects\ChatFoundry\services\TelegramService\src\TelegramService\Controllers\TelegramHookController.cs" containingFunctionPresentation="Method 'ReceivedMessage'">
+            <startOffsets>
+              <option value="821" />
+            </startOffsets>
+            <endOffsets>
+              <option value="867" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="116" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/services/TelegramService/src/TelegramService/Controllers/TelegramHookController.cs</url>
+          <line>40</line>
+          <properties documentPath="C:\Users\buryy\RiderProjects\ChatFoundry\services\TelegramService\src\TelegramService\Controllers\TelegramHookController.cs" containingFunctionPresentation="Method 'ReceivedMessage'">
+            <startOffsets>
+              <option value="1203" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1215" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="124" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

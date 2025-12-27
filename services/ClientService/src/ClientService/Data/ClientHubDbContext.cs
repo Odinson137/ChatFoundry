@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WorkflowService.Data;
 
-public class ClientHubDbContext : DbContext
+public class ClientDbContext : DbContext
 {
 
-    public ClientHubDbContext(DbContextOptions<ClientHubDbContext> options) : base(options)
+    public ClientDbContext(DbContextOptions<ClientDbContext> options) : base(options)
     {
         Database.EnsureCreated();
     }

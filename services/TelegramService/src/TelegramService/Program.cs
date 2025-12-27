@@ -1,5 +1,7 @@
 using Confluent.Kafka;
 using MassTransit;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Shared.Application.Events;
 using TelegramService.Consumers;
 using TelegramService.Interfaces;
@@ -12,6 +14,20 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 services.AddScoped<ITelegramClient, TelegramClient>();
 services.AddLogging();
+
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+    {
+        var settings = options.SerializerSettings;
+
+        settings.NullValueHandling = NullValueHandling.Ignore;
+        settings.MissingMemberHandling = MissingMemberHandling.Ignore;
+        settings.DefaultValueHandling = DefaultValueHandling.Ignore;
+        
+        settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+        
+        settings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+    });
 
 builder.Services.AddSingleton(new AdminClientConfig
 {

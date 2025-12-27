@@ -10,13 +10,14 @@ public sealed class TelegramClient(
     ILogger<TelegramClient> logger)
     : ITelegramClient
 {
+    public const string Token = "8206298582:AAHqEA_ULOItaGXxi0rAJt9fxztRmDtee2c"; 
     [field: AllowNull, MaybeNull]
     private TelegramBotClient BotClient
     {
         get
         {
             if (field == null)
-                field = new TelegramBotClient("8206298582:AAHqEA_ULOItaGXxi0rAJt9fxztRmDtee2c");
+                field = new TelegramBotClient(Token);
             return field;
         }
     }

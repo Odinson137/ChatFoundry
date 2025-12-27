@@ -2,13 +2,15 @@
 
 public enum MessageKind
 {
+    Unknown,
     Text,
     Image,
     Link,
     Audio,
     Command,
-    Unknown,
     Photo,
     Sticker,
-    CallbackQuery
+    CallbackQuery,
+    File,
+    Voice
 }
