@@ -2,9 +2,8 @@
 
 public enum ActionStatus
 {
-    Pending,
-    Processing,
-    Waiting,
-    Completed,
-    Failed
+    Pending = 0,
+    Processing = 1,
+    Completed = 2,
+    Failed = 3
 }

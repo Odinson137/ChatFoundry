@@ -1,5 +1,6 @@
 ﻿using Shared.Domain.Enums;
 using WorkflowService.Entities;
+using WorkflowService.Enums;
 using WorkflowService.Models.Workflow;
 
 namespace WorkflowService.Interfaces;

@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Shared.Domain.Enums;
+using WorkflowService.Enums;
 using WorkflowService.Models.Node;
 using WorkflowService.Models.Workflow;
 

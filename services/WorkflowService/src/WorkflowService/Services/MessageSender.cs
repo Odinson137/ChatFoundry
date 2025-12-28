@@ -1,14 +1,18 @@
 ﻿using MassTransit;
 using Shared.Application.Events;
+using Shared.Domain.Enums;
 using WorkflowService.Entities;
+using WorkflowService.Enums;
 using WorkflowService.Events;
 using WorkflowService.Interfaces;
+using WorkflowService.Models.Node;
+using WorkflowService.Models.Workflow;
 using WorkflowService.Utils;
 
 namespace WorkflowService.Services;
 
 public class MessageSender(
-    ITopicProducer<TelegramSendMessageEvent> producer,
+    ITopicProducer<BotOutgoingMessage> producer,
     WorkflowGraphParser workflowGraphParser,
     IWorkflowRepository workflowRepository,
     ISessionRepository sessionRepository,
@@ -24,14 +28,11 @@ public class MessageSender(
         var graph = workflowGraphParser.Parse(workflow.SchemaJson);
         var node = graph.GetNode(session!.CurrentNodeId!.Value);
 
-        var text = workflowTextRenderer.RenderNodeText(node, action.Session);
-
+        var messageKind = MessageKindMapper.FromNodeType(node.Type);
+        var text = WorkflowTextRenderer.RenderNodeText(node, action.Session, messageKind);
+        
         await producer.Produce(
-            new TelegramSendMessageEvent
-            {
-                ChatId = message.ExternalUserId,
-                Text = text
-            },
+            new BotOutgoingMessage(DefaultChannel.Telegram, message.ExternalUserId, text, messageKind),
             ct
         );
     }

@@ -1,6 +1,6 @@
 ﻿namespace Shared.Domain.Enums;
 
-public enum DefaultChannels
+public enum DefaultChannel
 {
     Telegram,
     Web,

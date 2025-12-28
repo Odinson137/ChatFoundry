@@ -1,6 +1,7 @@
 ﻿using MassTransit;
 using Shared.Application.Events;
 using Shared.Domain.Enums;
+using WorkflowService.Enums;
 using WorkflowService.Events;
 using WorkflowService.Interfaces;
 using WorkflowService.Utils;

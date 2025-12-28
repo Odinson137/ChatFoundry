@@ -11,7 +11,7 @@ public class Session : EntityBase
     public Workflow Workflow { get; set; } = null!;
 
     public string ClientId { get; set; } = null!;
-    public DefaultChannels Channel { get; set; }
+    public DefaultChannel Channel { get; set; }
 
     // Убрать потом TODO
     public Guid? CurrentNodeId { get; set; }

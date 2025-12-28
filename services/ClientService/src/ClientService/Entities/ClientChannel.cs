@@ -9,7 +9,7 @@ public class ClientChannel : EntityBase
     
     public Client Client { get; set; } = null!;
     
-    public DefaultChannels Channel { get; set; }
+    public DefaultChannel Channel { get; set; }
     
     public string ExternalUserId { get; set; } = null!;
     

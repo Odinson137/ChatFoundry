@@ -35,7 +35,7 @@ public class ClientChannelEntityConfiguration : BaseEntityTypeConfiguration<Clie
         builder.HasIndex(x => x.Email);
         
         builder.HasMany(x => x.Messages)
-            .WithOne(x => x.CreatedBy)
+            .WithOne(x => x.ClientChannel)
             .HasForeignKey(x => x.CreatedById)
             .OnDelete(DeleteBehavior.SetNull);
     }

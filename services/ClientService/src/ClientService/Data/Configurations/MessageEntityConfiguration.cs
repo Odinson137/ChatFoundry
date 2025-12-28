@@ -22,10 +22,7 @@ public class MessageEntityConfiguration : BaseEntityTypeConfiguration<Message>
             .IsRequired()
             .HasConversion<int>();
 
-        builder.HasIndex(x => x.InternalMessageId)
-            .IsUnique();
-
-        builder.HasOne(x => x.CreatedBy)
+        builder.HasOne(x => x.ClientChannel)
             .WithMany(x => x.Messages)
             .HasForeignKey(x => x.CreatedById)
             .OnDelete(DeleteBehavior.SetNull);

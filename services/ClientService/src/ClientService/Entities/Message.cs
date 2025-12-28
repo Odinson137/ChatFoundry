@@ -11,8 +11,8 @@ public class Message : EntityBase
     
     public MessageKind MessageKind { get; set; } = MessageKind.Text;
     
-    public string InternalMessageId { get; set; }
+    public string? InternalMessageId { get; set; }
     public Guid? CreatedById { get; set; }
     
-    public ClientChannel? CreatedBy { get; set; }
+    public ClientChannel? ClientChannel { get; set; }
 }

@@ -6,7 +6,7 @@ namespace ClientService.Interfaces;
 public interface IClientChannelRepository
 {
     Task<ClientChannel?> FindAsync(
-        DefaultChannels channel,
+        DefaultChannel channel,
         string externalUserId,
         CancellationToken ct = default);
 

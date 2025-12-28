@@ -48,7 +48,7 @@ public class TelegramHookController(ITopicProducer<BotIncomingMessage> producer,
             return new BotIncomingMessage(
                 botId,
                 update.CallbackQuery.From.Id.ToString(),
-                DefaultChannels.Telegram,
+                DefaultChannel.Telegram,
                 update.CallbackQuery.Data ?? "",
                 update.CallbackQuery.Id,
                 new Dictionary<MessageParameter, string>
@@ -95,7 +95,6 @@ public class TelegramHookController(ITopicProducer<BotIncomingMessage> producer,
             {
                 return $"https://api.telegram.org/file/bot{botToken}/{fileResponse.Result.FilePath}";
             }
-            
         }
         catch
         {
@@ -109,7 +108,7 @@ public class TelegramHookController(ITopicProducer<BotIncomingMessage> producer,
         string messageId)
     {
         return new BotIncomingMessage(
-            botId, chatId, DefaultChannels.Telegram, message.Text!, messageId,
+            botId, chatId, DefaultChannel.Telegram, message.Text!, messageId,
             new Dictionary<MessageParameter, string>
             {
                 [MessageParameter.FirstName] = message.From?.FirstName ?? "",
@@ -125,13 +124,13 @@ public class TelegramHookController(ITopicProducer<BotIncomingMessage> producer,
         var url = await GetFileUrlAsync(largePhoto.FileId, Token, token);
         
         return new BotIncomingMessage(
-            botId, chatId, DefaultChannels.Telegram, url ?? largePhoto.FileId, messageId,
+            botId, chatId, DefaultChannel.Telegram, url ?? largePhoto.FileId, messageId,
             new Dictionary<MessageParameter, string>
             {
                 [MessageParameter.FirstName] = message.From?.FirstName ?? "",
                 [MessageParameter.UserName] = message.From?.Username ?? ""
             },
-            MessageKind.Photo
+            MessageKind.Image
         );
     }
 
@@ -141,7 +140,7 @@ public class TelegramHookController(ITopicProducer<BotIncomingMessage> producer,
         var fileUrl = await GetFileUrlAsync(message.Sticker!.FileId, Token, token);
     
         return new BotIncomingMessage(
-            botId, chatId, DefaultChannels.Telegram, fileUrl ?? message.Sticker.FileId, messageId,
+            botId, chatId, DefaultChannel.Telegram, fileUrl ?? message.Sticker.FileId, messageId,
             new Dictionary<MessageParameter, string>
             {
                 [MessageParameter.FirstName] = message.From?.FirstName ?? "",
@@ -157,7 +156,7 @@ public class TelegramHookController(ITopicProducer<BotIncomingMessage> producer,
         var fileUrl = await GetFileUrlAsync(message.Document!.FileId, Token, token);
     
         return new BotIncomingMessage(
-            botId, chatId, DefaultChannels.Telegram, fileUrl ?? message.Document.FileId, messageId,
+            botId, chatId, DefaultChannel.Telegram, fileUrl ?? message.Document.FileId, messageId,
             new Dictionary<MessageParameter, string>
             {
                 [MessageParameter.FirstName] = message.From?.FirstName ?? "",
@@ -173,7 +172,7 @@ public class TelegramHookController(ITopicProducer<BotIncomingMessage> producer,
         var fileUrl = await GetFileUrlAsync(message.Voice!.FileId, Token, token);
     
         return new BotIncomingMessage(
-            botId, chatId, DefaultChannels.Telegram, fileUrl ?? message.Voice.FileId, messageId,
+            botId, chatId, DefaultChannel.Telegram, fileUrl ?? message.Voice.FileId, messageId,
             new Dictionary<MessageParameter, string>
             {
                 [MessageParameter.FirstName] = message.From?.FirstName ?? "",

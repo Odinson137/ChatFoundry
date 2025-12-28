@@ -61,7 +61,7 @@ namespace WorkflowService.IntegrationTests.Tests
             var incoming = new BotIncomingMessage(
                 botId,
                 ExternalUserId: "test-chat",
-                Channel: DefaultChannels.Telegram,
+                Channel: DefaultChannel.Telegram,
                 Payload: "hello",
                 MessageExternalId: "1",
                 new Dictionary<MessageParameter, string>
@@ -78,7 +78,7 @@ namespace WorkflowService.IntegrationTests.Tests
             var ackIncoming = new BotIncomingMessage(
                 botId,
                 ExternalUserId: "test-chat",
-                Channel: DefaultChannels.Telegram,
+                Channel: DefaultChannel.Telegram,
                 Payload: "order",
                 MessageExternalId: "2",
                 new Dictionary<MessageParameter, string>

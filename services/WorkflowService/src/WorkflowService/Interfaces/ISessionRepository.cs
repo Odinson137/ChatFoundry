@@ -6,7 +6,7 @@ namespace WorkflowService.Interfaces;
 public interface ISessionRepository
 {
     Task<Session?> FindActiveAsync(string clientId,
-        DefaultChannels channel,
+        DefaultChannel channel,
         CancellationToken ct);
 
     Task<Session?> GetAsync(Guid sessionId, CancellationToken ct = default);

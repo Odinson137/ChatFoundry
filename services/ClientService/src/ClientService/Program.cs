@@ -30,9 +30,11 @@ builder.Services.AddMassTransit(x =>
         cfg.ConfigureEndpoints(context);
     });
 
+    const string groupName = "client-service";
     x.AddRider(rider =>
     {
         rider.AddConsumer<BotIncomingMessageConsumer>();
+        rider.AddConsumer<BotOutgoingMessageConsumer>();
         
         rider.UsingKafka((context, cfg) =>
         {
@@ -40,11 +42,20 @@ builder.Services.AddMassTransit(x =>
 
             cfg.TopicEndpoint<BotIncomingMessage>(
                 "bot.message.incoming",
-                "client-service",
+                groupName,
                 e =>
                 {
                     e.CreateIfMissing();
                     e.ConfigureConsumer<BotIncomingMessageConsumer>(context);
+                });
+            
+            cfg.TopicEndpoint<BotOutgoingMessage>(
+                "bot.message.outgoing",
+                groupName,
+                e =>
+                {
+                    e.CreateIfMissing();
+                    e.ConfigureConsumer<BotOutgoingMessageConsumer>(context);
                 });
         });
     });

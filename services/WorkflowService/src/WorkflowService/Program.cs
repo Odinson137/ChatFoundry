@@ -67,9 +67,9 @@ services.AddMassTransit(x =>
         rider.AddConsumer<ActionCompletedConsumer>();
         
         rider.AddProducer<BotIncomingMessage>("bot.message.incoming");
+        rider.AddProducer<BotOutgoingMessage>("bot.message.outgoing");
         rider.AddProducer<ExecuteActionCommand>("workflow.action.execute");
         rider.AddProducer<ActionCompletedEvent>("workflow.action.completed");
-        rider.AddProducer<TelegramSendMessageEvent>("telegram.send-message");
         
         rider.UsingKafka((context, cfg) =>
         {

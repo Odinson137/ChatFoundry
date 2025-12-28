@@ -5,7 +5,7 @@ namespace Shared.Application.Events;
 public record BotIncomingMessage(
     Guid BotId, 
     string ExternalUserId, 
-    DefaultChannels Channel, 
+    DefaultChannel Channel, 
     string Payload,
     string MessageExternalId,
     IReadOnlyDictionary<MessageParameter, string> Parameters,

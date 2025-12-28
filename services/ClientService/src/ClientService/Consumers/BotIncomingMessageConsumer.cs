@@ -63,7 +63,7 @@ public class BotIncomingMessageConsumer(
             Direction = MessageDirection.Incoming,
             MessageKind = msg.MessageKind,
             Payload = msg.Payload,
-            CreatedBy = clientChannel,
+            ClientChannel = clientChannel,
             InternalMessageId = msg.MessageExternalId
         };
 

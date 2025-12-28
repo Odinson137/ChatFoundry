@@ -5,7 +5,7 @@ namespace WorkflowService.Interfaces;
 
 public interface IActionRepository
 {
-    Task<ActionEntity?> GetAsync(DefaultChannels channelId, string clientId, CancellationToken ct);
+    Task<ActionEntity?> GetAsync(DefaultChannel channelId, string clientId, CancellationToken ct);
     Task<ActionEntity?> GetAsync(Guid actionId, CancellationToken ct);
 
     Task AddAsync(ActionEntity action, CancellationToken ct = default);

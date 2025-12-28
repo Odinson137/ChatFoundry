@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WorkflowService.IntegrationTests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+78a080698738cb6368561cd8ea5fb2ab8b284e72")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+251a0da618e227e5927de62ad1aec85b23889a23")]
 [assembly: System.Reflection.AssemblyProductAttribute("WorkflowService.IntegrationTests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WorkflowService.IntegrationTests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

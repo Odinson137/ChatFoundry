@@ -1,5 +1,6 @@
 ﻿using Shared.Domain.Entities;
 using Shared.Domain.Enums;
+using WorkflowService.Enums;
 
 namespace WorkflowService.Entities;
 
@@ -24,13 +25,6 @@ public class ActionEntity : EntityBase
     {
         Status = ActionStatus.Completed;
     }
-    
-    public void MarkWaiting()
-    {
-        Status = ActionStatus.Waiting;
-    }
-
-    public bool IsWaiting => Status == ActionStatus.Waiting;
     
     public void MarkFailed()
     {

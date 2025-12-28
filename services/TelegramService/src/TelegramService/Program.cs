@@ -53,8 +53,8 @@ services.AddMassTransit(x =>
         {
             cfg.Host("localhost:9092");
 
-            cfg.TopicEndpoint<TelegramSendMessageEvent>(
-                "telegram.send-message",
+            cfg.TopicEndpoint<BotOutgoingMessage>(
+                "bot.message.outgoing",
                 "telegram-service",
                 e =>
                 {

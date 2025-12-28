@@ -1,4 +1,8 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Text;
+using System.Text.RegularExpressions;
+using Newtonsoft.Json;
+using Shared.Domain.Enums;
+using Shared.Domain.Models;
 using WorkflowService.Entities;
 using WorkflowService.Models.Node;
 using WorkflowService.Models.Workflow;
@@ -7,21 +11,48 @@ namespace WorkflowService.Utils;
 
 public partial class WorkflowTextRenderer
 {
-    private static readonly Regex VariableRegex =
-        MyRegex();
+    private static readonly Regex VariableRegex = MyRegex();
 
-    public string RenderNodeText(
+    public static string RenderNodeText(
         WorkflowNode node,
-        Session session)
+        Session session,
+        MessageKind messageKind)
     {
-        if (node.Data is not MessageNodeData message)
-            throw new InvalidOperationException(
-                $"Node {node.Id} does not contain message text");
+        BotMessagePayload messagePayload = messageKind switch
+        {
+            MessageKind.Text or MessageKind.Link or MessageKind.File or MessageKind.Image or MessageKind.Video
+                or MessageKind.Audio or MessageKind.Voice or MessageKind.Sticker => RenderMessagePayload(node, session),
+            MessageKind.Buttons => RenderButtonsPayload(node, session),
+            _ => throw new InvalidOperationException($"MessageKind '{messageKind}' is not supported by text renderer")
+        };
 
-        return RenderText(message.Text, session);
+        return JsonConvert.SerializeObject(messagePayload);
     }
 
-    public string RenderText(
+    private static MessagePayload RenderMessagePayload(WorkflowNode node, Session session)
+    {
+        if (node.Data is not MessageNodeData message)
+            throw new InvalidOperationException($"Node {node.Id} does not contain text data");
+
+        var text = RenderText(message.Text, session);
+        return new MessagePayload(text);
+    }
+
+    private static AskMessagePayload RenderButtonsPayload(WorkflowNode node, Session session)
+    {
+        if (node.Data is not AskNodeData ask)
+            throw new InvalidOperationException($"Node {node.Id} does not contain ask data");
+
+        var text = RenderText(ask.Text, session);
+        var buttons = ask.Ui?.Buttons.Select(b => new InlineButton(
+            RenderText(b.Text, session),
+            RenderText(b.Value, session)
+        )).ToList() ?? [];
+
+        return new AskMessagePayload(text, buttons);
+    }
+
+    public static string RenderText(
         string text,
         Session session)
     {
@@ -31,9 +62,7 @@ public partial class WorkflowTextRenderer
         return VariableRegex.Replace(text, match =>
         {
             var name = match.Groups["name"].Value;
-
             var value = session.GetVariable(name);
-
             return value ?? string.Empty;
         });
     }

@@ -1,5 +1,6 @@
 ﻿using MassTransit;
 using Shared.Application.Events;
+using Shared.Domain.Enums;
 using TelegramService.Interfaces;
 
 namespace TelegramService.Consumers;
@@ -8,20 +9,22 @@ public sealed class SendTelegramMessageConsumer(
     ITelegramClient telegramClient,
     ITopicProducer<ActionCompletedEvent> producer,
     ILogger<SendTelegramMessageConsumer> logger)
-    : IConsumer<TelegramSendMessageEvent>
+    : IConsumer<BotOutgoingMessage>
 {
-    public async Task Consume(ConsumeContext<TelegramSendMessageEvent> context)
+    public async Task Consume(ConsumeContext<BotOutgoingMessage> context)
     {
         var message = context.Message;
-        if (message == null || message.ChatId == null || message.Text == null) return;
+        if (message.Channel != DefaultChannel.Telegram) return;
+        
+        if (string.IsNullOrEmpty(message.Message)) return;
 
         logger.LogInformation(
             "Sending telegram message to {ChatId}",
-            message.ChatId);
+            message.ExternalUserId);
 
         await telegramClient.SendTextAsync(
-            message.ChatId,
-            message.Text,
+            message.ExternalUserId,
+            message.Message,
             context.CancellationToken);
         
     }

@@ -2,4 +2,4 @@
 
 namespace WorkflowService.Events;
 
-public record ExecuteActionCommand(Guid ActionId, string ExternalUserId, DefaultChannels Channel);
+public record ExecuteActionCommand(Guid ActionId, string ExternalUserId, DefaultChannel Channel);

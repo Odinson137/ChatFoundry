@@ -8,7 +8,7 @@ namespace WorkflowService.Repositories;
 
 public class ActionRepository(WorkflowDbContext db) : IActionRepository
 {
-    public async Task<ActionEntity?> GetAsync(DefaultChannels channel, string clientId, CancellationToken ct)
+    public async Task<ActionEntity?> GetAsync(DefaultChannel channel, string clientId, CancellationToken ct)
     {
         return await db.Actions
             .Include(c => c.Session)

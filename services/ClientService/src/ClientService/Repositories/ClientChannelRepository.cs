@@ -10,7 +10,7 @@ public class ClientChannelRepository(ClientDbContext db)
     : IClientChannelRepository
 {
     public Task<ClientChannel?> FindAsync(
-        DefaultChannels channel,
+        DefaultChannel channel,
         string externalUserId,
         CancellationToken ct = default)
     {

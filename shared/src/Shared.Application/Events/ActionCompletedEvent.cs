@@ -2,4 +2,4 @@
 
 namespace Shared.Application.Events;
 
-public record ActionCompletedEvent(DefaultChannels Channel, string ClientId);
+public record ActionCompletedEvent(DefaultChannel Channel, string ClientId);
