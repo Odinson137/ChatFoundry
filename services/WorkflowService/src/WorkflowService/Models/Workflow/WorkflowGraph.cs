@@ -1,5 +1,4 @@
-﻿using Shared.Domain.Enums;
-using WorkflowService.Entities;
+﻿using WorkflowService.Entities;
 using WorkflowService.Enums;
 using WorkflowService.Utils;
 

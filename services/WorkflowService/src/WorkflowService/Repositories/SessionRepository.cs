@@ -11,7 +11,8 @@ public class SessionRepository(WorkflowDbContext db) : ISessionRepository
     public Task<Session?> FindActiveAsync(string clientId, DefaultChannel channel, CancellationToken ct)
     {
         return db.Sessions.Include(c => c.Workflow)
-            .FirstOrDefaultAsync(c => c.ClientId == clientId && c.Channel == channel && c.Status == SessionStatus.Active, ct);
+            .FirstOrDefaultAsync(
+                c => c.ClientId == clientId && c.Channel == channel && c.Status == SessionStatus.Active, ct);
     }
 
     public async Task<Session?> GetAsync(Guid sessionId, CancellationToken ct = default)
@@ -28,5 +29,14 @@ public class SessionRepository(WorkflowDbContext db) : ISessionRepository
     public async Task SaveAsync(Session session, CancellationToken ct = default)
     {
         await db.SaveChangesAsync(ct);
+    }
+
+    public async Task<string?> GetBotTokenAsync(string clientId, CancellationToken cancellationToken)
+    {
+        return await db.Sessions.Where(c => c.ClientId == clientId)
+            .Select(c => c.Workflow)
+            .Select(c => c.Bot)
+            .Select(c => c.Token)
+            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
     }
 }

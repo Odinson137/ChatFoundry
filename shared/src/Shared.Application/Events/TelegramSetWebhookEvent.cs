@@ -1,6 +1,3 @@
 ﻿namespace Shared.Application.Events;
 
-public sealed class TelegramSetWebhookEvent
-{
-    public string Url { get; init; } = null!;
-}
+public sealed record TelegramSetWebhookEvent(Guid BotId, string Url);

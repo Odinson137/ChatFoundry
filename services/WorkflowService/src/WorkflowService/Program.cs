@@ -8,6 +8,7 @@ using WorkflowService.Actions.Factories;
 using WorkflowService.Consumers;
 using WorkflowService.Data;
 using WorkflowService.Events;
+using WorkflowService.Grpc;
 using WorkflowService.Interfaces;
 using WorkflowService.Repositories;
 using WorkflowService.Services;
@@ -32,6 +33,8 @@ builder.Services.AddAuthorization();
 services.AddScoped<IWorkflowRepository, WorkflowRepository>();
 services.AddScoped<IActionRepository, ActionRepository>();
 services.AddScoped<ISessionRepository, SessionRepository>();
+services.AddScoped<IBotRepository, BotRepository>();
+
 services.AddScoped<ISessionResolver, SessionResolver>();
 services.AddScoped<IActionFactory, ActionFactory>();
 
@@ -103,8 +106,12 @@ services.AddMassTransit(x =>
     });
 });
 
+builder.Services.AddGrpc();
+
+
 var app = builder.Build();
 
+app.MapGrpcService<BotTokenGrpcService>();
 
 app.MapControllers();
 

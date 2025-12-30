@@ -1,5 +1,4 @@
-﻿using Shared.Domain.Enums;
-using WorkflowService.Actions.Executors;
+﻿using WorkflowService.Actions.Executors;
 using WorkflowService.Enums;
 
 namespace WorkflowService.Actions.Factories;

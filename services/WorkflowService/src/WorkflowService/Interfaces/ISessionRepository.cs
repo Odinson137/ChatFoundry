@@ -14,4 +14,5 @@ public interface ISessionRepository
     Task AddAsync(Session session, CancellationToken ct = default);
 
     Task SaveAsync(Session session, CancellationToken ct = default);
+    Task<string?> GetBotTokenAsync(string clientId, CancellationToken cancellationToken);
 }

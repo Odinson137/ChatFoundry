@@ -54,6 +54,19 @@ services:
       - "5435:5432"
     volumes:
       - workflow_pgdata:/var/lib/postgresql/data
+        
+  telegram-db:
+    image: postgres:16
+    container_name: telegram_db
+    restart: always
+    environment:
+      POSTGRES_DB: foundry_db
+      POSTGRES_USER: foundry
+      POSTGRES_PASSWORD: foundry
+    ports:
+      - "5436:5432"
+    volumes:
+      - workflow_pgdata:/var/lib/postgresql/data
 
   redis:
     image: redis

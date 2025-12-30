@@ -5,7 +5,7 @@ namespace WorkflowService.Entities;
 public class WorkflowVersion : EntityBase
 {
     public Guid WorkflowId { get; set; }
-    public Workflow Workflow { get; set; } = null!;
+    public BotWorkflow Workflow { get; set; } = null!;
 
     public string SchemaJson { get; set; } = "{}";
 

@@ -34,7 +34,7 @@ public class BotOutgoingMessageConsumer(
         {
             Direction = MessageDirection.Outgoing,
             MessageKind = msg.MessageKind,
-            Payload = msg.Message,
+            Payload = msg.MessageJson,
             ClientChannel = clientChannel,
             InternalMessageId = context.CorrelationId.ToString() // kafka correlationId
         };

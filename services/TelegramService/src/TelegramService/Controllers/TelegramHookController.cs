@@ -1,27 +1,21 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using MassTransit;
+﻿using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Shared.Application.Events;
 using Shared.Domain.Enums;
+using TelegramService.Interfaces;
 using TelegramService.Models;
-using TelegramService.Services;
 
 namespace TelegramService.Controllers;
 
 [ApiController]
 [Route("telegramhook")]
-public class TelegramHookController(ITopicProducer<BotIncomingMessage> producer, ILogger<TelegramHookController> logger)
+public class TelegramHookController(
+    ITopicProducer<BotIncomingMessage> producer,
+    ILogger<TelegramHookController> logger,
+    ITelegramClient telegramClient)
     : ControllerBase
 {
-    private string Token => "8206298582:AAHqEA_ULOItaGXxi0rAJt9fxztRmDtee2c";
-    
-    [HttpGet("test")]
-    public IActionResult Test()
-    {
-        return Ok();
-    }
-
     [HttpPost("{BotId:guid}")]
     public async Task<IActionResult> ReceivedMessage([FromRoute] Guid botId, [FromBody] TelegramUpdateDto body,
         CancellationToken token)
@@ -79,31 +73,6 @@ public class TelegramHookController(ITopicProducer<BotIncomingMessage> producer,
             };
     }
 
-
-    private async Task<string?> GetFileUrlAsync(string fileId, string botToken, CancellationToken token)
-    {
-        try
-        {
-            var getFileUrl = $"https://api.telegram.org/bot{botToken}/getFile?file_id={Uri.EscapeDataString(fileId)}";
-        
-            using var client = new HttpClient();
-            var response = await client.GetStringAsync(getFileUrl, token);
-        
-            var fileResponse = JsonConvert.DeserializeObject<TelegramGetFileResponseDto>(response);
-        
-            if (fileResponse?.Ok == true && !string.IsNullOrEmpty(fileResponse.Result.FilePath))
-            {
-                return $"https://api.telegram.org/file/bot{botToken}/{fileResponse.Result.FilePath}";
-            }
-        }
-        catch
-        {
-            return null;
-        }
-
-        return null;
-    }
-    
     private BotIncomingMessage CreateTextMessage(Guid botId, TelegramMessageDto message, string chatId,
         string messageId)
     {
@@ -120,11 +89,12 @@ public class TelegramHookController(ITopicProducer<BotIncomingMessage> producer,
     private async Task<BotIncomingMessage> CreatePhotoMessage(Guid botId, TelegramMessageDto message, string chatId,
         string messageId, CancellationToken token)
     {
+        // берём самую качественную фотку
         var largePhoto = message.Photo!.OrderBy(c => c.FileSize).Last();
-        var url = await GetFileUrlAsync(largePhoto.FileId, Token, token);
-        
+        // var url = await telegramClient.GetFileAsync(largePhoto.FileId, token);
+
         return new BotIncomingMessage(
-            botId, chatId, DefaultChannel.Telegram, url ?? largePhoto.FileId, messageId,
+            botId, chatId, DefaultChannel.Telegram, largePhoto.FileId, messageId,
             new Dictionary<MessageParameter, string>
             {
                 [MessageParameter.FirstName] = message.From?.FirstName ?? "",
@@ -137,10 +107,10 @@ public class TelegramHookController(ITopicProducer<BotIncomingMessage> producer,
     private async Task<BotIncomingMessage> CreateStickerMessage(Guid botId, TelegramMessageDto message, string chatId,
         string messageId, CancellationToken token)
     {
-        var fileUrl = await GetFileUrlAsync(message.Sticker!.FileId, Token, token);
-    
+        // var fileUrl = await GetFileUrlAsync(message.Sticker!.FileId, Token, token);
+
         return new BotIncomingMessage(
-            botId, chatId, DefaultChannel.Telegram, fileUrl ?? message.Sticker.FileId, messageId,
+            botId, chatId, DefaultChannel.Telegram, message.Sticker!.FileId, messageId,
             new Dictionary<MessageParameter, string>
             {
                 [MessageParameter.FirstName] = message.From?.FirstName ?? "",
@@ -149,36 +119,36 @@ public class TelegramHookController(ITopicProducer<BotIncomingMessage> producer,
             MessageKind.Sticker
         );
     }
-    
+
     private async Task<BotIncomingMessage> CreateDocumentMessage(Guid botId, TelegramMessageDto message, string chatId,
         string messageId, CancellationToken token)
     {
-        var fileUrl = await GetFileUrlAsync(message.Document!.FileId, Token, token);
-    
+        //var fileUrl = await GetFileUrlAsync(message.Document!.FileId, Token, token);
+
         return new BotIncomingMessage(
-            botId, chatId, DefaultChannel.Telegram, fileUrl ?? message.Document.FileId, messageId,
+            botId, chatId, DefaultChannel.Telegram, message.Document!.FileId, messageId,
             new Dictionary<MessageParameter, string>
             {
                 [MessageParameter.FirstName] = message.From?.FirstName ?? "",
                 [MessageParameter.UserName] = message.From?.Username ?? ""
             },
-            MessageKind.File 
+            MessageKind.File
         );
     }
 
     private async Task<BotIncomingMessage> CreateVoiceMessage(Guid botId, TelegramMessageDto message, string chatId,
         string messageId, CancellationToken token)
     {
-        var fileUrl = await GetFileUrlAsync(message.Voice!.FileId, Token, token);
-    
+        //var fileUrl = await GetFileUrlAsync(message.Voice!.FileId, Token, token);
+
         return new BotIncomingMessage(
-            botId, chatId, DefaultChannel.Telegram, fileUrl ?? message.Voice.FileId, messageId,
+            botId, chatId, DefaultChannel.Telegram, message.Voice!.FileId, messageId,
             new Dictionary<MessageParameter, string>
             {
                 [MessageParameter.FirstName] = message.From?.FirstName ?? "",
                 [MessageParameter.UserName] = message.From?.Username ?? ""
             },
-            MessageKind.Voice 
+            MessageKind.Voice
         );
     }
 }

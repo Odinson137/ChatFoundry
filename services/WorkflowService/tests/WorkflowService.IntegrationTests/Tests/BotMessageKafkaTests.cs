@@ -37,7 +37,7 @@ namespace WorkflowService.IntegrationTests.Tests
 
             var botId = Guid.NewGuid();
 
-            var workflow = new Workflow
+            var workflow = new BotWorkflow
             {
                 Id = Guid.NewGuid(),
                 BotId = botId,

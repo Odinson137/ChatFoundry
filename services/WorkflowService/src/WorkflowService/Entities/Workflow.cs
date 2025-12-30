@@ -2,7 +2,7 @@
 
 namespace WorkflowService.Entities;
 
-public class Workflow : EntityBase
+public class BotWorkflow : EntityBase
 {
     public Guid BotId { get; set; }
     public Bot Bot { get; set; } = null!;
@@ -12,4 +12,6 @@ public class Workflow : EntityBase
     public int Version { get; set; } = 1;
     
     public bool IsActiveBotWorkflow { get; set; } = false;
+
+    public ICollection<Session> Sessions { get; set; } = [];
 }

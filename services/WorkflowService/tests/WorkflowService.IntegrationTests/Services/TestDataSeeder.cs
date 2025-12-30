@@ -10,7 +10,7 @@ public static class TestDataSeeder
     {
         var workflowRepo = services.GetRequiredService<IWorkflowRepository>();
 
-        await workflowRepo.SaveAsync(new Workflow
+        await workflowRepo.SaveAsync(new BotWorkflow
         {
             Bot = new Bot { Name = "Test" },
             Version = 1,

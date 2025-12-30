@@ -6,6 +6,7 @@ using Shared.Application.Events;
 using TelegramService.Consumers;
 using TelegramService.Interfaces;
 using TelegramService.Services;
+using Workflow.Grpc;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -13,6 +14,8 @@ var services = builder.Services;
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 services.AddScoped<ITelegramClient, TelegramClient>();
+services.AddScoped<IBotTokenProvider, GrpcBotTokenProvider>();
+
 services.AddLogging();
 
 builder.Services.AddControllers()
@@ -73,6 +76,12 @@ services.AddMassTransit(x =>
         });
     });
 });
+
+builder.Services.AddGrpcClient<BotTokenService.BotTokenServiceClient>(o =>
+{
+    o.Address = new Uri("http://workflow-service:5001");
+});
+
 
 var app = builder.Build();
 

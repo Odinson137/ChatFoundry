@@ -12,7 +12,7 @@ public class WorkflowDbContext : DbContext
     }
     
     public DbSet<Bot> Bots => Set<Bot>();
-    public DbSet<Workflow> Workflows => Set<Workflow>();
+    public DbSet<BotWorkflow> Workflows => Set<BotWorkflow>();
     public DbSet<ActionEntity> Actions => Set<ActionEntity>();
     public DbSet<Session> Sessions => Set<Session>();
 }

@@ -5,9 +5,9 @@ using WorkflowService.Entities;
 
 namespace WorkflowService.Data.Configurations;
 
-public class WorkflowConfiguration : BaseEntityTypeConfiguration<Workflow>
+public class WorkflowConfiguration : BaseEntityTypeConfiguration<BotWorkflow>
 {
-    public override void Configure(EntityTypeBuilder<Workflow> builder)
+    public override void Configure(EntityTypeBuilder<BotWorkflow> builder)
     {
         base.Configure(builder);
 

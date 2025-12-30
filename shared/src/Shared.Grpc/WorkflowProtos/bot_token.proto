@@ -1,0 +1,22 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Workflow.Grpc";
+
+package workflow;
+
+service BotTokenService {
+  rpc GetTokenByChatId (GetTokenByClientIdRequest) returns (GetTokenResponse);
+  rpc GetTokenByBotId  (GetTokenByBotIdRequest)  returns (GetTokenResponse);
+}
+
+message GetTokenByClientIdRequest {
+  string client_id = 1;
+}
+
+message GetTokenByBotIdRequest {
+  string bot_id = 1;
+}
+
+message GetTokenResponse {
+  string token = 1;
+}

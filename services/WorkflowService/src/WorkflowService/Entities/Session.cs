@@ -8,7 +8,7 @@ namespace WorkflowService.Entities;
 public class Session : EntityBase
 {
     public Guid WorkflowId { get; set; }
-    public Workflow Workflow { get; set; } = null!;
+    public BotWorkflow Workflow { get; set; } = null!;
 
     public string ClientId { get; set; } = null!;
     public DefaultChannel Channel { get; set; }

@@ -17,8 +17,7 @@ public sealed class SetTelegramWebhookConsumer(
             "Setting telegram webhook: {Url}",
             webhook);
 
-        await telegramClient.SetWebhookAsync(
-            webhook,
+        await telegramClient.SetWebhookAsync(context.Message.BotId, webhook,
             context.CancellationToken);
     }
 }

@@ -2,4 +2,8 @@
 
 namespace Shared.Application.Events;
 
-public record BotOutgoingMessage(DefaultChannel Channel, string ExternalUserId, string Message, MessageKind MessageKind);
+public record BotOutgoingMessage(
+    DefaultChannel Channel,
+    string ExternalUserId,
+    string MessageJson,
+    MessageKind MessageKind);

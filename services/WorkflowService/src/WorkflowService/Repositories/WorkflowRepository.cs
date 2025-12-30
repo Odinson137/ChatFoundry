@@ -7,7 +7,7 @@ namespace WorkflowService.Repositories;
 
 public class WorkflowRepository(WorkflowDbContext db) : IWorkflowRepository
 {
-    public async Task<Workflow?> GetActiveWorkflowAsync(Guid botId, CancellationToken ct)
+    public async Task<BotWorkflow?> GetActiveWorkflowAsync(Guid botId, CancellationToken ct)
     {
         return await db.Workflows
             .Where(x => x.BotId == botId)
@@ -15,12 +15,12 @@ public class WorkflowRepository(WorkflowDbContext db) : IWorkflowRepository
             .FirstOrDefaultAsync(cancellationToken: ct);
     }
 
-    public async Task<Workflow?> GetByIdAsync(Guid id)
+    public async Task<BotWorkflow?> GetByIdAsync(Guid id)
     {
         return await db.Workflows.FirstOrDefaultAsync(x => x.Id == id);
     }
 
-    public async Task SaveAsync(Workflow workflow)
+    public async Task SaveAsync(BotWorkflow workflow)
     {
         if (db.Entry(workflow).State == EntityState.Detached)
             db.Workflows.Add(workflow);
@@ -28,7 +28,7 @@ public class WorkflowRepository(WorkflowDbContext db) : IWorkflowRepository
         await db.SaveChangesAsync();
     }
 
-    public async Task<Workflow?> GetActionWorkflowAsync(Guid actionId)
+    public async Task<BotWorkflow?> GetActionWorkflowAsync(Guid actionId)
     {
         return await db.Actions.Where(c => c.Id == actionId).Select(x => x.Session.Workflow).FirstOrDefaultAsync();
     }
