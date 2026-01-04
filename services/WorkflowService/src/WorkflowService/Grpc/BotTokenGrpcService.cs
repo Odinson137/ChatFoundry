@@ -16,7 +16,7 @@ public sealed class BotTokenGrpcService : BotTokenService.BotTokenServiceBase
     }
 
     public override async Task<GetTokenResponse> GetTokenByChatId(
-        GetTokenByChatIdRequest request,
+        GetTokenByClientIdRequest request,
         ServerCallContext context)
     {
         var token = await _sessionRepository.GetBotTokenAsync(

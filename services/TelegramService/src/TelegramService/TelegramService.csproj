@@ -8,12 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Content Include="..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
-    </ItemGroup>
-
-    <ItemGroup>
         <ProjectReference Include="..\..\..\..\shared\src\Shared.Application\Shared.Application.csproj" />
         <ProjectReference Include="..\..\..\..\shared\src\Shared.Domain\Shared.Domain.csproj" />
         <ProjectReference Include="..\..\..\..\shared\src\Shared.Grpc\Shared.Grpc.csproj" />
@@ -22,5 +16,11 @@
 
     <ItemGroup>
       <PackageReference Include="Telegram.Bot" Version="22.7.6" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\..\..\..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
     </ItemGroup>
 </Project>

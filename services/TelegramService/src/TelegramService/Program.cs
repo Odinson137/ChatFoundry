@@ -32,9 +32,10 @@ builder.Services.AddControllers()
         settings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
     });
 
+var kafkaConnectionString = builder.Configuration.GetConnectionString("Kafka");
 builder.Services.AddSingleton(new AdminClientConfig
 {
-    BootstrapServers = "localhost:9092"
+    BootstrapServers = kafkaConnectionString
 });
 
 services.AddMassTransit(x =>
@@ -54,7 +55,7 @@ services.AddMassTransit(x =>
 
         rider.UsingKafka((context, cfg) =>
         {
-            cfg.Host("localhost:9092");
+            cfg.Host(kafkaConnectionString);
 
             cfg.TopicEndpoint<BotOutgoingMessage>(
                 "bot.message.outgoing",

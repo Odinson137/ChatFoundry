@@ -7,10 +7,14 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["TelegramService/TelegramService.csproj", "TelegramService/"]
-RUN dotnet restore "TelegramService/TelegramService.csproj"
+COPY ["services/TelegramService/src/TelegramService/TelegramService.csproj", "services/TelegramService/src/TelegramService/"]
+COPY ["shared/src/Shared.Infrastructure/Shared.Infrastructure.csproj", "shared/src/Shared.Infrastructure/"]
+COPY ["shared/src/Shared.Application/Shared.Application.csproj", "shared/src/Shared.Application/"]
+COPY ["shared/src/Shared.Domain/Shared.Domain.csproj", "shared/src/Shared.Domain/"]
+COPY ["shared/src/Shared.Grpc/Shared.Grpc.csproj", "shared/src/Shared.Grpc/"]
+RUN dotnet restore "services/TelegramService/src/TelegramService/TelegramService.csproj"
 COPY . .
-WORKDIR "/src/TelegramService"
+WORKDIR "/src/services/TelegramService/src/TelegramService"
 RUN dotnet build "./TelegramService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish

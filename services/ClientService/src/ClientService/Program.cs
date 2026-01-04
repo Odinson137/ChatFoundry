@@ -18,9 +18,11 @@ builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
 builder.Services.AddPostgreSql<ClientDbContext>(builder.Configuration);
 
+var kafkaConnectionString = builder.Configuration.GetConnectionString("Kafka");
+
 builder.Services.AddSingleton(new AdminClientConfig
 {
-    BootstrapServers = "localhost:9092"
+    BootstrapServers = kafkaConnectionString
 });
 
 builder.Services.AddMassTransit(x =>
@@ -38,7 +40,7 @@ builder.Services.AddMassTransit(x =>
         
         rider.UsingKafka((context, cfg) =>
         {
-            cfg.Host("localhost:9092");
+            cfg.Host(kafkaConnectionString);
 
             cfg.TopicEndpoint<BotIncomingMessage>(
                 "bot.message.incoming",

@@ -9,7 +9,7 @@ public sealed class GrpcBotTokenProvider(BotTokenService.BotTokenServiceClient c
     public async Task<string> GetByChatIdAsync(string clientId, CancellationToken ct)
     {
         var response = await client.GetTokenByChatIdAsync(
-            new GetTokenByChatIdRequest { ClientId = clientId },
+            new GetTokenByClientIdRequest { ClientId = clientId },
             cancellationToken: ct);
 
         return response.Token;
