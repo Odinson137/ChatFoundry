@@ -3,31 +3,46 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-//builder.Services.AddOpenApi();
-
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(opt =>
+    .AddJwtBearer(options =>
     {
-        opt.Authority = "http://identity:8080"; // docker service name
-        opt.Audience = "workflow";
-        opt.RequireHttpsMetadata = false;
+        options.Authority = "http://identity-service:8080";
+        options.Audience = "gateway";
+        options.RequireHttpsMetadata = false;
 
-        opt.TokenValidationParameters = new TokenValidationParameters
+        options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidateLifetime = true
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true
         };
     });
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("workflow-scope", policy =>
+    options.AddPolicy("workflow", p =>
     {
-        policy.RequireAuthenticatedUser();
-        policy.RequireClaim("scope", "workflow");
+        p.RequireAuthenticatedUser();
+        p.RequireClaim("scope", "workflow");
+    });
+
+    options.AddPolicy("client", p =>
+    {
+        p.RequireAuthenticatedUser();
+        p.RequireClaim("scope", "client");
+    });
+
+    options.AddPolicy("telegram", p =>
+    {
+        p.RequireAuthenticatedUser();
+        p.RequireClaim("scope", "telegram");
+    });
+
+    options.AddPolicy("identity", p =>
+    {
+        p.RequireAuthenticatedUser();
+        p.RequireClaim("scope", "identity");
     });
 });
 
@@ -37,19 +52,10 @@ builder.Services
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    //app.MapOpenApi();
-}
-
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapReverseProxy();
 
-app.UseHttpsRedirection();
-
 app.Run();
-

@@ -2,6 +2,7 @@ using IdentityServer.Data;
 using IdentityServer.Entities;
 using Microsoft.AspNetCore.Identity;
 using OpenIddict.Abstractions;
+using OpenIddict.Server;
 using Shared.Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,12 +37,26 @@ services.AddOpenIddict()
         options.AllowClientCredentialsFlow();
         
         //options.AcceptAnonymousClients(); // demo only
-        options.RegisterScopes("workflow");
+        options.RegisterScopes(
+            "workflow",
+            "client",
+            "telegram",
+            "identity"
+        );
         
         options.AddDevelopmentEncryptionCertificate()
             .AddDevelopmentSigningCertificate();
 
         options.UseAspNetCore().EnableTokenEndpointPassthrough();
+        
+        options.AddEventHandler<OpenIddictServerEvents.ProcessSignInContext>(builder =>
+        {
+            builder.UseInlineHandler(context =>
+            {
+                context.Principal!.SetAudiences("gateway");
+                return default;
+            });
+        });
     });
 
 
@@ -77,6 +92,9 @@ using (var scope = app.Services.CreateScope())
                 OpenIddictConstants.Permissions.GrantTypes.Password,
                 OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
                 OpenIddictConstants.Permissions.Prefixes.Scope + "workflow",
+                OpenIddictConstants.Permissions.Prefixes.Scope + "client",
+                OpenIddictConstants.Permissions.Prefixes.Scope + "telegram",
+                OpenIddictConstants.Permissions.Prefixes.Scope + "identity",
                 OpenIddictConstants.Permissions.Prefixes.Scope + "offline_access",
 
                 OpenIddictConstants.Permissions.ResponseTypes.Token,

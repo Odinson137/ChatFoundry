@@ -1,33 +1,25 @@
 ﻿version: '3.9'
 services:
-  identity-db:
-    image: postgres:16
-    restart: always
-    container_name: identity_db
-    environment:
-      POSTGRES_USER: foundry
-      POSTGRES_PASSWORD: foundry
-      POSTGRES_DB: foundry_db
+  gateway-service:
+    container_name: gateway_service
+    build:
+      context: .
+      dockerfile: ../services/Gateway/src/Gateway/Dockerfile
     ports:
-      - "5434:5432"
-    volumes:
-      - identitydata:/var/lib/postgresql/data
+      - "5000:8080"
+    depends_on:
+      - redis
   
-#  workflow-service:
-#    container_name: workflow_service
-#    build:
-#      context: .
-#      dockerfile: ./src/WorkflowService.Api/Dockerfile
-#    ports:
-#      - "5000:8080"
-#    depends_on:
-#      - workflow-db
-#      - redis
-#    environment:
-#      ASPNETCORE_ENVIRONMENT: "Development"
-#      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5433;Username=workflow;Password=workflow;Database=workflowdb"
-#      CacheSettings__Host: "redis"
-#      CacheSettings__Port: "6379"
+  workflow-service:
+    container_name: workflow_service
+    build:
+      context: .
+      dockerfile: ../services/WorkflowService/src/WorkflowService/Dockerfile
+    ports:
+      - "5010:8080"
+    depends_on:
+      - workflow-db
+      - redis
   
   workflow-db:
     image: postgres:16
@@ -41,7 +33,42 @@ services:
       - "5433:5432"
     volumes:
       - workflow_pgdata:/var/lib/postgresql/data
+     
+  identity-service:
+    container_name: identity_service
+    build:
+      context: .
+      dockerfile: ../services/IdentityServer/src/IdentityServer/Dockerfile
+    ports:
+      - "5020:8080"
+    depends_on:
+      - workflow-db
+      - redis
+
+  identity-db:
+    image: postgres:16
+    restart: always
+    container_name: identity_db
+    environment:
+      POSTGRES_USER: foundry
+      POSTGRES_PASSWORD: foundry
+      POSTGRES_DB: foundry_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - identitydata:/var/lib/postgresql/data
         
+  client-service:
+    container_name: client_service
+    build:
+      context: .
+      dockerfile: ../services/ClientService/src/ClientService/Dockerfile
+    ports:
+      - "5030:8080"
+    depends_on:
+      - workflow-db
+      - redis
+
   client-db:
     image: postgres:16
     container_name: client_db
@@ -53,8 +80,19 @@ services:
     ports:
       - "5435:5432"
     volumes:
-      - workflow_pgdata:/var/lib/postgresql/data
-        
+      - client_pgdata:/var/lib/postgresql/data
+  
+  telegram-service:
+    container_name: telegram_service
+    build:
+      context: .
+      dockerfile: ../services/TelegramService/src/TelegramService/Dockerfile
+    ports:
+      - "5040:8080"
+    depends_on:
+      - client-db
+      - redis
+  
   telegram-db:
     image: postgres:16
     container_name: telegram_db
@@ -67,16 +105,16 @@ services:
       - "5436:5432"
     volumes:
       - workflow_pgdata:/var/lib/postgresql/data
-
+      
   redis:
     image: redis
-    container_name: workflow-redis
+    container_name: redis
     restart: always
     ports:
       - "6380:6379"
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
-      - workflow_redis:/data
+      - redis:/data
         
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
@@ -110,4 +148,5 @@ services:
 volumes:
   identitydata:
   workflow_pgdata:
-  workflow_redis:
+  client_pgdata:
+  redis:

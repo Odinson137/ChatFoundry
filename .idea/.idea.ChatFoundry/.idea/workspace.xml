@@ -54,21 +54,30 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a15b5d9a-05b2-4a37-b1f5-4840a0f64271" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ChatFoundry/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ChatFoundry/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/bin/Debug/net10.0/appsettings.Development.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/bin/Debug/net10.0/appsettings.Development.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/bin/Debug/net10.0/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/bin/Debug/net10.0/appsettings.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.AssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.sourcelink.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/rpswa.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/rpswa.dswa.cache.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/Gateway/src/Gateway/appsettings.Development.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/Gateway/src/Gateway/appsettings.Development.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/Gateway/src/Gateway/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/Gateway/src/Gateway/appsettings.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/Debug/net10.0/Gateway.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/Debug/net10.0/Gateway.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/IdentityServer.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/IdentityServer.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Services/BotTokenProvider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Services/BotTokenProvider.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/rider.project.model.nuget.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Grpc/BotTokenGrpcService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Grpc/BotTokenGrpcService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/WorkflowService.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/WorkflowService.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/rider.project.model.nuget.info" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/Debug/net10.0/WorkflowService.IntegrationTests.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/Debug/net10.0/WorkflowService.IntegrationTests.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/rider.project.model.nuget.info" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/Shared.Application/obj/Debug/net10.0/Shared.Application.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Application/obj/Debug/net10.0/Shared.Application.AssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Application/obj/Debug/net10.0/Shared.Application.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Application/obj/Debug/net10.0/Shared.Application.sourcelink.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/Shared.Domain/obj/Debug/net10.0/Shared.Domain.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Domain/obj/Debug/net10.0/Shared.Domain.AssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Domain/obj/Debug/net10.0/Shared.Domain.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Domain/obj/Debug/net10.0/Shared.Domain.sourcelink.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Grpc/obj/Debug/net10.0/Shared.Grpc.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Grpc/obj/Debug/net10.0/Shared.Grpc.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.AssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.sourcelink.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -158,43 +167,39 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET Launch Settings Profile.ClientService: https.executor&quot;: &quot;Debug&quot;,
-    &quot;.NET Launch Settings Profile.IdentityServer: https.executor&quot;: &quot;Debug&quot;,
-    &quot;.NET Launch Settings Profile.TelegramService: http.executor&quot;: &quot;Debug&quot;,
-    &quot;.NET Launch Settings Profile.TelegramService: https.executor&quot;: &quot;Debug&quot;,
-    &quot;.NET Launch Settings Profile.WorkflowService: http.executor&quot;: &quot;Debug&quot;,
-    &quot;Docker.deployment.client-db: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.deployment.kafka-ui: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.deployment.kafka: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.deployment: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;HTTP Request.All in whats-new.executor&quot;: &quot;Run&quot;,
-    &quot;HTTP Request.generated-requests | #1.executor&quot;: &quot;Run&quot;,
-    &quot;HTTP Request.whats-new | Set global header.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;XThreadsFramesViewSplitterKey&quot;: &quot;0.4485437&quot;,
-    &quot;deletionFromPopupRequiresConfirmation&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;rest.client.default.execution.environment&quot;: &quot;test&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET Launch Settings Profile.ClientService: https.executor": "Debug",
+    ".NET Launch Settings Profile.IdentityServer: https.executor": "Debug",
+    ".NET Launch Settings Profile.TelegramService: http.executor": "Debug",
+    ".NET Launch Settings Profile.TelegramService: https.executor": "Debug",
+    ".NET Launch Settings Profile.WorkflowService: http.executor": "Debug",
+    "Docker.deployment.client-db: Compose Deployment.executor": "Run",
+    "Docker.deployment.kafka-ui: Compose Deployment.executor": "Run",
+    "Docker.deployment.kafka: Compose Deployment.executor": "Run",
+    "Docker.deployment.workflow-db: Compose Deployment.executor": "Run",
+    "Docker.deployment.workflow-service: Compose Deployment.executor": "Run",
+    "Docker.deployment: Compose Deployment.executor": "Run",
+    "HTTP Request.All in whats-new.executor": "Run",
+    "HTTP Request.generated-requests | #1.executor": "Run",
+    "HTTP Request.whats-new | Set global header.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "XThreadsFramesViewSplitterKey": "0.4485437",
+    "deletionFromPopupRequiresConfirmation": "false",
+    "git-widget-placeholder": "main",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "rest.client.default.execution.environment": "test",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
-  <component name="RunManager" selected=".NET Launch Settings Profile.TelegramService: https">
+}]]></component>
+  <component name="RunManager" selected="Docker.deployment.workflow-service: Compose Deployment">
     <configuration name="All in whats-new" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" path="$USER_HOME$/AppData/Local/Temp/whats-new-dir/whats-new.http">
-      <method v="2" />
-    </configuration>
-    <configuration name="generated-requests | #1" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" executionIdentifier="#1" runType="Run single request">
-      <method v="2" />
-    </configuration>
-    <configuration name="whats-new | Set global header" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$USER_HOME$/AppData/Local/Temp/whats-new-dir/whats-new.http" executionIdentifier="Set global header" runType="Run single request">
       <method v="2" />
     </configuration>
     <configuration name="ClientHubService: http" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
@@ -458,12 +463,54 @@
       <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />
       <method v="2" />
     </configuration>
+    <configuration name="IdentityServer/Dockerfile" type="docker-deploy" factoryName="dockerfile" server-name="Docker">
+      <deployment type="dockerfile">
+        <settings>
+          <option name="imageTag" value="identityserver" />
+          <option name="containerName" value="identityserver" />
+          <option name="contextFolderPath" value="C:\Users\buryy\RiderProjects\ChatFoundry" />
+          <option name="portBindings">
+            <list>
+              <DockerPortBindingImpl>
+                <option name="containerPort" value="8080" />
+                <option name="hostIp" value="127.0.0.1" />
+                <option name="hostPort" value="8080" />
+              </DockerPortBindingImpl>
+            </list>
+          </option>
+          <option name="sourceFilePath" value="services/IdentityServer/src/IdentityServer/Dockerfile" />
+        </settings>
+      </deployment>
+      <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />
+      <method v="2" />
+    </configuration>
     <configuration name="TelegramService/Dockerfile" type="docker-deploy" factoryName="dockerfile" server-name="Docker">
       <deployment type="dockerfile">
         <settings>
           <option name="containerName" value="telegramservice" />
           <option name="contextFolderPath" value="C:\Users\buryy\RiderProjects\ChatFoundry" />
           <option name="sourceFilePath" value="services/TelegramService/src/TelegramService/Dockerfile" />
+        </settings>
+      </deployment>
+      <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />
+      <method v="2" />
+    </configuration>
+    <configuration name="WorkflowService/Dockerfile" type="docker-deploy" factoryName="dockerfile" server-name="Docker">
+      <deployment type="dockerfile">
+        <settings>
+          <option name="imageTag" value="workflowservice" />
+          <option name="containerName" value="workflowservice" />
+          <option name="contextFolderPath" value="C:\Users\buryy\RiderProjects\ChatFoundry" />
+          <option name="portBindings">
+            <list>
+              <DockerPortBindingImpl>
+                <option name="containerPort" value="8080" />
+                <option name="hostIp" value="127.0.0.1" />
+                <option name="hostPort" value="8080" />
+              </DockerPortBindingImpl>
+            </list>
+          </option>
+          <option name="sourceFilePath" value="services/WorkflowService/src/WorkflowService/Dockerfile" />
         </settings>
       </deployment>
       <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />
@@ -486,20 +533,46 @@
     <configuration name="deployment: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
       <deployment type="docker-compose.yml">
         <settings>
-          <option name="envFilePath" value="" />
-          <option name="commandLineOptions" value="--build" />
           <option name="sourceFilePath" value="deployment/docker-compose.yml" />
         </settings>
       </deployment>
       <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />
       <method v="2" />
     </configuration>
-    <configuration name="deployment.kafka: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+    <configuration name="deployment.client-db: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
       <deployment type="docker-compose.yml">
         <settings>
           <option name="services">
             <list>
-              <option value="kafka" />
+              <option value="client-db" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="deployment/docker-compose.yml" />
+        </settings>
+      </deployment>
+      <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />
+      <method v="2" />
+    </configuration>
+    <configuration name="deployment.workflow-db: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="services">
+            <list>
+              <option value="workflow-db" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="deployment/docker-compose.yml" />
+        </settings>
+      </deployment>
+      <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />
+      <method v="2" />
+    </configuration>
+    <configuration name="deployment.workflow-service: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="services">
+            <list>
+              <option value="workflow-service" />
             </list>
           </option>
           <option name="sourceFilePath" value="deployment/docker-compose.yml" />
@@ -520,6 +593,8 @@
       <item itemvalue=".NET Launch Settings Profile.Gateway: https" />
       <item itemvalue=".NET Launch Settings Profile.GatewayServer: http" />
       <item itemvalue=".NET Launch Settings Profile.GatewayServer: https" />
+      <item itemvalue="Docker.IdentityServer/Dockerfile" />
+      <item itemvalue="Docker.WorkflowService/Dockerfile" />
       <item itemvalue="Docker.ClientHubService/Dockerfile" />
       <item itemvalue="Docker.ClientHubService/Dockerfile (1)" />
       <item itemvalue="Docker.ClientService/Dockerfile" />
@@ -527,19 +602,19 @@
       <item itemvalue="Docker.ClientHub/Dockerfile" />
       <item itemvalue="Docker.Gateway/Dockerfile" />
       <item itemvalue="Docker.GatewayServer/Dockerfile" />
-      <item itemvalue="Docker.deployment.kafka: Compose Deployment" />
+      <item itemvalue="Docker.deployment.client-db: Compose Deployment" />
+      <item itemvalue="Docker.deployment.workflow-db: Compose Deployment" />
+      <item itemvalue="Docker.deployment.workflow-service: Compose Deployment" />
       <item itemvalue="Docker.deployment: Compose Deployment" />
       <item itemvalue="HTTP Request.All in whats-new" />
-      <item itemvalue="HTTP Request.generated-requests | #1" />
-      <item itemvalue="HTTP Request.whats-new | Set global header" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="HTTP Request.All in whats-new" />
-        <item itemvalue="HTTP Request.whats-new | Set global header" />
-        <item itemvalue="HTTP Request.generated-requests | #1" />
+        <item itemvalue="Docker.deployment.workflow-service: Compose Deployment" />
+        <item itemvalue="Docker.deployment.workflow-db: Compose Deployment" />
         <item itemvalue="Docker.deployment: Compose Deployment" />
-        <item itemvalue="Docker.deployment.kafka: Compose Deployment" />
+        <item itemvalue="Docker.deployment.client-db: Compose Deployment" />
+        <item itemvalue="HTTP Request.All in whats-new" />
       </list>
     </recent_temporary>
   </component>
@@ -591,6 +666,8 @@
       <workItem from="1766938200719" duration="5842000" />
       <workItem from="1767114366717" duration="4128000" />
       <workItem from="1767272229534" duration="1430000" />
+      <workItem from="1767555007699" duration="782000" />
+      <workItem from="1767713325270" duration="1372000" />
     </task>
     <task id="LOCAL-00005" summary="add registration, receiving bearer token, refreshing token">
       <option name="closed" value="true" />
@@ -648,7 +725,15 @@
       <option name="project" value="LOCAL" />
       <updated>1767118513783</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="add docker services files, add grpc">
+      <option name="closed" value="true" />
+      <created>1767555534586</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1767555534586</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -679,7 +764,8 @@
     <MESSAGE value="add telegram different type message realization, update client service" />
     <MESSAGE value="refactoring, add outgoing consumer in client service, add outgoing type message support" />
     <MESSAGE value="add gRPC" />
-    <option name="LAST_COMMIT_MESSAGE" value="add gRPC" />
+    <MESSAGE value="add docker services files, add grpc" />
+    <option name="LAST_COMMIT_MESSAGE" value="add docker services files, add grpc" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
