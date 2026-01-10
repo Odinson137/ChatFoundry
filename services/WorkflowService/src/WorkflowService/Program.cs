@@ -1,6 +1,9 @@
 using Confluent.Kafka;
+using HotChocolate.AspNetCore;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Shared.Application.Events;
 using Shared.Infrastructure.DependencyInjection;
 using WorkflowService.Actions.Executors;
@@ -8,6 +11,8 @@ using WorkflowService.Actions.Factories;
 using WorkflowService.Consumers;
 using WorkflowService.Data;
 using WorkflowService.Events;
+using WorkflowService.GraphQL;
+using WorkflowService.GraphQL.Mutations;
 using WorkflowService.Grpc;
 using WorkflowService.Interfaces;
 using WorkflowService.Repositories;
@@ -20,15 +25,22 @@ var services = builder.Services;
 services.AddControllers();
 services.AddEndpointsApiExplorer();
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(opt =>
-    {
-        opt.Authority = "http://identity:8080";
-        opt.Audience = "workflow";
-        opt.RequireHttpsMetadata = false;
-    });
+builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = "http://identity-service:8080";
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = "http://identity-service:8080/",
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true
+        };
+    });
 
 services.AddScoped<IWorkflowRepository, WorkflowRepository>();
 services.AddScoped<IActionRepository, ActionRepository>();
@@ -51,9 +63,10 @@ services.AddScoped<WorkflowTextRenderer>();
 
 services.AddPostgreSql<WorkflowDbContext>(builder.Configuration);
 
-services.AddSingleton(new AdminClientConfig
+var kafkaConnectionString = builder.Configuration.GetConnectionString("Kafka");
+builder.Services.AddSingleton(new AdminClientConfig
 {
-    BootstrapServers = "localhost:9092"
+    BootstrapServers = kafkaConnectionString
 });
 
 services.AddMassTransit(x =>
@@ -76,7 +89,7 @@ services.AddMassTransit(x =>
         
         rider.UsingKafka((context, cfg) =>
         {
-            cfg.Host("localhost:9092");
+            cfg.Host(kafkaConnectionString);
 
             cfg.TopicEndpoint<BotIncomingMessage>(
                 "bot.message.incoming",
@@ -108,6 +121,13 @@ services.AddMassTransit(x =>
 
 builder.Services.AddGrpc();
 
+builder.Services
+    .AddGraphQLServer()
+    .AddQueryType<Query>()
+    .AddMutationType<BotMutation>()
+    .AddProjections() 
+    .AddFiltering()
+    .AddSorting();
 
 var app = builder.Build();
 
@@ -123,5 +143,7 @@ app.MapGet("/", () => "Workflow Service is running");
 
 app.MapGet("/run", () => "Workflow executed")
     .RequireAuthorization();
+
+app.MapGraphQL();
 
 app.Run();

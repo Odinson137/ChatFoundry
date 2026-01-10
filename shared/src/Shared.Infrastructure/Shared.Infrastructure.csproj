@@ -7,6 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="HotChocolate.Abstractions" Version="15.1.11" />
+        <PackageReference Include="HotChocolate.AspNetCore" Version="15.1.11" />
+        <PackageReference Include="HotChocolate.Data.EntityFramework" Version="15.1.11" />
+        <PackageReference Include="HotChocolate.Subscriptions" Version="15.1.11" />
+        
         <PackageReference Include="MassTransit" Version="8.5.7" />
         <PackageReference Include="MassTransit.Kafka" Version="8.5.7" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.1" />

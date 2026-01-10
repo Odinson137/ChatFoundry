@@ -19,7 +19,6 @@ builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddPostgreSql<ClientDbContext>(builder.Configuration);
 
 var kafkaConnectionString = builder.Configuration.GetConnectionString("Kafka");
-
 builder.Services.AddSingleton(new AdminClientConfig
 {
     BootstrapServers = kafkaConnectionString

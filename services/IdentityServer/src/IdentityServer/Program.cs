@@ -35,20 +35,23 @@ services.AddOpenIddict()
         options.AllowPasswordFlow();
         options.AllowRefreshTokenFlow();
         options.AllowClientCredentialsFlow();
+
+        //options.AcceptAnonymousClients(); // demo only 
         
-        //options.AcceptAnonymousClients(); // demo only
         options.RegisterScopes(
             "workflow",
             "client",
             "telegram",
             "identity"
         );
-        
-        options.AddDevelopmentEncryptionCertificate()
-            .AddDevelopmentSigningCertificate();
 
-        options.UseAspNetCore().EnableTokenEndpointPassthrough();
+        options.AddDevelopmentEncryptionCertificate();
+        options.AddDevelopmentSigningCertificate();
+        options.DisableAccessTokenEncryption(); // для теста
+        options.SetIssuer(new Uri("http://identity-service:8080/"));
         
+        options.UseAspNetCore().EnableTokenEndpointPassthrough().DisableTransportSecurityRequirement();
+
         options.AddEventHandler<OpenIddictServerEvents.ProcessSignInContext>(builder =>
         {
             builder.UseInlineHandler(context =>
