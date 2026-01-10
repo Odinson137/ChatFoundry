@@ -54,104 +54,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a15b5d9a-05b2-4a37-b1f5-4840a0f64271" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/GraphQL/Mutations/BotMutation.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/GraphQL/Query.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.ChatFoundry/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ChatFoundry/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ChatFoundry.sln" beforeDir="false" afterPath="$PROJECT_DIR$/ChatFoundry.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deployment/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/bin/Debug/net10.0/ClientService.deps.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/bin/Debug/net10.0/ClientService.deps.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/ClientService.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/ClientService.csproj.nuget.dgspec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/ClientService.csproj.nuget.g.targets" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/ClientService.csproj.nuget.g.targets" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.csproj.FileListAbsolute.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.sourcelink.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/project.assets.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/rider.project.model.nuget.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/rider.project.restore.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/Gateway/src/Gateway/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/Gateway/src/Gateway/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/Gateway/src/Gateway/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/Gateway/src/Gateway/appsettings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/Debug/net10.0/Gateway.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/Debug/net10.0/Gateway.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/Gateway.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/Gateway.csproj.nuget.dgspec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/project.assets.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/rider.project.model.nuget.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/rider.project.restore.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/appsettings.Development.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/appsettings.Development.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/appsettings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/bin/Debug/net10.0/IdentityServer.deps.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/bin/Debug/net10.0/IdentityServer.deps.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/bin/Debug/net10.0/appsettings.Development.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/bin/Debug/net10.0/appsettings.Development.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/bin/Debug/net10.0/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/bin/Debug/net10.0/appsettings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/IdentityServer.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/IdentityServer.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/IdentityServer.MvcApplicationPartsAssemblyInfo.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/IdentityServer.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/IdentityServer.csproj.FileListAbsolute.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/IdentityServer.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/IdentityServer.sourcelink.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/rpswa.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/rpswa.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/IdentityServer.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/IdentityServer.csproj.nuget.dgspec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/IdentityServer.csproj.nuget.g.targets" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/IdentityServer.csproj.nuget.g.targets" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/project.assets.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/rider.project.model.nuget.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/rider.project.restore.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/appsettings.Development.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/appsettings.Development.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/bin/Debug/net10.0/TelegramService.deps.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/bin/Debug/net10.0/TelegramService.deps.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/bin/Debug/net10.0/appsettings.Development.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/bin/Debug/net10.0/appsettings.Development.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/bin/Debug/net10.0/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/bin/Debug/net10.0/appsettings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.csproj.FileListAbsolute.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.sourcelink.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rpswa.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rpswa.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/TelegramService.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/TelegramService.csproj.nuget.dgspec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/TelegramService.csproj.nuget.g.targets" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/TelegramService.csproj.nuget.g.targets" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/project.assets.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/rider.project.model.nuget.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/rider.project.restore.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Data/WorkflowDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Data/WorkflowDbContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/appsettings.Development.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/appsettings.Development.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/appsettings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/bin/Debug/net10.0/WorkflowService.deps.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/bin/Debug/net10.0/WorkflowService.deps.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/bin/Debug/net10.0/appsettings.Development.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/bin/Debug/net10.0/appsettings.Development.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/bin/Debug/net10.0/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/bin/Debug/net10.0/appsettings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/WorkflowService.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/WorkflowService.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/WorkflowService.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/WorkflowService.csproj.FileListAbsolute.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/WorkflowService.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/WorkflowService.sourcelink.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/rpswa.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/rpswa.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/WorkflowService.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/WorkflowService.csproj.nuget.dgspec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/WorkflowService.csproj.nuget.g.targets" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/WorkflowService.csproj.nuget.g.targets" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/project.assets.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/rider.project.model.nuget.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/rider.project.restore.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/Debug/net10.0/WorkflowService.IntegrationTests.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/Debug/net10.0/WorkflowService.IntegrationTests.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/WorkflowService.IntegrationTests.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/WorkflowService.IntegrationTests.csproj.nuget.dgspec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/WorkflowService.IntegrationTests.csproj.nuget.g.targets" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/WorkflowService.IntegrationTests.csproj.nuget.g.targets" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/project.assets.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/rider.project.model.nuget.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/rider.project.restore.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Application/obj/Debug/net10.0/Shared.Application.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Application/obj/Debug/net10.0/Shared.Application.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Application/obj/Debug/net10.0/Shared.Application.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Application/obj/Debug/net10.0/Shared.Application.sourcelink.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Domain/obj/Debug/net10.0/Shared.Domain.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Domain/obj/Debug/net10.0/Shared.Domain.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Domain/obj/Debug/net10.0/Shared.Domain.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Domain/obj/Debug/net10.0/Shared.Domain.sourcelink.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Grpc/obj/Debug/net10.0/Shared.Grpc.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Grpc/obj/Debug/net10.0/Shared.Grpc.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/Shared.Infrastructure.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/Shared.Infrastructure.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/bin/Debug/net10.0/Shared.Infrastructure.deps.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/bin/Debug/net10.0/Shared.Infrastructure.deps.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.GlobalUsings.g.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.GlobalUsings.g.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.sourcelink.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Shared.Infrastructure.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Shared.Infrastructure.csproj.nuget.dgspec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Shared.Infrastructure.csproj.nuget.g.props" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Shared.Infrastructure.csproj.nuget.g.props" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Shared.Infrastructure.csproj.nuget.g.targets" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Shared.Infrastructure.csproj.nuget.g.targets" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/project.assets.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/project.packagespec.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/project.packagespec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/rider.project.model.nuget.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/rider.project.restore.info" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/GraphQl/BaseQuery.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/GraphQL/Query.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/GraphQL/Query.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -223,6 +127,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f298ae649a53e51ecdc2c62ca577e2d8b8d63a957cc5db88e59b12b3359251c/TelegramBotClientExtensions.ApiMethods.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/services/ClientService/src/ClientService/Program.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/buryy/RiderProjects/ChatFoundry/services/IdentityServer/src/IdentityServer/bin/Debug/net10.0/appsettings.Development.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/services/TelegramService/src/TelegramService/Consumers/SendTelegramMessageConsumer.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Consumers/BotMessageConsumer.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/shared/src/Shared.Grpc/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs" root0="SKIP_HIGHLIGHTING" />
@@ -644,7 +549,7 @@
       <workItem from="1767555007699" duration="782000" />
       <workItem from="1767713325270" duration="1614000" />
       <workItem from="1767797842110" duration="8857000" />
-      <workItem from="1768054940635" duration="11196000" />
+      <workItem from="1768054940635" duration="11715000" />
     </task>
     <task id="LOCAL-00005" summary="add registration, receiving bearer token, refreshing token">
       <option name="closed" value="true" />
@@ -718,7 +623,15 @@
       <option name="project" value="LOCAL" />
       <updated>1767727917159</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="add graphql">
+      <option name="closed" value="true" />
+      <created>1768069432129</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1768069432129</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -751,7 +664,8 @@
     <MESSAGE value="add gRPC" />
     <MESSAGE value="add docker services files, add grpc" />
     <MESSAGE value="update gateway" />
-    <option name="LAST_COMMIT_MESSAGE" value="update gateway" />
+    <MESSAGE value="add graphql" />
+    <option name="LAST_COMMIT_MESSAGE" value="add graphql" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -934,32 +848,6 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="125" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/GraphQL/Query.cs</url>
-          <line>17</line>
-          <properties documentPath="C:\Users\buryy\RiderProjects\ChatFoundry\services\WorkflowService\src\WorkflowService\GraphQL\Query.cs" containingFunctionPresentation="Method 'GetBots'">
-            <startOffsets>
-              <option value="465" />
-            </startOffsets>
-            <endOffsets>
-              <option value="485" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="128" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/GraphQL/Query.cs</url>
-          <line>16</line>
-          <properties documentPath="C:\Users\buryy\RiderProjects\ChatFoundry\services\WorkflowService\src\WorkflowService\GraphQL\Query.cs" containingFunctionPresentation="Method 'GetBots'">
-            <startOffsets>
-              <option value="395" />
-            </startOffsets>
-            <endOffsets>
-              <option value="456" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="130" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

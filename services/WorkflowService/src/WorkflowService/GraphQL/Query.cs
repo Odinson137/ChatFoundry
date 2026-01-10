@@ -2,19 +2,20 @@
 using HotChocolate;
 using HotChocolate.Data;
 using Microsoft.EntityFrameworkCore;
+using Shared.Infrastructure.GraphQl;
 using WorkflowService.Data;
 using WorkflowService.Entities;
 
 namespace WorkflowService.GraphQL;
 
-public class Query
+public class Query(IHttpContextAccessor httpContextAccessor) : BaseQuery(httpContextAccessor)
 {
     [UseProjection] 
     [UseFiltering]
     [UseSorting]
-    public IQueryable<Bot> GetBots([Service] WorkflowDbContext context, ClaimsPrincipal user)
+    public IQueryable<Bot> GetBots([Service] WorkflowDbContext context)
     {
-        var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var userId = UserId;
         return context.Bots;
     }
     
