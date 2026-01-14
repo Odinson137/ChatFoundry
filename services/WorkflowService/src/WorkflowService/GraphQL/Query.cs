@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using HotChocolate;
+﻿using HotChocolate;
 using HotChocolate.Data;
 using Microsoft.EntityFrameworkCore;
 using Shared.Infrastructure.GraphQl;
@@ -13,7 +12,7 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseQuery(httpCon
     [UseProjection] 
     [UseFiltering]
     [UseSorting]
-    public IQueryable<Bot> GetBots([Service] WorkflowDbContext context)
+    public IQueryable<Bot> GetBots([Service] WorkflowDbContext context) 
     {
         var userId = UserId;
         return context.Bots;

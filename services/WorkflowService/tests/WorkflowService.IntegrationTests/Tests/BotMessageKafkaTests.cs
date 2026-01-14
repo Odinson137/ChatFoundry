@@ -41,7 +41,9 @@ namespace WorkflowService.IntegrationTests.Tests
             {
                 Id = Guid.NewGuid(),
                 BotId = botId,
-                SchemaJson = TestWorkflowSchemas.TestWorkflowJson,
+                NodesDefinition = TestWorkflowSchemas.NodesJson,
+                EdgesDefinition = TestWorkflowSchemas.EdgesJson,
+                LayoutDefinition = TestWorkflowSchemas.LayoutJson,
                 Version = 1,
                 IsActiveBotWorkflow = true,
             };

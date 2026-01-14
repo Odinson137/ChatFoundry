@@ -24,7 +24,7 @@ public class BotMessageConsumer(
         
         var session = await sessionResolver.ResolveAsync(msg, ct);
 
-        var graph = workflowGraphParser.Parse(session.Workflow.SchemaJson);
+        var graph = workflowGraphParser.Parse(session.Workflow.NodesDefinition, session.Workflow.EdgesDefinition);
 
         var currentNode = session.CurrentNodeId == null
             ? graph.GetStartNode() 

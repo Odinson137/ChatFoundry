@@ -3,6 +3,18 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "BlazorClientPolicy",
+        policy =>
+        {
+            policy.WithOrigins("https://localhost:7555")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
+        });
+});
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -70,6 +82,9 @@ builder.Services
 var app = builder.Build();
 
 app.UseRouting();
+
+app.UseCors("BlazorClientPolicy");
+
 app.UseAuthentication();
 app.UseAuthorization();
 

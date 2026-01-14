@@ -19,18 +19,18 @@ public class ActionCompletedConsumer(
     {
         var msg = context.Message;
         var ct = context.CancellationToken;
-        
+
         var lastUserAction = await actionRepository.GetAsync(msg.Channel, msg.ClientId, ct);
         if (lastUserAction == null)
             return;
-        
+
 
         var session = lastUserAction.Session;
-        
+
         lastUserAction.MarkCompleted();
         session.CompletedAt = DateTime.UtcNow;
-        
-        var graph = workflowGraphParser.Parse(session.Workflow.SchemaJson);
+
+        var graph = workflowGraphParser.Parse(session.Workflow.NodesDefinition, session.Workflow.EdgesDefinition);
 
         var nextNode = graph.GetNextNode(lastUserAction.NodeId, session);
         if (nextNode == null)
@@ -38,10 +38,10 @@ public class ActionCompletedConsumer(
             await sessionResolver.CloseSessionAsync(session.Id, ct);
             return;
         }
-        
+
         if (lastUserAction.WorkflowNodeType == WorkflowNodeType.Ask)
             return;
-        
+
         session.MoveTo(nextNode.Id);
 
         var nextAction = await actionFactory.CreateAsync(

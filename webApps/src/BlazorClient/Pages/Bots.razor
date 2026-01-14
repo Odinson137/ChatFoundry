@@ -1,0 +1,319 @@
+﻿@page "/bots"
+@using Microsoft.AspNetCore.Authorization
+@using System.Net.Http.Headers
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@using BlazorClient.Configuration
+@using BlazorClient.Models.DTO
+@using Blazored.LocalStorage
+
+@attribute [Authorize]
+
+@inject HttpClient Http
+@inject ILocalStorageService LocalStorage
+@inject IJSRuntime JsRuntime
+
+<PageTitle>Управление ботами</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Управление ботами</h1>
+    <button class="btn btn-primary" @onclick="OpenCreateModal">
+        <span class="oi oi-plus"></span> Добавить бота
+    </button>
+</div>
+
+@if (isLoading)
+{
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Загрузка...</span>
+        </div>
+    </div>
+}
+else if (!string.IsNullOrEmpty(error))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @error
+        <button type="button" class="btn-close" @onclick="() => error = null"></button>
+    </div>
+}
+else
+{
+    @if (!bots.Any())
+    {
+        <div class="alert alert-info">Боты не найдены. Создайте первого бота!</div>
+    }
+    else
+    {
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+            <tr>
+                <th>Имя</th>
+                <th>Токен</th>
+                <th>Активный Workflow</th>
+                <th>Создан</th>
+                <th class="text-end">Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var bot in bots)
+            {
+                <tr>
+                    <td class="fw-bold">@bot.Name</td>
+                    <td>
+                        <code class="text-muted">@(bot.Token.Length > 10 ? bot.Token.Substring(0, 10) + "..." : bot.Token)</code>
+                    </td>
+                    <td>
+                        @{
+                            var activeWorkflow = bot.Workflows?.FirstOrDefault(w => w.IsActiveBotWorkflow);
+                            if (activeWorkflow != null)
+                            {
+                                <span class="badge bg-success">v@(activeWorkflow.Version)</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Нет</span>
+                            }
+                        }
+                    </td>
+                    <td>@bot.CreatedAt.ToLocalTime().ToString("g")</td>
+                    <!-- Внутри таблицы в Bots.razor -->
+                    <td class="text-end">
+                        <!-- Добавлена кнопка перехода к деталям -->
+                        <a href="@($"bots/{bot.Id}")" class="btn btn-sm btn-primary me-2" title="Открыть воркфлоу">
+                            <span class="oi oi-eye"></span> Открыть
+                        </a>
+
+                        <button class="btn btn-sm btn-outline-primary me-2" @onclick="() => OpenEditModal(bot)">
+                            <span class="oi oi-pencil"></span>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteBot(bot)">
+                            <span class="oi oi-trash"></span>
+                        </button>
+                    </td>
+
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+}
+
+@* --- Простая Модалка (Overlay) --- *@
+@if (showModal)
+{
+    <div class="modal-backdrop fade show"></div>
+    <div class="modal fade show d-block" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(isEditMode ? "Редактировать бота" : "Новый бот")</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Имя бота</label>
+                        <input type="text" class="form-control" @bind="currentBotModel.Name" placeholder="My Super Bot" />
+                    </div>
+                    @if (!isEditMode)
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">Токен (Telegram/Other)</label>
+                            <input type="text" class="form-control" @bind="currentBotModel.Token" />
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseModal">Отмена</button>
+                    <button type="button" class="btn btn-primary" @onclick="SaveBot" disabled="@isSaving">
+                        @if (isSaving) { <span class="spinner-border spinner-border-sm me-1"></span> }
+                        Сохранить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<BotDto> bots = new();
+    private bool isLoading = true;
+    private bool isSaving = false;
+    private string? error;
+    
+    private bool showModal = false;
+    private bool isEditMode = false;
+    private BotInputModel currentBotModel = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadBots();
+    }
+
+    private async Task LoadBots()
+    {
+        isLoading = true;
+        error = null;
+        try
+        {
+            var query = @"
+                query GetBots { 
+                    bots(order: [{ createdAt: DESC }]) { 
+                        id name token createdAt modifiedAt 
+                        workflows { id version isActiveBotWorkflow } 
+                    } 
+                }";
+            
+            var data = await ExecuteGraphQl<BotDataResponse>(query);
+            bots = data.Bots;
+        }
+        catch (Exception ex)
+        {
+            error = $"Ошибка загрузки: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    // 2. СОЗДАНИЕ и ОБНОВЛЕНИЕ (Mutation)
+    private async Task SaveBot()
+    {
+        if (string.IsNullOrWhiteSpace(currentBotModel.Name) || (!isEditMode && string.IsNullOrWhiteSpace(currentBotModel.Token)))
+        {
+            // Простая валидация
+            return;
+        }
+
+        isSaving = true;
+        try
+        {
+            if (isEditMode)
+            {
+                // Update
+                var query = @"
+                    mutation Update($input: UpdateBotInput!) {
+                        updateBot(input: $input) {
+                            bot { id name }
+                        }
+                    }";
+                
+                var variables = new { input = new { botId = currentBotModel.Id, name = currentBotModel.Name } };
+                await ExecuteGraphQl<object>(query, variables);
+            }
+            else
+            {
+                // Create
+                var query = @"
+                    mutation Add($input: AddBotInput!) {
+                        addBot(input: $input) {
+                            bot { id name }
+                        }
+                    }";
+                
+                var variables = new { input = new { name = currentBotModel.Name, token = currentBotModel.Token } };
+                await ExecuteGraphQl<object>(query, variables);
+            }
+
+            CloseModal();
+            await LoadBots(); // Перезагружаем список
+        }
+        catch (Exception ex)
+        {
+            error = $"Ошибка сохранения: {ex.Message}";
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    // 3. УДАЛЕНИЕ (Mutation)
+    private async Task DeleteBot(BotDto bot)
+    {
+        if (!await JsRuntime.InvokeAsync<bool>("confirm", $"Вы уверены, что хотите удалить бота '{bot.Name}'?"))
+        {
+            return;
+        }
+
+        try
+        {
+            var query = @"
+                mutation Delete($input: DeleteBotInput!) {
+                    deleteBot(input: $input) {
+                        bot { id }
+                    }
+                }";
+
+            var variables = new { input = new { botId = bot.Id } };
+            await ExecuteGraphQl<object>(query, variables);
+            await LoadBots();
+        }
+        catch (Exception ex)
+        {
+            error = $"Не удалось удалить: {ex.Message}";
+        }
+    }
+
+    private void OpenCreateModal()
+    {
+        currentBotModel = new BotInputModel();
+        isEditMode = false;
+        showModal = true;
+    }
+
+    private void OpenEditModal(BotDto bot)
+    {
+        currentBotModel = new BotInputModel 
+        { 
+            Id = bot.Id, 
+            Name = bot.Name, 
+            Token = bot.Token 
+        };
+        isEditMode = true;
+        showModal = true;
+    }
+
+    private void CloseModal()
+    {
+        showModal = false;
+        error = null;
+    }
+
+    private async Task<T> ExecuteGraphQl<T>(string query, object? variables = null)
+    {
+        var token = await LocalStorage.GetItemAsync<string>("authToken");
+        
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{ApiEndpoints.Api}/workflow/graphql");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        
+        var payload = new { query, variables };
+        request.Content = JsonContent.Create(payload);
+
+        var response = await Http.SendAsync(request);
+        var jsonString = await response.Content.ReadAsStringAsync();
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new Exception($"Сервер вернул ошибку {response.StatusCode}: {jsonString}");
+        }
+
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        var gqlResponse = JsonSerializer.Deserialize<GraphQLResponse<T>>(jsonString, options);
+
+        return gqlResponse!.Data!;
+    }
+
+    public class BotInputModel
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = "";
+        public string Token { get; set; } = "";
+    }
+
+    public class BotDataResponse
+    {
+        public List<BotDto> Bots { get; set; } = new();
+    }
+}

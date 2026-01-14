@@ -1,0 +1,103 @@
+﻿@page "/designer/{WorkflowId:guid}"
+@using Blazor.Diagrams.Components
+@using Blazor.Diagrams.Components.Widgets
+@using Blazor.Diagrams.Core.Models
+@using Blazor.Diagrams.Core.Models.Base
+
+<PageTitle>Редактор Workflow</PageTitle>
+
+<div class="designer-container">
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h5>Инструменты</h5>
+        </div>
+        <div class="d-grid gap-2 p-3">
+            <div class="node-tool btn-message" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.Message)">
+                <span class="oi oi-chat"></span> Сообщение
+            </div>
+            <div class="node-tool btn-filter" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.Filter)">
+                <span class="oi oi-random"></span> AI Фильтр
+            </div>
+            <div class="node-tool btn-action" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.Action)">
+                <span class="oi oi-bolt"></span> Действие
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <button class="btn btn-primary w-100" @onclick="SaveWorkflow">
+                <span class="oi oi-circle-check"></span> Сохранить
+            </button>
+        </div>
+    </div>
+
+    <div class="canvas-wrapper"
+         @ondrop="OnDrop"
+         @ondragover="OnDragOver"
+         @ondragover:preventDefault="true">
+        <CascadingValue Value="Diagram">
+            <DiagramCanvas>
+                <Widgets>
+                    <GridWidget Size="30"
+                                Mode="GridMode.Point"
+                                BackgroundColor="#ffffff"/>
+                    <SelectionBoxWidget/>
+                </Widgets>
+            </DiagramCanvas>
+        </CascadingValue>
+    </div>
+
+    @if (SelectedModel != null)
+    {
+        <div class="settings-panel">
+            <div class="panel-header">
+                <h6>Настройки @(SelectedModel is NodeModel ? "блока" : "связи")</h6>
+                <button class="btn-close" @onclick="() => SelectedModel = null"></button>
+            </div>
+            <div class="panel-body">
+                @if (SelectedModel is NodeModel node)
+                {
+                    <div class="mb-3">
+                        <label class="form-label">Заголовок</label>
+                        <input type="text" class="form-control" @bind-value="node.Title" @bind-value:event="oninput"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">ID элемента</label>
+                        <input type="text" class="form-control form-control-sm" value="@node.Id" readonly/>
+                    </div>
+                }
+                else if (SelectedModel is WorkflowLinkModel  link)
+                {
+                    <div class="settings-group">
+                        <label class="form-label">Стиль связи</label>
+
+                        <div class="mb-3">
+                            <label class="form-label"></label>
+                            <input type="text" class="form-control" 
+                                   @oninput="(e) => OnLinkLabelChanged(link, e)" />
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="small text-muted">Цвет линии</label>
+                            <div class="color-picker-wrapper">
+                                <input type="color"
+                                       class="form-control form-control-color w-100"
+                                       value="@link.Color"
+                                       @onchange="(e) => OnLinkColorChanged(link, e)"/>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="small text-muted">Толщина (@link.Width)</label>
+                            <input type="range"
+                                   class="form-range"
+                                   min="1" max="10" step="1"
+                                   value="@link.Width"
+                                   @onchange="(e) => OnLinkWidthChanged(link, e)"/>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    }
+</div>

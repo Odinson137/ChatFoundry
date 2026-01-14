@@ -1,7 +1,7 @@
 ﻿using ClientService.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace WorkflowService.Data;
+namespace ClientService.Data;
 
 public class ClientDbContext : DbContext
 {

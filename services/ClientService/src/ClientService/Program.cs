@@ -1,11 +1,13 @@
 using ClientService.Consumers;
+using ClientService.Data;
+using ClientService.GraphQL;
+using ClientService.GraphQL.Mutations;
 using ClientService.Interfaces;
 using ClientService.Repositories;
 using Confluent.Kafka;
 using MassTransit;
 using Shared.Application.Events;
 using Shared.Infrastructure.DependencyInjection;
-using WorkflowService.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,6 +63,15 @@ builder.Services.AddMassTransit(x =>
         });
     });
 });
+
+builder.Services
+    .AddGraphQLServer()
+    .AddQueryType<Query>()
+    .AddMutationType<ClientMutation>()
+    .AddMutationType<ClientChannelMutation>()
+    .AddProjections() 
+    .AddFiltering()
+    .AddSorting();
 
 var app = builder.Build();
 

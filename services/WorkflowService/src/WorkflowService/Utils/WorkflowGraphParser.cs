@@ -12,38 +12,81 @@ public sealed class WorkflowGraphParser
         PropertyNameCaseInsensitive = true
     };
 
-    // ========= PARSE =========
-
-    public WorkflowGraph Parse(string json)
+    public WorkflowGraph Parse(string? nodesJson, string? edgesJson)
     {
-        using var doc = JsonDocument.Parse(json);
-        var root = doc.RootElement;
-
-        var nodes = root.GetProperty("nodes")
-            .EnumerateArray()
-            .Select(ParseNode)
-            .ToDictionary(n => n.Id);
-
-        var edges = root.GetProperty("edges")
-            .EnumerateArray()
-            .Select(ParseEdge)
-            .ToList();
+        var nodes = ParseNodes(nodesJson);
+        var edges = ParseEdges(edgesJson);
 
         return new WorkflowGraph(nodes, edges);
     }
 
+    private Dictionary<Guid, WorkflowNode> ParseNodes(string? json)
+    {
+        if (string.IsNullOrWhiteSpace(json) || json == "[]" || json == "{}")
+            return new Dictionary<Guid, WorkflowNode>();
+
+        try
+        {
+            using var doc = JsonDocument.Parse(json);
+            return doc.RootElement.EnumerateArray()
+                .Select(ParseNode)
+                .ToDictionary(n => n.Id);
+        }
+        catch
+        {
+            return new Dictionary<Guid, WorkflowNode>();
+        }
+    }
+
+    private List<WorkflowEdge> ParseEdges(string? json)
+    {
+        if (string.IsNullOrWhiteSpace(json) || json == "[]")
+            return new List<WorkflowEdge>();
+
+        try
+        {
+            using var doc = JsonDocument.Parse(json);
+            return doc.RootElement.EnumerateArray()
+                .Select(ParseEdge)
+                .ToList();
+        }
+        catch
+        {
+            return new List<WorkflowEdge>();
+        }
+    }
+
+    private List<NodeLayout> ParseLayout(string? json)
+    {
+        if (string.IsNullOrWhiteSpace(json) || json == "[]")
+            return new List<NodeLayout>();
+
+        try
+        {
+            return JsonSerializer.Deserialize<List<NodeLayout>>(json, JsonOptions) ?? new();
+        }
+        catch
+        {
+            return new List<NodeLayout>();
+        }
+    }
+
+    // ========= Вспомогательные методы парсинга элементов =========
+
     private WorkflowNode ParseNode(JsonElement el)
     {
         var id = el.GetProperty("id").GetGuid();
-        var type = Enum.Parse<WorkflowNodeType>(
-            el.GetProperty("type").GetString()!,
-            ignoreCase: true);
+
+        // Безопасный парсинг Enum
+        var typeStr = el.TryGetProperty("type", out var t) ? t.GetString() : "Message";
+        if (!Enum.TryParse<WorkflowNodeType>(typeStr, true, out var type))
+            type = WorkflowNodeType.Message;
 
         return new WorkflowNode
         {
             Id = id,
             Type = type,
-            Label = el.GetProperty("label").GetString()!,
+            Label = el.TryGetProperty("label", out var l) ? l.GetString() ?? "" : "",
             Data = el.TryGetProperty("data", out var data)
                 ? ParseNodeData(type, data)
                 : NodeData.Empty
@@ -54,29 +97,23 @@ public sealed class WorkflowGraphParser
     {
         return new WorkflowEdge
         {
-            From = el.GetProperty("from").GetGuid(),
-            To = el.GetProperty("to").GetGuid(),
-            Condition = el.TryGetProperty("condition", out var c)
+            From = el.TryGetProperty("from", out var f) ? f.GetGuid() : Guid.Empty,
+            To = el.TryGetProperty("to", out var t) ? t.GetGuid() : Guid.Empty,
+            Condition = el.TryGetProperty("condition", out var c) && c.ValueKind != JsonValueKind.Null
                 ? ParseCondition(c)
                 : null
         };
     }
-    
-    private static NodeData ParseNodeData(
-        WorkflowNodeType type,
-        JsonElement data)
+
+    private static NodeData ParseNodeData(WorkflowNodeType type, JsonElement data)
     {
+        if (data.ValueKind == JsonValueKind.Null) return NodeData.Empty;
+
         return type switch
         {
-            WorkflowNodeType.Message =>
-                data.Deserialize<MessageNodeData>(JsonOptions)!,
-
-            WorkflowNodeType.Ask =>
-                data.Deserialize<AskNodeData>(JsonOptions)!,
-
-            WorkflowNodeType.SubWorkflow =>
-                data.Deserialize<SubWorkflowNodeData>(JsonOptions)!,
-
+            WorkflowNodeType.Message => data.Deserialize<MessageNodeData>(JsonOptions) ?? NodeData.Empty,
+            WorkflowNodeType.Ask => data.Deserialize<AskNodeData>(JsonOptions) ?? NodeData.Empty,
+            WorkflowNodeType.SubWorkflow => data.Deserialize<SubWorkflowNodeData>(JsonOptions) ?? NodeData.Empty,
             _ => NodeData.Empty
         };
     }
@@ -87,99 +124,54 @@ public sealed class WorkflowGraphParser
         {
             return new EqualsCondition
             {
-                Left = eq.GetProperty("left").GetString()!,
-                Right = eq.GetProperty("right").GetString()!
+                Left = eq.TryGetProperty("left", out var l) ? l.GetString() ?? "" : "",
+                Right = eq.TryGetProperty("right", out var r) ? r.GetString() ?? "" : ""
             };
         }
 
         if (el.TryGetProperty("and", out var and))
-        {
-            return new AndCondition
-            {
-                Conditions = and.EnumerateArray()
-                    .Select(ParseCondition)
-                    .ToList()
-            };
-        }
+            return new AndCondition { Conditions = and.EnumerateArray().Select(ParseCondition).ToList() };
 
         if (el.TryGetProperty("or", out var or))
-        {
-            return new OrCondition
-            {
-                Conditions = or.EnumerateArray()
-                    .Select(ParseCondition)
-                    .ToList()
-            };
-        }
+            return new OrCondition { Conditions = or.EnumerateArray().Select(ParseCondition).ToList() };
 
         throw new InvalidOperationException(
             $"Unknown condition: {el}");
     }
 
-    // ========= SERIALIZE =========
-
-    public string Serialize(WorkflowGraph graph)
+    public (string Nodes, string Edges) Serialize(WorkflowGraph graph)
     {
-        var model = new
+        var nodes = graph.Nodes.Values.Select(n => new
         {
-            nodes = graph.Nodes.Values.Select(SerializeNode),
-            edges = graph.Edges.Select(SerializeEdge)
-        };
-
-        return JsonSerializer.Serialize(model, new JsonSerializerOptions
-        {
-            WriteIndented = true
+            id = n.Id,
+            type = n.Type.ToString(),
+            label = n.Label,
+            data = n.Data is EmptyNodeData ? null : n.Data
         });
-    }
 
-    private static object SerializeNode(WorkflowNode node)
-    {
-        return new
+        var edges = graph.Edges.Select(e => new
         {
-            id = node.Id,
-            type = node.Type.ToString(),
-            label = node.Label,
-            data = node.Data is EmptyNodeData ? null : node.Data
-        };
-    }
+            from = e.From,
+            to = e.To,
+            condition = e.Condition != null ? SerializeCondition(e.Condition) : null
+        });
 
-    private static object SerializeEdge(WorkflowEdge edge)
-    {
-        return new
-        {
-            from = edge.From,
-            to = edge.To,
-            condition = edge.Condition != null
-                ? SerializeCondition(edge.Condition)
-                : null
-        };
+        return (
+            JsonSerializer.Serialize(nodes, JsonOptions),
+            JsonSerializer.Serialize(edges, JsonOptions)
+        );
     }
 
     private static object SerializeCondition(WorkflowCondition condition)
     {
         return condition switch
         {
-            EqualsCondition eq => new
-            {
-                equals = new
-                {
-                    left = eq.Left,
-                    right = eq.Right
-                }
-            },
-
-            AndCondition and => new
-            {
-                and = and.Conditions.Select(SerializeCondition)
-            },
-
-            OrCondition or => new
-            {
-                or = or.Conditions.Select(SerializeCondition)
-            },
-
-            _ => throw new InvalidOperationException(
-                $"Unknown condition type {condition.GetType().Name}")
+            EqualsCondition eq => new { equals = new { left = eq.Left, right = eq.Right } },
+            AndCondition and => new { and = and.Conditions.Select(SerializeCondition) },
+            OrCondition or => new { or = or.Conditions.Select(SerializeCondition) },
+            _ => new { }
         };
     }
 }
+
+public record NodeLayout(Guid NodeId, double X, double Y);

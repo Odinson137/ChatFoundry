@@ -1,0 +1,24 @@
+﻿.designer-container {
+    display: flex;
+    height: 85vh;
+    border: 1px solid #ccc;
+}
+
+.sidebar {
+    width: 250px;
+    background: #fff;
+    border-right: 1px solid #ccc;
+    padding: 15px;
+    z-index: 10;
+}
+
+.canvas-wrapper {
+    flex-grow: 1;
+    background-color: #f8f9fa;
+    overflow: hidden;
+    position: relative;
+}
+
+.sidebar .btn {
+    cursor: grab;
+}

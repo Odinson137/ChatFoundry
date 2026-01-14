@@ -11,8 +11,19 @@ public class WorkflowConfiguration : BaseEntityTypeConfiguration<BotWorkflow>
     {
         base.Configure(builder);
 
-        builder.Property(x => x.SchemaJson)
+        builder.Property(x => x.NodesDefinition)
             .HasColumnType("jsonb")
+            .HasDefaultValue("[]")
+            .IsRequired();
+
+        builder.Property(x => x.EdgesDefinition)
+            .HasColumnType("jsonb")
+            .HasDefaultValue("[]")
+            .IsRequired();
+
+        builder.Property(x => x.LayoutDefinition)
+            .HasColumnType("jsonb")
+            .HasDefaultValue("[]")
             .IsRequired();
 
         builder.HasIndex(x => x.BotId);

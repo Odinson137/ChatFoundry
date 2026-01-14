@@ -1,8 +1,8 @@
-﻿using ClientService.Entities;
+﻿using ClientService.Data;
+using ClientService.Entities;
 using ClientService.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Shared.Domain.Enums;
-using WorkflowService.Data;
 
 namespace ClientService.Repositories;
 

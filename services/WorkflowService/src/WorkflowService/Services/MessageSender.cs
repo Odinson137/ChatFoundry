@@ -22,7 +22,7 @@ public class MessageSender(
                        ?? throw new Exception("Workflow not found");
 
         var session = await sessionRepository.GetAsync(action.SessionId, ct);
-        var graph = workflowGraphParser.Parse(workflow.SchemaJson);
+        var graph = workflowGraphParser.Parse(workflow.NodesDefinition, workflow.EdgesDefinition);
         var node = graph.GetNode(session!.CurrentNodeId!.Value);
 
         var messageKind = MessageKindMapper.FromNodeType(node.Type);

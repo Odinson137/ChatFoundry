@@ -23,7 +23,7 @@ public class SessionResolver(
         var workflow = await workflowRepository
             .GetActiveWorkflowAsync(message.BotId, ct);
 
-        var node = workflowGraphParser.Parse(workflow?.SchemaJson ?? throw new InvalidOperationException()).GetStartNode();
+        var node = workflowGraphParser.Parse(workflow?.NodesDefinition ?? throw new InvalidOperationException(), workflow.EdgesDefinition).GetStartNode();
         
         session = new Session
         {

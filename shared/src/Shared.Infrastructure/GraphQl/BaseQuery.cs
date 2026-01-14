@@ -1,12 +1,13 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace Shared.Infrastructure.GraphQl;
 
 public abstract class BaseQuery
 {
     protected readonly IHttpContextAccessor HttpContextAccessor;
-    
+
     protected readonly Guid UserId;
     
     public BaseQuery(IHttpContextAccessor httpContextAccessor)

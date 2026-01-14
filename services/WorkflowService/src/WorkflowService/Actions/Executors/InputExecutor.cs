@@ -21,7 +21,7 @@ public class InputExecutor(ITopicProducer<ActionCompletedEvent> producer, ISessi
         if (session == null) 
             return;
         
-        var graph = workflowGraphParser.Parse(session.Workflow.SchemaJson);
+        var graph = workflowGraphParser.Parse(session.Workflow.NodesDefinition, session.Workflow.EdgesDefinition);
         var node = graph.GetNode(session.CurrentNodeId!.Value);
 
         var variable = (node.Data as AskNodeData)?.Variable;

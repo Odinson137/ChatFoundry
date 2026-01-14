@@ -1,0 +1,78 @@
+﻿@page "/login"
+@using System.Net.Http.Json
+@using BlazorClient.Auth
+@using BlazorClient.Models
+@using Microsoft.AspNetCore.Components.Authorization
+@using Blazored.LocalStorage
+
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ILocalStorageService LocalStorage
+
+<PageTitle>Вход</PageTitle>
+
+<h1>Вход</h1>
+
+<div class="card">
+    <div class="card-body">
+        <div class="form-group">
+            <label>Email</label>
+            <input class="form-control" @bind="email" />
+        </div>
+        <div class="form-group">
+            <label>Пароль</label>
+            <input type="password" class="form-control" @bind="password" />
+        </div>
+        <button class="btn btn-primary mt-3" @onclick="HandleLogin">Войти</button>
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <div class="alert alert-danger mt-3" role="alert">
+                @error
+            </div>
+        }
+    </div>
+</div>
+
+
+@code {
+    private string email = "bob@example.com";
+    private string password = "Pass123!";
+    private string? error;
+
+    private async Task HandleLogin()
+    {
+        error = null;
+        var requestBody = new FormUrlEncodedContent(new[]
+        {
+            new KeyValuePair<string, string>("grant_type", "password"),
+            new KeyValuePair<string, string>("username", email),
+            new KeyValuePair<string, string>("password", password),
+            new KeyValuePair<string, string>("client_id", "client"),
+            new KeyValuePair<string, string>("client_secret", "secret"),
+            new KeyValuePair<string, string>("scope", "workflow")
+        });
+
+        try
+        {
+            var response = await Http.PostAsync("https://localhost:5000/identity/connect/token", requestBody);
+            if (response.IsSuccessStatusCode)
+            {
+                var tokenResponse = await response.Content.ReadFromJsonAsync<TokenResponse>();
+                await LocalStorage.SetItemAsync("authToken", tokenResponse!.AccessToken);
+                ((ApiAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(tokenResponse.AccessToken);
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                error = "Ошибка аутентификации. Проверьте логин и пароль.";
+            }
+        }
+        catch (Exception ex)
+        {
+            // Эта ошибка будет показана, если сервер недоступен или есть проблемы с CORS
+            error = "Не удалось подключиться к серверу. Пожалуйста, попробуйте позже.";
+            Console.WriteLine(ex.Message); // Выводим ошибку в консоль браузера для отладки
+        }
+    }
+}

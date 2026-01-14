@@ -1,6 +1,6 @@
-﻿using ClientService.Entities;
+﻿using ClientService.Data;
+using ClientService.Entities;
 using ClientService.Interfaces;
-using WorkflowService.Data;
 
 namespace ClientService.Repositories;
 
