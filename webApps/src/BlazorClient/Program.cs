@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using BlazorClient;
 using BlazorClient.Auth;
+using BlazorClient.Interfaces;
+using BlazorClient.Services;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 
@@ -10,6 +12,9 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+
+builder.Services.AddScoped<IWorkflowApiClient, WorkflowApiClient>();
+builder.Services.AddScoped<IWorkflowSchemaService, WorkflowSchemaService>();
 
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddAuthorizationCore();

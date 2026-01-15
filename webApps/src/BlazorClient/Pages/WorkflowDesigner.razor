@@ -9,17 +9,57 @@
 <div class="designer-container">
     <div class="sidebar">
         <div class="sidebar-header">
-            <h5>Инструменты</h5>
+            <h5>Узлы воркфлоу</h5>
         </div>
-        <div class="d-grid gap-2 p-3">
-            <div class="node-tool btn-message" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.Message)">
-                <span class="oi oi-chat"></span> Сообщение
+        
+        <div class="sidebar-section">
+            <small>ЛОГИКА</small>
+            <div class="d-grid gap-2 p-2">
+                <div class="node-tool btn-start" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.Start)">
+                    <span class="oi oi-media-play"></span> Старт
+                </div>
+                <div class="node-tool btn-condition" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.Condition)">
+                    <span class="oi oi-fork"></span> Разветвление
+                </div>
+                <div class="node-tool btn-wait" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.Wait)">
+                    <span class="oi oi-timer"></span> Ожидание
+                </div>
+                <div class="node-tool btn-end" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.End)">
+                    <span class="oi oi-media-stop"></span> Конец
+                </div>
             </div>
-            <div class="node-tool btn-filter" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.Filter)">
-                <span class="oi oi-random"></span> AI Фильтр
+        </div>
+
+        <div class="sidebar-section">
+            <small>КОНТЕНТ</small>
+            <div class="d-grid gap-2 p-2">
+                <div class="node-tool btn-message" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.Message)">
+                    <span class="oi oi-chat"></span> Сообщение
+                </div>
+                <div class="node-tool btn-ask" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.Ask)">
+                    <span class="oi oi-question-mark"></span> Вопрос (Кнопки)
+                </div>
+                <div class="node-tool btn-media" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.Media)">
+                    <span class="oi oi-image"></span> Медиа-файл
+                </div>
             </div>
-            <div class="node-tool btn-action" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.Action)">
-                <span class="oi oi-bolt"></span> Действие
+        </div>
+
+        <div class="sidebar-section">
+            <small>ИНТЕГРАЦИИ И ИИ</small>
+            <div class="d-grid gap-2 p-2">
+                <div class="node-tool btn-api" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.HttpRequest)">
+                    <span class="oi oi-cloud-download"></span> API Запрос
+                </div>
+                <div class="node-tool btn-variable" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.SetVariable)">
+                    <span class="oi oi-list"></span> Переменная
+                </div>
+                <div class="node-tool btn-ai-filter" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.AIFilter)">
+                    <span class="oi oi-eye"></span> AI Фильтр
+                </div>
+                <div class="node-tool btn-ai-gen" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.AIGenerate)">
+                    <span class="oi oi-bolt"></span> AI Текст
+                </div>
             </div>
         </div>
 
@@ -30,16 +70,11 @@
         </div>
     </div>
 
-    <div class="canvas-wrapper"
-         @ondrop="OnDrop"
-         @ondragover="OnDragOver"
-         @ondragover:preventDefault="true">
+    <div class="canvas-wrapper" @ondrop="OnDrop" @ondragover="OnDragOver" @ondragover:preventDefault="true">
         <CascadingValue Value="Diagram">
             <DiagramCanvas>
                 <Widgets>
-                    <GridWidget Size="30"
-                                Mode="GridMode.Point"
-                                BackgroundColor="#ffffff"/>
+                    <GridWidget Size="30" Mode="GridMode.Point" BackgroundColor="#ffffff"/>
                     <SelectionBoxWidget/>
                 </Widgets>
             </DiagramCanvas>
@@ -65,38 +100,24 @@
                         <input type="text" class="form-control form-control-sm" value="@node.Id" readonly/>
                     </div>
                 }
-                else if (SelectedModel is WorkflowLinkModel  link)
+                else if (SelectedModel is WorkflowLinkModel link)
                 {
                     <div class="settings-group">
-                        <label class="form-label">Стиль связи</label>
-
+                        <label class="form-label">Текст на связи</label>
                         <div class="mb-3">
-                            <label class="form-label"></label>
-                            <input type="text" class="form-control" 
-                                   @oninput="(e) => OnLinkLabelChanged(link, e)" />
+                            <input type="text" class="form-control" @oninput="(e) => OnLinkLabelChanged(link, e)" />
                         </div>
-                        
                         <div class="mb-3">
                             <label class="small text-muted">Цвет линии</label>
-                            <div class="color-picker-wrapper">
-                                <input type="color"
-                                       class="form-control form-control-color w-100"
-                                       value="@link.Color"
-                                       @onchange="(e) => OnLinkColorChanged(link, e)"/>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="small text-muted">Толщина (@link.Width)</label>
-                            <input type="range"
-                                   class="form-range"
-                                   min="1" max="10" step="1"
-                                   value="@link.Width"
-                                   @onchange="(e) => OnLinkWidthChanged(link, e)"/>
+                            <input type="color" class="form-control form-control-color w-100" value="@link.Color" @onchange="(e) => OnLinkColorChanged(link, e)"/>
                         </div>
                     </div>
                 }
 
+                <hr />
+                <button class="btn btn-outline-danger w-100" @onclick="DeleteSelectedModel">
+                    <span class="oi oi-trash"></span> Удалить
+                </button>
             </div>
         </div>
     }

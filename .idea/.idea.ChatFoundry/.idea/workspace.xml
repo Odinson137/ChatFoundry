@@ -59,147 +59,55 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a15b5d9a-05b2-4a37-b1f5-4840a0f64271" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/GraphQL/Mutations/ClientChannelMutation.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/GraphQL/Mutations/ClientMutation.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/GraphQL/Query.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/App.razor" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Auth/ApiAuthenticationStateProvider.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/BlazorClient.csproj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Configuration/ApiEndpoints.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Data/NodeType.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Layout/MainLayout.razor" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Layout/MainLayout.razor.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Models/DTO/BotDto.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Models/DTO/GraphQLResponse.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Models/DTO/WorkflowDto.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Models/Diagram/BotNodeModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Models/LoginRequest.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Models/LoginResponse.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Models/TokenResponse.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/BotDetails.razor" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/Bots.razor" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/Clients.razor" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/Home.razor" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/Login.razor" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/Logout.razor" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/NotFound.razor" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/WorkflowDesigner.razor" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/WorkflowDesigner.razor.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/WorkflowDesigner.razor.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Program.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Properties/launchSettings.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Shared/MainLayout.razor" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Shared/NavMenu.razor" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/_Imports.razor" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/css/app.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/designer.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/favicon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/icon-192.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap-grid.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap-grid.css.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap-grid.min.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap-grid.min.css.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap-grid.rtl.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap-grid.rtl.css.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap-grid.rtl.min.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap-grid.rtl.min.css.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap-reboot.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap-reboot.css.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap-reboot.min.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap-reboot.min.css.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap-reboot.rtl.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap-reboot.rtl.css.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap-reboot.rtl.min.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap-reboot.rtl.min.css.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap-utilities.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap-utilities.css.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap-utilities.min.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap-utilities.min.css.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap-utilities.rtl.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap-utilities.rtl.css.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap-utilities.rtl.min.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap-utilities.rtl.min.css.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap.css.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap.min.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap.min.css.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap.rtl.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap.rtl.css.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap.rtl.min.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/css/bootstrap.rtl.min.css.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/js/bootstrap.bundle.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/js/bootstrap.bundle.js.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/js/bootstrap.bundle.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/js/bootstrap.bundle.min.js.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/js/bootstrap.esm.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/js/bootstrap.esm.js.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/js/bootstrap.esm.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/js/bootstrap.esm.min.js.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/js/bootstrap.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/js/bootstrap.js.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/js/bootstrap.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/lib/bootstrap/dist/js/bootstrap.min.js.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/wwwroot/sample-data/weather.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Interfaces/IWorkflowApiClient.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Interfaces/IWorkflowSchemaService.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Models/WorkflowLinkModel.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Models/WorkflowSchema.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Services/WorkflowApiClient.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Services/WorkflowSchemaService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ChatFoundry/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ChatFoundry/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ChatFoundry.sln" beforeDir="false" afterPath="$PROJECT_DIR$/ChatFoundry.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/Data/ClientHubDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/Data/ClientDbContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/Repositories/ClientChannelRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/Repositories/ClientChannelRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/Repositories/ClientRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/Repositories/ClientRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/Repositories/MessageRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/Repositories/MessageRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/bin/Debug/net10.0/ClientService.deps.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/bin/Debug/net10.0/ClientService.deps.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.ChatFoundry/Docker/docker-compose.generated.override.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ChatFoundry/Docker/docker-compose.generated.override.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.csproj.FileListAbsolute.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.sourcelink.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/rider.project.model.nuget.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/Gateway/src/Gateway/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/Gateway/src/Gateway/Program.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/Debug/net10.0/Gateway.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/Debug/net10.0/Gateway.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/rider.project.model.nuget.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/bin/Debug/net10.0/IdentityServer.deps.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/bin/Debug/net10.0/IdentityServer.deps.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/IdentityServer.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/IdentityServer.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/IdentityServer.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/IdentityServer.csproj.FileListAbsolute.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/IdentityServer.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/IdentityServer.sourcelink.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/rider.project.model.nuget.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/bin/Debug/net10.0/TelegramService.deps.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/bin/Debug/net10.0/TelegramService.deps.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.csproj.FileListAbsolute.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.sourcelink.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/rider.project.model.nuget.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Actions/Executors/InputExecutor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Actions/Executors/InputExecutor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Consumers/ActionCompletedConsumer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Consumers/ActionCompletedConsumer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Consumers/BotMessageConsumer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Consumers/BotMessageConsumer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Data/Configurations/WorkflowConfiguration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Data/Configurations/WorkflowConfiguration.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Entities/Workflow.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Entities/Workflow.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/GraphQL/Query.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/GraphQL/Query.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Services/MessageSender.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Services/MessageSender.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Services/SessionResolver.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Services/SessionResolver.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Utils/WorkflowGraphParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Utils/WorkflowGraphParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Enums/WorkflowNodeType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Enums/WorkflowNodeType.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/WorkflowService.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/WorkflowService.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/WorkflowService.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/WorkflowService.sourcelink.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/rider.project.model.nuget.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/Services/TestDataSeeder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/Services/TestDataSeeder.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/Tests/BotMessageKafkaTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/Tests/BotMessageKafkaTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/bin/Debug/net10.0/MvcTestingAppManifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/bin/Debug/net10.0/MvcTestingAppManifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/bin/Debug/net10.0/Shared.Infrastructure.deps.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/bin/Debug/net10.0/Shared.Infrastructure.deps.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/bin/Debug/net10.0/WorkflowService.IntegrationTests.deps.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/bin/Debug/net10.0/WorkflowService.IntegrationTests.deps.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/bin/Debug/net10.0/WorkflowService.deps.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/bin/Debug/net10.0/WorkflowService.deps.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/bin/Debug/net10.0/appsettings.Development.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/bin/Debug/net10.0/appsettings.Development.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/bin/Debug/net10.0/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/bin/Debug/net10.0/appsettings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/Debug/net10.0/MvcTestingAppManifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/Debug/net10.0/MvcTestingAppManifest.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/Debug/net10.0/WorkflowService.IntegrationTests.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/Debug/net10.0/WorkflowService.IntegrationTests.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/rider.project.model.nuget.info" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/Debug/net10.0/WorkflowService.IntegrationTests.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/Debug/net10.0/WorkflowService.IntegrationTests.csproj.FileListAbsolute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/Debug/net10.0/WorkflowService.IntegrationTests.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/Debug/net10.0/WorkflowService.IntegrationTests.sourcelink.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/Shared.Application/obj/Debug/net10.0/Shared.Application.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Application/obj/Debug/net10.0/Shared.Application.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/Shared.Application/obj/Debug/net10.0/Shared.Application.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Application/obj/Debug/net10.0/Shared.Application.sourcelink.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/Shared.Domain/obj/Debug/net10.0/Shared.Domain.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Domain/obj/Debug/net10.0/Shared.Domain.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/Shared.Domain/obj/Debug/net10.0/Shared.Domain.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Domain/obj/Debug/net10.0/Shared.Domain.sourcelink.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/Shared.Grpc/obj/Debug/net10.0/Shared.Grpc.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Grpc/obj/Debug/net10.0/Shared.Grpc.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/GraphQl/BaseQuery.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/GraphQl/BaseQuery.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.sourcelink.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/rider.project.model.nuget.info" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webApps/src/BlazorClient/Data/NodeType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Data/NodeType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webApps/src/BlazorClient/Models/DTO/WorkflowDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Models/DTO/WorkflowDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/BotDetails.razor" beforeDir="false" afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/BotDetails.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/WorkflowDesigner.razor" beforeDir="false" afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/WorkflowDesigner.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/WorkflowDesigner.razor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/WorkflowDesigner.razor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webApps/src/BlazorClient/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Program.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -245,6 +153,9 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/298f02cdf5c04d89a72949f36ba9e4381da00/68/af5dbc0a/Anchor.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/47adba819126411ea3cbbde848dc0943217220/28/82a71241/MigrationCommandExecutor.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5a682b090bf642d2ad76175704c0af7afc00/1a/b572e2ab/PortRenderer.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/6d7d3e62b7fd4b3384cd251468f14b9761910/b6/8d64a8fc/ComponentBase.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8e1d84c34b4341e5b681932bb03daaf74a7938/53/7b2af960/AsyncTaskMethodBuilder`1.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8e1d84c34b4341e5b681932bb03daaf74a7938/5c/5ae5864b/Task.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/a66a7b316c3e4760b72d0451673f13386e600/1d/bcdfe9b4/TopicPartition.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/a66a7b316c3e4760b72d0451673f13386e600/2d/044fbc73/Consumer`2.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/a66a7b316c3e4760b72d0451673f13386e600/30/974e3c52/AdminClientConfig.cs" root0="FORCE_HIGHLIGHTING" />
@@ -313,16 +224,18 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    ".NET Launch Settings Profile.BlazorClient: http.executor": "Run",
+    ".NET Launch Settings Profile.BlazorClient: http.executor": "Debug",
     ".NET Launch Settings Profile.BlazorClient: https.executor": "Run",
     ".NET Launch Settings Profile.ClientService: https.executor": "Debug",
     ".NET Launch Settings Profile.IdentityServer: https.executor": "Debug",
     ".NET Launch Settings Profile.TelegramService: http.executor": "Debug",
     ".NET Launch Settings Profile.TelegramService: https.executor": "Debug",
     ".NET Launch Settings Profile.WorkflowService: http.executor": "Debug",
-    ".NET Project.webApps\\src\\BlazorClient.executor": "Run",
+    ".NET Project.webApps\\src\\BlazorClient.executor": "Debug",
     "ATTACH_DIALOG_SELECTED_CONTAINER": "workflow_service",
+    "Attach to Process.56344:blazor-devserver.executor": "Debug",
     "Attach to Unity Player.Custom Player.executor": "Debug",
+    "Docker.Compose Deployment.executor": "Run",
     "Docker.Gateway/Dockerfile.executor": "Run",
     "Docker.deployment.client-db: Compose Deployment.executor": "Run",
     "Docker.deployment.gateway-service: Compose Deployment.executor": "Run",
@@ -340,6 +253,7 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
     "RunOnceActivity.git.unshallow": "true",
     "XThreadsFramesViewSplitterKey": "0.4485437",
+    "d101a9be-a925-45f4-bdc8-07833be299b4.executor": "Debug",
     "deletionFromPopupRequiresConfirmation": "false",
     "git-widget-placeholder": "main",
     "list.type.of.created.stylesheet": "CSS",
@@ -352,7 +266,7 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected=".NET Project.webApps\src\BlazorClient">
+  <component name="RunManager" selected=".NET Launch Settings Profile.BlazorClient: http">
     <configuration name="BlazorApp1.Client" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="" />
       <option name="PROGRAM_PARAMETERS" value="" />
@@ -433,10 +347,11 @@
     <configuration name="BlazorClient: http" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/webApps/src/BlazorClient/BlazorClient.csproj" />
       <option name="LAUNCH_PROFILE_TFM" value="net10.0" />
-      <option name="LAUNCH_PROFILE_NAME" value="http" />
+      <option name="LAUNCH_PROFILE_NAME" value="https" />
       <option name="USE_EXTERNAL_CONSOLE" value="0" />
       <option name="USE_MONO" value="0" />
       <option name="RUNTIME_ARGUMENTS" value="" />
+      <browser name="98ca6316-2f89-46d9-a9e5-fa9e2b0625b3" with-js-debugger="true" />
       <option name="GENERATE_APPLICATIONHOST_CONFIG" value="1" />
       <option name="SHOW_IIS_EXPRESS_OUTPUT" value="0" />
       <option name="SEND_DEBUG_REQUEST" value="1" />
@@ -816,7 +731,8 @@
       <workItem from="1768054940635" duration="14600000" />
       <workItem from="1768128006277" duration="2938000" />
       <workItem from="1768131011651" duration="11611000" />
-      <workItem from="1768406049217" duration="7101000" />
+      <workItem from="1768406049217" duration="7244000" />
+      <workItem from="1768500832985" duration="4011000" />
     </task>
     <task id="LOCAL-00005" summary="add registration, receiving bearer token, refreshing token">
       <option name="closed" value="true" />
@@ -906,7 +822,15 @@
       <option name="project" value="LOCAL" />
       <updated>1768069993266</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="add blazor client, add diagrams">
+      <option name="closed" value="true" />
+      <created>1768423159153</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1768423159153</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -941,7 +865,8 @@
     <MESSAGE value="update gateway" />
     <MESSAGE value="add graphql" />
     <MESSAGE value="add base query class" />
-    <option name="LAST_COMMIT_MESSAGE" value="add base query class" />
+    <MESSAGE value="add blazor client, add diagrams" />
+    <option name="LAST_COMMIT_MESSAGE" value="add blazor client, add diagrams" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1124,6 +1049,32 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="125" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/Tests/BotMessageKafkaTests.cs</url>
+          <line>30</line>
+          <properties documentPath="C:\Users\buryy\RiderProjects\ChatFoundry\services\WorkflowService\tests\WorkflowService.IntegrationTests\Tests\BotMessageKafkaTests.cs" containingFunctionPresentation="Method 'WorkflowService_Should_Start_Workflow_And_Process_Ask'">
+            <startOffsets>
+              <option value="769" />
+            </startOffsets>
+            <endOffsets>
+              <option value="819" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="128" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/Tests/BotMessageKafkaTests.cs</url>
+          <line>62</line>
+          <properties documentPath="C:\Users\buryy\RiderProjects\ChatFoundry\services\WorkflowService\tests\WorkflowService.IntegrationTests\Tests\BotMessageKafkaTests.cs" containingFunctionPresentation="Method 'WorkflowService_Should_Start_Workflow_And_Process_Ask'">
+            <startOffsets>
+              <option value="1881" />
+            </startOffsets>
+            <endOffsets>
+              <option value="2326" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="131" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

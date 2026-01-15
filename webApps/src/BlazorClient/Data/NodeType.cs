@@ -2,7 +2,15 @@
 
 public enum NodeType
 {
+    Start,
+    End,
     Message,
-    Filter,
-    Action
+    Ask,
+    Condition,
+    Wait,
+    SetVariable,
+    HttpRequest,
+    AIFilter,
+    AIGenerate,
+    Media
 }

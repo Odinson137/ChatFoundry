@@ -21,6 +21,14 @@ public enum WorkflowNodeType
     Sticker = 15,
     Link = 16,
 
+    Condition = 20,     // If-Else ветвление
+    Wait = 21,          // Пауза/Задержка
+    SetVariable = 22,   // Присвоение значения
+    HttpRequest = 23,   // Внешний API запрос
+    
+    AIFilter = 30,      // Определение интента/токсичности
+    AIGenerate = 31,
+    
     // ===== Interaction / system =====
     Command = 50,
 }
