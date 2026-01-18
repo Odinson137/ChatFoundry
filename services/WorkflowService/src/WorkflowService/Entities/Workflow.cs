@@ -16,4 +16,5 @@ public class BotWorkflow : EntityBase
     public bool IsActiveBotWorkflow { get; set; } = false;
 
     public ICollection<Session> Sessions { get; set; } = [];
+    public ICollection<WorkflowVersion> WorkflowVersions { get; set; } = [];
 }

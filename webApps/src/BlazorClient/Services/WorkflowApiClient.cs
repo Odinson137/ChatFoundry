@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 using System.Text.Json;
 using BlazorClient.Configuration;
 using BlazorClient.Interfaces;
@@ -32,11 +31,38 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
         var result = await ExecuteGraphQl<GqlWorkflowContent>(query.query, query.variables);
         return result.Workflows.FirstOrDefault();
     }
+
+    public async Task<BotDto?> GetBotWithWorkflowsAsync(Guid botId)
+    {
+        var query = new
+        {
+            query = """
+                    query GetBot($id: UUID!) {
+                        bots(where: { id: { eq: $id } }) {
+                            id
+                            name
+                            token
+                            createdAt
+                            modifiedAt
+                            workflows {
+                                id
+                                version
+                                isActiveBotWorkflow
+                                createdAt
+                            }
+                        }
+                    }
+                    """,
+            variables = new { id = botId }
+        };
+
+        var result = await ExecuteGraphQl<BotDataResponse>(query.query, query.variables);
+        return result.Bots.FirstOrDefault();
+    }
     
     private async Task<T> ExecuteGraphQl<T>(string query, object? variables = null)
     {
         var request = new HttpRequestMessage(HttpMethod.Post, $"{ApiEndpoints.Api}/workflow/graphql");
-        
         var payload = new { query, variables };
         request.Content = JsonContent.Create(payload);
 
@@ -45,7 +71,7 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new Exception($"Сервер вернул ошибку {response.StatusCode}: {jsonString}");
+            throw new Exception($"Http Error: {response.StatusCode}");
         }
 
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
@@ -53,4 +79,72 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
 
         return gqlResponse!.Data!;
     }
+    
+    public async Task<bool> AddBotWorkflowAsync(Guid botId, int version)
+    {
+        var query = new
+        {
+            query = """
+                    mutation Add($input: AddBotWorkflowInput!) {
+                        addBotWorkflow(input: $input) {
+                            botWorkflow { id }
+                        }
+                    }
+                    """,
+            variables = new { 
+                input = new { 
+                    botId, 
+                    version, 
+                    nodesDefinition = "[]", 
+                    edgesDefinition = "[]", 
+                    layoutDefinition = "[]", 
+                    isActiveBotWorkflow = false 
+                } 
+            }
+        };
+        try { await ExecuteGraphQl<object>(query.query, query.variables); return true; } 
+        catch { return false; }
+    }
+
+    public async Task<bool> UpdateBotWorkflowAsync(Guid workflowId, bool isActive)
+    {
+        var query = new
+        {
+            query = """
+                    mutation Update($input: UpdateBotWorkflowInput!) {
+                        updateBotWorkflow(input: $input) {
+                            botWorkflow { id }
+                        }
+                    }
+                    """,
+            variables = new { 
+                input = new { 
+                    workflowId, 
+                    isActiveBotWorkflow = isActive 
+                } 
+            }
+        };
+        try { await ExecuteGraphQl<object>(query.query, query.variables); return true; } 
+        catch { return false; }
+    }
+
+    public async Task<bool> DeleteBotWorkflowAsync(Guid workflowId)
+    {
+        var query = new
+        {
+            query = """
+                    mutation Delete($input: DeleteBotWorkflowInput!) {
+                        deleteBotWorkflow(input: $input) {
+                            botWorkflow { id }
+                        }
+                    }
+                    """,
+            variables = new { input = new { workflowId } }
+        };
+        try { await ExecuteGraphQl<object>(query.query, query.variables); return true; } 
+        catch { return false; }
+    }
+
+    private class BotDataResponse { public List<BotDto> Bots { get; set; } = []; }
+    private class GqlWorkflowContent { public List<WorkflowResponse> Workflows { get; set; } = []; }
 }

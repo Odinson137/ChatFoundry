@@ -9,7 +9,7 @@ using TelegramService.Models;
 namespace TelegramService.Controllers;
 
 [ApiController]
-[Route("telegramhook")]
+[Route("hook")]
 public class TelegramHookController(
     ITopicProducer<BotIncomingMessage> producer,
     ILogger<TelegramHookController> logger,

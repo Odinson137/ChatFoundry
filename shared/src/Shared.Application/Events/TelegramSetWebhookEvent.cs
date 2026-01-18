@@ -1,3 +1,3 @@
 ﻿namespace Shared.Application.Events;
 
-public sealed record TelegramSetWebhookEvent(Guid BotId, string Url);
+public sealed record TelegramSetWebhookEvent(Guid BotId, string Token);

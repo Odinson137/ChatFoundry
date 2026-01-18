@@ -59,55 +59,63 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a15b5d9a-05b2-4a37-b1f5-4840a0f64271" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Interfaces/IWorkflowApiClient.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Interfaces/IWorkflowSchemaService.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Models/WorkflowLinkModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Models/WorkflowSchema.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Services/WorkflowApiClient.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Services/WorkflowSchemaService.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Controllers/TelegramManagementController.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/GraphQL/Mutations/BotWorkflowMutation.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/GraphQL/Mutations/Mutation.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shared/src/Shared.Application/DTO/SetWebhookRequest.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/BotDetails.razor.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/BotDetails.razor.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ChatFoundry/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ChatFoundry/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ChatFoundry/Docker/docker-compose.generated.override.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ChatFoundry/Docker/docker-compose.generated.override.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/GraphQL/Query.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/GraphQL/Query.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.sourcelink.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/Gateway/src/Gateway/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/Gateway/src/Gateway/appsettings.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/Debug/net10.0/Gateway.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/Debug/net10.0/Gateway.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/IdentityServer.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/IdentityServer.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/IdentityServer.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/IdentityServer.sourcelink.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Consumers/SetTelegramWebhookConsumer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Consumers/SetTelegramWebhookConsumer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Controllers/TelegramHookController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Controllers/TelegramHookController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Services/TelegramClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Services/TelegramClient.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/appsettings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/bin/Debug/net10.0/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/bin/Debug/net10.0/appsettings.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.sourcelink.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Enums/WorkflowNodeType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Enums/WorkflowNodeType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rpswa.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rpswa.dswa.cache.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Data/Configurations/BotConfiguration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Data/Configurations/BotConfiguration.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Entities/Bot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Entities/Bot.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Entities/Workflow.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Entities/Workflow.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/GraphQL/Mutations/BotMutation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/GraphQL/Mutations/BotMutation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/GraphQL/Query.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/GraphQL/Query.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/WorkflowService.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/WorkflowService.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/WorkflowService.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/WorkflowService.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/WorkflowService.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/WorkflowService.sourcelink.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/bin/Debug/net10.0/MvcTestingAppManifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/bin/Debug/net10.0/MvcTestingAppManifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/bin/Debug/net10.0/Shared.Infrastructure.deps.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/bin/Debug/net10.0/Shared.Infrastructure.deps.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/bin/Debug/net10.0/WorkflowService.IntegrationTests.deps.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/bin/Debug/net10.0/WorkflowService.IntegrationTests.deps.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/bin/Debug/net10.0/WorkflowService.deps.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/bin/Debug/net10.0/WorkflowService.deps.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/bin/Debug/net10.0/appsettings.Development.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/bin/Debug/net10.0/appsettings.Development.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/bin/Debug/net10.0/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/bin/Debug/net10.0/appsettings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/Debug/net10.0/MvcTestingAppManifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/Debug/net10.0/MvcTestingAppManifest.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/Debug/net10.0/WorkflowService.IntegrationTests.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/Debug/net10.0/WorkflowService.IntegrationTests.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/Debug/net10.0/WorkflowService.IntegrationTests.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/Debug/net10.0/WorkflowService.IntegrationTests.csproj.FileListAbsolute.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/Debug/net10.0/WorkflowService.IntegrationTests.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/Debug/net10.0/WorkflowService.IntegrationTests.sourcelink.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Application/Events/TelegramSetWebhookEvent.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Application/Events/TelegramSetWebhookEvent.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Application/Shared.Application.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Application/Shared.Application.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/Shared.Application/obj/Debug/net10.0/Shared.Application.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Application/obj/Debug/net10.0/Shared.Application.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/Shared.Application/obj/Debug/net10.0/Shared.Application.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Application/obj/Debug/net10.0/Shared.Application.sourcelink.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/Shared.Domain/obj/Debug/net10.0/Shared.Domain.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Domain/obj/Debug/net10.0/Shared.Domain.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/Shared.Domain/obj/Debug/net10.0/Shared.Domain.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Domain/obj/Debug/net10.0/Shared.Domain.sourcelink.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/Shared.Grpc/obj/Debug/net10.0/Shared.Grpc.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Grpc/obj/Debug/net10.0/Shared.Grpc.AssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/GraphQl/BaseQuery.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/GraphQl/BaseQuery.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.sourcelink.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/webApps/src/BlazorClient/Data/NodeType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Data/NodeType.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/webApps/src/BlazorClient/Models/DTO/WorkflowDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Models/DTO/WorkflowDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webApps/src/BlazorClient/Interfaces/IWorkflowApiClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Interfaces/IWorkflowApiClient.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webApps/src/BlazorClient/Models/DTO/BotDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Models/DTO/BotDto.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/BotDetails.razor" beforeDir="false" afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/BotDetails.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/WorkflowDesigner.razor" beforeDir="false" afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/WorkflowDesigner.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/WorkflowDesigner.razor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/WorkflowDesigner.razor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/webApps/src/BlazorClient/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webApps/src/BlazorClient/Services/WorkflowApiClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Services/WorkflowApiClient.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -154,6 +162,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/47adba819126411ea3cbbde848dc0943217220/28/82a71241/MigrationCommandExecutor.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5a682b090bf642d2ad76175704c0af7afc00/1a/b572e2ab/PortRenderer.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/6d7d3e62b7fd4b3384cd251468f14b9761910/b6/8d64a8fc/ComponentBase.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7533cc3c5d824cc39f85ddc4e6a2be9219d08/86/dcf9c834/Uri.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8e1d84c34b4341e5b681932bb03daaf74a7938/53/7b2af960/AsyncTaskMethodBuilder`1.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8e1d84c34b4341e5b681932bb03daaf74a7938/5c/5ae5864b/Task.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/a66a7b316c3e4760b72d0451673f13386e600/1d/bcdfe9b4/TopicPartition.cs" root0="FORCE_HIGHLIGHTING" />
@@ -170,6 +179,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/b497fffbfe7f4dedb3ca68d87363a89122910/01/1b690501/IServiceCollection.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/bb7b06734dde412ab7a17876ecec5dc22b0e20/bc/4c7bac14/DbSet`1.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/bb7b06734dde412ab7a17876ecec5dc22b0e20/f7/c4b1d590/IEntityTypeConfiguration`1.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/bf56714b34b64c2e9e85a0382d02720a31308/9d/c9f30b40/Enumerable.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/ce8ce0b584a049ba87ac5bae30a12f42f4908/ea/dc970454/RegisterRequest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d965b427610645219c622d7764a327cff49910/08/4f87b037/Object.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d965b427610645219c622d7764a327cff49910/2e/11483c8d/StackFrameIterator.cs" root0="FORCE_HIGHLIGHTING" />
@@ -190,6 +200,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/7d382df578ec93391918cfaa4ce7f4b8f35c9aed1241d6556dc9be26df13c/IdentityUser.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/b9565d769ef8fd874767c4d7ad52227334c4aba0e95e8e71d67ef426af7c1eeb/OpenIddictServerAspNetCoreHandler.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/bd1d5c50194fea68ff3559c160230b0ab50f5acf4ce3061bffd6d62958e2182/ExceptionDispatchInfo.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d28b4ca09c6c8acf87134f4ce4d2f4bd1fc59a161342e1a7aefb1c1595378d8d/GrpcServiceExtensions.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d7e2ce30531b7a2d56142411c5e51c3d516aafcb44e7628167b959660a65c/ServiceProvider.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/da80a5ddeae0d314fda4dd6dc030f3f4e43bc13d787dcb406cf472466af03863/KeyedKafkaProducer.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f298ae649a53e51ecdc2c62ca577e2d8b8d63a957cc5db88e59b12b3359251c/TelegramBotClientExtensions.ApiMethods.cs" root0="FORCE_HIGHLIGHTING" />
@@ -198,6 +209,7 @@
     <setting file="file://$PROJECT_DIR$/services/TelegramService/src/TelegramService/Consumers/SendTelegramMessageConsumer.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Consumers/BotMessageConsumer.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/shared/src/Shared.Grpc/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/webApps/src/BlazorClient/Pages/BotDetails.razor.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../../../webApps/src/BlazorClient/Configuration/ApiEndpoints.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../../../webApps/src/BlazorClient/Models/Bot.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../../../webApps/src/BlazorClient/Models/DTO/BotDto.cs" root0="SKIP_HIGHLIGHTING" />
@@ -214,6 +226,9 @@
   &quot;isMigrated&quot;: true
 }</component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="false" />
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
 }</component>
@@ -236,16 +251,20 @@
     "Attach to Process.56344:blazor-devserver.executor": "Debug",
     "Attach to Unity Player.Custom Player.executor": "Debug",
     "Docker.Compose Deployment.executor": "Run",
+    "Docker.Gateway.executor": "Run",
     "Docker.Gateway/Dockerfile.executor": "Run",
+    "Docker.Workflow.executor": "Debug",
     "Docker.deployment.client-db: Compose Deployment.executor": "Run",
     "Docker.deployment.gateway-service: Compose Deployment.executor": "Run",
     "Docker.deployment.identity-service: Compose Deployment.executor": "Run",
     "Docker.deployment.kafka-ui: Compose Deployment.executor": "Run",
     "Docker.deployment.kafka: Compose Deployment.executor": "Run",
+    "Docker.deployment.telegram-service: Compose Deployment.executor": "Run",
     "Docker.deployment.workflow-db: Compose Deployment.executor": "Run",
     "Docker.deployment.workflow-service: Compose Deployment.executor": "Run",
     "Docker.deployment: Compose Deployment.executor": "Run",
     "Docker.gateway-service: Compose.executor": "Run",
+    "Docker.telegram-service.executor": "Debug",
     "HTTP Request.All in whats-new.executor": "Run",
     "HTTP Request.generated-requests | #1.executor": "Run",
     "HTTP Request.whats-new | Set global header.executor": "Run",
@@ -262,7 +281,7 @@
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "rest.client.default.execution.environment": "test",
-    "settings.editor.selected.configurable": "project.propDebugger",
+    "settings.editor.selected.configurable": "HotReloadSettingsPage",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -309,7 +328,6 @@
       <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
       <option name="PROJECT_KIND" value="DotNetCore" />
       <option name="PROJECT_TFM" value="net10.0" />
-      <browser with-js-debugger="true" />
       <method v="2">
         <option name="Build" projectName="Selected project" />
       </method>
@@ -351,7 +369,7 @@
       <option name="USE_EXTERNAL_CONSOLE" value="0" />
       <option name="USE_MONO" value="0" />
       <option name="RUNTIME_ARGUMENTS" value="" />
-      <browser name="98ca6316-2f89-46d9-a9e5-fa9e2b0625b3" with-js-debugger="true" />
+      <browser name="98ca6316-2f89-46d9-a9e5-fa9e2b0625b3" />
       <option name="GENERATE_APPLICATIONHOST_CONFIG" value="1" />
       <option name="SHOW_IIS_EXPRESS_OUTPUT" value="0" />
       <option name="SEND_DEBUG_REQUEST" value="1" />
@@ -646,6 +664,22 @@
       <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />
       <method v="2" />
     </configuration>
+    <configuration name="telegram-service" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="envFilePath" value="" />
+          <option name="commandLineOptions" value="--build" />
+          <option name="services">
+            <list>
+              <option value="telegram-service" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="deployment/docker-compose.yml" />
+        </settings>
+      </deployment>
+      <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue=".NET Launch Settings Profile.BlazorApp1: http" />
       <item itemvalue=".NET Launch Settings Profile.BlazorApp1: https" />
@@ -668,12 +702,13 @@
       <item itemvalue="Docker.Compose Deployment" />
       <item itemvalue="Docker.Gateway" />
       <item itemvalue="Docker.Identity" />
+      <item itemvalue="Docker.telegram-service" />
       <item itemvalue="Docker.deployment.workflow-db: Compose Deployment" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue=".NET Project.webApps\src\BlazorClient" />
         <item itemvalue="Docker.deployment.workflow-db: Compose Deployment" />
+        <item itemvalue=".NET Project.webApps\src\BlazorClient" />
       </list>
     </recent_temporary>
   </component>
@@ -732,7 +767,11 @@
       <workItem from="1768128006277" duration="2938000" />
       <workItem from="1768131011651" duration="11611000" />
       <workItem from="1768406049217" duration="7244000" />
-      <workItem from="1768500832985" duration="4011000" />
+      <workItem from="1768500832985" duration="5628000" />
+      <workItem from="1768631569966" duration="2870000" />
+      <workItem from="1768644125980" duration="213000" />
+      <workItem from="1768644823297" duration="2119000" />
+      <workItem from="1768750956237" duration="7051000" />
     </task>
     <task id="LOCAL-00005" summary="add registration, receiving bearer token, refreshing token">
       <option name="closed" value="true" />
@@ -830,7 +869,15 @@
       <option name="project" value="LOCAL" />
       <updated>1768423159153</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="update workflow designer page">
+      <option name="closed" value="true" />
+      <created>1768505183302</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1768505183302</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -866,7 +913,8 @@
     <MESSAGE value="add graphql" />
     <MESSAGE value="add base query class" />
     <MESSAGE value="add blazor client, add diagrams" />
-    <option name="LAST_COMMIT_MESSAGE" value="add blazor client, add diagrams" />
+    <MESSAGE value="update workflow designer page" />
+    <option name="LAST_COMMIT_MESSAGE" value="update workflow designer page" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1012,32 +1060,6 @@
           <option name="timeStamp" value="114" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/services/TelegramService/src/TelegramService/Controllers/TelegramHookController.cs</url>
-          <line>22</line>
-          <properties documentPath="C:\Users\buryy\RiderProjects\ChatFoundry\services\TelegramService\src\TelegramService\Controllers\TelegramHookController.cs" containingFunctionPresentation="Method 'ReceivedMessage'">
-            <startOffsets>
-              <option value="658" />
-            </startOffsets>
-            <endOffsets>
-              <option value="704" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="116" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/services/TelegramService/src/TelegramService/Controllers/TelegramHookController.cs</url>
-          <line>34</line>
-          <properties documentPath="C:\Users\buryy\RiderProjects\ChatFoundry\services\TelegramService\src\TelegramService\Controllers\TelegramHookController.cs" containingFunctionPresentation="Method 'ReceivedMessage'">
-            <startOffsets>
-              <option value="1040" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1052" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="124" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/services/TelegramService/src/TelegramService/Services/BotTokenProvider.cs</url>
           <line>10</line>
           <properties documentPath="C:\Users\buryy\RiderProjects\ChatFoundry\services\TelegramService\src\TelegramService\Services\BotTokenProvider.cs" containingFunctionPresentation="Method 'GetByChatIdAsync'">
@@ -1075,6 +1097,71 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="131" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/services/TelegramService/src/TelegramService/Consumers/SetTelegramWebhookConsumer.cs</url>
+          <line>13</line>
+          <properties documentPath="C:\Users\buryy\RiderProjects\ChatFoundry\services\TelegramService\src\TelegramService\Consumers\SetTelegramWebhookConsumer.cs" containingFunctionPresentation="Method 'Consume'">
+            <startOffsets>
+              <option value="393" />
+            </startOffsets>
+            <endOffsets>
+              <option value="427" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="132" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Grpc/BotTokenGrpcService.cs</url>
+          <line>35</line>
+          <properties documentPath="C:\Users\buryy\RiderProjects\ChatFoundry\services\WorkflowService\src\WorkflowService\Grpc\BotTokenGrpcService.cs" containingFunctionPresentation="Method 'GetTokenByBotId'">
+            <startOffsets>
+              <option value="1111" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1161" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="134" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/services/TelegramService/src/TelegramService/Services/BotTokenProvider.cs</url>
+          <line>19</line>
+          <properties documentPath="C:\Users\buryy\RiderProjects\ChatFoundry\services\TelegramService\src\TelegramService\Services\BotTokenProvider.cs" containingFunctionPresentation="Method 'GetByBotIdAsync'">
+            <startOffsets>
+              <option value="590" />
+            </startOffsets>
+            <endOffsets>
+              <option value="744" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="138" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/GraphQL/Mutations/BotWorkflowMutation.cs</url>
+          <line>14</line>
+          <properties documentPath="C:\Users\buryy\RiderProjects\ChatFoundry\services\WorkflowService\src\WorkflowService\GraphQL\Mutations\BotWorkflowMutation.cs" containingFunctionPresentation="Method 'AddBotWorkflowAsync'">
+            <startOffsets>
+              <option value="385" />
+            </startOffsets>
+            <endOffsets>
+              <option value="727" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="145" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/webApps/src/BlazorClient/Pages/BotDetails.razor.cs</url>
+          <line>53</line>
+          <properties documentPath="C:\Users\buryy\RiderProjects\ChatFoundry\webApps\src\BlazorClient\Pages\BotDetails.razor.cs" containingFunctionPresentation="Method 'CreateNewWorkflow'">
+            <startOffsets>
+              <option value="1381" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1451" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="146" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

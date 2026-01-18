@@ -81,6 +81,7 @@ services.AddMassTransit(x =>
         rider.AddConsumer<BotMessageConsumer>();
         rider.AddConsumer<ExecuteActionConsumer>();
         rider.AddConsumer<ActionCompletedConsumer>();
+        rider.AddProducer<TelegramSetWebhookEvent>("telegram.set-webhook");
         
         rider.AddProducer<BotIncomingMessage>("bot.message.incoming");
         rider.AddProducer<BotOutgoingMessage>("bot.message.outgoing");
@@ -124,7 +125,9 @@ builder.Services.AddGrpc();
 builder.Services
     .AddGraphQLServer()
     .AddQueryType<Query>()
-    .AddMutationType<BotMutation>()
+    .AddMutationType<Mutation>()
+    .AddTypeExtension<BotMutation>()
+    .AddTypeExtension<BotWorkflowMutation>()
     .AddProjections() 
     .AddFiltering()
     .AddSorting();

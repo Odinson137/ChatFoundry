@@ -1,8 +1,15 @@
-﻿namespace BlazorClient.Interfaces;
+﻿using BlazorClient.Models.DTO;
+
+namespace BlazorClient.Interfaces;
 
 public interface IWorkflowApiClient
 {
     Task<WorkflowResponse?> GetWorkflowByIdAsync(Guid id);
+    Task<BotDto?> GetBotWithWorkflowsAsync(Guid botId);
+    
+    Task<bool> AddBotWorkflowAsync(Guid botId, int version);
+    Task<bool> UpdateBotWorkflowAsync(Guid workflowId, bool isActive);
+    Task<bool> DeleteBotWorkflowAsync(Guid workflowId);
 }
 
 public record GqlData(GqlWorkflowContent Data);

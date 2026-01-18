@@ -19,7 +19,13 @@ public class BotConfiguration : BaseEntityTypeConfiguration<Bot>
         builder.Property(x => x.Token)
             .IsRequired()
             .HasMaxLength(100);
+        
+        builder.Property(x => x.CreatedUserId)
+            .IsRequired()
+            .HasMaxLength(100);
 
+        builder.HasIndex(x => x.CreatedUserId);
+        
         builder.HasMany(b => b.Workflows)
             .WithOne(w => w.Bot)
             .HasForeignKey(w => w.BotId)

@@ -7,7 +7,7 @@ using WorkflowService.Entities;
 
 namespace WorkflowService.GraphQL;
 
-public class Query(IHttpContextAccessor httpContextAccessor) : BaseQuery(httpContextAccessor)
+public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpContextAccessor)
 {
     [UseProjection] 
     [UseFiltering]

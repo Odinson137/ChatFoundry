@@ -6,7 +6,7 @@ using Shared.Infrastructure.GraphQl;
 
 namespace ClientService.GraphQL;
 
-public class Query(IHttpContextAccessor httpContextAccessor, ClientDbContext context) : BaseQuery(httpContextAccessor)
+public class Query(IHttpContextAccessor httpContextAccessor, ClientDbContext context) : BaseGraphQl(httpContextAccessor)
 {
     [UseProjection] 
     [UseFiltering]

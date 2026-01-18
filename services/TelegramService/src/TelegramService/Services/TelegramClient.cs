@@ -43,6 +43,12 @@ public sealed class TelegramClient(
         return _botClient;
     }
     
+    private ITelegramBotClient InitializeClientByBotIdAsync(string token)
+    {
+        _botClient = new TelegramBotClient(token);
+        return _botClient;
+    }
+    
     public async Task SendTextAsync(string clientid, string text, CancellationToken ct)
     {
         var client = await InitializeClientAsync(clientid, ct);
@@ -55,10 +61,11 @@ public sealed class TelegramClient(
         logger.LogInformation("Telegram message sent to {ChatId}", clientid);
     }
 
-    public async Task SetWebhookAsync(Guid botId, string url, CancellationToken ct)
+    public async Task SetWebhookAsync(Guid botId, string token, CancellationToken ct)
     {
-        var client = await InitializeClientByBotIdAsync(botId, ct);
-        
+        var client = InitializeClientByBotIdAsync(token);
+
+        var url = $"https://mongoose-needed-partially.ngrok-free.app/telegram/hook/{botId}";
         await client.SetWebhook(
             url,
             maxConnections: 40, // default

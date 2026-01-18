@@ -49,6 +49,7 @@ services.AddMassTransit(x =>
     {
         rider.AddProducer<BotIncomingMessage>("bot.message.incoming");
         rider.AddProducer<ActionCompletedEvent>("workflow.action.completed");
+        rider.AddProducer<TelegramSetWebhookEvent>("telegram.set-webhook");
         
         rider.AddConsumer<SendTelegramMessageConsumer>();
         rider.AddConsumer<SetTelegramWebhookConsumer>();
@@ -80,7 +81,9 @@ services.AddMassTransit(x =>
 
 builder.Services.AddGrpcClient<BotTokenService.BotTokenServiceClient>(o =>
 {
-    o.Address = new Uri("http://workflow-service:5001");
+    var address = builder.Configuration["Services:WorkflowServiceUrl"] 
+                  ?? "http://localhost:5001";
+    o.Address = new Uri(address);
 });
 
 

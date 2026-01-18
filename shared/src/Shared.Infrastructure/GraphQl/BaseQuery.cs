@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Shared.Infrastructure.GraphQl;
 
-public abstract class BaseQuery
+public abstract class BaseGraphQl
 {
     protected readonly IHttpContextAccessor HttpContextAccessor;
 
     protected readonly Guid UserId;
     
-    public BaseQuery(IHttpContextAccessor httpContextAccessor)
+    public BaseGraphQl(IHttpContextAccessor httpContextAccessor)
     {
         HttpContextAccessor = httpContextAccessor;
         var user = HttpContextAccessor.HttpContext?.User;

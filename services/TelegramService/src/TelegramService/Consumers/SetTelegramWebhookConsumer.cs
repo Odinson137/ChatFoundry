@@ -11,13 +11,13 @@ public sealed class SetTelegramWebhookConsumer(
 {
     public async Task Consume(ConsumeContext<TelegramSetWebhookEvent> context)
     {
-        var webhook = context.Message.Url;
+        var token = context.Message.Token;
 
         logger.LogInformation(
-            "Setting telegram webhook: {Url}",
-            webhook);
+            "Setting telegram token: {token}",
+            token);
 
-        await telegramClient.SetWebhookAsync(context.Message.BotId, webhook,
+        await telegramClient.SetWebhookAsync(context.Message.BotId, token,
             context.CancellationToken);
     }
 }
