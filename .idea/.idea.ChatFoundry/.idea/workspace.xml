@@ -58,65 +58,7 @@
     </option>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a15b5d9a-05b2-4a37-b1f5-4840a0f64271" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Controllers/TelegramManagementController.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/GraphQL/Mutations/BotWorkflowMutation.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/GraphQL/Mutations/Mutation.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/shared/src/Shared.Application/DTO/SetWebhookRequest.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/BotDetails.razor.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/BotDetails.razor.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.ChatFoundry/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ChatFoundry/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.ChatFoundry/Docker/docker-compose.generated.override.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ChatFoundry/Docker/docker-compose.generated.override.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deployment/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/GraphQL/Query.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/GraphQL/Query.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/ClientService.sourcelink.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/Gateway/src/Gateway/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/Gateway/src/Gateway/appsettings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/Debug/net10.0/Gateway.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/Gateway/src/Gateway/obj/Debug/net10.0/Gateway.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/IdentityServer.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/IdentityServer.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/IdentityServer.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/IdentityServer.sourcelink.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/IdentityServer/src/IdentityServer/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Consumers/SetTelegramWebhookConsumer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Consumers/SetTelegramWebhookConsumer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Controllers/TelegramHookController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Controllers/TelegramHookController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Services/TelegramClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Services/TelegramClient.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/appsettings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/bin/Debug/net10.0/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/bin/Debug/net10.0/appsettings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/TelegramService.sourcelink.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rpswa.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/obj/Debug/net10.0/rpswa.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Data/Configurations/BotConfiguration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Data/Configurations/BotConfiguration.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Entities/Bot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Entities/Bot.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Entities/Workflow.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Entities/Workflow.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/GraphQL/Mutations/BotMutation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/GraphQL/Mutations/BotMutation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/GraphQL/Query.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/GraphQL/Query.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/WorkflowService.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/WorkflowService.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/WorkflowService.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/WorkflowService.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/WorkflowService.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/WorkflowService.sourcelink.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/obj/Debug/net10.0/rjsmrazor.dswa.cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/Debug/net10.0/WorkflowService.IntegrationTests.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/tests/WorkflowService.IntegrationTests/obj/Debug/net10.0/WorkflowService.IntegrationTests.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Application/Events/TelegramSetWebhookEvent.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Application/Events/TelegramSetWebhookEvent.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Application/Shared.Application.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Application/Shared.Application.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Application/obj/Debug/net10.0/Shared.Application.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Application/obj/Debug/net10.0/Shared.Application.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Application/obj/Debug/net10.0/Shared.Application.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Application/obj/Debug/net10.0/Shared.Application.sourcelink.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Domain/obj/Debug/net10.0/Shared.Domain.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Domain/obj/Debug/net10.0/Shared.Domain.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Domain/obj/Debug/net10.0/Shared.Domain.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Domain/obj/Debug/net10.0/Shared.Domain.sourcelink.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Grpc/obj/Debug/net10.0/Shared.Grpc.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Grpc/obj/Debug/net10.0/Shared.Grpc.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/GraphQl/BaseQuery.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/GraphQl/BaseQuery.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/Shared.Infrastructure/obj/Debug/net10.0/Shared.Infrastructure.sourcelink.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/webApps/src/BlazorClient/Interfaces/IWorkflowApiClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Interfaces/IWorkflowApiClient.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/webApps/src/BlazorClient/Models/DTO/BotDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Models/DTO/BotDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/BotDetails.razor" beforeDir="false" afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/BotDetails.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/webApps/src/BlazorClient/Services/WorkflowApiClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Services/WorkflowApiClient.cs" afterDir="false" />
-    </list>
+    <list default="true" id="a15b5d9a-05b2-4a37-b1f5-4840a0f64271" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -206,6 +148,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f298ae649a53e51ecdc2c62ca577e2d8b8d63a957cc5db88e59b12b3359251c/TelegramBotClientExtensions.ApiMethods.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/services/ClientService/src/ClientService/Program.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/services/ClientService/src/ClientService/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/buryy/RiderProjects/ChatFoundry/services/Gateway/src/Gateway/appsettings.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/services/TelegramService/src/TelegramService/Consumers/SendTelegramMessageConsumer.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Consumers/BotMessageConsumer.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/shared/src/Shared.Grpc/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs" root0="SKIP_HIGHLIGHTING" />
@@ -237,54 +180,54 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET Launch Settings Profile.BlazorClient: http.executor": "Debug",
-    ".NET Launch Settings Profile.BlazorClient: https.executor": "Run",
-    ".NET Launch Settings Profile.ClientService: https.executor": "Debug",
-    ".NET Launch Settings Profile.IdentityServer: https.executor": "Debug",
-    ".NET Launch Settings Profile.TelegramService: http.executor": "Debug",
-    ".NET Launch Settings Profile.TelegramService: https.executor": "Debug",
-    ".NET Launch Settings Profile.WorkflowService: http.executor": "Debug",
-    ".NET Project.webApps\\src\\BlazorClient.executor": "Debug",
-    "ATTACH_DIALOG_SELECTED_CONTAINER": "workflow_service",
-    "Attach to Process.56344:blazor-devserver.executor": "Debug",
-    "Attach to Unity Player.Custom Player.executor": "Debug",
-    "Docker.Compose Deployment.executor": "Run",
-    "Docker.Gateway.executor": "Run",
-    "Docker.Gateway/Dockerfile.executor": "Run",
-    "Docker.Workflow.executor": "Debug",
-    "Docker.deployment.client-db: Compose Deployment.executor": "Run",
-    "Docker.deployment.gateway-service: Compose Deployment.executor": "Run",
-    "Docker.deployment.identity-service: Compose Deployment.executor": "Run",
-    "Docker.deployment.kafka-ui: Compose Deployment.executor": "Run",
-    "Docker.deployment.kafka: Compose Deployment.executor": "Run",
-    "Docker.deployment.telegram-service: Compose Deployment.executor": "Run",
-    "Docker.deployment.workflow-db: Compose Deployment.executor": "Run",
-    "Docker.deployment.workflow-service: Compose Deployment.executor": "Run",
-    "Docker.deployment: Compose Deployment.executor": "Run",
-    "Docker.gateway-service: Compose.executor": "Run",
-    "Docker.telegram-service.executor": "Debug",
-    "HTTP Request.All in whats-new.executor": "Run",
-    "HTTP Request.generated-requests | #1.executor": "Run",
-    "HTTP Request.whats-new | Set global header.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "XThreadsFramesViewSplitterKey": "0.4485437",
-    "d101a9be-a925-45f4-bdc8-07833be299b4.executor": "Debug",
-    "deletionFromPopupRequiresConfirmation": "false",
-    "git-widget-placeholder": "main",
-    "list.type.of.created.stylesheet": "CSS",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "rest.client.default.execution.environment": "test",
-    "settings.editor.selected.configurable": "HotReloadSettingsPage",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET Launch Settings Profile.BlazorClient: http.executor&quot;: &quot;Debug&quot;,
+    &quot;.NET Launch Settings Profile.BlazorClient: https.executor&quot;: &quot;Run&quot;,
+    &quot;.NET Launch Settings Profile.ClientService: https.executor&quot;: &quot;Debug&quot;,
+    &quot;.NET Launch Settings Profile.IdentityServer: https.executor&quot;: &quot;Debug&quot;,
+    &quot;.NET Launch Settings Profile.TelegramService: http.executor&quot;: &quot;Debug&quot;,
+    &quot;.NET Launch Settings Profile.TelegramService: https.executor&quot;: &quot;Debug&quot;,
+    &quot;.NET Launch Settings Profile.WorkflowService: http.executor&quot;: &quot;Debug&quot;,
+    &quot;.NET Project.webApps\\src\\BlazorClient.executor&quot;: &quot;Debug&quot;,
+    &quot;ATTACH_DIALOG_SELECTED_CONTAINER&quot;: &quot;workflow_service&quot;,
+    &quot;Attach to Process.56344:blazor-devserver.executor&quot;: &quot;Debug&quot;,
+    &quot;Attach to Unity Player.Custom Player.executor&quot;: &quot;Debug&quot;,
+    &quot;Docker.Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.Gateway.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.Gateway/Dockerfile.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.Workflow.executor&quot;: &quot;Debug&quot;,
+    &quot;Docker.deployment.client-db: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.deployment.gateway-service: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.deployment.identity-service: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.deployment.kafka-ui: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.deployment.kafka: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.deployment.telegram-service: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.deployment.workflow-db: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.deployment.workflow-service: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.deployment: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.gateway-service: Compose.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.telegram-service.executor&quot;: &quot;Debug&quot;,
+    &quot;HTTP Request.All in whats-new.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.generated-requests | #1.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.whats-new | Set global header.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;XThreadsFramesViewSplitterKey&quot;: &quot;0.4485437&quot;,
+    &quot;d101a9be-a925-45f4-bdc8-07833be299b4.executor&quot;: &quot;Debug&quot;,
+    &quot;deletionFromPopupRequiresConfirmation&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;rest.client.default.execution.environment&quot;: &quot;test&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;HotReloadSettingsPage&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected=".NET Launch Settings Profile.BlazorClient: http">
     <configuration name="BlazorApp1.Client" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="" />
@@ -771,7 +714,7 @@
       <workItem from="1768631569966" duration="2870000" />
       <workItem from="1768644125980" duration="213000" />
       <workItem from="1768644823297" duration="2119000" />
-      <workItem from="1768750956237" duration="7051000" />
+      <workItem from="1768750956237" duration="7226000" />
     </task>
     <task id="LOCAL-00005" summary="add registration, receiving bearer token, refreshing token">
       <option name="closed" value="true" />
@@ -877,7 +820,15 @@
       <option name="project" value="LOCAL" />
       <updated>1768505183302</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="fix set webhook init">
+      <option name="closed" value="true" />
+      <created>1768758882717</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1768758882717</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -914,7 +865,8 @@
     <MESSAGE value="add base query class" />
     <MESSAGE value="add blazor client, add diagrams" />
     <MESSAGE value="update workflow designer page" />
-    <option name="LAST_COMMIT_MESSAGE" value="update workflow designer page" />
+    <MESSAGE value="fix set webhook init" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix set webhook init" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

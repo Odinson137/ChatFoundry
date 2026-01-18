@@ -65,10 +65,11 @@ public sealed class TelegramClient(
     {
         var client = InitializeClientByBotIdAsync(token);
 
-        var url = $"https://mongoose-needed-partially.ngrok-free.app/telegram/hook/{botId}";
+        var url = $"https://mongoose-needed-partially.ngrok-free.app/telegram/hook/{botId}"; // TODO вынести в переменные. Возможно потом запускать нгрок в докере и тянуть адрес прямо от туда
         await client.SetWebhook(
             url,
             maxConnections: 40, // default
+            secretToken: "7b3e1a5d-9c24-4f8a-b12d-6e5f8a3c9b47", // TODO вынести в секреты и ПОМЕНЯТЬ
             cancellationToken: ct);
 
         logger.LogInformation("Telegram webhook set: {Url}", url);
