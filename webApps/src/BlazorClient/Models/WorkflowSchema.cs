@@ -5,7 +5,7 @@ public record WorkflowSchema(
     List<EdgeDefinition> Edges,
     List<LayoutDefinition> Layout);
 
-public record NodeDefinition(Guid Id, string Type, string Label, object? Data);
+public record NodeDefinition(Guid Id, string Type, string Label, NodeData? Data);
 
 public record EdgeDefinition(Guid From, Guid To, ConditionDefinition? Condition);
 

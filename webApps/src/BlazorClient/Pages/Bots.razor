@@ -1,11 +1,10 @@
 ﻿@page "/bots"
-@using Microsoft.AspNetCore.Authorization
 @using System.Net.Http.Headers
 @using System.Text.Json
-@using System.Text.Json.Serialization
 @using BlazorClient.Configuration
 @using BlazorClient.Models.DTO
 @using Blazored.LocalStorage
+@using Microsoft.AspNetCore.Authorization
 
 @attribute [Authorize]
 
@@ -138,11 +137,11 @@ else
 @code {
     private List<BotDto> bots = new();
     private bool isLoading = true;
-    private bool isSaving = false;
+    private bool isSaving;
     private string? error;
     
-    private bool showModal = false;
-    private bool isEditMode = false;
+    private bool showModal;
+    private bool isEditMode;
     private BotInputModel currentBotModel = new();
 
     protected override async Task OnInitializedAsync()

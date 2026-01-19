@@ -2,67 +2,43 @@
 @using Blazor.Diagrams.Components
 @using Blazor.Diagrams.Components.Widgets
 @using Blazor.Diagrams.Core.Models
-@using Blazor.Diagrams.Core.Models.Base
+@layout MainLayout
 
 <PageTitle>Редактор Workflow</PageTitle>
 
-<div class="designer-container">
-    <div class="sidebar">
+<div class="designer-page-container">
+    <div class="designer-sidebar">
         <div class="sidebar-header">
-            <h5>Узлы воркфлоу</h5>
+            <h5>Узлы</h5>
         </div>
-        
-        <div class="sidebar-section">
-            <small>ЛОГИКА</small>
-            <div class="d-grid gap-2 p-2">
-                <div class="node-tool btn-start" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.Start)">
-                    <span class="oi oi-media-play"></span> Старт
+        <div class="sidebar-content">
+            <div class="sidebar-section">
+                <small>ЛОГИКА</small>
+                <div class="node-grid">
+                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.Start)"><span class="oi oi-media-play"></span> Старт</div>
+                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.Condition)"><span class="oi oi-fork"></span> Условие</div>
+                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.Wait)"><span class="oi oi-timer"></span> Ожидание</div>
+                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.End)"><span class="oi oi-media-stop"></span> Конец</div>
                 </div>
-                <div class="node-tool btn-condition" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.Condition)">
-                    <span class="oi oi-fork"></span> Разветвление
+            </div>
+            <div class="sidebar-section">
+                <small>КОНТЕНТ</small>
+                <div class="node-grid">
+                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.Message)"><span class="oi oi-chat"></span> Сообщение</div>
+                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.Ask)"><span class="oi oi-question-mark"></span> Вопрос</div>
+                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.Media)"><span class="oi oi-image"></span> Медиа</div>
                 </div>
-                <div class="node-tool btn-wait" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.Wait)">
-                    <span class="oi oi-timer"></span> Ожидание
-                </div>
-                <div class="node-tool btn-end" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.End)">
-                    <span class="oi oi-media-stop"></span> Конец
+            </div>
+            <div class="sidebar-section">
+                <small>ИНТЕГРАЦИИ</small>
+                <div class="node-grid">
+                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.HttpRequest)"><span class="oi oi-cloud-download"></span> API Запрос</div>
+                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.SetVariable)"><span class="oi oi-list"></span> Переменная</div>
+                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.AIFilter)"><span class="oi oi-eye"></span> AI Фильтр</div>
+                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.AIGenerate)"><span class="oi oi-bolt"></span> AI Текст</div>
                 </div>
             </div>
         </div>
-
-        <div class="sidebar-section">
-            <small>КОНТЕНТ</small>
-            <div class="d-grid gap-2 p-2">
-                <div class="node-tool btn-message" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.Message)">
-                    <span class="oi oi-chat"></span> Сообщение
-                </div>
-                <div class="node-tool btn-ask" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.Ask)">
-                    <span class="oi oi-question-mark"></span> Вопрос (Кнопки)
-                </div>
-                <div class="node-tool btn-media" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.Media)">
-                    <span class="oi oi-image"></span> Медиа-файл
-                </div>
-            </div>
-        </div>
-
-        <div class="sidebar-section">
-            <small>ИНТЕГРАЦИИ И ИИ</small>
-            <div class="d-grid gap-2 p-2">
-                <div class="node-tool btn-api" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.HttpRequest)">
-                    <span class="oi oi-cloud-download"></span> API Запрос
-                </div>
-                <div class="node-tool btn-variable" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.SetVariable)">
-                    <span class="oi oi-list"></span> Переменная
-                </div>
-                <div class="node-tool btn-ai-filter" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.AIFilter)">
-                    <span class="oi oi-eye"></span> AI Фильтр
-                </div>
-                <div class="node-tool btn-ai-gen" draggable="true" @ondragstart="(e) => OnDragStart(e, NodeType.AIGenerate)">
-                    <span class="oi oi-bolt"></span> AI Текст
-                </div>
-            </div>
-        </div>
-
         <div class="sidebar-footer">
             <button class="btn btn-primary w-100" @onclick="SaveWorkflow">
                 <span class="oi oi-circle-check"></span> Сохранить
@@ -74,7 +50,7 @@
         <CascadingValue Value="Diagram">
             <DiagramCanvas>
                 <Widgets>
-                    <GridWidget Size="30" Mode="GridMode.Point" BackgroundColor="#ffffff"/>
+                    <GridWidget Size="25" Mode="GridMode.Point" BackgroundColor="#f9fafb"/>
                     <SelectionBoxWidget/>
                 </Widgets>
             </DiagramCanvas>
@@ -83,10 +59,10 @@
 
     @if (SelectedModel != null)
     {
-        <div class="settings-panel">
+        <div class="designer-settings-panel">
             <div class="panel-header">
-                <h6>Настройки @(SelectedModel is NodeModel ? "блока" : "связи")</h6>
-                <button class="btn-close" @onclick="() => SelectedModel = null"></button>
+                <h6>Настройки</h6>
+                <button type="button" class="btn-close" @onclick="() => SelectedModel = null"></button>
             </div>
             <div class="panel-body">
                 @if (SelectedModel is NodeModel node)
@@ -95,29 +71,43 @@
                         <label class="form-label">Заголовок</label>
                         <input type="text" class="form-control" @bind-value="node.Title" @bind-value:event="oninput"/>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">ID элемента</label>
-                        <input type="text" class="form-control form-control-sm" value="@node.Id" readonly/>
-                    </div>
+                    
+                    @* НОВЫЙ БЛОК: Для редактирования NodeData *@
+                    @if (node is WorkflowNodeModel { Data: MessageNodeData msgData })
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">Текст сообщения</label>
+                            <textarea class="form-control" @bind="msgData.Text" @bind:event="oninput" rows="4"></textarea>
+                        </div>
+                    }
+                    /* Добавьте блоки для других типов NodeData, например:
+                        @if (wfNode.Data is AskNodeData askData)
+                        {
+                            <div class="mb-3">
+                                <label class="form-label">Вопрос</label>
+                                <input type="text" class="form-control" @bind="askData.Question" @bind:event="oninput" />
+                            </div>
+                            // ... UI для Options
+                        }
+                        */
                 }
                 else if (SelectedModel is WorkflowLinkModel link)
                 {
-                    <div class="settings-group">
+                    <div class="mb-3">
                         <label class="form-label">Текст на связи</label>
-                        <div class="mb-3">
-                            <input type="text" class="form-control" @oninput="(e) => OnLinkLabelChanged(link, e)" />
-                        </div>
-                        <div class="mb-3">
-                            <label class="small text-muted">Цвет линии</label>
-                            <input type="color" class="form-control form-control-color w-100" value="@link.Color" @onchange="(e) => OnLinkColorChanged(link, e)"/>
-                        </div>
+                        <input type="text" class="form-control" @bind="link.Label" @bind:event="oninput" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Цвет линии</label>
+                        <input type="color" class="form-control form-control-color w-100" @bind="link.Color" />
                     </div>
                 }
-
                 <hr />
-                <button class="btn btn-outline-danger w-100" @onclick="DeleteSelectedModel">
-                    <span class="oi oi-trash"></span> Удалить
-                </button>
+                <div class="mt-3">
+                     <button class="btn btn-outline-danger w-100" @onclick="DeleteSelectedModel">
+                        <span class="oi oi-trash"></span> Удалить
+                    </button>
+                </div>
             </div>
         </div>
     }

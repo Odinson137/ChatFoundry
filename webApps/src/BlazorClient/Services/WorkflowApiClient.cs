@@ -105,6 +105,42 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
         try { await ExecuteGraphQl<object>(query.query, query.variables); return true; } 
         catch { return false; }
     }
+    
+    public async Task<bool> UpdateWorkflowDefinitionsAsync(Guid workflowId, string nodes, string edges, string layout)
+    {
+        var query = new
+        {
+            query = """
+                    mutation UpdateWorkflowDefs($input: UpdateBotWorkflowInput!) {
+                        updateBotWorkflow(input: $input) {
+                            botWorkflow { id }
+                        }
+                    }
+                    """,
+            variables = new
+            {
+                input = new
+                {
+                    workflowId,
+                    nodesDefinition = nodes,
+                    edgesDefinition = edges,
+                    layoutDefinition = layout
+                }
+            }
+        };
+
+        try
+        {
+            await ExecuteGraphQl<object>(query.query, query.variables);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            // Логирование ошибки может быть полезно для отладки
+            Console.WriteLine($"Failed to update workflow definitions: {ex.Message}");
+            return false;
+        }
+    }
 
     public async Task<bool> UpdateBotWorkflowAsync(Guid workflowId, bool isActive)
     {

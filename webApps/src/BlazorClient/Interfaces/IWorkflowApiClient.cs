@@ -10,6 +10,7 @@ public interface IWorkflowApiClient
     Task<bool> AddBotWorkflowAsync(Guid botId, int version);
     Task<bool> UpdateBotWorkflowAsync(Guid workflowId, bool isActive);
     Task<bool> DeleteBotWorkflowAsync(Guid workflowId);
+    Task<bool> UpdateWorkflowDefinitionsAsync(Guid workflowId, string nStr, string eStr, string lStr);
 }
 
 public record GqlData(GqlWorkflowContent Data);

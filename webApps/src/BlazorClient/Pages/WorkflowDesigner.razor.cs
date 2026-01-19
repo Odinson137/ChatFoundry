@@ -7,11 +7,74 @@ using Blazor.Diagrams.Core.PathGenerators;
 using Blazor.Diagrams.Core.Routers;
 using Blazor.Diagrams.Options;
 using BlazorClient.Interfaces;
-using BlazorClient.Models;
+using BlazorClient.Models; // Убедитесь, что эта using-директива присутствует
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Text.Json; // Добавьте для работы с JsonElement, если потребуется
 
 namespace BlazorClient.Pages;
+
+public class WorkflowNodeModel : NodeModel
+{
+    public string NodeType { get; }
+    public NodeData? Data { get; set; } // Добавлено свойство Data
+
+    public WorkflowNodeModel(Point? position, string nodeType, string title, Guid? id = null, NodeData? data = null) 
+        : base(id?.ToString() ?? Guid.NewGuid().ToString(), position)
+    {
+        NodeType = nodeType;
+        Title = title;
+        Data = data;
+    }
+}
+
+public class WorkflowPortModel : PortModel
+{
+    public WorkflowPortModel(NodeModel parent, PortAlignment alignment, Point? position = null, Guid? id = null)
+        : base(id?.ToString() ?? Guid.NewGuid().ToString(), parent, alignment, position) { }
+}
+
+public class WorkflowLinkModel : LinkModel
+{
+    private LinkLabelModel? _labelModel;
+
+    public string? Label
+    {
+        get => _labelModel?.Content;
+        set
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                if (_labelModel != null)
+                {
+                    Labels.Remove(_labelModel);
+                    _labelModel = null;
+                }
+            }
+            else
+            {
+                if (_labelModel == null)
+                {
+                    _labelModel = new LinkLabelModel(this, value, offset: new Point(0, -20));
+                    Labels.Add(_labelModel);
+                }
+                else
+                {
+                    _labelModel.Content = value;
+                }
+            }
+            Refresh();
+        }
+    }
+
+    public WorkflowLinkModel(Anchor source, Anchor? target = null, Guid? id = null) 
+        : base(id?.ToString() ?? Guid.NewGuid().ToString(), source, target) { }
+}
+
 
 public partial class WorkflowDesigner : IDisposable
 {
@@ -68,7 +131,8 @@ public partial class WorkflowDesigner : IDisposable
             var layout = schema.Layout.FirstOrDefault(l => l.NodeId == nDef.Id);
             var position = layout != null ? new Point(layout.X, layout.Y) : new Point(50, 50);
             
-            var node = CreateNodeInstance(nDef.Type, nDef.Label, position, nDef.Id);
+            // ПЕРЕДАЕМ NodeData В CreateNodeInstance
+            var node = CreateNodeInstance(nDef.Type, nDef.Label, position, nDef.Id, nDef.Data);
             nodeMap[nDef.Id] = node;
             Diagram.Nodes.Add(node);
         }
@@ -77,56 +141,55 @@ public partial class WorkflowDesigner : IDisposable
         {
             if (nodeMap.TryGetValue(eDef.From, out var source) && nodeMap.TryGetValue(eDef.To, out var target))
             {
-                var sourcePort = source.GetPort(PortAlignment.Bottom) ?? source.Ports.FirstOrDefault();
-                var targetPort = target.GetPort(PortAlignment.Top) ?? target.Ports.FirstOrDefault();
+                var sourcePort = source.Ports.FirstOrDefault(p => p.Alignment == PortAlignment.Bottom) ?? source.Ports.FirstOrDefault();
+                var targetPort = target.Ports.FirstOrDefault(p => p.Alignment == PortAlignment.Top) ?? target.Ports.FirstOrDefault();
 
                 if (sourcePort != null && targetPort != null)
                 {
-                    Diagram.Links.Add(new WorkflowLinkModel(
-                        new SinglePortAnchor(sourcePort), 
-                        new SinglePortAnchor(targetPort)));
+                    var link = new WorkflowLinkModel(new SinglePortAnchor(sourcePort), new SinglePortAnchor(targetPort));
+                    Diagram.Links.Add(link);
                 }
             }
         }
     }
 
-    private NodeModel CreateNodeInstance(string type, string label, Point position, Guid? id = null)
+    // ИЗМЕНЕНИЕ: Добавлен параметр NodeData? data = null
+    private NodeModel CreateNodeInstance(string type, string label, Point position, Guid? id = null, NodeData? data = null)
     {
-        var node = id.HasValue ? new NodeModel(id.Value.ToString(), position) : new NodeModel(position);
-        node.Title = label;
+        if (data == null && type.ToLower() == "message")
+        {
+            // Изменено на инициализатор
+            data = new MessageNodeData { Text = "" };
+        }
+        else if (data == null) // Если данных нет и это не "Message", используем EmptyNodeData
+        {
+             data = new EmptyNodeData();
+        }
+
+        var node = new WorkflowNodeModel(position, type, label, id, data);
 
         switch (type.ToLower())
         {
             case "start":
-                node.AddPort(PortAlignment.Bottom);
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Bottom));
                 break;
             case "end":
-                node.AddPort(PortAlignment.Top);
-                break;
-            case "message":
-            case "ask":
-            case "input":
-            case "media":
-            case "setvariable":
-            case "httprequest":
-            case "aigenerate":
-                node.AddPort(PortAlignment.Top);
-                node.AddPort(PortAlignment.Bottom);
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Top));
                 break;
             case "condition":
             case "aifilter":
-                node.AddPort(PortAlignment.Top);
-                node.AddPort(PortAlignment.Left);
-                node.AddPort(PortAlignment.Right);
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Top));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Left));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right));
                 break;
-            case "wait":
-                node.AddPort(PortAlignment.Top);
-                node.AddPort(PortAlignment.Bottom);
+            default:
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Top));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Bottom));
                 break;
         }
         return node;
     }
-
+    
     private void OnDrop(DragEventArgs e)
     {
         if (_draggedType == null) return;
@@ -147,11 +210,64 @@ public partial class WorkflowDesigner : IDisposable
             _ => "Блок"
         };
 
-        var node = CreateNodeInstance(_draggedType.Value.ToString(), label, point);
+        NodeData? initialData = null;
+        if (_draggedType.Value == NodeType.Message)
+        {
+            initialData = new MessageNodeData()
+            {
+                Text = string.Empty
+            }; // Создаем пустой MessageNodeData для нового узла
+        }
+        // Добавьте логику для других типов узлов, если у них есть начальные данные
+        
+        var node = CreateNodeInstance(_draggedType.Value.ToString(), label, point, data: initialData);
         Diagram.Nodes.Add(node);
         _draggedType = null;
     }
 
+    private async Task SaveWorkflow()
+    {
+        var nodes = Diagram.Nodes.Cast<WorkflowNodeModel>().Select(n => new NodeDefinition(
+            Guid.Parse(n.Id),
+            n.NodeType,
+            n.Title,
+            n.Data is EmptyNodeData ? null : n.Data)).ToList(); // ИЗМЕНЕНИЕ ЗДЕСЬ: отправляем null, если данные пустые
+
+        var edges = Diagram.Links.Select(l =>
+        {
+            var fromId = GetNodeIdFromAnchor(l.Source);
+            var toId = GetNodeIdFromAnchor(l.Target);
+
+            return (fromId.HasValue && toId.HasValue)
+                ? new EdgeDefinition(fromId.Value, toId.Value, null)
+                : null;
+        })
+        .Where(e => e != null)
+        .Select(e => e!)
+        .ToList();
+
+        var layout = Diagram.Nodes.Select(n => new LayoutDefinition(
+            Guid.Parse(n.Id),
+            n.Position.X,
+            n.Position.Y)).ToList();
+
+        var schema = new WorkflowSchema(nodes, edges, layout);
+        var (nStr, eStr, lStr) = SchemaService.Serialize(schema);
+        
+        await ApiClient.UpdateWorkflowDefinitionsAsync(WorkflowId, nStr, eStr, lStr);
+    }
+
+    private Guid? GetNodeIdFromAnchor(Anchor anchor)
+    {
+        if (anchor.Model is NodeModel node) 
+            return Guid.Parse(node.Id);
+
+        if (anchor.Model is PortModel port) 
+            return Guid.Parse(port.Parent.Id);
+
+        return null;
+    }
+    
     private void OnSelectionChanged(SelectableModel model)
     {
         SelectedModel = model.Selected ? (Model)model : null;
@@ -163,96 +279,31 @@ public partial class WorkflowDesigner : IDisposable
         if (SelectedModel == null) return;
 
         if (SelectedModel is NodeModel node)
-        {
             Diagram.Nodes.Remove(node);
-        }
-        else if (SelectedModel is BaseLinkModel link)
-        {
+        else if (SelectedModel is LinkModel link)
             Diagram.Links.Remove(link);
-        }
-
+        
         SelectedModel = null;
-        StateHasChanged();
     }
 
-    private void OnDragStart(DragEventArgs e, NodeType type)
-    {
-        _draggedType = type;
-        e.DataTransfer.EffectAllowed = "copy";
-    }
-
-    private async Task SaveWorkflow()
-    {
-        // 1. Собираем узлы (Nodes)
-        var nodes = Diagram.Nodes.Select(n => new NodeDefinition(
-            Guid.Parse(n.Id), 
-            n.Title, 
-            n.Title, 
-            null)).ToList();
-
-        var edges = Diagram.Links.Select(l => 
-            {
-                var fromId = GetNodeIdFromAnchor(l.Source);
-                var toId = GetNodeIdFromAnchor(l.Target);
-
-                return (fromId.HasValue && toId.HasValue) 
-                    ? new EdgeDefinition(fromId.Value, toId.Value, null) 
-                    : null;
-            })
-            .Where(e => e != null)
-            .Select(e => e!)
-            .ToList();
-
-        var layout = Diagram.Nodes.Select(n => new LayoutDefinition(
-            Guid.Parse(n.Id), 
-            n.Position.X, 
-            n.Position.Y)).ToList();
-
-        var schema = new WorkflowSchema(nodes, edges, layout);
-        var (nStr, eStr, lStr) = SchemaService.Serialize(schema);
-
-        Console.WriteLine($"Nodes: {nStr}");
-        Console.WriteLine($"Edges: {eStr}");
-        Console.WriteLine($"Layout: {lStr}");
-    }
-
-    private Guid? GetNodeIdFromAnchor(Blazor.Diagrams.Core.Anchors.Anchor anchor)
-    {
-        if (anchor.Model is NodeModel node) 
-            return Guid.Parse(node.Id);
-
-        if (anchor.Model is PortModel port) 
-            return Guid.Parse(port.Parent.Id);
-
-        return null;
-    }
-
-
+    private void OnDragStart(DragEventArgs e, NodeType type) => _draggedType = type;
+    
     private void OnLinkColorChanged(LinkModel link, ChangeEventArgs e)
     {
-        var newColor = e.Value?.ToString();
-        if (!string.IsNullOrEmpty(newColor))
-        {
-            link.Color = newColor;
-            link.Refresh();
-        }
-    }
-
-    private void OnLinkWidthChanged(LinkModel link, ChangeEventArgs e)
-    {
-        if (double.TryParse(e.Value?.ToString(), out var width))
-        {
-            link.Width = width;
-            link.Refresh();
-        }
-    }
-
-    private void OnLinkLabelChanged(WorkflowLinkModel link, ChangeEventArgs text)
-    {
-        link.UpdateLabel(text?.Value?.ToString() ?? string.Empty);
+        link.Color = e.Value?.ToString() ?? "gray";
         link.Refresh();
     }
-
-    public void Dispose() => Diagram.SelectionChanged -= OnSelectionChanged;
+    
+    private void OnLinkLabelChanged(WorkflowLinkModel link, ChangeEventArgs e)
+    {
+        link.Label = e.Value?.ToString();
+    }
+    
     private void OnDragOver(DragEventArgs e) { }
+    
+    public void Dispose()
+    {
+        if (Diagram != null)
+            Diagram.SelectionChanged -= OnSelectionChanged;
+    }
 }

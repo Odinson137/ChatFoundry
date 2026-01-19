@@ -2,7 +2,6 @@
 using System.Security.Claims;
 using System.Text.Json;
 using Blazored.LocalStorage;
-using BlazorClient.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace BlazorClient.Auth;

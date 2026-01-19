@@ -1,12 +1,17 @@
 ﻿using System.Text.Json;
 using BlazorClient.Interfaces;
-using BlazorClient.Models;
+using BlazorClient.Models; // Убедитесь, что эта using-директива присутствует
+using System.Collections.Generic;
 
 namespace BlazorClient.Services;
 
 public class WorkflowSchemaService : IWorkflowSchemaService
 {
-    private readonly JsonSerializerOptions _options = new() { PropertyNameCaseInsensitive = true };
+    private readonly JsonSerializerOptions _options = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        PropertyNameCaseInsensitive = true
+    };
 
     public WorkflowSchema Deserialize(string nodes, string edges, string layout)
     {
