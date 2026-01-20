@@ -18,6 +18,7 @@ public class SendMessageActionExecutor(
     {
         Console.WriteLine("Sending message");
         await messageSender.SendAsync(action, message, ct);
+        // todo пока так, потом может другое придумать
         await actionCompletedProducer.Produce(new ActionCompletedEvent(message.Channel, message.ExternalUserId), ct);
     }
 }

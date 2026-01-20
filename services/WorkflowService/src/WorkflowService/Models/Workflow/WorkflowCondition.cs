@@ -12,6 +12,12 @@ public sealed class EqualsCondition : WorkflowCondition
     public string Right { get; init; } = null!;
 }
 
+public class ContainsCondition : WorkflowCondition
+{
+    public string Left { get; init; } = null!;
+    public string Right { get; init; } = null!;
+}
+
 public sealed class AndCondition : WorkflowCondition
 {
     public IReadOnlyList<WorkflowCondition> Conditions { get; init; } = [];

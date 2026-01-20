@@ -15,27 +15,49 @@
             <div class="sidebar-section">
                 <small>ЛОГИКА</small>
                 <div class="node-grid">
-                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.Start)"><span class="oi oi-media-play"></span> Старт</div>
-                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.Condition)"><span class="oi oi-fork"></span> Условие</div>
-                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.Wait)"><span class="oi oi-timer"></span> Ожидание</div>
-                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.End)"><span class="oi oi-media-stop"></span> Конец</div>
+                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.Start)"><span
+                            class="oi oi-media-play"></span> Старт
+                    </div>
+                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.Condition)"><span
+                            class="oi oi-fork"></span> Условие
+                    </div>
+                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.Wait)"><span
+                            class="oi oi-timer"></span> Ожидание
+                    </div>
+                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.End)"><span
+                            class="oi oi-media-stop"></span> Конец
+                    </div>
                 </div>
             </div>
             <div class="sidebar-section">
                 <small>КОНТЕНТ</small>
                 <div class="node-grid">
-                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.Message)"><span class="oi oi-chat"></span> Сообщение</div>
-                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.Ask)"><span class="oi oi-question-mark"></span> Вопрос</div>
-                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.Media)"><span class="oi oi-image"></span> Медиа</div>
+                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.Message)"><span
+                            class="oi oi-chat"></span> Сообщение
+                    </div>
+                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.Ask)"><span
+                            class="oi oi-question-mark"></span> Вопрос
+                    </div>
+                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.Media)"><span
+                            class="oi oi-image"></span> Медиа
+                    </div>
                 </div>
             </div>
             <div class="sidebar-section">
                 <small>ИНТЕГРАЦИИ</small>
                 <div class="node-grid">
-                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.HttpRequest)"><span class="oi oi-cloud-download"></span> API Запрос</div>
-                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.SetVariable)"><span class="oi oi-list"></span> Переменная</div>
-                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.AIFilter)"><span class="oi oi-eye"></span> AI Фильтр</div>
-                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.AIGenerate)"><span class="oi oi-bolt"></span> AI Текст</div>
+                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.HttpRequest)">
+                        <span class="oi oi-cloud-download"></span> API Запрос
+                    </div>
+                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.SetVariable)">
+                        <span class="oi oi-list"></span> Переменная
+                    </div>
+                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.AIFilter)"><span
+                            class="oi oi-eye"></span> AI Фильтр
+                    </div>
+                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.AIGenerate)">
+                        <span class="oi oi-bolt"></span> AI Текст
+                    </div>
                 </div>
             </div>
         </div>
@@ -71,16 +93,16 @@
                         <label class="form-label">Заголовок</label>
                         <input type="text" class="form-control" @bind-value="node.Title" @bind-value:event="oninput"/>
                     </div>
-                    
-                    @* НОВЫЙ БЛОК: Для редактирования NodeData *@
+
                     @if (node is WorkflowNodeModel { Data: MessageNodeData msgData })
                     {
                         <div class="mb-3">
                             <label class="form-label">Текст сообщения</label>
-                            <textarea class="form-control" @bind="msgData.Text" @bind:event="oninput" rows="4"></textarea>
+                            <textarea class="form-control" @bind="msgData.Text" @bind:event="oninput"
+                                      rows="4"></textarea>
                         </div>
                     }
-                    /* Добавьте блоки для других типов NodeData, например:
+                    /* 
                         @if (wfNode.Data is AskNodeData askData)
                         {
                             <div class="mb-3">
@@ -93,18 +115,57 @@
                 }
                 else if (SelectedModel is WorkflowLinkModel link)
                 {
+                    <div class="section-title mb-3 fw-bold">Логика перехода</div>
+
                     <div class="mb-3">
-                        <label class="form-label">Текст на связи</label>
-                        <input type="text" class="form-control" @bind="link.Label" @bind:event="oninput" />
+                        <label class="form-label">Тип условия</label>
+                        <select class="form-select"
+                                @onchange="@(e => OnConditionTypeChanged(link, e.Value?.ToString()))">
+                            <option value="none" selected="@(link.Condition == null)">Без условия (Всегда)</option>
+                            <option value="equals" selected="@(link.Condition?.Equals != null)">Равно (==)</option>
+                            <option value="contains" selected="@(link.Condition?.Contains != null)">Содержит (*)
+                            </option>
+                        </select>
                     </div>
+
+                    @if (link.Condition?.Equals != null)
+                    {
+                        <div class="card p-3 border-primary mb-3 shadow-sm">
+                            <div class="mb-2">
+                                <label class="small text-muted">Переменная (напр. $client.name)</label>
+                                <input type="text" class="form-control" @bind="link.Condition.Equals.Left"/>
+                            </div>
+                            <div class="text-center my-1"><span class="badge bg-primary">РАВНО</span></div>
+                            <div>
+                                <label class="small text-muted">Значение</label>
+                                <input type="text" class="form-control" @bind="link.Condition.Equals.Right"/>
+                            </div>
+                        </div>
+                    }
+                    else if (link.Condition?.Contains != null)
+                    {
+                        <div class="card p-3 border-success mb-3 shadow-sm">
+                            <div class="mb-2">
+                                <label class="small text-muted">Переменная</label>
+                                <input type="text" class="form-control" @bind="link.Condition.Contains.Left"/>
+                            </div>
+                            <div class="text-center my-1"><span class="badge bg-success">СОДЕРЖИТ</span></div>
+                            <div>
+                                <label class="small text-muted">Подстрока</label>
+                                <input type="text" class="form-control" @bind="link.Condition.Contains.Right"/>
+                            </div>
+                        </div>
+                    }
+
                     <div class="mb-3">
-                        <label class="form-label">Цвет линии</label>
-                        <input type="color" class="form-control form-control-color w-100" @bind="link.Color" />
+                        <label class="form-label">Текст на линии</label>
+                        <input type="text" class="form-control" @bind="link.Label" placeholder="Напр: Да / Нет"/>
                     </div>
                 }
-                <hr />
+
+                <hr/>
                 <div class="mt-3">
-                     <button class="btn btn-outline-danger w-100" @onclick="DeleteSelectedModel">
+                    <button class="btn btn-outline-danger w-100" @onclick="DeleteSelectedModel">
                         <span class="oi oi-trash"></span> Удалить
                     </button>
                 </div>
