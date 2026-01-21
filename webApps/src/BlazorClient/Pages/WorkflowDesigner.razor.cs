@@ -1,4 +1,4 @@
-﻿using Blazor.Diagrams;
+using Blazor.Diagrams;
 using Blazor.Diagrams.Core.Anchors;
 using Blazor.Diagrams.Core.Geometry;
 using Blazor.Diagrams.Core.Models;
@@ -7,83 +7,39 @@ using Blazor.Diagrams.Core.PathGenerators;
 using Blazor.Diagrams.Core.Routers;
 using Blazor.Diagrams.Options;
 using BlazorClient.Interfaces;
-using BlazorClient.Models; // Убедитесь, что эта using-директива присутствует
+using BlazorClient.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Text.Json; // Добавьте для работы с JsonElement, если потребуется
+using BlazorClient.Models.Diagram;
 
 namespace BlazorClient.Pages;
 
-public class WorkflowNodeModel : NodeModel
+// Модели переменных
+public class VariableInfo
 {
-    public string NodeType { get; }
-    public NodeData? Data { get; set; } // Добавлено свойство Data
-
-    public WorkflowNodeModel(Point? position, string nodeType, string title, Guid? id = null, NodeData? data = null)
-        : base(id?.ToString() ?? Guid.NewGuid().ToString(), position)
-    {
-        NodeType = nodeType;
-        Title = title;
-        Data = data;
-    }
+    public string Name { get; set; } = "";
+    public VariableType Type { get; set; }
+    public string? SourceNode { get; set; }
+    public List<string> UsageNodes { get; set; } = new();
+    public int UsageCount => UsageNodes.Count;
 }
 
-public class WorkflowPortModel : PortModel
+public enum VariableType
 {
-    public WorkflowPortModel(NodeModel parent, PortAlignment alignment, Point? position = null, Guid? id = null)
-        : base(id?.ToString() ?? Guid.NewGuid().ToString(), parent, alignment, position)
-    {
-    }
-}
-
-public class WorkflowLinkModel : LinkModel
-{
-    private LinkLabelModel? _labelModel;
-
-    public ConditionDefinition? Condition { get; set; }
-
-    public string? Label
-    {
-        get => _labelModel?.Content;
-        set
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                if (_labelModel != null)
-                {
-                    Labels.Remove(_labelModel);
-                    _labelModel = null;
-                }
-            }
-            else
-            {
-                if (_labelModel == null)
-                {
-                    _labelModel = new LinkLabelModel(this, value, offset: new Point(0, -20));
-                    Labels.Add(_labelModel);
-                }
-                else
-                {
-                    _labelModel.Content = value;
-                }
-            }
-
-            Refresh();
-        }
-    }
-
-    public WorkflowLinkModel(Anchor source, Anchor? target = null, Guid? id = null)
-        : base(id?.ToString() ?? Guid.NewGuid().ToString(), source, target)
-    {
-    }
+    System,
+    User,
+    Custom
 }
 
 public partial class WorkflowDesigner : IDisposable
 {
+    [Inject] private IJSRuntime JSRuntime { get; set; } = null!;
     [Inject] private IWorkflowApiClient ApiClient { get; set; } = null!;
     [Inject] private IWorkflowSchemaService SchemaService { get; set; } = null!;
 
@@ -93,10 +49,21 @@ public partial class WorkflowDesigner : IDisposable
     private NodeType? _draggedType;
     private Model? SelectedModel { get; set; }
 
+    // Переменные - управление панелью
+    private bool IsVariablesPanelOpen { get; set; } = true;
+    private List<VariableInfo> DiscoveredVariables { get; set; } = new();
+    private string VariableSearchQuery { get; set; } = "";
+
+    // Переменные - модальное окно выбора
+    private bool IsVariablePickerOpen { get; set; }
+    private string VariablePickerSearch { get; set; } = "";
+    private Action<string>? OnVariableSelected { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         InitializeDiagram();
         await LoadWorkflowData();
+        RefreshVariables();
     }
 
     private void InitializeDiagram()
@@ -122,7 +89,21 @@ public partial class WorkflowDesigner : IDisposable
 
         Diagram = new BlazorDiagram(options);
         Diagram.SelectionChanged += OnSelectionChanged;
+        Diagram.Changed += OnDiagramChanged;
     }
+
+    private void OnDiagramChanged()
+    {
+        RefreshVariables();
+    }
+
+    private void OnWorkflowChanged()
+    {
+        RefreshVariables();
+        StateHasChanged();
+    }
+
+    #region Загрузка и сохранение
 
     private async Task LoadWorkflowData()
     {
@@ -137,7 +118,6 @@ public partial class WorkflowDesigner : IDisposable
             var layout = schema.Layout.FirstOrDefault(l => l.NodeId == nDef.Id);
             var position = layout != null ? new Point(layout.X, layout.Y) : new Point(50, 50);
 
-            // ПЕРЕДАЕМ NodeData В CreateNodeInstance
             var node = CreateNodeInstance(nDef.Type, nDef.Label, position, nDef.Id, nDef.Data);
             nodeMap[nDef.Id] = node;
             Diagram.Nodes.Add(node);
@@ -155,23 +135,61 @@ public partial class WorkflowDesigner : IDisposable
                 if (sourcePort != null && targetPort != null)
                 {
                     var link = new WorkflowLinkModel(new SinglePortAnchor(sourcePort),
-                        new SinglePortAnchor(targetPort));
+                        new SinglePortAnchor(targetPort))
+                    {
+                        Condition = eDef.Condition
+                    };
                     Diagram.Links.Add(link);
                 }
             }
         }
     }
 
-    // ИЗМЕНЕНИЕ: Добавлен параметр NodeData? data = null
+    private async Task SaveWorkflow()
+    {
+        var nodes = Diagram.Nodes.Cast<WorkflowNodeModel>().Select(n => new NodeDefinition(
+            Guid.Parse(n.Id),
+            n.NodeType,
+            n.Title,
+            n.Data is EmptyNodeData ? null : n.Data)).ToList();
+
+        var edges = Diagram.Links.Cast<WorkflowLinkModel>().Select(l =>
+        {
+            var fromId = GetNodeIdFromAnchor(l.Source);
+            var toId = GetNodeIdFromAnchor(l.Target);
+
+            return (fromId.HasValue && toId.HasValue)
+                ? new EdgeDefinition(fromId.Value, toId.Value, l.Condition)
+                : null;
+        }).Where(e => e != null).Select(e => e!).ToList();
+
+        var layout = Diagram.Nodes.Select(n => new LayoutDefinition(
+            Guid.Parse(n.Id),
+            n.Position.X,
+            n.Position.Y)).ToList();
+
+        var schema = new WorkflowSchema(nodes, edges, layout);
+        var (nStr, eStr, lStr) = SchemaService.Serialize(schema);
+
+        await ApiClient.UpdateWorkflowDefinitionsAsync(WorkflowId, nStr, eStr, lStr);
+    }
+
+    #endregion
+
+    #region Работа с узлами
+
     private NodeModel CreateNodeInstance(string type, string label, Point position, Guid? id = null,
         NodeData? data = null)
     {
         if (data == null && type.ToLower() == "message")
         {
-            // Изменено на инициализатор
             data = new MessageNodeData { Text = "" };
         }
-        else if (data == null) // Если данных нет и это не "Message", используем EmptyNodeData
+        else if (data == null && type.ToLower() == "setvariable")
+        {
+            data = new SetVariableNodeData { Variable = "", Value = "" };
+        }
+        else if (data == null)
         {
             data = new EmptyNodeData();
         }
@@ -222,49 +240,273 @@ public partial class WorkflowDesigner : IDisposable
             _ => "Блок"
         };
 
-        NodeData? initialData = null;
-        if (_draggedType.Value == NodeType.Message)
+        NodeData? initialData = _draggedType.Value switch
         {
-            initialData = new MessageNodeData()
-            {
-                Text = string.Empty
-            }; // Создаем пустой MessageNodeData для нового узла
-        }
-        // Добавьте логику для других типов узлов, если у них есть начальные данные
+            NodeType.Message => new MessageNodeData { Text = "" },
+            NodeType.SetVariable => new SetVariableNodeData { Variable = "", Value = "" },
+            _ => null
+        };
 
         var node = CreateNodeInstance(_draggedType.Value.ToString(), label, point, data: initialData);
         Diagram.Nodes.Add(node);
         _draggedType = null;
+        
+        RefreshVariables();
     }
 
-    private async Task SaveWorkflow()
+    private void DeleteSelectedModel()
     {
-        var nodes = Diagram.Nodes.Cast<WorkflowNodeModel>().Select(n => new NodeDefinition(
-            Guid.Parse(n.Id),
-            n.NodeType,
-            n.Title,
-            n.Data is EmptyNodeData ? null : n.Data)).ToList();
+        if (SelectedModel == null) return;
 
-        var edges = Diagram.Links.Cast<WorkflowLinkModel>().Select(l =>
-        {
-            var fromId = GetNodeIdFromAnchor(l.Source);
-            var toId = GetNodeIdFromAnchor(l.Target);
+        if (SelectedModel is NodeModel node)
+            Diagram.Nodes.Remove(node);
+        else if (SelectedModel is LinkModel link)
+            Diagram.Links.Remove(link);
 
-            return (fromId.HasValue && toId.HasValue)
-                ? new EdgeDefinition(fromId.Value, toId.Value, l.Condition) 
-                : null;
-        }).Where(e => e != null).Select(e => e!).ToList();
-
-        var layout = Diagram.Nodes.Select(n => new LayoutDefinition(
-            Guid.Parse(n.Id),
-            n.Position.X,
-            n.Position.Y)).ToList();
-
-        var schema = new WorkflowSchema(nodes, edges, layout);
-        var (nStr, eStr, lStr) = SchemaService.Serialize(schema);
-
-        await ApiClient.UpdateWorkflowDefinitionsAsync(WorkflowId, nStr, eStr, lStr);
+        SelectedModel = null;
+        RefreshVariables();
     }
+
+    #endregion
+
+    #region Работа с переменными - Обнаружение
+
+    private void RefreshVariables()
+    {
+        var variables = new Dictionary<string, VariableInfo>();
+
+        foreach (var node in Diagram.Nodes.Cast<WorkflowNodeModel>())
+        {
+            var nodeTitle = node.Title ?? "Unnamed";
+
+            if (node.Data is SetVariableNodeData varData && !string.IsNullOrWhiteSpace(varData.Variable))
+            {
+                var varName = NormalizeVariableName(varData.Variable);
+                if (!variables.ContainsKey(varName))
+                {
+                    variables[varName] = new VariableInfo
+                    {
+                        Name = varName,
+                        Type = GetVariableType(varName),
+                        SourceNode = nodeTitle
+                    };
+                }
+
+                if (!string.IsNullOrWhiteSpace(varData.Value))
+                {
+                    var usedVars = ExtractVariables(varData.Value);
+                    foreach (var usedVar in usedVars)
+                    {
+                        EnsureVariableExists(variables, usedVar);
+                        variables[usedVar].UsageNodes.Add(nodeTitle);
+                    }
+                }
+            }
+
+            if (node.Data is MessageNodeData msgData && !string.IsNullOrWhiteSpace(msgData.Text))
+            {
+                var usedVars = ExtractVariables(msgData.Text);
+                foreach (var varName in usedVars)
+                {
+                    EnsureVariableExists(variables, varName);
+                    if (!variables[varName].UsageNodes.Contains(nodeTitle))
+                    {
+                        variables[varName].UsageNodes.Add(nodeTitle);
+                    }
+                }
+            }
+        }
+
+        foreach (var link in Diagram.Links.Cast<WorkflowLinkModel>())
+        {
+            if (link.Condition?.Equals != null)
+            {
+                var leftVar = NormalizeVariableName(link.Condition.Equals.Left);
+                EnsureVariableExists(variables, leftVar);
+                variables[leftVar].UsageNodes.Add("Условие на линке");
+
+                var rightVars = ExtractVariables(link.Condition.Equals.Right);
+                foreach (var rv in rightVars)
+                {
+                    EnsureVariableExists(variables, rv);
+                    variables[rv].UsageNodes.Add("Условие на линке");
+                }
+            }
+
+            if (link.Condition?.Contains != null)
+            {
+                var leftVar = NormalizeVariableName(link.Condition.Contains.Left);
+                EnsureVariableExists(variables, leftVar);
+                variables[leftVar].UsageNodes.Add("Условие на линке");
+
+                var rightVars = ExtractVariables(link.Condition.Contains.Right);
+                foreach (var rv in rightVars)
+                {
+                    EnsureVariableExists(variables, rv);
+                    variables[rv].UsageNodes.Add("Условие на линке");
+                }
+            }
+        }
+
+        DiscoveredVariables = variables.Values
+            .OrderBy(v => v.Type)
+            .ThenBy(v => v.Name)
+            .ToList();
+    }
+
+    private void EnsureVariableExists(Dictionary<string, VariableInfo> variables, string varName)
+    {
+        if (!variables.ContainsKey(varName))
+        {
+            variables[varName] = new VariableInfo
+            {
+                Name = varName,
+                Type = GetVariableType(varName),
+                SourceNode = null
+            };
+        }
+    }
+
+    private List<string> ExtractVariables(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return new List<string>();
+
+        var variables = new List<string>();
+        var pattern = @"\$?\{\{([^}]+)\}\}";
+        var matches = Regex.Matches(text, pattern);
+
+        foreach (Match match in matches)
+        {
+            var varName = match.Groups[1].Value.Trim();
+            varName = NormalizeVariableName(varName);
+            if (!variables.Contains(varName))
+            {
+                variables.Add(varName);
+            }
+        }
+
+        return variables;
+    }
+
+    private string NormalizeVariableName(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+            return "";
+
+        var normalized = input.Trim();
+        normalized = Regex.Replace(normalized, @"^\{\{|\}\}$", "");
+
+        if (!normalized.StartsWith("$"))
+        {
+            normalized = "$" + normalized;
+        }
+
+        return normalized;
+    }
+
+    private VariableType GetVariableType(string varName)
+    {
+        var lower = varName.ToLower();
+
+        if (lower.StartsWith("$system.") || lower.StartsWith("$bot."))
+            return VariableType.System;
+
+        if (lower.StartsWith("$user."))
+            return VariableType.User;
+
+        return VariableType.Custom;
+    }
+
+    private string GetVariableCssClass(VariableInfo variable)
+    {
+        return variable.Type switch
+        {
+            VariableType.System => "var-system",
+            VariableType.User => "var-user",
+            VariableType.Custom => "var-custom",
+            _ => ""
+        };
+    }
+
+    private Dictionary<string, List<VariableInfo>> GetGroupedVariables()
+    {
+        var filtered = string.IsNullOrWhiteSpace(VariableSearchQuery)
+            ? DiscoveredVariables
+            : DiscoveredVariables.Where(v => v.Name.Contains(VariableSearchQuery, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+        return filtered.GroupBy(v => v.Type switch
+        {
+            VariableType.System => "Системные",
+            VariableType.User => "Пользователь",
+            VariableType.Custom => "Пользовательские",
+            _ => "Другие"
+        }).ToDictionary(g => g.Key, g => g.ToList());
+    }
+
+    #endregion
+
+    #region Работа с переменными - UI Actions
+
+    private void ToggleVariablesPanel()
+    {
+        IsVariablesPanelOpen = !IsVariablesPanelOpen;
+    }
+
+    private async Task CopyVariableToClipboard(string variableName)
+    {
+        var toCopy = "{{" + variableName.TrimStart('$') + "}}";
+        await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", toCopy);
+    }
+
+    private void ShowVariablePicker(Action<string> onSelected)
+    {
+        OnVariableSelected = onSelected;
+        VariablePickerSearch = "";
+        IsVariablePickerOpen = true;
+    }
+
+    private void CloseVariablePicker()
+    {
+        IsVariablePickerOpen = false;
+        OnVariableSelected = null;
+    }
+
+    private void SelectVariableFromPicker(string variableName)
+    {
+        OnVariableSelected?.Invoke(variableName);
+        CloseVariablePicker();
+        StateHasChanged();
+    }
+
+    private List<VariableInfo> GetFilteredVariablesForPicker()
+    {
+        if (string.IsNullOrWhiteSpace(VariablePickerSearch))
+            return DiscoveredVariables;
+
+        return DiscoveredVariables
+            .Where(v => v.Name.Contains(VariablePickerSearch, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
+    private void InsertVariable(object dataObject, string propertyName, string variableName)
+    {
+        var property = dataObject.GetType().GetProperty(propertyName);
+        if (property != null)
+        {
+            var currentValue = property.GetValue(dataObject)?.ToString() ?? "";
+            var toInsert = "{{" + variableName.TrimStart('$') + "}}";
+            
+            property.SetValue(dataObject, currentValue + toInsert);
+            
+            OnWorkflowChanged();
+        }
+    }
+
+    #endregion
+
+    #region Helpers
 
     private Guid? GetNodeIdFromAnchor(Anchor anchor)
     {
@@ -283,44 +525,23 @@ public partial class WorkflowDesigner : IDisposable
         StateHasChanged();
     }
 
-    private void DeleteSelectedModel()
-    {
-        if (SelectedModel == null) return;
-
-        if (SelectedModel is NodeModel node)
-            Diagram.Nodes.Remove(node);
-        else if (SelectedModel is LinkModel link)
-            Diagram.Links.Remove(link);
-
-        SelectedModel = null;
-    }
-
     private void OnDragStart(DragEventArgs e, NodeType type) => _draggedType = type;
-
-    private void OnLinkColorChanged(LinkModel link, ChangeEventArgs e)
-    {
-        link.Color = e.Value?.ToString() ?? "gray";
-        link.Refresh();
-    }
-
-    private void OnLinkLabelChanged(WorkflowLinkModel link, ChangeEventArgs e)
-    {
-        link.Label = e.Value?.ToString();
-    }
 
     private void OnConditionTypeChanged(WorkflowLinkModel link, string? type)
     {
         switch (type)
         {
             case "equals":
-                link.Condition = new ConditionDefinition { 
-                    Equals = new EqualsCondition("$var", "value") 
+                link.Condition = new ConditionDefinition
+                {
+                    Equals = new EqualsCondition("$var", "value")
                 };
                 link.Label = "Равно";
                 break;
             case "contains":
-                link.Condition = new ConditionDefinition { 
-                    Contains = new ContainsCondition("$var", "text") 
+                link.Condition = new ConditionDefinition
+                {
+                    Contains = new ContainsCondition("$var", "text")
                 };
                 link.Label = "Содержит";
                 break;
@@ -339,6 +560,11 @@ public partial class WorkflowDesigner : IDisposable
     public void Dispose()
     {
         if (Diagram != null)
+        {
             Diagram.SelectionChanged -= OnSelectionChanged;
+            Diagram.Changed -= OnDiagramChanged;
+        }
     }
+
+    #endregion
 }

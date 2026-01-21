@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using WorkflowService.Enums;
 using WorkflowService.Models.Node;
 using WorkflowService.Models.Workflow;
@@ -114,6 +114,7 @@ public sealed class WorkflowGraphParser
             WorkflowNodeType.Message => data.Deserialize<MessageNodeData>(JsonOptions) ?? NodeData.Empty,
             WorkflowNodeType.Ask => data.Deserialize<AskNodeData>(JsonOptions) ?? NodeData.Empty,
             WorkflowNodeType.SubWorkflow => data.Deserialize<SubWorkflowNodeData>(JsonOptions) ?? NodeData.Empty,
+            WorkflowNodeType.SetVariable => data.Deserialize<SetVariableNodeData>(JsonOptions) ?? NodeData.Empty,
             _ => NodeData.Empty
         };
     }

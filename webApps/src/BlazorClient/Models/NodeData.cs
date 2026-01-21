@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace BlazorClient.Models;
 
@@ -8,6 +8,7 @@ namespace BlazorClient.Models;
 // 'typeDiscriminator' должен соответствовать тому, как сервер определяет тип данных.
 [JsonDerivedType(typeof(EmptyNodeData), "Empty")] // 'Empty' - если нет специфичных данных
 [JsonDerivedType(typeof(MessageNodeData), "Message")] // 'Message' - для узла сообщения
+[JsonDerivedType(typeof(SetVariableNodeData), "SetVariable")] // 'SetVariable' - для узла установки переменной
 // Добавьте сюда другие типы NodeData, если они появятся, например:
 // [JsonDerivedType(typeof(AskNodeData), "Ask")] 
 public abstract class NodeData { }
@@ -18,6 +19,19 @@ public class MessageNodeData : NodeData
 {
     // Теперь здесь set вместо init, и Blazor сможет привязаться к этому полю
     public string Text { get; set; } = string.Empty;
+}
+
+public class SetVariableNodeData : NodeData
+{
+    /// <summary>
+    /// Имя переменной, куда будет сохранено значение (например, "user_name" или "client.name")
+    /// </summary>
+    public string Variable { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Значение, которое будет установлено. Может быть статическим текстом или ссылкой на другую переменную через {{variable_name}}
+    /// </summary>
+    public string Value { get; set; } = string.Empty;
 }
 // Если у вас есть другие типы узлов с данными (например, "Ask"), добавьте их здесь:
 //public record AskNodeData(string Question, List<string> Options) : NodeData();

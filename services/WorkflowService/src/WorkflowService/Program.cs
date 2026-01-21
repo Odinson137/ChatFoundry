@@ -54,6 +54,7 @@ services.AddScoped<IActionExecutor, SendMessageActionExecutor>();
 services.AddScoped<IActionExecutor, AskActionExecutor>();
 services.AddScoped<IActionExecutor, StartActionExecutor>();
 services.AddScoped<IActionExecutor, InputExecutor>();
+services.AddScoped<IActionExecutor, SetVariableActionExecutor>();
 
 services.AddScoped<IMessageSender, MessageSender>();
 
