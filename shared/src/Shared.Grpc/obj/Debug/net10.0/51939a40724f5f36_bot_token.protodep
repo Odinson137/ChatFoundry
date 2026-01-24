@@ -1,2 +1,0 @@
-obj\Debug\net10.0\WorkflowProtos/BotToken.cs \
-obj\Debug\net10.0\WorkflowProtos/BotTokenGrpc.cs: WorkflowProtos/bot_token.proto
