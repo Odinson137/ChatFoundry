@@ -197,6 +197,19 @@ services:
     networks:
       - app_network
 
+  ngrok:
+    image: ngrok/ngrok:latest
+    restart: unless-stopped
+    ports:
+      - "4040:4040"
+    depends_on:
+      - gateway-service
+    environment:
+      NGROK_AUTHTOKEN: 3055WP7065mrJ8lzPXzzEzK9TaR_4EZ3RCkkF3a1nzzM7zfPo
+    command: http "https://gateway-service:8443" --domain probable-dogfish-known.ngrok-free.app
+    networks:
+      - app_network
+
 volumes:
   identitydata:
   workflow_pgdata:
