@@ -65,7 +65,7 @@ public sealed class TelegramClient(
     {
         var client = InitializeClientByBotIdAsync(token);
 
-        var url = $"https://mongoose-needed-partially.ngrok-free.app/telegram/hook/{botId}"; // TODO вынести в переменные. Возможно потом запускать нгрок в докере и тянуть адрес прямо от туда
+        var url = $"https://probable-dogfish-known.ngrok-free.app/telegram/hook/{botId}"; // TODO вынести в переменные. Возможно потом запускать нгрок в докере и тянуть адрес прямо от туда
         await client.SetWebhook(
             url,
             maxConnections: 40, // default

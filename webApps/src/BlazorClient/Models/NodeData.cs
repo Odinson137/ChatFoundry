@@ -9,8 +9,8 @@ namespace BlazorClient.Models;
 [JsonDerivedType(typeof(EmptyNodeData), "Empty")] // 'Empty' - если нет специфичных данных
 [JsonDerivedType(typeof(MessageNodeData), "Message")] // 'Message' - для узла сообщения
 [JsonDerivedType(typeof(SetVariableNodeData), "SetVariable")] // 'SetVariable' - для узла установки переменной
-// Добавьте сюда другие типы NodeData, если они появятся, например:
-// [JsonDerivedType(typeof(AskNodeData), "Ask")] 
+[JsonDerivedType(typeof(AskNodeData), "Ask")]
+
 public abstract class NodeData { }
 
 public class EmptyNodeData : NodeData { }
@@ -33,5 +33,8 @@ public class SetVariableNodeData : NodeData
     /// </summary>
     public string Value { get; set; } = string.Empty;
 }
-// Если у вас есть другие типы узлов с данными (например, "Ask"), добавьте их здесь:
-//public record AskNodeData(string Question, List<string> Options) : NodeData();
+
+public class AskNodeData : NodeData
+{
+    public string Text { get; set; } = string.Empty;
+}

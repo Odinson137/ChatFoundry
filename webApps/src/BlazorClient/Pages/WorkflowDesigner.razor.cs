@@ -185,6 +185,10 @@ public partial class WorkflowDesigner : IDisposable
         {
             data = new MessageNodeData { Text = "" };
         }
+        else if (data == null && type.ToLower() == "ask")
+        {
+            data = new AskNodeData { Text = "" };
+        }
         else if (data == null && type.ToLower() == "setvariable")
         {
             data = new SetVariableNodeData { Variable = "", Value = "" };
@@ -243,6 +247,7 @@ public partial class WorkflowDesigner : IDisposable
         NodeData? initialData = _draggedType.Value switch
         {
             NodeType.Message => new MessageNodeData { Text = "" },
+            NodeType.Ask => new AskNodeData { Text = "" },
             NodeType.SetVariable => new SetVariableNodeData { Variable = "", Value = "" },
             _ => null
         };
@@ -306,6 +311,19 @@ public partial class WorkflowDesigner : IDisposable
             if (node.Data is MessageNodeData msgData && !string.IsNullOrWhiteSpace(msgData.Text))
             {
                 var usedVars = ExtractVariables(msgData.Text);
+                foreach (var varName in usedVars)
+                {
+                    EnsureVariableExists(variables, varName);
+                    if (!variables[varName].UsageNodes.Contains(nodeTitle))
+                    {
+                        variables[varName].UsageNodes.Add(nodeTitle);
+                    }
+                }
+            }
+            
+            if (node.Data is AskNodeData askData && !string.IsNullOrWhiteSpace(askData.Text))
+            {
+                var usedVars = ExtractVariables(askData.Text);
                 foreach (var varName in usedVars)
                 {
                     EnsureVariableExists(variables, varName);
