@@ -55,12 +55,15 @@ services.AddScoped<IActionExecutor, AskActionExecutor>();
 services.AddScoped<IActionExecutor, StartActionExecutor>();
 services.AddScoped<IActionExecutor, InputExecutor>();
 services.AddScoped<IActionExecutor, SetVariableActionExecutor>();
+services.AddScoped<IActionExecutor, HttpRequestActionExecutor>();
 
 services.AddScoped<IMessageSender, MessageSender>();
 
 services.AddScoped<IActionExecutorFactory, ActionExecutorFactory>();
 services.AddScoped<WorkflowGraphParser>();
 services.AddScoped<WorkflowTextRenderer>();
+
+services.AddHttpClient();
 
 services.AddPostgreSql<WorkflowDbContext>(builder.Configuration);
 

@@ -207,6 +207,80 @@
                             </small>
                         </div>
                     }
+
+                    @if (node is WorkflowNodeModel { Data: HttpRequestNodeData httpData })
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">Метод</label>
+                            <select class="form-select" @bind="httpData.Method">
+                                <option value="GET">GET</option>
+                                <option value="POST">POST</option>
+                                <option value="PUT">PUT</option>
+                                <option value="DELETE">DELETE</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label d-flex justify-content-between align-items-center">
+                                <span>URL</span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" 
+                                        @onclick="() => ShowVariablePicker(v => InsertVariable(httpData, nameof(httpData.Url), v))">
+                                    <span class="oi oi-code"></span> {}
+                                </button>
+                            </label>
+                            <input type="text" class="form-control font-monospace" @bind="httpData.Url" placeholder="https://api.example.com/data"/>
+                        </div>
+
+                        @if (httpData.Method == "POST" || httpData.Method == "PUT")
+                        {
+                            <div class="mb-3">
+                                <label class="form-label d-flex justify-content-between align-items-center">
+                                    <span>Тело запроса (Body)</span>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" 
+                                            @onclick="() => ShowVariablePicker(v => InsertVariable(httpData, nameof(httpData.Body), v))">
+                                        <span class="oi oi-code"></span> {}
+                                    </button>
+                                </label>
+                                <textarea class="form-control font-monospace" rows="5" @bind="httpData.Body" placeholder='{"key": "{{variable_name}}"}'></textarea>
+                            </div>
+                        }
+
+                        <div class="mb-3">
+                            <label class="form-label">Заголовки</label>
+                            @foreach (var header in httpData.Headers.ToList())
+                            {
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control" placeholder="Header Name" value="@header.Key"
+                                           @onchange="@(e => { var newKey = e.Value.ToString(); if (!string.IsNullOrWhiteSpace(newKey)) { httpData.Headers.Remove(header.Key); httpData.Headers[newKey] = header.Value; }})"/>
+                                    <input type="text" class="form-control" placeholder="Header Value" @bind="httpData.Headers[header.Key]" />
+                                    <button class="btn btn-outline-danger" @onclick="() => httpData.Headers.Remove(header.Key)">
+                                        <span class="oi oi-trash"></span>
+                                    </button>
+                                </div>
+                            }
+                            <button class="btn btn-sm btn-outline-primary" @onclick="() => AddHeader(httpData)">
+                                <span class="oi oi-plus"></span> Добавить заголовок
+                            </button>
+                        </div>
+                        
+                        <hr/>
+
+                        <div class="mb-3">
+                            <label class="form-label">Сохранить тело ответа в переменную</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="text" class="form-control font-monospace" @bind="httpData.ResponseVariable" placeholder="api_response"/>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Сохранить статус-код в переменную</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="text" class="form-control font-monospace" @bind="httpData.StatusCodeVariable" placeholder="api_status_code"/>
+                            </div>
+                        </div>
+                    }
                 }
                 else if (SelectedModel is WorkflowLinkModel link)
                 {

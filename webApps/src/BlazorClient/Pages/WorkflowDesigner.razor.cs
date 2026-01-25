@@ -250,6 +250,7 @@ public partial class WorkflowDesigner : IDisposable
             NodeType.Message => new MessageNodeData { Text = "" },
             NodeType.Ask => new AskNodeData { Text = "" },
             NodeType.SetVariable => new SetVariableNodeData { Variable = "", Value = "" },
+            NodeType.HttpRequest => new HttpRequestNodeData { Method = "GET", Headers = new(), Url = "" },
             _ => null
         };
 
@@ -271,6 +272,15 @@ public partial class WorkflowDesigner : IDisposable
 
         SelectedModel = null;
         RefreshVariables();
+    }
+
+    private void AddHeader(HttpRequestNodeData httpData)
+    {
+        if (httpData?.Headers != null)
+        {
+            httpData.Headers.Add($"Header-{httpData.Headers.Count + 1}", "");
+            StateHasChanged();
+        }
     }
 
     #endregion
@@ -365,6 +375,55 @@ public partial class WorkflowDesigner : IDisposable
                         {
                             variables[varName].UsageNodes.Add(nodeTitle);
                         }
+                    }
+                }
+            }
+            
+            if (node.Data is HttpRequestNodeData httpData)
+            {
+                // Definitions
+                if (!string.IsNullOrWhiteSpace(httpData.ResponseVariable))
+                {
+                    var varName = NormalizeVariableName(httpData.ResponseVariable);
+                    if (!variables.ContainsKey(varName))
+                    {
+                        variables[varName] = new VariableInfo { Name = varName, Type = GetVariableType(varName), SourceNode = nodeTitle };
+                    }
+                }
+                if (!string.IsNullOrWhiteSpace(httpData.StatusCodeVariable))
+                {
+                    var varName = NormalizeVariableName(httpData.StatusCodeVariable);
+                    if (!variables.ContainsKey(varName))
+                    {
+                        variables[varName] = new VariableInfo { Name = varName, Type = GetVariableType(varName), SourceNode = nodeTitle };
+                    }
+                }
+
+                // Usages
+                var urlVars = ExtractVariables(httpData.Url);
+                foreach (var varName in urlVars)
+                {
+                    EnsureVariableExists(variables, varName);
+                    if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].UsageNodes.Add(nodeTitle);
+                }
+
+                if (!string.IsNullOrWhiteSpace(httpData.Body))
+                {
+                    var bodyVars = ExtractVariables(httpData.Body);
+                    foreach (var varName in bodyVars)
+                    {
+                        EnsureVariableExists(variables, varName);
+if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].UsageNodes.Add(nodeTitle);
+                    }
+                }
+
+                foreach (var header in httpData.Headers)
+                {
+                    var headerVars = ExtractVariables(header.Value);
+                    foreach (var varName in headerVars)
+                    {
+                        EnsureVariableExists(variables, varName);
+                        if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].UsageNodes.Add(nodeTitle);
                     }
                 }
             }
