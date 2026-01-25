@@ -137,7 +137,8 @@ public partial class WorkflowDesigner : IDisposable
                     var link = new WorkflowLinkModel(new SinglePortAnchor(sourcePort),
                         new SinglePortAnchor(targetPort))
                     {
-                        Condition = eDef.Condition
+                        Condition = eDef.Condition,
+                        Label = eDef.Label
                     };
                     Diagram.Links.Add(link);
                 }
@@ -159,7 +160,7 @@ public partial class WorkflowDesigner : IDisposable
             var toId = GetNodeIdFromAnchor(l.Target);
 
             return (fromId.HasValue && toId.HasValue)
-                ? new EdgeDefinition(fromId.Value, toId.Value, l.Condition)
+                ? new EdgeDefinition(fromId.Value, toId.Value, l.Label, l.Condition)
                 : null;
         }).Where(e => e != null).Select(e => e!).ToList();
 

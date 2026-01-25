@@ -1,4 +1,6 @@
-﻿namespace BlazorClient.Models;
+﻿using System.Text.Json.Serialization;
+
+namespace BlazorClient.Models;
 
 public record WorkflowSchema(
     List<NodeDefinition> Nodes,
@@ -7,13 +9,15 @@ public record WorkflowSchema(
 
 public record NodeDefinition(Guid Id, string Type, string Label, NodeData? Data);
 
-public record EdgeDefinition(Guid From, Guid To, ConditionDefinition? Condition);
+public record EdgeDefinition(Guid From, Guid To, string? Label, ConditionDefinition? Condition);
 
 public record LayoutDefinition(Guid NodeId, double X, double Y);
 
 public class ConditionDefinition
 {
+#pragma warning disable CS0108, CS0114
     public EqualsCondition? Equals { get; set; }
+#pragma warning restore CS0108, CS0114
     public ContainsCondition? Contains { get; set; }
 
     public ConditionDefinition() { }
