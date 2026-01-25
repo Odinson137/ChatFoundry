@@ -308,28 +308,62 @@ public partial class WorkflowDesigner : IDisposable
                 }
             }
 
-            if (node.Data is MessageNodeData msgData && !string.IsNullOrWhiteSpace(msgData.Text))
+            if (node.Data is MessageNodeData msgData)
             {
-                var usedVars = ExtractVariables(msgData.Text);
-                foreach (var varName in usedVars)
+                if (!string.IsNullOrWhiteSpace(msgData.Variable))
                 {
-                    EnsureVariableExists(variables, varName);
-                    if (!variables[varName].UsageNodes.Contains(nodeTitle))
+                    var varName = NormalizeVariableName(msgData.Variable);
+                    if (!variables.ContainsKey(varName))
                     {
-                        variables[varName].UsageNodes.Add(nodeTitle);
+                        variables[varName] = new VariableInfo
+                        {
+                            Name = varName,
+                            Type = GetVariableType(varName),
+                            SourceNode = nodeTitle
+                        };
+                    }
+                }
+    
+                if (!string.IsNullOrWhiteSpace(msgData.Text))
+                {
+                    var usedVars = ExtractVariables(msgData.Text);
+                    foreach (var varName in usedVars)
+                    {
+                        EnsureVariableExists(variables, varName);
+                        if (!variables[varName].UsageNodes.Contains(nodeTitle))
+                        {
+                            variables[varName].UsageNodes.Add(nodeTitle);
+                        }
                     }
                 }
             }
             
-            if (node.Data is AskNodeData askData && !string.IsNullOrWhiteSpace(askData.Text))
+            if (node.Data is AskNodeData askData)
             {
-                var usedVars = ExtractVariables(askData.Text);
-                foreach (var varName in usedVars)
+                if (!string.IsNullOrWhiteSpace(askData.Variable))
                 {
-                    EnsureVariableExists(variables, varName);
-                    if (!variables[varName].UsageNodes.Contains(nodeTitle))
+                    var varName = NormalizeVariableName(askData.Variable);
+                    if (!variables.ContainsKey(varName))
                     {
-                        variables[varName].UsageNodes.Add(nodeTitle);
+                        variables[varName] = new VariableInfo
+                        {
+                            Name = varName,
+                            Type = GetVariableType(varName),
+                            SourceNode = nodeTitle
+                        };
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(askData.Text))
+                {
+                    var usedVars = ExtractVariables(askData.Text);
+                    foreach (var varName in usedVars)
+                    {
+                        EnsureVariableExists(variables, varName);
+                        if (!variables[varName].UsageNodes.Contains(nodeTitle))
+                        {
+                            variables[varName].UsageNodes.Add(nodeTitle);
+                        }
                     }
                 }
             }

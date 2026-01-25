@@ -120,6 +120,20 @@
                                 Используйте <code>{{variable_name}}</code> или <code>${{variable_name}}</code>
                             </small>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">Сохранить результат в переменную</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="text" 
+                                       class="form-control font-monospace" 
+                                       @bind="msgData.Variable" 
+                                       @oninput="OnWorkflowChanged"
+                                       placeholder="например, message_id"/>
+                            </div>
+                            <small class="form-text text-muted">
+                                Имя переменной для сохранения ID сообщения. Не обязательно.
+                            </small>
+                        </div>
                     }
 
                     @if (node is WorkflowNodeModel { Data: AskNodeData askData })
@@ -138,6 +152,20 @@
                                       rows="4"></textarea>
                             <small class="form-text text-muted">
                                 Используйте <code>{{variable_name}}</code> или <code>${{variable_name}}</code>
+                            </small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Сохранить результат в переменную</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="text" 
+                                       class="form-control font-monospace" 
+                                       @bind="askData.Variable" 
+                                       @oninput="OnWorkflowChanged"
+                                       placeholder="например, user_response"/>
+                            </div>
+                            <small class="form-text text-muted">
+                                Имя переменной для сохранения ответа. Не обязательно.
                             </small>
                         </div>
                     }

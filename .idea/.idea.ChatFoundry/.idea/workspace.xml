@@ -61,9 +61,12 @@
     <list default="true" id="a15b5d9a-05b2-4a37-b1f5-4840a0f64271" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ChatFoundry/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ChatFoundry/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ChatFoundry/Docker/docker-compose.generated.override.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ChatFoundry/Docker/docker-compose.generated.override.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Services/TelegramClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/TelegramService/src/TelegramService/Services/TelegramClient.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Models/Node/AskNodeData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Models/Node/AskNodeData.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Models/Node/MessageNodeData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Models/Node/MessageNodeData.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/webApps/src/BlazorClient/Models/NodeData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Models/NodeData.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/WorkflowDesigner.razor" beforeDir="false" afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/WorkflowDesigner.razor" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/WorkflowDesigner.razor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Pages/WorkflowDesigner.razor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webApps/src/BlazorClient/Properties/launchSettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/webApps/src/BlazorClient/Properties/launchSettings.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -169,6 +172,7 @@
     <setting file="mock://C:/Users/buryy/RiderProjects/ChatFoundry/webApps/src/BlazorClient/Models/NodeData.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://C:/Users/buryy/RiderProjects/ChatFoundry/webApps/src/BlazorClient/Models/NodeData.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/webApps/src/BlazorClient/Pages/BotDetails.razor.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/buryy/RiderProjects/ChatFoundry/webApps/src/BlazorClient/Pages/WorkflowDesigner.razor" root0="SKIP_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" root2="FORCE_HIGHLIGHTING" />
     <setting file="mock://C:/Users/buryy/RiderProjects/ChatFoundry/webApps/src/BlazorClient/Pages/WorkflowDesigner.razor.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://C:/Users/buryy/RiderProjects/ChatFoundry/webApps/src/BlazorClient/Pages/WorkflowDesigner.razor.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../../../webApps/src/BlazorClient/Configuration/ApiEndpoints.cs" root0="SKIP_HIGHLIGHTING" />
@@ -198,54 +202,54 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET Launch Settings Profile.BlazorClient: http.executor&quot;: &quot;Run&quot;,
-    &quot;.NET Launch Settings Profile.BlazorClient: https.executor&quot;: &quot;Run&quot;,
-    &quot;.NET Launch Settings Profile.ClientService: https.executor&quot;: &quot;Debug&quot;,
-    &quot;.NET Launch Settings Profile.IdentityServer: https.executor&quot;: &quot;Debug&quot;,
-    &quot;.NET Launch Settings Profile.TelegramService: http.executor&quot;: &quot;Debug&quot;,
-    &quot;.NET Launch Settings Profile.TelegramService: https.executor&quot;: &quot;Debug&quot;,
-    &quot;.NET Launch Settings Profile.WorkflowService: http.executor&quot;: &quot;Debug&quot;,
-    &quot;.NET Project.webApps\\src\\BlazorClient.executor&quot;: &quot;Debug&quot;,
-    &quot;ATTACH_DIALOG_SELECTED_CONTAINER&quot;: &quot;workflow_service&quot;,
-    &quot;Attach to Process.56344:blazor-devserver.executor&quot;: &quot;Debug&quot;,
-    &quot;Attach to Unity Player.Custom Player.executor&quot;: &quot;Debug&quot;,
-    &quot;Docker.Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.Gateway.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.Gateway/Dockerfile.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.Workflow.executor&quot;: &quot;Debug&quot;,
-    &quot;Docker.deployment.client-db: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.deployment.gateway-service: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.deployment.identity-service: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.deployment.kafka-ui: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.deployment.kafka: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.deployment.telegram-service: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.deployment.workflow-db: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.deployment.workflow-service: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.deployment: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.gateway-service: Compose.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.telegram-service.executor&quot;: &quot;Debug&quot;,
-    &quot;HTTP Request.All in whats-new.executor&quot;: &quot;Run&quot;,
-    &quot;HTTP Request.generated-requests | #1.executor&quot;: &quot;Run&quot;,
-    &quot;HTTP Request.whats-new | Set global header.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;XThreadsFramesViewSplitterKey&quot;: &quot;0.4485437&quot;,
-    &quot;d101a9be-a925-45f4-bdc8-07833be299b4.executor&quot;: &quot;Debug&quot;,
-    &quot;deletionFromPopupRequiresConfirmation&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;rest.client.default.execution.environment&quot;: &quot;test&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;project.propDebugger&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET Launch Settings Profile.BlazorClient: http.executor": "Debug",
+    ".NET Launch Settings Profile.BlazorClient: https.executor": "Run",
+    ".NET Launch Settings Profile.ClientService: https.executor": "Debug",
+    ".NET Launch Settings Profile.IdentityServer: https.executor": "Debug",
+    ".NET Launch Settings Profile.TelegramService: http.executor": "Debug",
+    ".NET Launch Settings Profile.TelegramService: https.executor": "Debug",
+    ".NET Launch Settings Profile.WorkflowService: http.executor": "Debug",
+    ".NET Project.webApps\\src\\BlazorClient.executor": "Debug",
+    "ATTACH_DIALOG_SELECTED_CONTAINER": "workflow_service",
+    "Attach to Process.56344:blazor-devserver.executor": "Debug",
+    "Attach to Unity Player.Custom Player.executor": "Debug",
+    "Docker.Compose Deployment.executor": "Run",
+    "Docker.Gateway.executor": "Run",
+    "Docker.Gateway/Dockerfile.executor": "Run",
+    "Docker.Workflow.executor": "Debug",
+    "Docker.deployment.client-db: Compose Deployment.executor": "Run",
+    "Docker.deployment.gateway-service: Compose Deployment.executor": "Run",
+    "Docker.deployment.identity-service: Compose Deployment.executor": "Run",
+    "Docker.deployment.kafka-ui: Compose Deployment.executor": "Run",
+    "Docker.deployment.kafka: Compose Deployment.executor": "Run",
+    "Docker.deployment.telegram-service: Compose Deployment.executor": "Run",
+    "Docker.deployment.workflow-db: Compose Deployment.executor": "Run",
+    "Docker.deployment.workflow-service: Compose Deployment.executor": "Run",
+    "Docker.deployment: Compose Deployment.executor": "Run",
+    "Docker.gateway-service: Compose.executor": "Run",
+    "Docker.telegram-service.executor": "Debug",
+    "HTTP Request.All in whats-new.executor": "Run",
+    "HTTP Request.generated-requests | #1.executor": "Run",
+    "HTTP Request.whats-new | Set global header.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "XThreadsFramesViewSplitterKey": "0.4485437",
+    "d101a9be-a925-45f4-bdc8-07833be299b4.executor": "Debug",
+    "deletionFromPopupRequiresConfirmation": "false",
+    "git-widget-placeholder": "main",
+    "list.type.of.created.stylesheet": "CSS",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "rest.client.default.execution.environment": "test",
+    "settings.editor.selected.configurable": "project.propDebugger",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected=".NET Launch Settings Profile.BlazorClient: http">
     <configuration name="BlazorApp1.Client" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="" />
@@ -738,7 +742,8 @@
       <workItem from="1768848310576" duration="5646000" />
       <workItem from="1768937519583" duration="2168000" />
       <workItem from="1769014153941" duration="4754000" />
-      <workItem from="1769238800185" duration="4831000" />
+      <workItem from="1769238800185" duration="5685000" />
+      <workItem from="1769333595787" duration="885000" />
     </task>
     <task id="LOCAL-00005" summary="add registration, receiving bearer token, refreshing token">
       <option name="closed" value="true" />
@@ -963,19 +968,6 @@
           <line>14</line>
           <properties documentPath="C:\Users\buryy\RiderProjects\ChatFoundry\TelegramService\Consumers\SendTelegramMessageConsumer.cs" containingFunctionPresentation="Method 'Consume'" />
           <option name="timeStamp" value="105" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/services/WorkflowService/src/WorkflowService/Actions/Executors/AskActionExecutor.cs</url>
-          <line>16</line>
-          <properties documentPath="C:\Users\buryy\RiderProjects\ChatFoundry\services\WorkflowService\src\WorkflowService\Actions\Executors\AskActionExecutor.cs" containingFunctionPresentation="Method 'ExecuteAsync'">
-            <startOffsets>
-              <option value="500" />
-            </startOffsets>
-            <endOffsets>
-              <option value="551" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="109" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/TelegramService/Controllers/TelegramHookController.cs</url>

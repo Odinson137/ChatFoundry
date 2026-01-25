@@ -19,6 +19,13 @@ public class MessageNodeData : NodeData
 {
     // Теперь здесь set вместо init, и Blazor сможет привязаться к этому полю
     public string Text { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Имя переменной, в которую будет сохранен результат (например, ответ пользователя).
+    /// </summary>
+    [JsonPropertyName("variable")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Variable { get; set; }
 }
 
 public class SetVariableNodeData : NodeData
@@ -37,4 +44,11 @@ public class SetVariableNodeData : NodeData
 public class AskNodeData : NodeData
 {
     public string Text { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Имя переменной, в которую будет сохранен результат (например, ответ пользователя).
+    /// </summary>
+    [JsonPropertyName("variable")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Variable { get; set; }
 }
