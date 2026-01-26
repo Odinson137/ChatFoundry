@@ -11,6 +11,7 @@ namespace BlazorClient.Models;
 [JsonDerivedType(typeof(SetVariableNodeData), "SetVariable")] // 'SetVariable' - для узла установки переменной
 [JsonDerivedType(typeof(AskNodeData), "Ask")]
 [JsonDerivedType(typeof(HttpRequestNodeData), "HttpRequest")]
+[JsonDerivedType(typeof(AIGenerateNodeData), "AIGenerate")]
 
 public abstract class NodeData { }
 
@@ -62,10 +63,14 @@ public class AskNodeData : NodeData
 {
     public string Text { get; set; } = string.Empty;
     
-    /// <summary>
-    /// Имя переменной, в которую будет сохранен результат (например, ответ пользователя).
-    /// </summary>
-    [JsonPropertyName("variable")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Variable { get; set; }
+}
+
+public class AIGenerateNodeData : NodeData
+{
+    public string Prompt { get; set; } = string.Empty;
+    
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Variable { get; set; }
 }

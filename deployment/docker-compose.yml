@@ -32,6 +32,8 @@ services:
       - ASPNETCORE_Kestrel__Endpoints__Http__Protocols=Http1
       - ASPNETCORE_Kestrel__Endpoints__Grpc__Url=http://+:8081
       - ASPNETCORE_Kestrel__Endpoints__Grpc__Protocols=Http2
+    env_file:
+      - .env
     ports:
       - "5010:8080" # Порт для GraphQL / REST
       - "5011:8081" # НОВЫЙ порт для gRPC

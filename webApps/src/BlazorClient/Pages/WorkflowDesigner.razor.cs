@@ -251,6 +251,7 @@ public partial class WorkflowDesigner : IDisposable
             NodeType.Ask => new AskNodeData { Text = "" },
             NodeType.SetVariable => new SetVariableNodeData { Variable = "", Value = "" },
             NodeType.HttpRequest => new HttpRequestNodeData { Method = "GET", Headers = new(), Url = "" },
+            NodeType.AIGenerate => new AIGenerateNodeData { Prompt = "", Variable = ""},
             _ => null
         };
 
@@ -424,6 +425,33 @@ if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].Usage
                     {
                         EnsureVariableExists(variables, varName);
                         if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].UsageNodes.Add(nodeTitle);
+                    }
+                }
+            }
+            
+            if (node.Data is AIGenerateNodeData aiData)
+            {
+                // Definition
+                if (!string.IsNullOrWhiteSpace(aiData.Variable))
+                {
+                    var varName = NormalizeVariableName(aiData.Variable);
+                    if (!variables.ContainsKey(varName))
+                    {
+                        variables[varName] = new VariableInfo { Name = varName, Type = GetVariableType(varName), SourceNode = nodeTitle };
+                    }
+                }
+
+                // Usage in Prompt
+                if (!string.IsNullOrWhiteSpace(aiData.Prompt))
+                {
+                    var promptVars = ExtractVariables(aiData.Prompt);
+                    foreach (var varName in promptVars)
+                    {
+                        EnsureVariableExists(variables, varName);
+                        if (!variables[varName].UsageNodes.Contains(nodeTitle))
+                        {
+                            variables[varName].UsageNodes.Add(nodeTitle);
+                        }
                     }
                 }
             }

@@ -281,6 +281,40 @@
                             </div>
                         </div>
                     }
+
+                    @if (node is WorkflowNodeModel { Data: AIGenerateNodeData aiData })
+                    {
+                        <div class="mb-3">
+                            <label class="form-label d-flex justify-content-between align-items-center">
+                                <span>Промпт для AI</span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" 
+                                        @onclick="() => ShowVariablePicker(v => InsertVariable(aiData, nameof(aiData.Prompt), v))">
+                                    <span class="oi oi-code"></span> {}
+                                </button>
+                            </label>
+                            <textarea class="form-control font-monospace" 
+                                      @bind="aiData.Prompt" 
+                                      @oninput="OnWorkflowChanged"
+                                      rows="6"></textarea>
+                            <small class="form-text text-muted">
+                                Опишите, что должен сделать AI. Используйте переменные <code>{{variable_name}}</code>.
+                            </small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Сохранить результат в переменную</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="text" 
+                                       class="form-control font-monospace" 
+                                       @bind="aiData.Variable" 
+                                       @oninput="OnWorkflowChanged"
+                                       placeholder="например, ai_response"/>
+                            </div>
+                            <small class="form-text text-muted">
+                                Имя переменной для сохранения ответа от AI.
+                            </small>
+                        </div>
+                    }
                 }
                 else if (SelectedModel is WorkflowLinkModel link)
                 {

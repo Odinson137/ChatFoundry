@@ -56,14 +56,19 @@ services.AddScoped<IActionExecutor, StartActionExecutor>();
 services.AddScoped<IActionExecutor, InputExecutor>();
 services.AddScoped<IActionExecutor, SetVariableActionExecutor>();
 services.AddScoped<IActionExecutor, HttpRequestActionExecutor>();
+services.AddScoped<IActionExecutor, AIGenerateActionExecutor>();
 
 services.AddScoped<IMessageSender, MessageSender>();
+services.AddScoped<IOpenAiService, OpenAiService>();
 
 services.AddScoped<IActionExecutorFactory, ActionExecutorFactory>();
 services.AddScoped<WorkflowGraphParser>();
 services.AddScoped<WorkflowTextRenderer>();
 
 services.AddHttpClient();
+
+services.Configure<WorkflowService.Options.OpenAiOptions>(
+    builder.Configuration.GetSection(WorkflowService.Options.OpenAiOptions.SectionName));
 
 services.AddPostgreSql<WorkflowDbContext>(builder.Configuration);
 
