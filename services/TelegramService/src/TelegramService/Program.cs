@@ -6,9 +6,14 @@ using Shared.Application.Events;
 using TelegramService.Consumers;
 using TelegramService.Interfaces;
 using TelegramService.Services;
+using TelegramService.Options;
 using Workflow.Grpc;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<TelegramOptions>(
+    builder.Configuration.GetSection(TelegramOptions.SectionName));
+
 var services = builder.Services;
 
 builder.Services.AddControllers();

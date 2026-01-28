@@ -1,4 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.Options;
+using TelegramService.Options;
+using System.Diagnostics.CodeAnalysis;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -9,7 +11,8 @@ namespace TelegramService.Services;
 
 public sealed class TelegramClient(
     IBotTokenProvider botTokenProvider,
-    ILogger<TelegramClient> logger)
+    ILogger<TelegramClient> logger,
+    IOptions<TelegramOptions> options)
     : ITelegramClient
 {
     private ITelegramBotClient? _botClient;
@@ -65,11 +68,11 @@ public sealed class TelegramClient(
     {
         var client = InitializeClientByBotIdAsync(token);
 
-        var url = $"https://probable-dogfish-known.ngrok-free.app/telegram/hook/{botId}"; // TODO вынести в переменные. Возможно потом запускать нгрок в докере и тянуть адрес прямо от туда
+        var url = $"{options.Value.WebhookUrl}/telegram/hook/{botId}";
         await client.SetWebhook(
             url,
             maxConnections: 40, // default
-            secretToken: "7b3e1a5d-9c24-4f8a-b12d-6e5f8a3c9b47", // TODO вынести в секреты и ПОМЕНЯТЬ
+            secretToken: options.Value.SecretToken,
             cancellationToken: ct);
 
         logger.LogInformation("Telegram webhook set: {Url}", url);
