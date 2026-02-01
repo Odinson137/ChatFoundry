@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.ComponentModel.DataAnnotations.Schema;
 using Shared.Domain.Entities;
 using Shared.Domain.Enums;
 
@@ -13,38 +14,31 @@ public class Session : EntityBase
     public string ClientId { get; set; } = null!;
     public DefaultChannel Channel { get; set; }
 
-    // Убрать потом TODO
     public Guid? CurrentNodeId { get; set; }
-    //public Guid? CurrentActionId { get; set; }
-    //public ActionEntity? CurrentAction { get; set; }
 
     public SessionStatus Status { get; set; } = SessionStatus.Active;
 
     public DateTime? CompletedAt { get; set; }
+    
+    [NotMapped]
+    public bool UserProfileDirty { get; set; }
 
     public List<ActionEntity> Actions { get; set; } = [];
-
-    // TODO потом сделать отдельную таблицу для их хранения. Возможно даже событичную бд взять (так как всё время данные будут только добавляться)
-    public string VariablesJson { get; private set; } = "{}";
     
+    public Dictionary<string, string> Variables { get; set; } = new();
+
     public void SetVariable(string key, object? value)
     {
         if (string.IsNullOrWhiteSpace(key))
             throw new ArgumentException("Variable key cannot be empty", nameof(key));
-
-        var json = string.IsNullOrWhiteSpace(VariablesJson)
-            ? new JsonObject()
-            : JsonNode.Parse(VariablesJson)?.AsObject()
-              ?? new JsonObject();
-
-        json[key] = value switch
+        
+        if (key.StartsWith("user."))
         {
-            null => null,
-            JsonNode node => node,
-            _ => JsonValue.Create(value)
-        };
+            UserProfileDirty = true;
+        }
 
-        VariablesJson = json.ToJsonString();
+        var stringValue = value?.ToString() ?? string.Empty;
+        Variables[key] = stringValue;
     }
 
     public string? GetVariable(string key)
@@ -52,21 +46,7 @@ public class Session : EntityBase
         if (string.IsNullOrWhiteSpace(key))
             throw new ArgumentException("Variable key cannot be empty", nameof(key));
 
-        if (string.IsNullOrWhiteSpace(VariablesJson))
-            return null;
-
-        var json = JsonNode.Parse(VariablesJson)?.AsObject();
-        if (json == null || !json.TryGetPropertyValue(key, out var node) || node == null)
-            return null;
-
-        try
-        {
-            return node.ToString();
-        }
-        catch (JsonException)
-        {
-            return null;
-        }
+        return Variables.GetValueOrDefault(key);
     }
     
     public void MoveTo(Guid nextNodeId)

@@ -1,11 +1,10 @@
 using Confluent.Kafka;
-using HotChocolate.AspNetCore;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Shared.Application.Events;
 using Shared.Infrastructure.DependencyInjection;
+using Workflow.Grpc.Client;
 using WorkflowService.Actions.Executors;
 using WorkflowService.Actions.Factories;
 using WorkflowService.Consumers;
@@ -57,6 +56,7 @@ services.AddScoped<IActionExecutor, InputExecutor>();
 services.AddScoped<IActionExecutor, SetVariableActionExecutor>();
 services.AddScoped<IActionExecutor, HttpRequestActionExecutor>();
 services.AddScoped<IActionExecutor, AIGenerateActionExecutor>();
+services.AddScoped<IActionExecutor, GetUserProfileActionExecutor>();
 
 services.AddScoped<IMessageSender, MessageSender>();
 services.AddScoped<IOpenAiService, OpenAiService>();
@@ -64,6 +64,8 @@ services.AddScoped<IOpenAiService, OpenAiService>();
 services.AddScoped<IActionExecutorFactory, ActionExecutorFactory>();
 services.AddScoped<WorkflowGraphParser>();
 services.AddScoped<WorkflowTextRenderer>();
+services.AddScoped<IUserProfileSyncer, UserProfileSyncer>();
+
 
 services.AddHttpClient();
 
@@ -129,7 +131,14 @@ services.AddMassTransit(x =>
     });
 });
 
-builder.Services.AddGrpc();
+services.AddGrpc();
+
+// TODO потом придумать способ 
+services.AddGrpcClient<ClientAttributesService.ClientAttributesServiceClient>(o =>
+{
+    o.Address = new Uri("http://client-service:8080");
+});
+
 
 builder.Services
     .AddGraphQLServer()

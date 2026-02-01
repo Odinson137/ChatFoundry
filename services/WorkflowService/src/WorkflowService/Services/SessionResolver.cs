@@ -1,5 +1,7 @@
-﻿using Shared.Application.Events;
+﻿using Grpc.Core;
+using Shared.Application.Events;
 using Shared.Domain.Enums;
+using Workflow.Grpc.Client;
 using WorkflowService.Entities;
 using WorkflowService.Interfaces;
 using WorkflowService.Utils;
@@ -17,25 +19,25 @@ public class SessionResolver(
         CancellationToken ct)
     {
         var session = await sessionRepository.FindActiveAsync(message.ExternalUserId, message.Channel, ct);
-        if (session != null)
-            return session;
-
-        var workflow = await workflowRepository
-            .GetActiveWorkflowAsync(message.BotId, ct);
-
-        var node = workflowGraphParser.Parse(workflow?.NodesDefinition ?? throw new InvalidOperationException(), workflow.EdgesDefinition).GetStartNode();
-        
-        session = new Session
+        if (session == null)
         {
-            Workflow = workflow,
-            ClientId = message.ExternalUserId,
-            Channel = message.Channel,
-            CurrentNodeId = node.Id,
-            Status = SessionStatus.Active,
-        };
+            var workflow = await workflowRepository
+                .GetActiveWorkflowAsync(message.BotId, ct) ?? throw new InvalidOperationException("Active workflow not found.");
 
-        await sessionRepository.AddAsync(session, ct);
+            var node = workflowGraphParser.Parse(workflow.NodesDefinition, workflow.EdgesDefinition).GetStartNode();
+            
+            session = new Session
+            {
+                Workflow = workflow,
+                ClientId = message.ExternalUserId,
+                Channel = message.Channel,
+                CurrentNodeId = node.Id,
+                Status = SessionStatus.Active,
+            };
 
+            await sessionRepository.AddAsync(session, ct);
+        }
+        
         return session;
     }
 

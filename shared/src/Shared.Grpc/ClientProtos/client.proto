@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+option csharp_namespace = "Workflow.Grpc.Client";
+
+package workflow.client;
+
+import "google/protobuf/wrappers.proto";
+
+service ClientAttributesService {
+  rpc GetClientAttributes (GetClientAttributesRequest) returns (GetClientAttributesResponse);
+  rpc SetClientAttributes (SetClientAttributesRequest) returns (SetClientAttributesResponse);
+}
+
+// --- Get ---
+
+message GetClientAttributesRequest {
+  string external_user_id = 1;
+  string channel = 2;
+}
+
+message GetClientAttributesResponse {
+  BaseAttributes base_attributes = 1;
+  map<string, string> custom_attributes = 2;
+}
+
+// --- Set ---
+
+message SetClientAttributesRequest {
+  string external_user_id = 1;
+  string channel = 2;
+  BaseAttributes base_attributes = 3;
+  map<string, string> custom_attributes = 4;
+}
+
+message BaseAttributes {
+  google.protobuf.StringValue name = 1;
+  google.protobuf.StringValue username = 2;
+  google.protobuf.StringValue phone = 3;
+  google.protobuf.StringValue email = 4;
+}
+
+message SetClientAttributesResponse {
+  bool success = 1;
+}

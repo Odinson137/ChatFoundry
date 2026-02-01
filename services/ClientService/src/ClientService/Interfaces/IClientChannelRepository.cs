@@ -11,4 +11,6 @@ public interface IClientChannelRepository
         CancellationToken ct = default);
 
     Task AddAsync(ClientChannel clientChannel, CancellationToken ct = default);
+
+    Task SaveAsync(ClientChannel clientChannel, CancellationToken ct = default);
 }

@@ -25,4 +25,9 @@ public class ClientChannelRepository(ClientDbContext db)
     {
         await db.ClientChannels.AddAsync(clientChannel, ct);
     }
+
+    public Task SaveAsync(ClientChannel clientChannel, CancellationToken ct = default)
+    {
+        return db.SaveChangesAsync(ct);
+    }
 }

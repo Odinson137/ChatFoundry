@@ -1,4 +1,5 @@
-﻿using ClientService.Entities;
+﻿using System.Text.Json;
+using ClientService.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shared.Infrastructure.EntityTypeConfiguration;
@@ -27,6 +28,13 @@ public class ClientChannelEntityConfiguration : BaseEntityTypeConfiguration<Clie
 
         builder.Property(x => x.Username)
             .HasMaxLength(100);
+        
+        builder.Property(x => x.Name)
+            .HasMaxLength(100);
+
+        builder.Property(x => x.Attributes)
+            .HasColumnType("jsonb")
+            .HasDefaultValue(new Dictionary<string, JsonElement>());
 
         builder.HasIndex(x => new { x.Channel, x.ExternalUserId })
             .IsUnique();

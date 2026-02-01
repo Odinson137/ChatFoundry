@@ -10,9 +10,12 @@ using Shared.Application.Events;
 using Shared.Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
+var services = builder.Services;
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+
+services.AddGrpc();
 
 builder.Services.AddScoped<IClientChannelRepository, ClientChannelRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
@@ -75,10 +78,7 @@ builder.Services
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-// if (app.Environment.IsDevelopment())
-// {
-// }
+app.MapGraphQL();
 
 app.UseHttpsRedirection();
 
