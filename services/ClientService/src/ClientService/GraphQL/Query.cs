@@ -1,6 +1,7 @@
 ﻿using ClientService.Data;
 using ClientService.Entities;
 using HotChocolate.Data;
+using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
 using Shared.Infrastructure.GraphQl;
 
@@ -8,6 +9,7 @@ namespace ClientService.GraphQL;
 
 public class Query(IHttpContextAccessor httpContextAccessor, ClientDbContext context) : BaseGraphQl(httpContextAccessor)
 {
+    [UsePaging(IncludeTotalCount = true)]
     [UseProjection] 
     [UseFiltering]
     [UseSorting]
@@ -16,6 +18,7 @@ public class Query(IHttpContextAccessor httpContextAccessor, ClientDbContext con
         return context.Clients;
     }
     
+    [UsePaging(IncludeTotalCount = true)]
     [UseProjection] 
     [UseFiltering]
     [UseSorting]
@@ -24,6 +27,7 @@ public class Query(IHttpContextAccessor httpContextAccessor, ClientDbContext con
         return context.ClientChannels;
     }
     
+    [UsePaging(IncludeTotalCount = true)]
     [UseProjection] 
     [UseFiltering]
     [UseSorting]

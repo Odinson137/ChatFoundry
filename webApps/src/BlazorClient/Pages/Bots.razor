@@ -1,15 +1,10 @@
 ﻿@page "/bots"
-@using System.Net.Http.Headers
-@using System.Text.Json
-@using BlazorClient.Configuration
 @using BlazorClient.Models.DTO
-@using Blazored.LocalStorage
 @using Microsoft.AspNetCore.Authorization
 
 @attribute [Authorize]
 
-@inject HttpClient Http
-@inject ILocalStorageService LocalStorage
+@inject BlazorClient.Interfaces.IWorkflowApiClient ApiClient
 @inject IJSRuntime JsRuntime
 
 <PageTitle>Управление ботами</PageTitle>
@@ -76,13 +71,10 @@ else
                         }
                     </td>
                     <td>@bot.CreatedAt.ToLocalTime().ToString("g")</td>
-                    <!-- Внутри таблицы в Bots.razor -->
                     <td class="text-end">
-                        <!-- Добавлена кнопка перехода к деталям -->
                         <a href="@($"bots/{bot.Id}")" class="btn btn-sm btn-primary me-2" title="Открыть воркфлоу">
                             <span class="oi oi-eye"></span> Открыть
                         </a>
-
                         <button class="btn btn-sm btn-outline-primary me-2" @onclick="() => OpenEditModal(bot)">
                             <span class="oi oi-pencil"></span>
                         </button>
@@ -90,7 +82,6 @@ else
                             <span class="oi oi-trash"></span>
                         </button>
                     </td>
-
                 </tr>
             }
             </tbody>
@@ -98,7 +89,7 @@ else
     }
 }
 
-@* --- Простая Модалка (Overlay) --- *@
+@* --- Модалька --- *@
 @if (showModal)
 {
     <div class="modal-backdrop fade show"></div>
@@ -139,7 +130,7 @@ else
     private bool isLoading = true;
     private bool isSaving;
     private string? error;
-    
+
     private bool showModal;
     private bool isEditMode;
     private BotInputModel currentBotModel = new();
@@ -155,16 +146,7 @@ else
         error = null;
         try
         {
-            var query = @"
-                query GetBots { 
-                    bots(order: [{ createdAt: DESC }]) { 
-                        id name token createdAt modifiedAt 
-                        workflows { id version isActiveBotWorkflow } 
-                    } 
-                }";
-            
-            var data = await ExecuteGraphQl<BotDataResponse>(query);
-            bots = data.Bots;
+            bots = await ApiClient.GetBotsAsync();
         }
         catch (Exception ex)
         {
@@ -176,12 +158,11 @@ else
         }
     }
 
-    // 2. СОЗДАНИЕ и ОБНОВЛЕНИЕ (Mutation)
     private async Task SaveBot()
     {
-        if (string.IsNullOrWhiteSpace(currentBotModel.Name) || (!isEditMode && string.IsNullOrWhiteSpace(currentBotModel.Token)))
+        if (string.IsNullOrWhiteSpace(currentBotModel.Name)
+            || (!isEditMode && string.IsNullOrWhiteSpace(currentBotModel.Token)))
         {
-            // Простая валидация
             return;
         }
 
@@ -189,34 +170,12 @@ else
         try
         {
             if (isEditMode)
-            {
-                // Update
-                var query = @"
-                    mutation Update($input: UpdateBotInput!) {
-                        updateBot(input: $input) {
-                            bot { id name }
-                        }
-                    }";
-                
-                var variables = new { input = new { botId = currentBotModel.Id, name = currentBotModel.Name } };
-                await ExecuteGraphQl<object>(query, variables);
-            }
+                await ApiClient.UpdateBotAsync(currentBotModel.Id, currentBotModel.Name);
             else
-            {
-                // Create
-                var query = @"
-                    mutation Add($input: AddBotInput!) {
-                        addBot(input: $input) {
-                            bot { id name }
-                        }
-                    }";
-                
-                var variables = new { input = new { name = currentBotModel.Name, token = currentBotModel.Token } };
-                await ExecuteGraphQl<object>(query, variables);
-            }
+                await ApiClient.AddBotAsync(currentBotModel.Name, currentBotModel.Token);
 
             CloseModal();
-            await LoadBots(); // Перезагружаем список
+            await LoadBots();
         }
         catch (Exception ex)
         {
@@ -228,25 +187,14 @@ else
         }
     }
 
-    // 3. УДАЛЕНИЕ (Mutation)
     private async Task DeleteBot(BotDto bot)
     {
         if (!await JsRuntime.InvokeAsync<bool>("confirm", $"Вы уверены, что хотите удалить бота '{bot.Name}'?"))
-        {
             return;
-        }
 
         try
         {
-            var query = @"
-                mutation Delete($input: DeleteBotInput!) {
-                    deleteBot(input: $input) {
-                        bot { id }
-                    }
-                }";
-
-            var variables = new { input = new { botId = bot.Id } };
-            await ExecuteGraphQl<object>(query, variables);
+            await ApiClient.DeleteBotAsync(bot.Id);
             await LoadBots();
         }
         catch (Exception ex)
@@ -264,11 +212,11 @@ else
 
     private void OpenEditModal(BotDto bot)
     {
-        currentBotModel = new BotInputModel 
-        { 
-            Id = bot.Id, 
-            Name = bot.Name, 
-            Token = bot.Token 
+        currentBotModel = new BotInputModel
+        {
+            Id = bot.Id,
+            Name = bot.Name,
+            Token = bot.Token
         };
         isEditMode = true;
         showModal = true;
@@ -280,39 +228,10 @@ else
         error = null;
     }
 
-    private async Task<T> ExecuteGraphQl<T>(string query, object? variables = null)
-    {
-        var token = await LocalStorage.GetItemAsync<string>("authToken");
-        
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{ApiEndpoints.Api}/workflow/graphql");
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        
-        var payload = new { query, variables };
-        request.Content = JsonContent.Create(payload);
-
-        var response = await Http.SendAsync(request);
-        var jsonString = await response.Content.ReadAsStringAsync();
-
-        if (!response.IsSuccessStatusCode)
-        {
-            throw new Exception($"Сервер вернул ошибку {response.StatusCode}: {jsonString}");
-        }
-
-        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-        var gqlResponse = JsonSerializer.Deserialize<GraphQLResponse<T>>(jsonString, options);
-
-        return gqlResponse!.Data!;
-    }
-
-    public class BotInputModel
+    private class BotInputModel
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = "";
         public string Token { get; set; } = "";
-    }
-
-    public class BotDataResponse
-    {
-        public List<BotDto> Bots { get; set; } = new();
     }
 }

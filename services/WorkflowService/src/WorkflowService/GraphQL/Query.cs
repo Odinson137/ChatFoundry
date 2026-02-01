@@ -1,5 +1,6 @@
 ﻿using HotChocolate;
 using HotChocolate.Data;
+using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
 using Shared.Infrastructure.GraphQl;
 using WorkflowService.Data;
@@ -9,6 +10,7 @@ namespace WorkflowService.GraphQL;
 
 public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpContextAccessor)
 {
+    [UsePaging(IncludeTotalCount = true)]
     [UseProjection] 
     [UseFiltering]
     [UseSorting]
@@ -18,6 +20,7 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
         return context.Bots;
     }
     
+    [UsePaging(IncludeTotalCount = true)]
     [UseProjection] 
     [UseFiltering]
     [UseSorting]
@@ -26,6 +29,7 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
         return context.Sessions;
     }
     
+    [UsePaging(IncludeTotalCount = true)]
     [UseProjection] 
     [UseFiltering]
     [UseSorting]
@@ -34,6 +38,7 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
         return context.Workflows;
     }
         
+    [UsePaging(IncludeTotalCount = true)]
     [UseProjection] 
     [UseFiltering]
     [UseSorting]
@@ -42,6 +47,7 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
         return context.WorkflowVersions;
     }
     
+    [UsePaging(IncludeTotalCount = true)]
     [UseProjection] 
     [UseFiltering]
     [UseSorting]

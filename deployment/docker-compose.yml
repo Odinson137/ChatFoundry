@@ -4,8 +4,8 @@ services:
   gateway-service:
     container_name: gateway_service
     build:
-      context: .
-      dockerfile: ../services/Gateway/src/Gateway/Dockerfile
+      context: ..
+      dockerfile: services/Gateway/src/Gateway/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8080;https://+:8443
@@ -23,8 +23,8 @@ services:
   workflow-service:
     container_name: workflow_service
     build:
-      context: .
-      dockerfile: ../services/WorkflowService/src/WorkflowService/Dockerfile
+      context: ..
+      dockerfile: services/WorkflowService/src/WorkflowService/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8080;http://+:8081
@@ -61,8 +61,8 @@ services:
   identity-service:
     container_name: identity_service
     build:
-      context: .
-      dockerfile: ../services/IdentityServer/src/IdentityServer/Dockerfile
+      context: ..
+      dockerfile: services/IdentityServer/src/IdentityServer/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8080
@@ -92,8 +92,8 @@ services:
   client-service:
     container_name: client_service
     build:
-      context: .
-      dockerfile: ../services/ClientService/src/ClientService/Dockerfile
+      context: ..
+      dockerfile: services/ClientService/src/ClientService/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8080
@@ -123,8 +123,8 @@ services:
   telegram-service:
     container_name: telegram_service
     build:
-      context: .
-      dockerfile: ../services/TelegramService/src/TelegramService/Dockerfile
+      context: ..
+      dockerfile: services/TelegramService/src/TelegramService/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8080
