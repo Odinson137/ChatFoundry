@@ -10,6 +10,7 @@ public interface IWorkflowApiClient
     Task<BotDto> AddBotAsync(string name, string token);
     Task<BotDto> UpdateBotAsync(Guid botId, string name);
     Task DeleteBotAsync(Guid botId);
+    Task RefreshBotWebhookAsync(Guid botId);
 
     // ─── Workflows ───────────────────────────────────────────────────────────
     Task<WorkflowResponse?> GetWorkflowByIdAsync(Guid id);

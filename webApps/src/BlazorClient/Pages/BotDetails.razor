@@ -49,6 +49,23 @@
                                 <span class="oi oi-copywriting"></span>
                             </button>
                         </div>
+                        <button class="btn btn-sm btn-outline-secondary mt-2 w-100" 
+                                @onclick="RefreshWebhook" 
+                                disabled="@_isRefreshingWebhook">
+                            @if (_isRefreshingWebhook)
+                            {
+                                <span class="spinner-border spinner-border-sm me-1"></span>
+                            }
+                            else if (_webhookRefreshed)
+                            {
+                                <span class="oi oi-check me-1"></span>
+                            }
+                            else
+                            {
+                                <span class="oi oi-reload me-1"></span>
+                            }
+                            @(_isRefreshingWebhook ? "Обновляется..." : _webhookRefreshed ? "Готово" : "Актуализировать хук")
+                        </button>
                     </div>
                 </div>
             </div>

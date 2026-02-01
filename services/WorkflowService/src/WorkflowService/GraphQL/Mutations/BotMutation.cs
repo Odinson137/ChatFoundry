@@ -59,6 +59,20 @@ public class BotMutation(IHttpContextAccessor httpContextAccessor) : BaseGraphQl
         return new UpdateBotPayload(bot);
     }
     
+    public async Task<RefreshWebhookPayload> RefreshBotWebhookAsync(
+        RefreshBotWebhookInput input,
+        [Service] WorkflowDbContext context,
+        [Service] ITopicProducer<TelegramSetWebhookEvent> producer)
+    {
+        var bot = await context.Bots.FindAsync(input.BotId);
+        if (bot is null)
+            return new RefreshWebhookPayload(null);
+
+        await producer.Produce(new TelegramSetWebhookEvent(bot.Id, bot.Token));
+
+        return new RefreshWebhookPayload(bot);
+    }
+
     public async Task<DeleteBotPayload> DeleteBotAsync(
         DeleteBotInput input,
         [Service] WorkflowDbContext context)
@@ -84,3 +98,6 @@ public record UpdateBotPayload(Bot? Bot);
 
 public record DeleteBotInput(Guid BotId);
 public record DeleteBotPayload(Bot? Bot);
+
+public record RefreshBotWebhookInput(Guid BotId);
+public record RefreshWebhookPayload(Bot? Bot);

@@ -240,6 +240,20 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
 
         return gqlResponse!.Data!;
     }
+    
+    public async Task RefreshBotWebhookAsync(Guid botId)
+    {
+        var query = """
+                    mutation Refresh($input: RefreshBotWebhookInput!) {
+                        refreshBotWebhook(input: $input) {
+                            bot { id name }
+                        }
+                    }
+                    """;
+
+        var variables = new { input = new { botId } };
+        await ExecuteGraphQl<object>(query, variables);
+    }
 
     // ─── Response DTOs (private, для десериализацииConnection-обёрток) ──────
 
