@@ -1,4 +1,3 @@
-using ClientService.Data.Enums;
 using ClientService.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

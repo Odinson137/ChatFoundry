@@ -20,6 +20,25 @@ services:
     - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry:/src:rw"
     - "C:\\Users\\buryy\\.nuget\\packages:/home/app/.nuget/packages"
     working_dir: "/app"
+  company-service:
+    build:
+      context: "C:\\Users\\buryy\\RiderProjects\\ChatFoundry"
+      dockerfile: "services/CompanyService/src/CompanyService/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net10.0/CompanyService.dll"
+    environment:
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "companyservice:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry\\services\\CompanyService\\src\\\
+      CompanyService:/app:rw"
+    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry:/src:rw"
+    - "C:\\Users\\buryy\\.nuget\\packages:/home/app/.nuget/packages"
+    working_dir: "/app"
   gateway-service:
     build:
       context: "C:\\Users\\buryy\\RiderProjects\\ChatFoundry"

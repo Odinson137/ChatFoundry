@@ -2,4 +2,6 @@
 .env
 **/bin
 **/obj
+.claude
+.gemini
 commit_message.tmp
