@@ -6,7 +6,7 @@ namespace WorkflowService.Services;
 
 public class VariableService(ClientAttributesService.ClientAttributesServiceClient grpcClient) : IVariableService
 {
-    private const string ClientPrefix = "client.";
+    private const string ClientPrefix = "$client.";
 
     private static readonly Dictionary<string, Func<BaseAttributes, string?>> BaseAttrGetters = new()
     {
@@ -68,7 +68,14 @@ public class VariableService(ClientAttributesService.ClientAttributesServiceClie
         if (string.IsNullOrWhiteSpace(key))
             throw new ArgumentException("Variable key cannot be empty", nameof(key));
 
-        return session.Variables.GetValueOrDefault(key);
+        // TODO разобраться потом с операндом: надо ли его ставить и хранить в бд или нет
+        var value = session.Variables.GetValueOrDefault(key);
+        if (value == null)
+        {
+            value = session.Variables.GetValueOrDefault($"${key}");
+        }
+
+        return value;
     }
 
     public async Task SyncIfDirtyAsync(Session session, CancellationToken ct)

@@ -17,10 +17,13 @@ public class ClientChannel : EntityBase
     public string? Username { get; set; }
     
     public string? Name { get; set; }
+    public string? LastName { get; set; }
     
     public Guid ClientId { get; set; }
     
     public Client Client { get; set; } = null!;
     
     public ICollection<Message> Messages { get; set; } = new List<Message>();
+
+    public ICollection<ClientAttribute> Attributes { get; set; } = [];
 }

@@ -16,7 +16,7 @@ services:
     - "--mode=server"
     - "--frontend-port=57000"
     - "--backend-port=57200"
-    - "--roslyn-worker-port=57406"
+    - "--roslyn-worker-port=57413"
     - "--timeout=60"
     environment:
       DOTNET_USE_POLLING_FILE_WATCHER: "true"
@@ -24,9 +24,9 @@ services:
       RESHARPER_LOG_CONF: "/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
     image: "workflowservice:dev"
     ports:
-    - "127.0.0.1:57006:57000"
-    - "127.0.0.1:57206:57200"
-    - "127.0.0.1:57406:57406"
+    - "127.0.0.1:57013:57000"
+    - "127.0.0.1:57213:57200"
+    - "127.0.0.1:57413:57413"
     volumes:
     - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry\\services\\WorkflowService\\src\\\
       WorkflowService:/app:rw"
@@ -36,5 +36,5 @@ services:
       Linux64:/opt/JetBrains/RiderDebuggerTools"
     - "C:\\Program Files\\JetBrains\\JetBrains Rider 2025.1.4\\bin\\backend-log.xml:/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
     - "C:\\Users\\buryy\\AppData\\Local\\JetBrains\\Rider2025.1\\log\\DebuggerWorker\\\
-      JetBrains.Debugger.Worker.2026_2_07_21_15_45:/var/opt/JetBrains/RiderDebuggerTools:rw"
+      JetBrains.Debugger.Worker.2026_2_07_22_18_47:/var/opt/JetBrains/RiderDebuggerTools:rw"
     working_dir: "/app"

@@ -1,12 +1,14 @@
-using ClientService.Interfaces;
+using ClientService.Data;
+using ClientService.Entities;
 using Grpc.Core;
+using Microsoft.EntityFrameworkCore;
 using Shared.Domain.Enums;
 using Workflow.Grpc.Client;
 
 namespace ClientService.Grpc;
 
 public sealed class ClientAttributesGrpcService(
-    IClientChannelRepository clientChannelRepository)
+    ClientDbContext db)
     : ClientAttributesService.ClientAttributesServiceBase
 {
     public override async Task<GetClientAttributesResponse> GetClientAttributes(
@@ -16,8 +18,11 @@ public sealed class ClientAttributesGrpcService(
         if (!Enum.TryParse<DefaultChannel>(request.Channel, true, out var channel))
             throw new RpcException(new Status(StatusCode.InvalidArgument, $"Unknown channel: {request.Channel}"));
 
-        var clientChannel = await clientChannelRepository.FindAsync(
-            channel, request.ExternalUserId, context.CancellationToken);
+        var clientChannel = await db.ClientChannels
+            .Include(c => c.Attributes)
+            .FirstOrDefaultAsync(c =>
+                c.Channel == channel &&
+                c.ExternalUserId == request.ExternalUserId, context.CancellationToken);
 
         if (clientChannel == null)
             throw new RpcException(new Status(StatusCode.NotFound, "Client channel not found"));
@@ -33,6 +38,11 @@ public sealed class ClientAttributesGrpcService(
             }
         };
 
+        foreach (var attr in clientChannel.Attributes)
+        {
+            response.CustomAttributes.Add(attr.Key, attr.Value);
+        }
+
         return response;
     }
 
@@ -43,8 +53,11 @@ public sealed class ClientAttributesGrpcService(
         if (!Enum.TryParse<DefaultChannel>(request.Channel, true, out var channel))
             throw new RpcException(new Status(StatusCode.InvalidArgument, $"Unknown channel: {request.Channel}"));
 
-        var clientChannel = await clientChannelRepository.FindAsync(
-            channel, request.ExternalUserId, context.CancellationToken);
+        var clientChannel = await db.ClientChannels
+            .Include(c => c.Attributes)
+            .FirstOrDefaultAsync(c =>
+                c.Channel == channel &&
+                c.ExternalUserId == request.ExternalUserId, context.CancellationToken);
 
         if (clientChannel == null)
             throw new RpcException(new Status(StatusCode.NotFound, "Client channel not found"));
@@ -58,7 +71,25 @@ public sealed class ClientAttributesGrpcService(
             if (attrs.Email != null) clientChannel.Email = attrs.Email;
         }
 
-        await clientChannelRepository.SaveAsync(clientChannel, context.CancellationToken);
+        foreach (var (key, value) in request.CustomAttributes)
+        {
+            var existing = clientChannel.Attributes.FirstOrDefault(a => a.Key == key);
+            if (existing != null)
+            {
+                existing.Value = value;
+            }
+            else
+            {
+                clientChannel.Attributes.Add(new ClientAttribute
+                {
+                    Key = key,
+                    Value = value,
+                    ClientChannelId = clientChannel.Id
+                });
+            }
+        }
+
+        await db.SaveChangesAsync(context.CancellationToken);
 
         return new SetClientAttributesResponse { Success = true };
     }

@@ -16,6 +16,7 @@ public class ClientDbContext : DbContext
     public DbSet<ClientChannel> ClientChannels => Set<ClientChannel>();
     public DbSet<Message> Messages => Set<Message>();
     public DbSet<AttributeDefinition> AttributeDefinitions => Set<AttributeDefinition>();
+    public DbSet<ClientAttribute> ClientAttributes => Set<ClientAttribute>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
