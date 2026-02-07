@@ -8,25 +8,11 @@ using Shared.Infrastructure.GraphQl;
 namespace ClientService.GraphQL.Mutations;
 
 [ExtendObjectType(typeof(Mutation))]
-public class TeamMutation(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpContextAccessor)
+public class AttributeDefinitionMutation(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpContextAccessor)
 {
-    public async Task<Team> CreateTeam(
-        string name,
-        [Service] ITeamRepository teamRepository,
-        CancellationToken ct)
-    {
-        var team = new Team
-        {
-            Name = name
-        };
-
-        await teamRepository.AddAsync(team, ct);
-        
-        return team;
-    }
-
     public async Task<AttributeDefinition> CreateAttributeDefinition(
-        Guid teamId,
+        AttributeScope scope,
+        Guid scopeEntityId,
         string key,
         AttributeType type,
         string? displayName,
@@ -36,7 +22,8 @@ public class TeamMutation(IHttpContextAccessor httpContextAccessor) : BaseGraphQ
     {
         var attributeDefinition = new AttributeDefinition
         {
-            TeamId = teamId,
+            Scope = scope,
+            ScopeEntityId = scopeEntityId,
             Key = key,
             Type = type,
             DisplayName = displayName,
@@ -44,7 +31,7 @@ public class TeamMutation(IHttpContextAccessor httpContextAccessor) : BaseGraphQ
         };
 
         await attributeDefinitionRepository.AddAsync(attributeDefinition, ct);
-        
+
         return attributeDefinition;
     }
 }

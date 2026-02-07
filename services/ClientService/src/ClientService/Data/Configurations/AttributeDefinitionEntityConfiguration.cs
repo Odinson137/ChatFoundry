@@ -1,3 +1,4 @@
+using ClientService.Data.Enums;
 using ClientService.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -13,12 +14,13 @@ public class AttributeDefinitionEntityConfiguration : IEntityTypeConfiguration<A
         builder.Property(ad => ad.Key).IsRequired().HasMaxLength(50);
         builder.Property(ad => ad.DisplayName).HasMaxLength(100);
         builder.Property(ad => ad.Description).HasMaxLength(500);
-        
-        builder.HasOne(ad => ad.Team)
-            .WithMany(t => t.AttributeDefinitions)
-            .HasForeignKey(ad => ad.TeamId)
-            .OnDelete(DeleteBehavior.Cascade);
-            
-        builder.HasIndex(ad => new { ad.TeamId, ad.Key }).IsUnique();
+
+        builder.Property(ad => ad.Scope)
+            .IsRequired()
+            .HasConversion<int>();
+
+        builder.Property(ad => ad.ScopeEntityId).IsRequired();
+
+        builder.HasIndex(ad => new { ad.ScopeEntityId, ad.Key }).IsUnique();
     }
 }

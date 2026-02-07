@@ -73,7 +73,7 @@ builder.Services
     .AddGraphQLServer()
     .AddQueryType<Query>()
     .AddMutationType<ClientMutation>()
-    .AddMutationType<TeamMutation>()
+    .AddMutationType<AttributeDefinitionMutation>()
     .AddProjections() 
     .AddFiltering()
     .AddSorting();

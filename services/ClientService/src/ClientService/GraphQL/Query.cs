@@ -1,8 +1,5 @@
 ﻿using ClientService.Data;
 using ClientService.Entities;
-using ClientService.GraphQL.Dtos;
-using ClientService.Interfaces;
-using HotChocolate;
 using HotChocolate.Data;
 using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
@@ -38,7 +35,7 @@ public class Query(IHttpContextAccessor httpContextAccessor, ClientDbContext con
     {
         return context.Messages;
     }
-    
+
     [UsePaging(IncludeTotalCount = true)]
     [UseProjection]
     [UseFiltering]
@@ -47,20 +44,4 @@ public class Query(IHttpContextAccessor httpContextAccessor, ClientDbContext con
     {
         return context.AttributeDefinitions;
     }
-
-    // public async Task<List<AttributeDefinitionDto>> GetAttributeDefinitions(
-    //     Guid teamId,
-    //     [Service] IAttributeDefinitionRepository repository,
-    //     CancellationToken ct)
-    // {
-    //     var attributes = await repository.GetByTeamIdAsync(teamId, ct);
-    //     
-    //     return attributes.Select(a => new AttributeDefinitionDto
-    //     {
-    //         Key = a.Key,
-    //         DisplayName = a.DisplayName,
-    //         Description = a.Description,
-    //         Type = a.Type.ToString()
-    //     }).ToList();
-    // }
 }
