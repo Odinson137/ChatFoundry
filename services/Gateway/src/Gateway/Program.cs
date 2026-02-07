@@ -81,6 +81,16 @@ builder.Services.AddAuthorization(options =>
             return scopes.Contains("identity");
         });
     });
+
+    options.AddPolicy("company", p =>
+    {
+        p.RequireAuthenticatedUser();
+        p.RequireAssertion(ctx =>
+        {
+            var scopes = ctx.User.FindFirst("scope")?.Value.Split(' ', StringSplitOptions.RemoveEmptyEntries) ?? [];
+            return scopes.Contains("company");
+        });
+    });
 });
 
 builder.Services

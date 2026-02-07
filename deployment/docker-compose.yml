@@ -122,6 +122,37 @@ services:
     networks:
       - app_network
 
+  company-service:
+    container_name: company_service
+    build:
+      context: ..
+      dockerfile: services/CompanyService/src/CompanyService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - "5050:8080"
+    depends_on:
+      - company-db
+      - redis
+    networks:
+      - app_network
+
+  company-db:
+    image: postgres:16
+    container_name: company_db
+    restart: always
+    environment:
+      POSTGRES_DB: foundry_db
+      POSTGRES_USER: foundry
+      POSTGRES_PASSWORD: foundry
+    ports:
+      - "5437:5432"
+    volumes:
+      - company_pgdata:/var/lib/postgresql/data
+    networks:
+      - app_network
+
   telegram-service:
     container_name: telegram_service
     build:
@@ -220,6 +251,7 @@ volumes:
   identitydata:
   workflow_pgdata:
   client_pgdata:
+  company_pgdata:
   redis:
 
 networks:
