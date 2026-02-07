@@ -32,10 +32,6 @@ public class ClientChannelEntityConfiguration : BaseEntityTypeConfiguration<Clie
         builder.Property(x => x.Name)
             .HasMaxLength(100);
 
-        builder.Property(x => x.Attributes)
-            .HasColumnType("jsonb")
-            .HasDefaultValue(new Dictionary<string, JsonElement>());
-
         builder.HasIndex(x => new { x.Channel, x.ExternalUserId })
             .IsUnique();
 

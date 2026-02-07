@@ -1,9 +1,12 @@
 ﻿using ClientService.Data;
 using HotChocolate;
+using HotChocolate.Types;
+using Shared.Infrastructure.GraphQl;
 
 namespace ClientService.GraphQL.Mutations;
 
-public class ClientMutation
+[ExtendObjectType(typeof(Mutation))]
+public class ClientMutation(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpContextAccessor)
 {
     public async Task<OkPayload> UpdateClientAsync(
         UpdateClientInput input,

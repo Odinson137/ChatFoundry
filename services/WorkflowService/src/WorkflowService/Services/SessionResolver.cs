@@ -36,6 +36,8 @@ public class SessionResolver(
             };
 
             await sessionRepository.AddAsync(session, ct);
+            
+            
         }
         
         return session;

@@ -20,6 +20,8 @@ services.AddGrpc();
 builder.Services.AddScoped<IClientChannelRepository, ClientChannelRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<ITeamRepository, TeamRepository>();
+builder.Services.AddScoped<IAttributeDefinitionRepository, AttributeDefinitionRepository>();
 
 builder.Services.AddPostgreSql<ClientDbContext>(builder.Configuration);
 
@@ -71,7 +73,7 @@ builder.Services
     .AddGraphQLServer()
     .AddQueryType<Query>()
     .AddMutationType<ClientMutation>()
-    .AddMutationType<ClientChannelMutation>()
+    .AddMutationType<TeamMutation>()
     .AddProjections() 
     .AddFiltering()
     .AddSorting();

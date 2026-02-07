@@ -25,7 +25,6 @@ public enum WorkflowNodeType
     Wait = 21,          // Пауза/Задержка
     SetVariable = 22,   // Присвоение значения
     HttpRequest = 23,   // Внешний API запрос
-    GetCurrentUserInfo = 23,   // Полученние данных о клиенте
     
     AIFilter = 30,      // Определение интента/токсичности
     AIGenerate = 31,

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Shared.Application.Events;
 using Shared.Infrastructure.DependencyInjection;
+using Shared.Infrastructure.GraphQl;
 using Workflow.Grpc.Client;
 using WorkflowService.Actions.Executors;
 using WorkflowService.Actions.Factories;
@@ -56,7 +57,6 @@ services.AddScoped<IActionExecutor, InputExecutor>();
 services.AddScoped<IActionExecutor, SetVariableActionExecutor>();
 services.AddScoped<IActionExecutor, HttpRequestActionExecutor>();
 services.AddScoped<IActionExecutor, AIGenerateActionExecutor>();
-services.AddScoped<IActionExecutor, GetUserProfileActionExecutor>();
 
 services.AddScoped<IMessageSender, MessageSender>();
 services.AddScoped<IOpenAiService, OpenAiService>();

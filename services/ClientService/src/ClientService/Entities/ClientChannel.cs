@@ -22,6 +22,5 @@ public class ClientChannel : EntityBase
     
     public Client Client { get; set; } = null!;
     
-    public ICollection<Message> Messages { get; set; }
-    public IDictionary<string, JsonElement> Attributes { get; set; }
+    public ICollection<Message> Messages { get; set; } = new List<Message>();
 }

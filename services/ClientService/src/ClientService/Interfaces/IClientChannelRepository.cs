@@ -10,6 +10,8 @@ public interface IClientChannelRepository
         string externalUserId,
         CancellationToken ct = default);
 
+    Task<ClientChannel?> GetByIdAsync(Guid id, CancellationToken ct = default);
+
     Task AddAsync(ClientChannel clientChannel, CancellationToken ct = default);
 
     Task SaveAsync(ClientChannel clientChannel, CancellationToken ct = default);

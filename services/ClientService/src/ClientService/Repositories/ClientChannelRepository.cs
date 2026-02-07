@@ -21,6 +21,13 @@ public class ClientChannelRepository(ClientDbContext db)
                 x.ExternalUserId == externalUserId, ct);
     }
 
+    public Task<ClientChannel?> GetByIdAsync(Guid id, CancellationToken ct = default)
+    {
+        return db.ClientChannels
+            .Include(x => x.Client)
+            .FirstOrDefaultAsync(x => x.Id == id, ct);
+    }
+
     public async Task AddAsync(ClientChannel clientChannel, CancellationToken ct = default)
     {
         await db.ClientChannels.AddAsync(clientChannel, ct);
