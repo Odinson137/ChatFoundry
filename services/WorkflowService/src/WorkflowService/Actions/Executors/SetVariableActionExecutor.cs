@@ -12,7 +12,9 @@ namespace WorkflowService.Actions.Executors;
 public class SetVariableActionExecutor(
     ITopicProducer<ActionCompletedEvent> producer,
     ISessionRepository sessionRepository,
-    WorkflowGraphParser workflowGraphParser)
+    IVariableService variableService,
+    WorkflowGraphParser workflowGraphParser,
+    WorkflowTextRenderer workflowTextRenderer)
     : IActionExecutor
 {
     public WorkflowNodeType WorkflowNodeType => WorkflowNodeType.SetVariable;
@@ -21,6 +23,7 @@ public class SetVariableActionExecutor(
     {
         Console.WriteLine("SetVariableActionExecutor");
 
+        // TODO как-то оптимизировать потом, а то слишком часто идёт обращение к сессии
         var session = await sessionRepository.GetAsync(action.SessionId, ct);
         if (session == null)
             return;
@@ -31,9 +34,10 @@ public class SetVariableActionExecutor(
         if (node.Data is not SetVariableNodeData setVariableData)
             return;
 
-        var renderedValue = WorkflowTextRenderer.RenderText(setVariableData.Value, session);
+        var renderedValue = workflowTextRenderer.RenderText(setVariableData.Value, session);
 
-        session.SetVariable(setVariableData.Variable, renderedValue);
+        variableService.SetVariable(session, setVariableData.Variable, renderedValue);
+        await variableService.SyncIfDirtyAsync(session, ct);
         await sessionRepository.SaveAsync(session, ct);
 
         await producer.Produce(new ActionCompletedEvent(message.Channel, message.ExternalUserId), ct);

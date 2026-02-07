@@ -64,7 +64,7 @@ services.AddScoped<IOpenAiService, OpenAiService>();
 services.AddScoped<IActionExecutorFactory, ActionExecutorFactory>();
 services.AddScoped<WorkflowGraphParser>();
 services.AddScoped<WorkflowTextRenderer>();
-services.AddScoped<IUserProfileSyncer, UserProfileSyncer>();
+services.AddScoped<IVariableService, VariableService>();
 
 
 services.AddHttpClient();
@@ -136,7 +136,7 @@ services.AddGrpc();
 // TODO потом придумать способ 
 services.AddGrpcClient<ClientAttributesService.ClientAttributesServiceClient>(o =>
 {
-    o.Address = new Uri("http://client-service:8080");
+    o.Address = new Uri("http://client-service:8081");
 });
 
 

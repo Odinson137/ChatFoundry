@@ -1,18 +1,19 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Shared.Domain.Enums;
 using Shared.Domain.Models;
 using WorkflowService.Entities;
+using WorkflowService.Interfaces;
 using WorkflowService.Models.Node;
 using WorkflowService.Models.Workflow;
 
 namespace WorkflowService.Utils;
 
-public partial class WorkflowTextRenderer
+public partial class WorkflowTextRenderer(IVariableService variableService)
 {
     private static readonly Regex VariableRegex = MyRegex();
 
-    public static string RenderNodeText(
+    public string RenderNodeText(
         WorkflowNode node,
         Session session,
         MessageKind messageKind)
@@ -28,7 +29,7 @@ public partial class WorkflowTextRenderer
         return JsonConvert.SerializeObject(messagePayload);
     }
 
-    private static MessagePayload RenderMessagePayload(WorkflowNode node, Session session)
+    private MessagePayload RenderMessagePayload(WorkflowNode node, Session session)
     {
         if (node.Data is not MessageNodeData message)
             throw new InvalidOperationException($"Node {node.Id} does not contain text data");
@@ -37,7 +38,7 @@ public partial class WorkflowTextRenderer
         return new MessagePayload(text);
     }
 
-    private static AskMessagePayload RenderButtonsPayload(WorkflowNode node, Session session)
+    private AskMessagePayload RenderButtonsPayload(WorkflowNode node, Session session)
     {
         if (node.Data is not AskNodeData ask)
             throw new InvalidOperationException($"Node {node.Id} does not contain ask data");
@@ -51,9 +52,7 @@ public partial class WorkflowTextRenderer
         return new AskMessagePayload(text, buttons);
     }
 
-    public static string RenderText(
-        string text,
-        Session session)
+    public string RenderText(string text, Session session)
     {
         if (string.IsNullOrEmpty(text))
             return text;
@@ -61,7 +60,7 @@ public partial class WorkflowTextRenderer
         return VariableRegex.Replace(text, match =>
         {
             var name = match.Groups["name"].Value;
-            var value = session.GetVariable(name);
+            var value = variableService.GetVariable(session, name);
             return value ?? string.Empty;
         });
     }

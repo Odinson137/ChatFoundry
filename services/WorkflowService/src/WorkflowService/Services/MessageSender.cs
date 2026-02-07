@@ -26,7 +26,7 @@ public class MessageSender(
         var node = graph.GetNode(session!.CurrentNodeId!.Value);
 
         var messageKind = MessageKindMapper.FromNodeType(node.Type);
-        var text = WorkflowTextRenderer.RenderNodeText(node, action.Session, messageKind);
+        var text = workflowTextRenderer.RenderNodeText(node, action.Session, messageKind);
         
         await producer.Produce(
             new BotOutgoingMessage(DefaultChannel.Telegram, message.ExternalUserId, text, messageKind),

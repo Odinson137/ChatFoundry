@@ -1,12 +1,6 @@
-using System;
-using System.Linq;
-using System.Net.Http;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using MassTransit;
 using Shared.Application.Events;
-using WorkflowService.Actions.Executors;
 using WorkflowService.Entities;
 using WorkflowService.Enums;
 using WorkflowService.Events;
@@ -19,8 +13,10 @@ namespace WorkflowService.Actions.Executors;
 public class HttpRequestActionExecutor(
     IHttpClientFactory httpClientFactory,
     ISessionRepository sessionRepository,
+    IVariableService variableService,
     ITopicProducer<ActionCompletedEvent> producer,
-    WorkflowGraphParser workflowGraphParser) : IActionExecutor
+    WorkflowGraphParser workflowGraphParser,
+    WorkflowTextRenderer workflowTextRenderer) : IActionExecutor
 {
     public WorkflowNodeType WorkflowNodeType => WorkflowNodeType.HttpRequest;
 
@@ -35,17 +31,17 @@ public class HttpRequestActionExecutor(
 
         if (node.Data is not HttpRequestNodeData requestData)
             return;
-        
+
         var client = httpClientFactory.CreateClient();
 
         // Render all text fields with session variables
-        var renderedUrl = WorkflowTextRenderer.RenderText(requestData.Url, session);
-        var renderedBody = requestData.Body != null ? WorkflowTextRenderer.RenderText(requestData.Body, session) : null;
+        var renderedUrl = workflowTextRenderer.RenderText(requestData.Url, session);
+        var renderedBody = requestData.Body != null ? workflowTextRenderer.RenderText(requestData.Body, session) : null;
         var renderedHeaders = requestData.Headers.ToDictionary(
             kvp => kvp.Key,
-            kvp => WorkflowTextRenderer.RenderText(kvp.Value, session)
+            kvp => workflowTextRenderer.RenderText(kvp.Value, session)
         );
-        
+
         var httpMethod = new HttpMethod(requestData.Method.ToUpper());
         using var requestMessage = new HttpRequestMessage(httpMethod, renderedUrl);
 
@@ -53,7 +49,7 @@ public class HttpRequestActionExecutor(
         {
             requestMessage.Content = new StringContent(renderedBody, Encoding.UTF8, "application/json");
         }
-        
+
         foreach (var header in renderedHeaders)
         {
             requestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value);
@@ -61,20 +57,21 @@ public class HttpRequestActionExecutor(
 
         // TODO доработать timeout
         var responseMessage = await client.SendAsync(requestMessage, ct);
-        
+
         // TODO доработать размер файла, потому что гигабайты я брать не хочу
         var responseContent = await responseMessage.Content.ReadAsStringAsync(ct);
-        
+
         if (!string.IsNullOrWhiteSpace(requestData.ResponseVariable))
         {
-            session.SetVariable(requestData.ResponseVariable, responseContent);
+            variableService.SetVariable(session, requestData.ResponseVariable, responseContent);
         }
 
         if (!string.IsNullOrWhiteSpace(requestData.StatusCodeVariable))
         {
-            session.SetVariable(requestData.StatusCodeVariable, (int)responseMessage.StatusCode);
+            variableService.SetVariable(session, requestData.StatusCodeVariable, (int)responseMessage.StatusCode);
         }
 
+        await variableService.SyncIfDirtyAsync(session, ct);
         await sessionRepository.SaveAsync(session, ct);
 
         await producer.Produce(new ActionCompletedEvent(message.Channel, message.ExternalUserId), ct);

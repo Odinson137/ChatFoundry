@@ -11,6 +11,7 @@ public class ActionCompletedConsumer(
     IActionFactory actionFactory,
     IActionRepository actionRepository,
     ISessionResolver sessionResolver,
+    IVariableService variableService,
     ITopicProducer<ExecuteActionCommand> producer,
     WorkflowGraphParser workflowGraphParser)
     : IConsumer<ActionCompletedEvent>
@@ -32,7 +33,7 @@ public class ActionCompletedConsumer(
 
         var graph = workflowGraphParser.Parse(session.Workflow.NodesDefinition, session.Workflow.EdgesDefinition);
 
-        var nextNode = graph.GetNextNode(lastUserAction.NodeId, session);
+        var nextNode = graph.GetNextNode(lastUserAction.NodeId, session, variableService);
         if (nextNode == null)
         {
             await sessionResolver.CloseSessionAsync(session.Id, ct);

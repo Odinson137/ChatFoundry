@@ -1,5 +1,6 @@
 ﻿using WorkflowService.Entities;
 using WorkflowService.Enums;
+using WorkflowService.Interfaces;
 using WorkflowService.Utils;
 
 namespace WorkflowService.Models.Workflow;
@@ -19,7 +20,7 @@ public sealed class WorkflowGraph(
     public WorkflowNode GetStartNode()
         => Nodes.Values.First(n => n.Type == WorkflowNodeType.Start);
 
-    public WorkflowNode? GetNextNode(Guid completedActionNodeId, Session session)
+    public WorkflowNode? GetNextNode(Guid completedActionNodeId, Session session, IVariableService variableService)
     {
         var outgoingEdges = Edges
             .Where(e => e.From == completedActionNodeId)
@@ -27,11 +28,11 @@ public sealed class WorkflowGraph(
 
         if (outgoingEdges.Count == 0)
             return null;
-        
+
         foreach (var outgoingEdge in outgoingEdges)
         {
             if (outgoingEdge.Condition != null &&
-                WorkflowConditionEvaluator.Evaluate(outgoingEdge.Condition, session))
+                WorkflowConditionEvaluator.Evaluate(outgoingEdge.Condition, session, variableService))
             {
                 return GetNode(outgoingEdge.To);
             }

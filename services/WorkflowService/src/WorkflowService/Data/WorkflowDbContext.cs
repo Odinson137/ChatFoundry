@@ -34,6 +34,6 @@ public class WorkflowDbContext : DbContext
                     c => c.ToDictionary(entry => entry.Key, entry => entry.Value)));
         
         modelBuilder.Entity<Session>()
-            .Ignore(s => s.UserProfileDirty);
+            .Ignore(s => s.ClientProfileDirty);
     }
 }

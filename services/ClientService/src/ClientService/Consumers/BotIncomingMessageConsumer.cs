@@ -21,6 +21,7 @@ public class BotIncomingMessageConsumer(
             .FindAsync(channel, msg.ExternalUserId, ct);
 
         var userName = msg.Parameters.GetValueOrDefault(MessageParameter.UserName);
+        var name = msg.Parameters.GetValueOrDefault(MessageParameter.FirstName);
         var mail = msg.Parameters.GetValueOrDefault(MessageParameter.Mail);
         var phone = msg.Parameters.GetValueOrDefault(MessageParameter.Phone);
 
@@ -41,6 +42,7 @@ public class BotIncomingMessageConsumer(
                 Channel = channel,
                 ExternalUserId = msg.ExternalUserId,
                 Username = userName,
+                Name = name,
                 Email = mail,
                 Phone = phone
             };

@@ -9,6 +9,7 @@ public class ClientDbContext : DbContext
 
     public ClientDbContext(DbContextOptions<ClientDbContext> options) : base(options)
     {
+        Database.EnsureCreated();
     }
     
     public DbSet<Client> Clients => Set<Client>();

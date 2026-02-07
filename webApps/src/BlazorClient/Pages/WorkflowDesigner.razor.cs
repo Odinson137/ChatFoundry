@@ -32,6 +32,7 @@ public class VariableInfo
 
 public enum VariableType
 {
+    Contact,
     System,
     User,
     Custom
@@ -288,9 +289,27 @@ public partial class WorkflowDesigner : IDisposable
 
     #region Работа с переменными - Обнаружение
 
+    private static readonly List<(string Name, string Description)> ContactVariables =
+    [
+        ("$client.name", "Имя"),
+        ("$client.username", "Username"),
+        ("$client.phone", "Телефон"),
+        ("$client.email", "Email")
+    ];
+
     private void RefreshVariables()
     {
         var variables = new Dictionary<string, VariableInfo>();
+
+        foreach (var (name, description) in ContactVariables)
+        {
+            variables[name] = new VariableInfo
+            {
+                Name = name,
+                Type = VariableType.Contact,
+                SourceNode = description
+            };
+        }
 
         foreach (var node in Diagram.Nodes.Cast<WorkflowNodeModel>())
         {
@@ -549,6 +568,9 @@ if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].Usage
     {
         var lower = varName.ToLower();
 
+        if (lower.StartsWith("$client."))
+            return VariableType.Contact;
+
         if (lower.StartsWith("$system.") || lower.StartsWith("$bot."))
             return VariableType.System;
 
@@ -562,6 +584,7 @@ if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].Usage
     {
         return variable.Type switch
         {
+            VariableType.Contact => "var-contact",
             VariableType.System => "var-system",
             VariableType.User => "var-user",
             VariableType.Custom => "var-custom",
@@ -578,6 +601,7 @@ if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].Usage
 
         return filtered.GroupBy(v => v.Type switch
         {
+            VariableType.Contact => "Контакт",
             VariableType.System => "Системные",
             VariableType.User => "Пользователь",
             VariableType.Custom => "Пользовательские",

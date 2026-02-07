@@ -1,7 +1,5 @@
-﻿using Grpc.Core;
-using Shared.Application.Events;
+﻿using Shared.Application.Events;
 using Shared.Domain.Enums;
-using Workflow.Grpc.Client;
 using WorkflowService.Entities;
 using WorkflowService.Interfaces;
 using WorkflowService.Utils;
@@ -11,6 +9,7 @@ namespace WorkflowService.Services;
 public class SessionResolver(
     ISessionRepository sessionRepository,
     IWorkflowRepository workflowRepository,
+    IVariableService variableService,
     WorkflowGraphParser workflowGraphParser)
     : ISessionResolver
 {
@@ -25,7 +24,7 @@ public class SessionResolver(
                 .GetActiveWorkflowAsync(message.BotId, ct) ?? throw new InvalidOperationException("Active workflow not found.");
 
             var node = workflowGraphParser.Parse(workflow.NodesDefinition, workflow.EdgesDefinition).GetStartNode();
-            
+
             session = new Session
             {
                 Workflow = workflow,
@@ -36,10 +35,10 @@ public class SessionResolver(
             };
 
             await sessionRepository.AddAsync(session, ct);
-            
-            
         }
-        
+
+        await variableService.LoadClientVariablesAsync(session, ct);
+
         return session;
     }
 
