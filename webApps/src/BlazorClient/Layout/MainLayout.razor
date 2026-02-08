@@ -1,3 +1,4 @@
+@using Microsoft.AspNetCore.Components.Authorization
 @inherits LayoutComponentBase
 
 <div class="cf-layout">
@@ -26,12 +27,37 @@
             </nav>
 
             <div class="cf-header-actions">
-                <a href="/bots" class="cf-btn cf-btn-primary">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right: 6px;">
-                        <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                    Создать бота
-                </a>
+                <AuthorizeView>
+                    <Authorized>
+                        <a href="/bots" class="cf-btn cf-btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right: 6px;">
+                                <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            Создать бота
+                        </a>
+                        <a href="/logout" class="cf-auth-link cf-auth-logout">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+                                <polyline points="16 17 21 12 16 7"/>
+                                <line x1="21" y1="12" x2="9" y2="12"/>
+                            </svg>
+                            <span>Выйти</span>
+                        </a>
+                    </Authorized>
+                    <NotAuthorized>
+                        <a href="/login" class="cf-auth-link">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/>
+                                <polyline points="10 17 15 12 10 7"/>
+                                <line x1="15" y1="12" x2="3" y2="12"/>
+                            </svg>
+                            <span>Войти</span>
+                        </a>
+                        <a href="/register" class="cf-btn cf-btn-primary">
+                            Регистрация
+                        </a>
+                    </NotAuthorized>
+                </AuthorizeView>
             </div>
         </div>
     </header>

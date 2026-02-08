@@ -59,43 +59,79 @@
     align-items: center;
 }
 
-.cf-nav ::deep .main-nav {
+.cf-nav ::deep .cf-nav-menu {
     display: flex;
     align-items: center;
+    gap: 2px;
 }
 
-.cf-nav ::deep .nav-tabs {
-    display: flex;
-    gap: 4px;
-    border-bottom: none;
-}
-
-.cf-nav ::deep .nav-link {
-    padding: 6px 14px;
-    font-size: 0.875rem;
+.cf-nav ::deep .cf-nav-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    font-size: 0.84rem;
     font-weight: 500;
     color: #64748b;
-    border: none;
-    border-radius: 6px;
-    transition: color 0.15s, background 0.15s;
-    margin-bottom: 0;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: color 0.15s ease, background 0.15s ease;
+    white-space: nowrap;
 }
 
-.cf-nav ::deep .nav-link:hover {
+.cf-nav ::deep .cf-nav-item:hover {
     color: #0f172a;
     background: #f8fafc;
-    border-color: transparent;
+    text-decoration: none;
 }
 
-.cf-nav ::deep .nav-link.active {
+.cf-nav ::deep .cf-nav-item.active {
     color: #6366f1;
     background: #eef2ff;
-    border-color: transparent;
 }
 
-/* Header CTA */
+.cf-nav ::deep .cf-nav-icon {
+    flex-shrink: 0;
+    opacity: 0.7;
+    transition: opacity 0.15s ease;
+}
+
+.cf-nav ::deep .cf-nav-item:hover .cf-nav-icon,
+.cf-nav ::deep .cf-nav-item.active .cf-nav-icon {
+    opacity: 1;
+}
+
+/* Header actions (auth + CTA) */
 .cf-header-actions {
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cf-auth-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    font-size: 0.84rem;
+    font-weight: 500;
+    color: #64748b;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: color 0.15s ease, background 0.15s ease;
+    white-space: nowrap;
+}
+
+.cf-auth-link:hover {
+    color: #0f172a;
+    background: #f8fafc;
+    text-decoration: none;
+}
+
+.cf-auth-logout:hover {
+    color: #ef4444;
+    background: #fef2f2;
 }
 
 .cf-btn {
@@ -187,7 +223,11 @@
         gap: 1rem;
     }
 
-    .cf-header-actions {
+    .cf-header-actions .cf-btn {
+        display: none;
+    }
+
+    .cf-auth-link span {
         display: none;
     }
 
@@ -198,13 +238,28 @@
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
     .cf-logo-text {
         font-size: 1rem;
     }
 
-    .cf-nav ::deep .nav-link {
-        padding: 6px 10px;
-        font-size: 0.8rem;
+    .cf-nav ::deep .cf-nav-item {
+        padding: 6px 8px;
+        font-size: 0.78rem;
+        gap: 4px;
+    }
+
+    .cf-nav ::deep .cf-nav-item span {
+        display: none;
+    }
+
+    .cf-nav ::deep .cf-nav-icon {
+        opacity: 1;
+    }
+}
+
+@media (max-width: 480px) {
+    .cf-logo-text {
+        display: none;
     }
 }

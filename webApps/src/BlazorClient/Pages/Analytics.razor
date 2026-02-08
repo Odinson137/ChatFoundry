@@ -1,0 +1,39 @@
+@page "/analytics"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+
+<PageTitle>Аналитика</PageTitle>
+
+<div class="coming-soon">
+    <div class="coming-soon-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+    </div>
+    <h1 class="coming-soon-title">Аналитика</h1>
+    <p class="coming-soon-desc">
+        Отслеживайте эффективность ваших ботов: количество сообщений, конверсию по шагам
+        workflow, среднюю длительность диалогов и другие метрики.
+    </p>
+
+    <div class="metrics-preview">
+        <div class="metric-card">
+            <div class="metric-value">—</div>
+            <div class="metric-label">Сообщений сегодня</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value">—</div>
+            <div class="metric-label">Активных ботов</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value">—</div>
+            <div class="metric-label">Уникальных пользователей</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value">—</div>
+            <div class="metric-label">Среднее время ответа</div>
+        </div>
+    </div>
+</div>
