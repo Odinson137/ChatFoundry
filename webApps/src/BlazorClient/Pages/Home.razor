@@ -1,7 +1,275 @@
-﻿@page "/"
+@page "/"
 
-<PageTitle>Главная</PageTitle>
+<PageTitle>ChatFoundry — Визуальный конструктор AI-ботов</PageTitle>
 
-<h1>Добро пожаловать в ChatFoundry!</h1>
+<!-- Hero -->
+<section class="hero">
+    <div class="hero-inner">
+        <div class="hero-badge">Open Source / Self-Hosted / SaaS</div>
+        <h1 class="hero-title">
+            Создавайте AI-ботов<br/>
+            <span class="hero-accent">без написания кода</span>
+        </h1>
+        <p class="hero-subtitle">
+            Визуальный конструктор чат-ботов с интеграцией LLM, мультиканальностью
+            и возможностью развёртывания на своих серверах.
+            Для бизнеса в СНГ и не только.
+        </p>
+        <div class="hero-actions">
+            <a href="/bots" class="btn-hero-primary">
+                Начать бесплатно
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-left: 6px;">
+                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+            <a href="https://github.com" target="_blank" rel="noopener" class="btn-hero-secondary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+                GitHub
+            </a>
+        </div>
 
-Используйте меню навигации, чтобы начать работу.
+        <div class="hero-visual">
+            <div class="hero-flow">
+                <div class="flow-node flow-start">Start</div>
+                <div class="flow-arrow"></div>
+                <div class="flow-node flow-message">Message</div>
+                <div class="flow-arrow"></div>
+                <div class="flow-node flow-ai">AI Generate</div>
+                <div class="flow-arrow"></div>
+                <div class="flow-node flow-condition">Condition</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features -->
+<section class="features">
+    <div class="section-inner">
+        <div class="section-header">
+            <h2 class="section-title">Всё для создания умных ботов</h2>
+            <p class="section-subtitle">Перетаскивайте блоки, подключайте AI и запускайте в любом мессенджере</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon" style="background: #eef2ff; color: #6366f1;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7" rx="1"/>
+                        <rect x="14" y="3" width="7" height="7" rx="1"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1"/>
+                        <rect x="14" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Визуальный конструктор</h3>
+                <p class="feature-desc">Drag & drop редактор workflow. Создавайте логику бота из готовых блоков: сообщения, условия, переменные, HTTP-запросы.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon" style="background: #faf5ff; color: #8b5cf6;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2a4 4 0 014 4v2a4 4 0 01-8 0V6a4 4 0 014-4z"/>
+                        <path d="M9 18h6"/>
+                        <path d="M12 14v4"/>
+                        <circle cx="12" cy="21" r="1"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">AI-интеграция</h3>
+                <p class="feature-desc">Подключайте LLM (OpenAI, Anthropic) для генерации ответов, фильтрации контента и интеллектуальной маршрутизации диалогов.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon" style="background: #ecfdf5; color: #10b981;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Мультиканальность</h3>
+                <p class="feature-desc">Telegram, WhatsApp, веб-виджет и другие каналы. Один workflow — все мессенджеры. Начните с Telegram за несколько минут.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon" style="background: #fff7ed; color: #f97316;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="3" width="20" height="14" rx="2"/>
+                        <path d="M8 21h8"/>
+                        <path d="M12 17v4"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Self-Hosted</h3>
+                <p class="feature-desc">Разверните на своих серверах через Docker Compose. Полный контроль над данными — идеально для банков, госструктур и enterprise.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon" style="background: #fef2f2; color: #ef4444;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Микросервисы</h3>
+                <p class="feature-desc">Архитектура на .NET с gRPC и Kafka. Каждый сервис масштабируется независимо. Готово к продакшн-нагрузкам.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon" style="background: #f0f9ff; color: #0ea5e9;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">BYOK</h3>
+                <p class="feature-desc">Используйте свои API-ключи для LLM. Никаких скрытых наценок на токены — вы платите только провайдеру напрямую.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How it works -->
+<section class="how-it-works">
+    <div class="section-inner">
+        <div class="section-header">
+            <h2 class="section-title">Как это работает</h2>
+            <p class="section-subtitle">Три шага от идеи до работающего бота</p>
+        </div>
+
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3 class="step-title">Соберите workflow</h3>
+                <p class="step-desc">Перетащите блоки на холст и соедините их. Message, Ask, Condition, AI Generate, HTTP Request — всё, что нужно для любого сценария.</p>
+            </div>
+            <div class="step-divider"></div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3 class="step-title">Подключите канал</h3>
+                <p class="step-desc">Привяжите Telegram-бота или встройте веб-виджет на сайт. Один workflow работает сразу во всех каналах.</p>
+            </div>
+            <div class="step-divider"></div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3 class="step-title">Запустите</h3>
+                <p class="step-desc">Бот начинает принимать сообщения и обрабатывать их по вашему сценарию. Следите за статистикой в реальном времени.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Architecture -->
+<section class="architecture">
+    <div class="section-inner">
+        <div class="section-header">
+            <h2 class="section-title">Архитектура</h2>
+            <p class="section-subtitle">Построено для надёжности и масштабирования</p>
+        </div>
+
+        <div class="arch-grid">
+            <div class="arch-card">
+                <div class="arch-label">Gateway</div>
+                <div class="arch-detail">YARP reverse proxy, JWT, маршрутизация</div>
+            </div>
+            <div class="arch-card">
+                <div class="arch-label">WorkflowService</div>
+                <div class="arch-detail">Движок workflow, GraphQL API, исполнение блоков</div>
+            </div>
+            <div class="arch-card">
+                <div class="arch-label">ClientService</div>
+                <div class="arch-detail">Управление клиентами, атрибутами, командами</div>
+            </div>
+            <div class="arch-card">
+                <div class="arch-label">IdentityServer</div>
+                <div class="arch-detail">OAuth2 / OpenID Connect через OpenIddict</div>
+            </div>
+            <div class="arch-card">
+                <div class="arch-label">TelegramService</div>
+                <div class="arch-detail">Webhook, отправка/получение сообщений</div>
+            </div>
+            <div class="arch-card">
+                <div class="arch-label">BlazorClient</div>
+                <div class="arch-detail">Blazor WASM + визуальный редактор workflow</div>
+            </div>
+        </div>
+
+        <div class="tech-stack">
+            <span class="tech-tag">.NET 10</span>
+            <span class="tech-tag">gRPC</span>
+            <span class="tech-tag">GraphQL</span>
+            <span class="tech-tag">Kafka</span>
+            <span class="tech-tag">PostgreSQL</span>
+            <span class="tech-tag">Docker</span>
+            <span class="tech-tag">Blazor WASM</span>
+            <span class="tech-tag">EF Core</span>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing -->
+<section class="pricing">
+    <div class="section-inner">
+        <div class="section-header">
+            <h2 class="section-title">Тарифы</h2>
+            <p class="section-subtitle">Начните бесплатно, масштабируйтесь по мере роста</p>
+        </div>
+
+        <div class="pricing-grid">
+            <div class="price-card">
+                <div class="price-name">Free</div>
+                <div class="price-amount">$0</div>
+                <div class="price-period">навсегда</div>
+                <ul class="price-features">
+                    <li>1 бот</li>
+                    <li>1 канал</li>
+                    <li>100 сообщений / мес</li>
+                    <li>Community-поддержка</li>
+                </ul>
+                <a href="/bots" class="price-btn">Начать</a>
+            </div>
+
+            <div class="price-card price-card-featured">
+                <div class="price-badge">Популярный</div>
+                <div class="price-name">Pro</div>
+                <div class="price-amount">$29</div>
+                <div class="price-period">в месяц</div>
+                <ul class="price-features">
+                    <li>5 ботов</li>
+                    <li>3 канала</li>
+                    <li>5 000 сообщений / мес</li>
+                    <li>BYOK (свои API-ключи)</li>
+                    <li>Приоритетная поддержка</li>
+                </ul>
+                <a href="/bots" class="price-btn price-btn-featured">Выбрать Pro</a>
+            </div>
+
+            <div class="price-card">
+                <div class="price-name">Business</div>
+                <div class="price-amount">$79</div>
+                <div class="price-period">в месяц</div>
+                <ul class="price-features">
+                    <li>Безлимит ботов</li>
+                    <li>Все каналы</li>
+                    <li>50 000 сообщений / мес</li>
+                    <li>Команда до 5 человек</li>
+                    <li>Аналитика и отчёты</li>
+                </ul>
+                <a href="/bots" class="price-btn">Выбрать Business</a>
+            </div>
+        </div>
+
+        <p class="pricing-note">
+            Self-hosted / Enterprise — от $500/мес с выделенной поддержкой и SLA
+        </p>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+    <div class="section-inner">
+        <h2 class="cta-title">Готовы создать своего бота?</h2>
+        <p class="cta-subtitle">Присоединяйтесь к ChatFoundry и запустите AI-бота за считанные минуты</p>
+        <a href="/bots" class="btn-hero-primary">
+            Начать бесплатно
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-left: 6px;">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </a>
+    </div>
+</section>
