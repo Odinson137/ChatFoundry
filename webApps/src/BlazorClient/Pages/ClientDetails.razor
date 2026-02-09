@@ -2,9 +2,11 @@
 @using Microsoft.AspNetCore.Authorization
 @using BlazorClient.Interfaces
 @using BlazorClient.Models.DTO
+@using Microsoft.JSInterop
 @attribute [Authorize]
 @inject IClientApiClient ClientApi
 @inject NavigationManager Navigation
+@inject IJSRuntime JS
 
 <PageTitle>@(client?.DisplayName ?? "Клиент")</PageTitle>
 
@@ -157,7 +159,7 @@
             }
             else if (selectedChannelId != Guid.Empty)
             {
-                <div class="cd-chat">
+                <div class="cd-chat" @ref="chatContainer">
                     @if (hasMoreMessages)
                     {
                         <div class="cd-chat-load-more">
@@ -168,7 +170,7 @@
                                 }
                                 else
                                 {
-                                    <span>Загрузить ранние сообщения</span>
+                                    <span>Загрузить старые сообщения</span>
                                 }
                             </button>
                             <span class="cd-muted cd-text-sm">@messageTotalCount сообщений всего</span>
@@ -200,6 +202,7 @@
                             </div>
                         </div>
                     }
+                    <div @ref="chatBottom"></div>
                 </div>
             }
             else
@@ -226,6 +229,9 @@
     private string? messagesCursor;
     private int messageTotalCount;
     private Guid selectedChannelId;
+    
+    private ElementReference chatContainer;
+    private ElementReference chatBottom;
 
     private const int MessagesPageSize = 50;
 
@@ -282,6 +288,8 @@
         try
         {
             var result = await ClientApi.GetMessagesAsync(selectedChannelId, MessagesPageSize);
+            // Реверсируем список, чтобы новые сообщения были внизу
+            result.Items.Reverse();
             messages = result.Items;
             hasMoreMessages = result.HasNextPage;
             messagesCursor = result.EndCursor;
@@ -295,6 +303,8 @@
         {
             isLoadingMessages = false;
             StateHasChanged();
+            // Прокручиваем вниз после загрузки
+            await ScrollToBottom();
         }
     }
 
@@ -307,7 +317,10 @@
         try
         {
             var result = await ClientApi.GetMessagesAsync(selectedChannelId, MessagesPageSize, messagesCursor);
-            messages.AddRange(result.Items);
+            // Реверсируем новую порцию
+            result.Items.Reverse();
+            // Добавляем старые сообщения В НАЧАЛО списка
+            messages.InsertRange(0, result.Items);
             hasMoreMessages = result.HasNextPage;
             messagesCursor = result.EndCursor;
         }
@@ -359,4 +372,23 @@
         "CALLBACK_QUERY" => "\u21a9",
         _ => "\U0001f4e6"
     };
+
+    private async Task ScrollToBottom()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("eval", @"
+                setTimeout(() => {
+                    const chatBottom = document.querySelector('.cd-chat > div:last-child');
+                    if (chatBottom) {
+                        chatBottom.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                    }
+                }, 100);
+            ");
+        }
+        catch
+        {
+            // Игнорируем ошибки прокрутки
+        }
+    }
 }

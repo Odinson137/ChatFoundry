@@ -146,7 +146,7 @@ public class ClientApiClient(HttpClient http) : IClientApiClient
                 messages(
                     first: $first{{afterArg}},
                     where: { clientChannel: { id: { eq: $clientChannelId } } },
-                    order: [{ createdAt: ASC }]
+                    order: [{ createdAt: DESC }]
                 ) {
                     totalCount
                     pageInfo {
