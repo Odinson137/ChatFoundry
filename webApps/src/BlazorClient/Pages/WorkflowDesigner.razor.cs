@@ -285,6 +285,23 @@ public partial class WorkflowDesigner : IDisposable
         }
     }
 
+    private void AddAskButton(AskNodeData askData)
+    {
+        if (askData == null) return;
+        askData.Ui ??= new AskUiData();
+        askData.Ui.Buttons.Add(new AskButtonData { Text = "", Value = "" });
+        OnWorkflowChanged();
+        StateHasChanged();
+    }
+
+    private void RemoveAskButton(AskNodeData askData, AskButtonData button)
+    {
+        if (askData?.Ui?.Buttons == null) return;
+        askData.Ui.Buttons.Remove(button);
+        OnWorkflowChanged();
+        StateHasChanged();
+    }
+
     #endregion
 
     #region Работа с переменными - Обнаружение

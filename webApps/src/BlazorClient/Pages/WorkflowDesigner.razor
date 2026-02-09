@@ -155,6 +155,28 @@
                             </small>
                         </div>
                         <div class="mb-3">
+                            <label class="form-label">Кнопки (отправляются под сообщением)</label>
+                            @if (askData.Ui?.Buttons != null)
+                            {
+                                @foreach (var btn in askData.Ui.Buttons.ToList())
+                                {
+                                    <div class="input-group mb-2">
+                                        <input type="text" class="form-control" placeholder="Текст на кнопке" @bind="btn.Text" @oninput="OnWorkflowChanged"/>
+                                        <input type="text" class="form-control font-monospace" placeholder="Значение (в переменную)" @bind="btn.Value" @oninput="OnWorkflowChanged"/>
+                                        <button type="button" class="btn btn-outline-danger" @onclick="() => RemoveAskButton(askData, btn)">
+                                            <span class="oi oi-trash"></span>
+                                        </button>
+                                    </div>
+                                }
+                            }
+                            <button type="button" class="btn btn-sm btn-outline-primary" @onclick="() => AddAskButton(askData)">
+                                <span class="oi oi-plus"></span> Добавить кнопку
+                            </button>
+                            <small class="form-text text-muted d-block mt-1">
+                                При нажатии пользователем в переменную попадёт «Значение». Если кнопок нет — ожидается любой ввод.
+                            </small>
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label">Сохранить результат в переменную</label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>

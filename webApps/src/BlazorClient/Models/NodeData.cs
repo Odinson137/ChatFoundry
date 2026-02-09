@@ -59,12 +59,37 @@ public class SetVariableNodeData : NodeData
     public string Value { get; set; } = string.Empty;
 }
 
+/// <summary>
+/// Кнопка для блока Ask (inline-кнопка под сообщением).
+/// </summary>
+public class AskButtonData
+{
+    /// <summary>Текст на кнопке (отображается пользователю).</summary>
+    public string Text { get; set; } = string.Empty;
+    /// <summary>Значение, которое попадёт в переменную при нажатии.</summary>
+    public string Value { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// UI-данные блока Ask (кнопки и т.д.).
+/// </summary>
+public class AskUiData
+{
+    public List<AskButtonData> Buttons { get; set; } = new();
+}
+
 public class AskNodeData : NodeData
 {
     public string Text { get; set; } = string.Empty;
     
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Variable { get; set; }
+
+    /// <summary>
+    /// Кнопки под вопросом (если пусто — кнопки не отправляются).
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public AskUiData? Ui { get; set; }
 }
 
 public class AIGenerateNodeData : NodeData

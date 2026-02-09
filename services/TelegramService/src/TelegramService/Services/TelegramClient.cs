@@ -81,13 +81,17 @@ public sealed class TelegramClient(
     public async Task SendInlineKeyboardAsync(string clientid, string text, List<InlineButton> buttons, CancellationToken ct)
     {
         var client = await InitializeClientAsync(clientid, ct);
-        
-        var keyboardRows = buttons
-            .Select(g => new KeyboardButton(g.Text))
+
+        var rows = buttons
+            .Select(b =>
+            {
+                return new[] { InlineKeyboardButton.WithCallbackData(b.Text, string.IsNullOrWhiteSpace(b.CallbackData) ? b.Text :  b.CallbackData)
+                };
+            })
             .ToArray();
 
-        var markup = new ReplyKeyboardMarkup(keyboardRows);
-        
+        var markup = new InlineKeyboardMarkup(rows);
+
         await client.SendMessage(
             chatId: clientid,
             text: text,
@@ -95,7 +99,16 @@ public sealed class TelegramClient(
             replyMarkup: markup,
             cancellationToken: ct);
 
-        logger.LogInformation("Inline keyboard sent to {ChatId}", clientid);
+        logger.LogInformation("Inline keyboard (attached to message) sent to {ChatId}", clientid);
+    }
+
+    private static string TruncateToUtf8Bytes(string value, int maxBytes)
+    {
+        var bytes = System.Text.Encoding.UTF8.GetBytes(value);
+        if (bytes.Length <= maxBytes) return value;
+        var truncated = new byte[maxBytes];
+        Array.Copy(bytes, truncated, maxBytes);
+        return System.Text.Encoding.UTF8.GetString(truncated).TrimEnd('\uFFFD');
     }
 
     public async Task SendDocumentAsync(string clientid, string fileId, CancellationToken ct)
