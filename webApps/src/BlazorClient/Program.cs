@@ -14,6 +14,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
 builder.Services.AddScoped<IWorkflowApiClient, WorkflowApiClient>();
+builder.Services.AddScoped<IClientApiClient, ClientApiClient>();
 builder.Services.AddScoped<IWorkflowSchemaService, WorkflowSchemaService>();
 
 builder.Services.AddBlazoredLocalStorage();

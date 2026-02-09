@@ -1,7 +1,376 @@
-﻿@page "/clients"
+@page "/clients"
 @using Microsoft.AspNetCore.Authorization
+@using BlazorClient.Interfaces
+@using BlazorClient.Models.DTO
 @attribute [Authorize]
+@inject IClientApiClient ClientApi
+@inject NavigationManager Navigation
 
 <PageTitle>Клиенты</PageTitle>
 
-<h1>Управление клиентами</h1>
+<div class="clients-page">
+    <!-- Header -->
+    <div class="clients-header">
+        <div class="clients-header-left">
+            <h1 class="clients-title">Клиенты</h1>
+            @if (!isLoading && totalCount > 0)
+            {
+                <span class="clients-count">@totalCount</span>
+            }
+        </div>
+    </div>
+
+    <!-- Toolbar: Search + Filter -->
+    <div class="clients-toolbar">
+        <div class="clients-search-wrap">
+            <svg class="clients-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input type="text"
+                   class="clients-search"
+                   placeholder="Поиск по имени..."
+                   @bind="searchText"
+                   @bind:event="oninput"
+                   @bind:after="OnSearchChanged" />
+            @if (!string.IsNullOrEmpty(searchText))
+            {
+                <button class="clients-search-clear" @onclick="ClearSearch">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+                    </svg>
+                </button>
+            }
+        </div>
+
+        <div class="clients-filter-wrap">
+            <select class="clients-filter" @bind="selectedChannel" @bind:after="OnFilterChanged">
+                <option value="">Все каналы</option>
+                <option value="TELEGRAM">Telegram</option>
+                <option value="WEB">Web</option>
+                <option value="WHATSAPP">WhatsApp</option>
+                <option value="API">API</option>
+                <option value="EMAIL">Email</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Content -->
+    @if (isLoading)
+    {
+        <div class="clients-loading">
+            <div class="clients-spinner"></div>
+            <p>Загрузка клиентов...</p>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(error))
+    {
+        <div class="clients-error">
+            <p>@error</p>
+            <button class="clients-btn clients-btn-primary" @onclick="LoadClients">Повторить</button>
+        </div>
+    }
+    else if (clients.Count == 0)
+    {
+        <div class="clients-empty">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            <p class="clients-empty-title">Клиенты не найдены</p>
+            <p class="clients-empty-desc">
+                @if (!string.IsNullOrEmpty(searchText) || !string.IsNullOrEmpty(selectedChannel))
+                {
+                    <span>Попробуйте изменить параметры поиска или фильтры</span>
+                }
+                else
+                {
+                    <span>Клиенты появятся здесь после первого взаимодействия с ботом</span>
+                }
+            </p>
+        </div>
+    }
+    else
+    {
+        <!-- Table -->
+        <div class="clients-table-wrap">
+            <table class="clients-table">
+                <thead>
+                    <tr>
+                        <th class="clients-th clients-th-sortable" @onclick='() => ToggleSort("displayName")'>
+                            Имя
+                            @if (sortField == "displayName")
+                            {
+                                <span class="clients-sort-arrow">@(sortDirection == "ASC" ? "\u2191" : "\u2193")</span>
+                            }
+                        </th>
+                        <th class="clients-th">Каналы</th>
+                        <th class="clients-th">Контакт</th>
+                        <th class="clients-th clients-th-sortable" @onclick='() => ToggleSort("createdAt")'>
+                            Создан
+                            @if (sortField == "createdAt")
+                            {
+                                <span class="clients-sort-arrow">@(sortDirection == "ASC" ? "\u2191" : "\u2193")</span>
+                            }
+                        </th>
+                        <th class="clients-th clients-th-sortable" @onclick='() => ToggleSort("modifiedAt")'>
+                            Активность
+                            @if (sortField == "modifiedAt")
+                            {
+                                <span class="clients-sort-arrow">@(sortDirection == "ASC" ? "\u2191" : "\u2193")</span>
+                            }
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var client in clients)
+                    {
+                        <tr class="clients-row"
+                            @onclick="() => NavigateToClient(client.Id)">
+                            <td class="clients-td clients-td-name">
+                                <div class="clients-avatar">
+                                    @(GetInitials(client))
+                                </div>
+                                <span>@(client.DisplayName ?? "—")</span>
+                            </td>
+                            <td class="clients-td">
+                                <div class="clients-badges">
+                                    @foreach (var ch in client.ClientChannels)
+                                    {
+                                        <span class="clients-badge clients-badge-@(ch.Channel.ToLowerInvariant())">@ch.Channel</span>
+                                    }
+                                </div>
+                            </td>
+                            <td class="clients-td clients-td-contact">
+                                @{ var primary = client.ClientChannels.FirstOrDefault(); }
+                                @if (primary != null)
+                                {
+                                    @if (!string.IsNullOrEmpty(primary.Username))
+                                    {
+                                        <span>@@@primary.Username</span>
+                                    }
+                                    else if (!string.IsNullOrEmpty(primary.Phone))
+                                    {
+                                        <span>@primary.Phone</span>
+                                    }
+                                    else if (!string.IsNullOrEmpty(primary.Email))
+                                    {
+                                        <span>@primary.Email</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="clients-muted">@primary.ExternalUserId</span>
+                                    }
+                                }
+                            </td>
+                            <td class="clients-td clients-td-date">
+                                @client.CreatedAt.ToString("dd.MM.yyyy")
+                            </td>
+                            <td class="clients-td clients-td-date">
+                                @client.ModifiedAt.ToString("dd.MM.yyyy")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="clients-pagination">
+            <div class="clients-pagination-info">
+                <span class="clients-muted">
+                    Показано @clients.Count из @totalCount
+                </span>
+            </div>
+
+            <div class="clients-pagination-controls">
+                <label class="clients-muted">Размер:</label>
+                <select class="clients-page-size" @bind="pageSize" @bind:after="OnPageSizeChanged">
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                </select>
+
+                <button class="clients-btn clients-btn-page"
+                        disabled="@(!hasPreviousPage)"
+                        @onclick="GoToPreviousPage">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m15 18-6-6 6-6"/>
+                    </svg>
+                </button>
+                <button class="clients-btn clients-btn-page"
+                        disabled="@(!hasNextPage)"
+                        @onclick="GoToNextPage">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m9 18 6-6-6-6"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<ClientDto> clients = [];
+    private bool isLoading = true;
+    private string? error;
+
+    private string searchText = "";
+    private string selectedChannel = "";
+    private string sortField = "createdAt";
+    private string sortDirection = "DESC";
+
+    private int pageSize = 25;
+    private string? endCursor;
+    private bool hasNextPage;
+    private bool hasPreviousPage;
+    private int totalCount;
+
+    private System.Timers.Timer? debounceTimer;
+    private readonly List<string> cursorStack = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadClients();
+    }
+
+    private async Task LoadClients()
+    {
+        isLoading = true;
+        error = null;
+        StateHasChanged();
+
+        try
+        {
+            var result = await ClientApi.GetClientsAsync(
+                first: pageSize,
+                after: endCursor,
+                search: string.IsNullOrWhiteSpace(searchText) ? null : searchText,
+                channelFilter: string.IsNullOrEmpty(selectedChannel) ? null : selectedChannel,
+                sortField: sortField,
+                sortDirection: sortDirection);
+
+            clients = result.Items;
+            totalCount = result.TotalCount;
+            hasNextPage = result.HasNextPage;
+            hasPreviousPage = cursorStack.Count > 0;
+            endCursor = result.EndCursor;
+        }
+        catch (Exception ex)
+        {
+            error = $"Не удалось загрузить клиентов: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void OnSearchChanged()
+    {
+        debounceTimer?.Stop();
+        debounceTimer?.Dispose();
+        debounceTimer = new System.Timers.Timer(400);
+        debounceTimer.Elapsed += async (_, _) =>
+        {
+            debounceTimer?.Stop();
+            await InvokeAsync(async () =>
+            {
+                ResetPagination();
+                await LoadClients();
+            });
+        };
+        debounceTimer.AutoReset = false;
+        debounceTimer.Start();
+    }
+
+    private async Task ClearSearch()
+    {
+        searchText = "";
+        ResetPagination();
+        await LoadClients();
+    }
+
+    private async Task OnFilterChanged()
+    {
+        ResetPagination();
+        await LoadClients();
+    }
+
+    private async Task OnPageSizeChanged()
+    {
+        ResetPagination();
+        await LoadClients();
+    }
+
+    private void ToggleSort(string field)
+    {
+        if (sortField == field)
+        {
+            sortDirection = sortDirection == "ASC" ? "DESC" : "ASC";
+        }
+        else
+        {
+            sortField = field;
+            sortDirection = "ASC";
+        }
+
+        ResetPagination();
+        _ = LoadClients();
+    }
+
+    private async Task GoToNextPage()
+    {
+        if (endCursor != null)
+        {
+            cursorStack.Add(endCursor);
+        }
+        await LoadClients();
+    }
+
+    private async Task GoToPreviousPage()
+    {
+        if (cursorStack.Count > 0)
+        {
+            cursorStack.RemoveAt(cursorStack.Count - 1);
+        }
+        endCursor = cursorStack.Count > 0 ? cursorStack[^1] : null;
+        await LoadClients();
+    }
+
+    private void ResetPagination()
+    {
+        endCursor = null;
+        cursorStack.Clear();
+    }
+
+    private void NavigateToClient(Guid clientId)
+    {
+        Navigation.NavigateTo($"/clients/{clientId}");
+    }
+
+    private static string GetInitials(ClientDto client)
+    {
+        if (!string.IsNullOrWhiteSpace(client.DisplayName))
+        {
+            var parts = client.DisplayName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            return parts.Length >= 2
+                ? $"{parts[0][0]}{parts[1][0]}".ToUpper()
+                : $"{parts[0][0]}".ToUpper();
+        }
+
+        var ch = client.ClientChannels.FirstOrDefault();
+        if (ch != null && !string.IsNullOrEmpty(ch.Name))
+            return ch.Name[..1].ToUpper();
+
+        return "?";
+    }
+
+    public void Dispose()
+    {
+        debounceTimer?.Dispose();
+    }
+}

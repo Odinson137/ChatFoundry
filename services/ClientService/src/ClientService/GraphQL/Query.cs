@@ -1,5 +1,6 @@
 ﻿using ClientService.Data;
 using ClientService.Entities;
+using HotChocolate;
 using HotChocolate.Data;
 using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
@@ -7,13 +8,13 @@ using Shared.Infrastructure.GraphQl;
 
 namespace ClientService.GraphQL;
 
-public class Query(IHttpContextAccessor httpContextAccessor, ClientDbContext context) : BaseGraphQl(httpContextAccessor)
+public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpContextAccessor)
 {
     [UsePaging(IncludeTotalCount = true)]
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public IQueryable<Client> GetClients()
+    public IQueryable<Client> GetClients([Service] ClientDbContext context)
     {
         return context.Clients;
     }
@@ -22,7 +23,7 @@ public class Query(IHttpContextAccessor httpContextAccessor, ClientDbContext con
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public IQueryable<ClientChannel> GetClientChannels()
+    public IQueryable<ClientChannel> GetClientChannels([Service] ClientDbContext context)
     {
         return context.ClientChannels;
     }
@@ -31,7 +32,7 @@ public class Query(IHttpContextAccessor httpContextAccessor, ClientDbContext con
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public DbSet<Message> GetMessages()
+    public DbSet<Message> GetMessages([Service] ClientDbContext context)
     {
         return context.Messages;
     }
@@ -40,7 +41,7 @@ public class Query(IHttpContextAccessor httpContextAccessor, ClientDbContext con
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public DbSet<AttributeDefinition> GetAttributes()
+    public DbSet<AttributeDefinition> GetAttributes([Service] ClientDbContext context)
     {
         return context.AttributeDefinitions;
     }

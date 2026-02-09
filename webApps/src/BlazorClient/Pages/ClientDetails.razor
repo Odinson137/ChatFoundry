@@ -1,0 +1,362 @@
+@page "/clients/{ClientId:guid}"
+@using Microsoft.AspNetCore.Authorization
+@using BlazorClient.Interfaces
+@using BlazorClient.Models.DTO
+@attribute [Authorize]
+@inject IClientApiClient ClientApi
+@inject NavigationManager Navigation
+
+<PageTitle>@(client?.DisplayName ?? "Клиент")</PageTitle>
+
+<div class="cd-page">
+    @if (isLoading)
+    {
+        <div class="cd-loading">
+            <div class="cd-spinner"></div>
+            <p>Загрузка...</p>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(error))
+    {
+        <div class="cd-error">
+            <p>@error</p>
+            <button class="cd-btn cd-btn-primary" @onclick="LoadClient">Повторить</button>
+        </div>
+    }
+    else if (client != null)
+    {
+        <!-- Breadcrumb -->
+        <nav class="cd-breadcrumb">
+            <a href="/clients" class="cd-breadcrumb-link">Клиенты</a>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="cd-breadcrumb-current">@(client.DisplayName ?? "Без имени")</span>
+        </nav>
+
+        <!-- Client Info Card -->
+        <div class="cd-info-card">
+            <div class="cd-info-header">
+                <div class="cd-avatar-lg">@GetInitials(client)</div>
+                <div class="cd-info-main">
+                    <h1 class="cd-client-name">@(client.DisplayName ?? "Без имени")</h1>
+                    <div class="cd-info-meta">
+                        <span class="cd-meta-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                            Создан @client.CreatedAt.ToString("dd.MM.yyyy HH:mm")
+                        </span>
+                        <span class="cd-meta-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg>
+                            Обновлён @client.ModifiedAt.ToString("dd.MM.yyyy HH:mm")
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Channels Section -->
+        <div class="cd-section">
+            <h2 class="cd-section-title">Каналы <span class="cd-count-badge">@client.ClientChannels.Count</span></h2>
+            <div class="cd-channels-grid">
+                @foreach (var ch in client.ClientChannels)
+                {
+                    <div class="cd-channel-card">
+                        <div class="cd-channel-header">
+                            <span class="cd-badge cd-badge-@(ch.Channel.ToLowerInvariant())">@ch.Channel</span>
+                            <span class="cd-muted">@ch.ExternalUserId</span>
+                        </div>
+                        <div class="cd-channel-fields">
+                            @if (!string.IsNullOrEmpty(ch.Name) || !string.IsNullOrEmpty(ch.LastName))
+                            {
+                                <div class="cd-field">
+                                    <span class="cd-field-label">Имя</span>
+                                    <span>@ch.Name @ch.LastName</span>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(ch.Username))
+                            {
+                                <div class="cd-field">
+                                    <span class="cd-field-label">Username</span>
+                                    <span>@@@ch.Username</span>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(ch.Phone))
+                            {
+                                <div class="cd-field">
+                                    <span class="cd-field-label">Телефон</span>
+                                    <span>@ch.Phone</span>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(ch.Email))
+                            {
+                                <div class="cd-field">
+                                    <span class="cd-field-label">Email</span>
+                                    <span>@ch.Email</span>
+                                </div>
+                            }
+                            <div class="cd-field">
+                                <span class="cd-field-label">Подключён</span>
+                                <span>@ch.CreatedAt.ToString("dd.MM.yyyy HH:mm")</span>
+                            </div>
+                        </div>
+                        @if (ch.Attributes.Count > 0)
+                        {
+                            <div class="cd-attrs">
+                                <span class="cd-field-label">Атрибуты</span>
+                                <div class="cd-attr-list">
+                                    @foreach (var attr in ch.Attributes)
+                                    {
+                                        <span class="cd-attr-tag">@attr.Key: @attr.Value</span>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Chat Section -->
+        <div class="cd-section">
+            <h2 class="cd-section-title">Сообщения</h2>
+
+            @if (client.ClientChannels.Count > 1)
+            {
+                <div class="cd-channel-tabs">
+                    @foreach (var ch in client.ClientChannels)
+                    {
+                        <button class="cd-tab @(selectedChannelId == ch.Id ? "cd-tab-active" : "")"
+                                @onclick="() => SelectChannel(ch.Id)">
+                            <span class="cd-badge cd-badge-@(ch.Channel.ToLowerInvariant()) cd-badge-sm">@ch.Channel</span>
+                            @if (!string.IsNullOrEmpty(ch.Username))
+                            {
+                                <span>@@@ch.Username</span>
+                            }
+                            else if (!string.IsNullOrEmpty(ch.Name))
+                            {
+                                <span>@ch.Name</span>
+                            }
+                        </button>
+                    }
+                </div>
+            }
+
+            @if (isLoadingMessages)
+            {
+                <div class="cd-loading cd-loading-sm">
+                    <div class="cd-spinner"></div>
+                    <p>Загрузка сообщений...</p>
+                </div>
+            }
+            else if (messages.Count == 0 && selectedChannelId != Guid.Empty)
+            {
+                <div class="cd-empty-chat">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/>
+                    </svg>
+                    <p>Сообщений пока нет</p>
+                </div>
+            }
+            else if (selectedChannelId != Guid.Empty)
+            {
+                <div class="cd-chat">
+                    @if (hasMoreMessages)
+                    {
+                        <div class="cd-chat-load-more">
+                            <button class="cd-btn cd-btn-ghost" @onclick="LoadMoreMessages" disabled="@isLoadingMoreMessages">
+                                @if (isLoadingMoreMessages)
+                                {
+                                    <div class="cd-spinner cd-spinner-sm"></div>
+                                }
+                                else
+                                {
+                                    <span>Загрузить ранние сообщения</span>
+                                }
+                            </button>
+                            <span class="cd-muted cd-text-sm">@messageTotalCount сообщений всего</span>
+                        </div>
+                    }
+
+                    @{ DateTime? lastDate = null; }
+                    @foreach (var msg in messages)
+                    {
+                        var msgDate = msg.CreatedAt.Date;
+                        @if (lastDate == null || lastDate != msgDate)
+                        {
+                            lastDate = msgDate;
+                            <div class="cd-chat-date-sep">
+                                <span>@FormatDateSeparator(msgDate)</span>
+                            </div>
+                        }
+
+                        var isOutgoing = msg.Direction.Equals("OUTGOING", StringComparison.OrdinalIgnoreCase);
+                        <div class="cd-msg @(isOutgoing ? "cd-msg-outgoing" : "cd-msg-incoming")">
+                            <div class="cd-msg-bubble @(isOutgoing ? "cd-msg-bubble-out" : "cd-msg-bubble-in")">
+                                @if (!msg.MessageKind.Equals("TEXT", StringComparison.OrdinalIgnoreCase) &&
+                                     !msg.MessageKind.Equals("UNKNOWN", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <span class="cd-msg-kind">@GetKindIcon(msg.MessageKind) @msg.MessageKind</span>
+                                }
+                                <div class="cd-msg-text">@(msg.Payload ?? "")</div>
+                                <span class="cd-msg-time">@msg.CreatedAt.ToString("HH:mm")</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="cd-empty-chat">
+                    <p>Выберите канал для просмотра сообщений</p>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public Guid ClientId { get; set; }
+
+    private ClientDto? client;
+    private bool isLoading = true;
+    private string? error;
+
+    private List<MessageDto> messages = [];
+    private bool isLoadingMessages;
+    private bool isLoadingMoreMessages;
+    private bool hasMoreMessages;
+    private string? messagesCursor;
+    private int messageTotalCount;
+    private Guid selectedChannelId;
+
+    private const int MessagesPageSize = 50;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadClient();
+    }
+
+    private async Task LoadClient()
+    {
+        isLoading = true;
+        error = null;
+        StateHasChanged();
+
+        try
+        {
+            client = await ClientApi.GetClientByIdAsync(ClientId);
+            if (client == null)
+            {
+                error = "Клиент не найден";
+            }
+            else if (client.ClientChannels.Count > 0)
+            {
+                await SelectChannel(client.ClientChannels[0].Id);
+            }
+        }
+        catch (Exception ex)
+        {
+            error = $"Не удалось загрузить данные: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task SelectChannel(Guid channelId)
+    {
+        if (selectedChannelId == channelId) return;
+        selectedChannelId = channelId;
+        messages.Clear();
+        messagesCursor = null;
+        hasMoreMessages = false;
+        messageTotalCount = 0;
+        await LoadMessages();
+    }
+
+    private async Task LoadMessages()
+    {
+        isLoadingMessages = true;
+        StateHasChanged();
+
+        try
+        {
+            var result = await ClientApi.GetMessagesAsync(selectedChannelId, MessagesPageSize);
+            messages = result.Items;
+            hasMoreMessages = result.HasNextPage;
+            messagesCursor = result.EndCursor;
+            messageTotalCount = result.TotalCount;
+        }
+        catch (Exception ex)
+        {
+            error = $"Не удалось загрузить сообщения: {ex.Message}";
+        }
+        finally
+        {
+            isLoadingMessages = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadMoreMessages()
+    {
+        if (!hasMoreMessages || isLoadingMoreMessages) return;
+        isLoadingMoreMessages = true;
+        StateHasChanged();
+
+        try
+        {
+            var result = await ClientApi.GetMessagesAsync(selectedChannelId, MessagesPageSize, messagesCursor);
+            messages.AddRange(result.Items);
+            hasMoreMessages = result.HasNextPage;
+            messagesCursor = result.EndCursor;
+        }
+        catch (Exception ex)
+        {
+            error = $"Ошибка загрузки: {ex.Message}";
+        }
+        finally
+        {
+            isLoadingMoreMessages = false;
+            StateHasChanged();
+        }
+    }
+
+    private static string GetInitials(ClientDto c)
+    {
+        if (!string.IsNullOrWhiteSpace(c.DisplayName))
+        {
+            var parts = c.DisplayName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            return parts.Length >= 2
+                ? $"{parts[0][0]}{parts[1][0]}".ToUpper()
+                : $"{parts[0][0]}".ToUpper();
+        }
+        var ch = c.ClientChannels.FirstOrDefault();
+        if (ch != null && !string.IsNullOrEmpty(ch.Name))
+            return ch.Name[..1].ToUpper();
+        return "?";
+    }
+
+    private static string FormatDateSeparator(DateTime date)
+    {
+        var today = DateTime.UtcNow.Date;
+        if (date == today) return "Сегодня";
+        if (date == today.AddDays(-1)) return "Вчера";
+        return date.ToString("dd MMMM yyyy");
+    }
+
+    private static string GetKindIcon(string kind) => kind.ToUpperInvariant() switch
+    {
+        "IMAGE" => "\U0001f5bc",
+        "AUDIO" => "\U0001f3b5",
+        "VIDEO" => "\U0001f3ac",
+        "VOICE" => "\U0001f3a4",
+        "FILE" => "\U0001f4ce",
+        "STICKER" => "\U0001f600",
+        "LINK" => "\U0001f517",
+        "COMMAND" => "/",
+        "BUTTONS" => "\u2328",
+        "CALLBACK_QUERY" => "\u21a9",
+        _ => "\U0001f4e6"
+    };
+}

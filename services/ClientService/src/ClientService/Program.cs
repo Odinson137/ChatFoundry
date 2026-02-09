@@ -3,6 +3,7 @@ using ClientService.Data;
 using ClientService.GraphQL;
 using ClientService.GraphQL.Mutations;
 using ClientService.Interfaces;
+using Shared.Infrastructure.GraphQl;
 using ClientService.Repositories;
 using Confluent.Kafka;
 using MassTransit;
@@ -15,6 +16,7 @@ var services = builder.Services;
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
+services.AddHttpContextAccessor();
 services.AddGrpc();
 
 builder.Services.AddScoped<IClientChannelRepository, ClientChannelRepository>();
@@ -71,11 +73,13 @@ builder.Services.AddMassTransit(x =>
 builder.Services
     .AddGraphQLServer()
     .AddQueryType<Query>()
-    .AddMutationType<ClientMutation>()
-    .AddMutationType<AttributeDefinitionMutation>()
-    .AddProjections() 
+    .AddMutationType<Mutation>()
+    .AddTypeExtension<ClientMutation>()
+    .AddTypeExtension<AttributeDefinitionMutation>()
+    .AddProjections()
     .AddFiltering()
-    .AddSorting();
+    .AddSorting()
+    .ModifyRequestOptions(opt => opt.IncludeExceptionDetails = true);
 
 var app = builder.Build();
 
