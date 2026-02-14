@@ -1,8 +1,8 @@
-﻿namespace Shared.Domain.Models;
+namespace Shared.Domain.Models;
 
 public abstract record BotMessagePayload;
 
-public record MessagePayload(string Text) : BotMessagePayload;
+public record MessagePayload(string Text, string? Caption = null) : BotMessagePayload;
 
 public record AskMessagePayload(
     string Text, 

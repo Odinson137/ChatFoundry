@@ -111,37 +111,40 @@ public sealed class TelegramClient(
         return System.Text.Encoding.UTF8.GetString(truncated).TrimEnd('\uFFFD');
     }
 
-    public async Task SendDocumentAsync(string clientid, string fileId, CancellationToken ct)
+    public async Task SendDocumentAsync(string clientid, string fileId, string? caption, CancellationToken ct)
     {
         var client = await InitializeClientAsync(clientid, ct);
-        
+        var cap = TruncateToUtf8Bytes(caption ?? "", 1024);
         await client.SendDocument(
             chatId: clientid,
             document: fileId,
+            caption: cap.Length > 0 ? cap : null,
             cancellationToken: ct);
 
         logger.LogInformation("Document sent to {ChatId}", clientid);
     }
 
-    public async Task SendPhotoAsync(string clientid, string photoUrl, CancellationToken ct)
+    public async Task SendPhotoAsync(string clientid, string photoUrl, string? caption, CancellationToken ct)
     {
         var client = await InitializeClientAsync(clientid, ct);
-        
+        var cap = TruncateToUtf8Bytes(caption ?? "", 1024);
         await client.SendPhoto(
             chatId: clientid,
             photo: photoUrl,
+            caption: cap.Length > 0 ? cap : null,
             cancellationToken: ct);
 
         logger.LogInformation("Photo sent to {ChatId}", clientid);
     }
 
-    public async Task SendVideoAsync(string clientid, string videoUrl, CancellationToken ct)
+    public async Task SendVideoAsync(string clientid, string videoUrl, string? caption, CancellationToken ct)
     {
         var client = await InitializeClientAsync(clientid, ct);
-
+        var cap = TruncateToUtf8Bytes(caption ?? "", 1024);
         await client.SendVideo(
             chatId: clientid,
             video: videoUrl,
+            caption: cap.Length > 0 ? cap : null,
             cancellationToken: ct);
 
         logger.LogInformation("Video sent to {ChatId}", clientid);

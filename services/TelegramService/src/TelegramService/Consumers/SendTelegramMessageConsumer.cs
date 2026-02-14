@@ -1,4 +1,4 @@
-﻿using MassTransit;
+using MassTransit;
 using Shared.Application.Events;
 using Shared.Domain.Enums;
 using Shared.Domain.Models;
@@ -48,17 +48,17 @@ public sealed class SendTelegramMessageConsumer(
 
             case MessageKind.File:
                 var filePayload = JsonConvert.DeserializeObject<MessagePayload>(messageJson)!;
-                await telegramClient.SendDocumentAsync(chatId, filePayload.Text, ct);
+                await telegramClient.SendDocumentAsync(chatId, filePayload.Text, filePayload.Caption, ct);
                 break;
 
             case MessageKind.Image:
                 var imagePayload = JsonConvert.DeserializeObject<MessagePayload>(messageJson)!;
-                await telegramClient.SendPhotoAsync(chatId, imagePayload.Text, ct);
+                await telegramClient.SendPhotoAsync(chatId, imagePayload.Text, imagePayload.Caption, ct);
                 break;
 
             case MessageKind.Video:
                 var videoPayload = JsonConvert.DeserializeObject<MessagePayload>(messageJson)!;
-                await telegramClient.SendVideoAsync(chatId, videoPayload.Text, ct);
+                await telegramClient.SendVideoAsync(chatId, videoPayload.Text, videoPayload.Caption, ct);
                 break;
 
             case MessageKind.Audio:

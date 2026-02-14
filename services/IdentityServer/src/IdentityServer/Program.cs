@@ -42,7 +42,9 @@ services.AddOpenIddict()
             "workflow",
             "client",
             "telegram",
-            "identity"
+            "identity",
+            "file",
+            OpenIddictConstants.Scopes.OfflineAccess
         );
 
         options.AddDevelopmentEncryptionCertificate();
@@ -98,6 +100,7 @@ using (var scope = app.Services.CreateScope())
                 OpenIddictConstants.Permissions.Prefixes.Scope + "client",
                 OpenIddictConstants.Permissions.Prefixes.Scope + "telegram",
                 OpenIddictConstants.Permissions.Prefixes.Scope + "identity",
+                OpenIddictConstants.Permissions.Prefixes.Scope + "file",
                 OpenIddictConstants.Permissions.Prefixes.Scope + "offline_access",
 
                 OpenIddictConstants.Permissions.ResponseTypes.Token,

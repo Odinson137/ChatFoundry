@@ -1,22 +1,22 @@
 # This is a generated file. Not intended for manual editing.
 version: "3.9"
 services:
-  telegram-service:
+  file-service:
     build:
       context: "C:\\Users\\buryy\\RiderProjects\\ChatFoundry"
-      dockerfile: "services/TelegramService/src/TelegramService/Dockerfile"
+      dockerfile: "services/FileService/src/FileService/Dockerfile"
       target: "base"
     command: []
     entrypoint:
     - "dotnet"
-    - "/app/bin/Debug/net10.0/TelegramService.dll"
+    - "/app/bin/Debug/net10.0/FileService.dll"
     environment:
       DOTNET_USE_POLLING_FILE_WATCHER: "true"
-    image: "telegramservice:dev"
+    image: "fileservice:dev"
     ports: []
     volumes:
-    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry\\services\\TelegramService\\src\\\
-      TelegramService:/app:rw"
+    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry\\services\\FileService\\src\\\
+      FileService:/app:rw"
     - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry:/src:rw"
     - "C:\\Users\\buryy\\.nuget\\packages:/home/app/.nuget/packages"
     working_dir: "/app"

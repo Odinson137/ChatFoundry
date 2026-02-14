@@ -117,6 +117,7 @@ public sealed class WorkflowGraphParser
             WorkflowNodeType.SetVariable => data.Deserialize<SetVariableNodeData>(JsonOptions) ?? NodeData.Empty,
             WorkflowNodeType.HttpRequest => data.Deserialize<HttpRequestNodeData>(JsonOptions) ?? NodeData.Empty,
             WorkflowNodeType.AIGenerate => data.Deserialize<AIGenerateNodeData>(JsonOptions) ?? NodeData.Empty,
+            WorkflowNodeType.Media => data.Deserialize<MediaNodeData>(JsonOptions) ?? NodeData.Empty,
             _ => NodeData.Empty
         };
     }

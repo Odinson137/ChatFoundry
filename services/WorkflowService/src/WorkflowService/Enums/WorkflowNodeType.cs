@@ -1,4 +1,4 @@
-﻿namespace WorkflowService.Enums;
+namespace WorkflowService.Enums;
 
 public enum WorkflowNodeType
 {
@@ -13,6 +13,7 @@ public enum WorkflowNodeType
     Input = 3,
 
     // ===== Media / rich content =====
+    Media = 9,   // один блок «Медиа» с выбором типа внутри (Image/Video/Audio/File)
     Image = 10,
     Video = 11,
     Audio = 12,

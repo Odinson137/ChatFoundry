@@ -57,6 +57,7 @@ services.AddScoped<IActionExecutor, InputExecutor>();
 services.AddScoped<IActionExecutor, SetVariableActionExecutor>();
 services.AddScoped<IActionExecutor, HttpRequestActionExecutor>();
 services.AddScoped<IActionExecutor, AIGenerateActionExecutor>();
+services.AddScoped<IActionExecutor, SendMediaActionExecutor>();
 
 services.AddScoped<IMessageSender, MessageSender>();
 services.AddScoped<IOpenAiService, OpenAiService>();
@@ -71,6 +72,15 @@ services.AddHttpClient();
 
 services.Configure<WorkflowService.Options.OpenAiOptions>(
     builder.Configuration.GetSection(WorkflowService.Options.OpenAiOptions.SectionName));
+services.Configure<WorkflowService.Options.FileServiceOptions>(
+    builder.Configuration.GetSection(WorkflowService.Options.FileServiceOptions.SectionName));
+
+services.AddHttpClient<FileUrlResolver>((sp, client) =>
+{
+    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<WorkflowService.Options.FileServiceOptions>>().Value;
+    client.BaseAddress = new Uri(options.BaseUrl.TrimEnd('/') + "/");
+});
+services.AddScoped<IFileUrlResolver>(sp => sp.GetRequiredService<FileUrlResolver>());
 
 services.AddPostgreSql<WorkflowDbContext>(builder.Configuration);
 

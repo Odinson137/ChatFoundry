@@ -12,6 +12,7 @@ namespace BlazorClient.Models;
 [JsonDerivedType(typeof(AskNodeData), "Ask")]
 [JsonDerivedType(typeof(HttpRequestNodeData), "HttpRequest")]
 [JsonDerivedType(typeof(AIGenerateNodeData), "AIGenerate")]
+[JsonDerivedType(typeof(MediaNodeData), "Media")]
 
 public abstract class NodeData { }
 
@@ -98,4 +99,42 @@ public class AIGenerateNodeData : NodeData
     
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Variable { get; set; }
+}
+
+/// <summary>
+/// Тип медиа для блока «Медиа».
+/// </summary>
+public enum MediaKind
+{
+    Image,
+    Video,
+    Audio,
+    File
+}
+
+/// <summary>
+/// Источник медиа: ссылка или прикреплённый файл из хранилища.
+/// </summary>
+public enum MediaSourceType
+{
+    Url,
+    Attachment
+}
+
+/// <summary>
+/// Данные узла «Медиа»: тип медиа, источник (ссылка или ключ в хранилище), подпись.
+/// </summary>
+public class MediaNodeData : NodeData
+{
+    public MediaKind MediaKind { get; set; } = MediaKind.Image;
+
+    public MediaSourceType SourceType { get; set; } = MediaSourceType.Url;
+
+    /// <summary>
+    /// При SourceType.Url — прямая ссылка на медиа. При SourceType.Attachment — ключ файла в хранилище.
+    /// </summary>
+    public string Value { get; set; } = string.Empty;
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Caption { get; set; }
 }

@@ -1,4 +1,4 @@
-﻿version: '3.9'
+version: '3.9'
 
 services:
   gateway-service:
@@ -176,6 +176,37 @@ services:
     networks:
       - app_network
 
+  file-service:
+    container_name: file_service
+    build:
+      context: ..
+      dockerfile: services/FileService/src/FileService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=file-db;Port=5432;Database=foundry_db;Username=foundry;Password=foundry
+    ports:
+      - "5070:8080"
+    depends_on:
+      - file-db
+    networks:
+      - app_network
+
+  file-db:
+    image: postgres:16
+    container_name: file_db
+    restart: always
+    environment:
+      POSTGRES_DB: foundry_db
+      POSTGRES_USER: foundry
+      POSTGRES_PASSWORD: foundry
+    ports:
+      - "5438:5432"
+    volumes:
+      - file_pgdata:/var/lib/postgresql/data
+    networks:
+      - app_network
+
   telegram-db:
     image: postgres:16
     container_name: telegram_db
@@ -257,6 +288,7 @@ volumes:
   workflow_pgdata:
   client_pgdata:
   company_pgdata:
+  file_pgdata:
   redis:
 
 networks:

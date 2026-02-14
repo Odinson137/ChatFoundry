@@ -8,6 +8,7 @@ using Blazor.Diagrams.Core.Routers;
 using Blazor.Diagrams.Options;
 using BlazorClient.Interfaces;
 using BlazorClient.Models;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
@@ -43,6 +44,7 @@ public partial class WorkflowDesigner : IDisposable
     [Inject] private IJSRuntime JSRuntime { get; set; } = null!;
     [Inject] private IWorkflowApiClient ApiClient { get; set; } = null!;
     [Inject] private IWorkflowSchemaService SchemaService { get; set; } = null!;
+    [Inject] private IFileApiClient FileApiClient { get; set; } = null!;
 
     [Parameter] public Guid WorkflowId { get; set; }
 
@@ -59,6 +61,9 @@ public partial class WorkflowDesigner : IDisposable
     private bool IsVariablePickerOpen { get; set; }
     private string VariablePickerSearch { get; set; } = "";
     private Action<string>? OnVariableSelected { get; set; }
+
+    // Файловое хранилище — список для выбора в блоке Медиа
+    private List<FileInfoDto>? StorageFiles { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -195,6 +200,10 @@ public partial class WorkflowDesigner : IDisposable
         {
             data = new SetVariableNodeData { Variable = "", Value = "" };
         }
+        else if (data == null && type.ToLower() == "media")
+        {
+            data = new MediaNodeData { SourceType = MediaSourceType.Url };
+        }
         else if (data == null)
         {
             data = new EmptyNodeData();
@@ -253,6 +262,7 @@ public partial class WorkflowDesigner : IDisposable
             NodeType.SetVariable => new SetVariableNodeData { Variable = "", Value = "" },
             NodeType.HttpRequest => new HttpRequestNodeData { Method = "GET", Headers = new(), Url = "" },
             NodeType.AIGenerate => new AIGenerateNodeData { Prompt = "", Variable = ""},
+            NodeType.Media => new MediaNodeData { SourceType = MediaSourceType.Url },
             _ => null
         };
 
@@ -300,6 +310,57 @@ public partial class WorkflowDesigner : IDisposable
         askData.Ui.Buttons.Remove(button);
         OnWorkflowChanged();
         StateHasChanged();
+    }
+
+    private async Task LoadStorageFiles()
+    {
+        try
+        {
+            StorageFiles = await FileApiClient.ListFilesAsync(workflowId: WorkflowId);
+            StateHasChanged();
+        }
+        catch
+        {
+            StorageFiles = new List<FileInfoDto>();
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnMediaFileSelected(InputFileChangeEventArgs e, MediaNodeData mediaData)
+    {
+        var file = e.File;
+        if (file == null) return;
+
+        try
+        {
+            await using var stream = file.OpenReadStream(maxAllowedSize: 20 * 1024 * 1024); // 20 MB
+            var contentType = file.ContentType;
+            var result = await FileApiClient.UploadFileAsync(stream, file.Name, contentType, workflowId: WorkflowId);
+            if (result != null)
+            {
+                mediaData.Value = result.Key;
+                mediaData.MediaKind = DetectMediaKindFromFileName(file.Name);
+                OnWorkflowChanged();
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            // TODO: показать пользователю ошибку (например через toast или лог)
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    private static MediaKind DetectMediaKindFromFileName(string fileName)
+    {
+        var ext = Path.GetExtension(fileName).ToLowerInvariant();
+        return ext switch
+        {
+            ".jpg" or ".jpeg" or ".png" or ".gif" or ".webp" or ".bmp" => MediaKind.Image,
+            ".mp4" or ".mov" or ".avi" or ".webm" or ".mkv" => MediaKind.Video,
+            ".mp3" or ".wav" or ".ogg" or ".m4a" or ".aac" => MediaKind.Audio,
+            _ => MediaKind.File
+        };
     }
 
     #endregion
@@ -482,6 +543,34 @@ if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].Usage
                 {
                     var promptVars = ExtractVariables(aiData.Prompt);
                     foreach (var varName in promptVars)
+                    {
+                        EnsureVariableExists(variables, varName);
+                        if (!variables[varName].UsageNodes.Contains(nodeTitle))
+                        {
+                            variables[varName].UsageNodes.Add(nodeTitle);
+                        }
+                    }
+                }
+            }
+
+            if (node.Data is MediaNodeData mediaData)
+            {
+                if (!string.IsNullOrWhiteSpace(mediaData.Caption))
+                {
+                    var captionVars = ExtractVariables(mediaData.Caption);
+                    foreach (var varName in captionVars)
+                    {
+                        EnsureVariableExists(variables, varName);
+                        if (!variables[varName].UsageNodes.Contains(nodeTitle))
+                        {
+                            variables[varName].UsageNodes.Add(nodeTitle);
+                        }
+                    }
+                }
+                if (!string.IsNullOrWhiteSpace(mediaData.Value) && mediaData.SourceType == MediaSourceType.Url)
+                {
+                    var valueVars = ExtractVariables(mediaData.Value);
+                    foreach (var varName in valueVars)
                     {
                         EnsureVariableExists(variables, varName);
                         if (!variables[varName].UsageNodes.Contains(nodeTitle))

@@ -4,6 +4,7 @@
 @using Blazor.Diagrams.Core.Models
 @using System.Text.RegularExpressions
 @using BlazorClient.Models.Diagram
+@using Microsoft.AspNetCore.Components.Forms
 @layout MainLayout
 
 <PageTitle>Редактор Workflow</PageTitle>
@@ -335,6 +336,87 @@
                             <small class="form-text text-muted">
                                 Имя переменной для сохранения ответа от AI.
                             </small>
+                        </div>
+                    }
+
+                    @if (node is WorkflowNodeModel { Data: MediaNodeData mediaData })
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">Тип медиа</label>
+                            <select class="form-select" @bind="mediaData.MediaKind" @bind:event="onchange" @bind:after="OnWorkflowChanged">
+                                <option value="Image">Изображение</option>
+                                <option value="Video">Видео</option>
+                                <option value="Audio">Аудио</option>
+                                <option value="File">Файл</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Источник</label>
+                            <select class="form-select" @bind="mediaData.SourceType" @bind:event="onchange" @bind:after="OnWorkflowChanged">
+                                <option value="Url">Ссылка</option>
+                                <option value="Attachment">Файл из хранилища</option>
+                            </select>
+                        </div>
+                        @if (mediaData.SourceType == MediaSourceType.Url)
+                        {
+                            <div class="mb-3">
+                                <label class="form-label d-flex justify-content-between align-items-center">
+                                    <span>Ссылка на медиа</span>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                                            @onclick="() => ShowVariablePicker(v => InsertVariable(mediaData, nameof(mediaData.Value), v))">
+                                        <span class="oi oi-code"></span> {}
+                                    </button>
+                                </label>
+                                <input type="text" class="form-control font-monospace"
+                                       @bind="mediaData.Value"
+                                       @oninput="OnWorkflowChanged"
+                                       placeholder="https://..."/>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="mb-3">
+                                <label class="form-label">Загрузить файл</label>
+                                <InputFile class="form-control" accept="image/*,video/*,audio/*,.pdf,.doc,.docx" OnChange="@(e => OnMediaFileSelected(e, mediaData))"/>
+                                <small class="form-text text-muted">Файл будет загружен в хранилище, к блоку привяжется ключ.</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Или выбрать из хранилища</label>
+                                <button type="button" class="btn btn-sm btn-outline-primary" @onclick="() => LoadStorageFiles()">
+                                    <span class="oi oi-list"></span> Обновить список
+                                </button>
+                                @if (StorageFiles != null)
+                                {
+                                    <select class="form-select mt-2" @bind="mediaData.Value" @bind:event="onchange" @bind:after="OnWorkflowChanged">
+                                        <option value="">— Выберите файл —</option>
+                                        @foreach (var f in StorageFiles)
+                                        {
+                                            <option value="@f.Key">@(f.Name ?? f.Key)</option>
+                                        }
+                                    </select>
+                                }
+                            </div>
+                            @if (!string.IsNullOrEmpty(mediaData.Value))
+                            {
+                                <div class="mb-3">
+                                    <label class="form-label">Текущий ключ</label>
+                                    <input type="text" class="form-control font-monospace" readonly value="@mediaData.Value"/>
+                                </div>
+                            }
+                        }
+                        <div class="mb-3">
+                            <label class="form-label d-flex justify-content-between align-items-center">
+                                <span>Подпись (Caption)</span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                        @onclick="() => ShowVariablePicker(v => InsertVariable(mediaData, nameof(mediaData.Caption), v))">
+                                    <span class="oi oi-code"></span> {}
+                                </button>
+                            </label>
+                            <textarea class="form-control font-monospace" rows="2"
+                                      @bind="mediaData.Caption"
+                                      @oninput="OnWorkflowChanged"
+                                      placeholder="Необязательно"></textarea>
+                            <small class="form-text text-muted">Можно использовать переменные <code>{{variable_name}}</code>.</small>
                         </div>
                     }
                 }
