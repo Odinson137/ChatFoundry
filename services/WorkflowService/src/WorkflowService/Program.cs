@@ -149,6 +149,8 @@ services.AddGrpcClient<ClientAttributesService.ClientAttributesServiceClient>(o 
     o.Address = new Uri("http://client-service:8081");
 });
 
+services.AddScoped<Query>();
+services.AddScoped<BotMutation>();
 
 builder.Services
     .AddGraphQLServer()

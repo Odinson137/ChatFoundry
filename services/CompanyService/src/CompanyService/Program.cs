@@ -7,6 +7,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddPostgreSql<CompanyDbContext>(builder.Configuration);
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<Query>();
+builder.Services.AddScoped<CompanyMutation>();
+builder.Services.AddScoped<CompanyMemberMutation>();
+
 builder.Services
     .AddGraphQLServer()
     .AddQueryType<Query>()

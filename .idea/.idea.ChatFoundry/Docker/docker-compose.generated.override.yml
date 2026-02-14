@@ -16,7 +16,7 @@ services:
     - "--mode=server"
     - "--frontend-port=57000"
     - "--backend-port=57200"
-    - "--roslyn-worker-port=50715"
+    - "--roslyn-worker-port=62813"
     - "--timeout=60"
     environment:
       DOTNET_USE_POLLING_FILE_WATCHER: "true"
@@ -24,9 +24,9 @@ services:
       RESHARPER_LOG_CONF: "/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
     image: "fileservice:dev"
     ports:
-    - "127.0.0.1:57018:57000"
-    - "127.0.0.1:57218:57200"
-    - "127.0.0.1:50715:50715"
+    - "127.0.0.1:57025:57000"
+    - "127.0.0.1:57225:57200"
+    - "127.0.0.1:62813:62813"
     volumes:
     - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry\\services\\FileService\\src\\\
       FileService:/app:rw"
@@ -36,42 +36,5 @@ services:
       Linux64:/opt/JetBrains/RiderDebuggerTools"
     - "C:\\Program Files\\JetBrains\\JetBrains Rider 2025.1.4\\bin\\backend-log.xml:/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
     - "C:\\Users\\buryy\\AppData\\Local\\JetBrains\\Rider2025.1\\log\\DebuggerWorker\\\
-      JetBrains.Debugger.Worker.2026_2_14_20_37_54:/var/opt/JetBrains/RiderDebuggerTools:rw"
-    working_dir: "/app"
-  telegram-service:
-    build:
-      context: "C:\\Users\\buryy\\RiderProjects\\ChatFoundry"
-      dockerfile: "services/TelegramService/src/TelegramService/Dockerfile"
-      target: "base"
-      args:
-        BUILD_CONFIGURATION: "Debug"
-    command: []
-    entrypoint:
-    - "/opt/JetBrains/RiderDebuggerTools/linux-x64/JetBrains.Debugger.Worker"
-    - "--runtimeconfig"
-    - "/opt/JetBrains/RiderDebuggerTools/JetBrains.Debugger.Worker.runtimeconfig.json"
-    - "--mode=server"
-    - "--frontend-port=57000"
-    - "--backend-port=57200"
-    - "--roslyn-worker-port=50716"
-    - "--timeout=60"
-    environment:
-      DOTNET_USE_POLLING_FILE_WATCHER: "true"
-      RIDER_DEBUGGER_LOG_DIR: "/var/opt/JetBrains/RiderDebuggerTools"
-      RESHARPER_LOG_CONF: "/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
-    image: "telegramservice:dev"
-    ports:
-    - "127.0.0.1:57019:57000"
-    - "127.0.0.1:57219:57200"
-    - "127.0.0.1:50716:50716"
-    volumes:
-    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry\\services\\TelegramService\\src\\\
-      TelegramService:/app:rw"
-    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry:/src:rw"
-    - "C:\\Users\\buryy\\.nuget\\packages:/home/app/.nuget/packages"
-    - "C:\\Users\\buryy\\AppData\\Local\\JetBrains\\RiderRemoteDebugger\\2025.1.8\\\
-      Linux64:/opt/JetBrains/RiderDebuggerTools"
-    - "C:\\Program Files\\JetBrains\\JetBrains Rider 2025.1.4\\bin\\backend-log.xml:/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
-    - "C:\\Users\\buryy\\AppData\\Local\\JetBrains\\Rider2025.1\\log\\DebuggerWorker\\\
-      JetBrains.Debugger.Worker.2026_2_14_20_37_54:/var/opt/JetBrains/RiderDebuggerTools:rw"
+      JetBrains.Debugger.Worker.2026_2_14_23_01_25:/var/opt/JetBrains/RiderDebuggerTools:rw"
     working_dir: "/app"

@@ -70,6 +70,10 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
+builder.Services.AddScoped<Query>();
+builder.Services.AddScoped<ClientMutation>();
+builder.Services.AddScoped<AttributeDefinitionMutation>();
+
 builder.Services
     .AddGraphQLServer()
     .AddQueryType<Query>()

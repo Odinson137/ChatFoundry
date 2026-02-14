@@ -91,6 +91,17 @@ builder.Services.AddAuthorization(options =>
             return scopes.Contains("company");
         });
     });
+
+    options.AddPolicy("file", p =>
+    {
+        p.RequireAuthenticatedUser();
+        p.RequireAssertion(ctx =>
+        {
+            var scopes = ctx.User.FindFirst("scope")?.Value.Split(' ', StringSplitOptions.RemoveEmptyEntries) ?? [];
+            return scopes.Contains("file");
+        });
+    });
+
 });
 
 builder.Services
