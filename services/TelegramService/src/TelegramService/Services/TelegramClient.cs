@@ -11,6 +11,7 @@ namespace TelegramService.Services;
 
 public sealed class TelegramClient(
     IBotTokenProvider botTokenProvider,
+    IFileSignedUrlProvider fileSignedUrlProvider,
     ILogger<TelegramClient> logger,
     IOptions<TelegramOptions> options)
     : ITelegramClient
@@ -111,13 +112,26 @@ public sealed class TelegramClient(
         return System.Text.Encoding.UTF8.GetString(truncated).TrimEnd('\uFFFD');
     }
 
+    private async Task<string> ResolveMediaUrlAsync(string value, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return value;
+        var trimmed = value.Trim();
+        if (Guid.TryParse(trimmed, out var fileId))
+        {
+            var url = await fileSignedUrlProvider.GetSignedUrlAsync(fileId, ct);
+            if (!string.IsNullOrEmpty(url)) return url;
+        }
+        return trimmed;
+    }
+
     public async Task SendDocumentAsync(string clientid, string fileId, string? caption, CancellationToken ct)
     {
+        var urlOrFileId = await ResolveMediaUrlAsync(fileId, ct);
         var client = await InitializeClientAsync(clientid, ct);
         var cap = TruncateToUtf8Bytes(caption ?? "", 1024);
         await client.SendDocument(
             chatId: clientid,
-            document: fileId,
+            document: urlOrFileId,
             caption: cap.Length > 0 ? cap : null,
             cancellationToken: ct);
 
@@ -126,11 +140,12 @@ public sealed class TelegramClient(
 
     public async Task SendPhotoAsync(string clientid, string photoUrl, string? caption, CancellationToken ct)
     {
+        var url = await ResolveMediaUrlAsync(photoUrl, ct);
         var client = await InitializeClientAsync(clientid, ct);
         var cap = TruncateToUtf8Bytes(caption ?? "", 1024);
         await client.SendPhoto(
             chatId: clientid,
-            photo: photoUrl,
+            photo: url,
             caption: cap.Length > 0 ? cap : null,
             cancellationToken: ct);
 
@@ -139,11 +154,12 @@ public sealed class TelegramClient(
 
     public async Task SendVideoAsync(string clientid, string videoUrl, string? caption, CancellationToken ct)
     {
+        var url = await ResolveMediaUrlAsync(videoUrl, ct);
         var client = await InitializeClientAsync(clientid, ct);
         var cap = TruncateToUtf8Bytes(caption ?? "", 1024);
         await client.SendVideo(
             chatId: clientid,
-            video: videoUrl,
+            video: url,
             caption: cap.Length > 0 ? cap : null,
             cancellationToken: ct);
 

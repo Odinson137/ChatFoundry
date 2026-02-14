@@ -202,7 +202,7 @@ public partial class WorkflowDesigner : IDisposable
         }
         else if (data == null && type.ToLower() == "media")
         {
-            data = new MediaNodeData { SourceType = MediaSourceType.Url };
+            data = new MediaNodeData { SourceType = MediaSourceType.Attachment };
         }
         else if (data == null)
         {
@@ -262,7 +262,7 @@ public partial class WorkflowDesigner : IDisposable
             NodeType.SetVariable => new SetVariableNodeData { Variable = "", Value = "" },
             NodeType.HttpRequest => new HttpRequestNodeData { Method = "GET", Headers = new(), Url = "" },
             NodeType.AIGenerate => new AIGenerateNodeData { Prompt = "", Variable = ""},
-            NodeType.Media => new MediaNodeData { SourceType = MediaSourceType.Url },
+            NodeType.Media => new MediaNodeData { SourceType = MediaSourceType.Attachment },
             _ => null
         };
 
@@ -338,7 +338,7 @@ public partial class WorkflowDesigner : IDisposable
             var result = await FileApiClient.UploadFileAsync(stream, file.Name, contentType, workflowId: WorkflowId);
             if (result != null)
             {
-                mediaData.Value = result.Key;
+                mediaData.Value = result.Id;
                 mediaData.MediaKind = DetectMediaKindFromFileName(file.Name);
                 OnWorkflowChanged();
                 StateHasChanged();
@@ -567,7 +567,7 @@ if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].Usage
                         }
                     }
                 }
-                if (!string.IsNullOrWhiteSpace(mediaData.Value) && mediaData.SourceType == MediaSourceType.Url)
+                if (!string.IsNullOrWhiteSpace(mediaData.Value))
                 {
                     var valueVars = ExtractVariables(mediaData.Value);
                     foreach (var varName in valueVars)

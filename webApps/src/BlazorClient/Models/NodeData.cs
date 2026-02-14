@@ -131,7 +131,7 @@ public class MediaNodeData : NodeData
     public MediaSourceType SourceType { get; set; } = MediaSourceType.Url;
 
     /// <summary>
-    /// При SourceType.Url — прямая ссылка на медиа. При SourceType.Attachment — ключ файла в хранилище.
+    /// При SourceType.Url — прямая ссылка на медиа. При SourceType.Attachment — ID файла в файловом сервисе (или переменная).
     /// </summary>
     public string Value { get; set; } = string.Empty;
 

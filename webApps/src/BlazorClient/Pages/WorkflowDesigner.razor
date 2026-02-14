@@ -351,59 +351,40 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Источник</label>
-                            <select class="form-select" @bind="mediaData.SourceType" @bind:event="onchange" @bind:after="OnWorkflowChanged">
-                                <option value="Url">Ссылка</option>
-                                <option value="Attachment">Файл из хранилища</option>
-                            </select>
+                            <label class="form-label">Загрузить файл</label>
+                            <InputFile class="form-control" OnChange="@(e => OnMediaFileSelected(e, mediaData))"/>
+                            <small class="form-text text-muted">Файл будет загружен в хранилище, к блоку привяжется ID файла.</small>
                         </div>
-                        @if (mediaData.SourceType == MediaSourceType.Url)
-                        {
-                            <div class="mb-3">
-                                <label class="form-label d-flex justify-content-between align-items-center">
-                                    <span>Ссылка на медиа</span>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary"
-                                            @onclick="() => ShowVariablePicker(v => InsertVariable(mediaData, nameof(mediaData.Value), v))">
-                                        <span class="oi oi-code"></span> {}
-                                    </button>
-                                </label>
-                                <input type="text" class="form-control font-monospace"
-                                       @bind="mediaData.Value"
-                                       @oninput="OnWorkflowChanged"
-                                       placeholder="https://..."/>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="mb-3">
-                                <label class="form-label">Загрузить файл</label>
-                                <InputFile class="form-control" accept="image/*,video/*,audio/*,.pdf,.doc,.docx" OnChange="@(e => OnMediaFileSelected(e, mediaData))"/>
-                                <small class="form-text text-muted">Файл будет загружен в хранилище, к блоку привяжется ключ.</small>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Или выбрать из хранилища</label>
-                                <button type="button" class="btn btn-sm btn-outline-primary" @onclick="() => LoadStorageFiles()">
-                                    <span class="oi oi-list"></span> Обновить список
-                                </button>
-                                @if (StorageFiles != null)
-                                {
-                                    <select class="form-select mt-2" @bind="mediaData.Value" @bind:event="onchange" @bind:after="OnWorkflowChanged">
-                                        <option value="">— Выберите файл —</option>
-                                        @foreach (var f in StorageFiles)
-                                        {
-                                            <option value="@f.Key">@(f.Name ?? f.Key)</option>
-                                        }
-                                    </select>
-                                }
-                            </div>
-                            @if (!string.IsNullOrEmpty(mediaData.Value))
+                        <div class="mb-3">
+                            <label class="form-label">Или выбрать из хранилища</label>
+                            <button type="button" class="btn btn-sm btn-outline-primary" @onclick="() => LoadStorageFiles()">
+                                <span class="oi oi-list"></span> Обновить список
+                            </button>
+                            @if (StorageFiles != null)
                             {
-                                <div class="mb-3">
-                                    <label class="form-label">Текущий ключ</label>
-                                    <input type="text" class="form-control font-monospace" readonly value="@mediaData.Value"/>
-                                </div>
+                                <select class="form-select mt-2" @bind="mediaData.Value" @bind:event="onchange" @bind:after="OnWorkflowChanged">
+                                    <option value="">— Выберите файл —</option>
+                                    @foreach (var f in StorageFiles)
+                                    {
+                                        <option value="@f.Id">@(f.Name ?? f.Id)</option>
+                                    }
+                                </select>
                             }
-                        }
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label d-flex justify-content-between align-items-center">
+                                <span>Текущий ключ (ID файла)</span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                        @onclick="() => ShowVariablePicker(v => InsertVariable(mediaData, nameof(mediaData.Value), v))">
+                                    <span class="oi oi-code"></span> {}
+                                </button>
+                            </label>
+                            <input type="text" class="form-control font-monospace"
+                                   @bind="mediaData.Value"
+                                   @oninput="OnWorkflowChanged"
+                                   placeholder="ID файла или {{variable_name}}"/>
+                            <small class="form-text text-muted">Можно использовать переменные (например, <code>{{variable_name}}</code>).</small>
+                        </div>
                         <div class="mb-3">
                             <label class="form-label d-flex justify-content-between align-items-center">
                                 <span>Подпись (Caption)</span>

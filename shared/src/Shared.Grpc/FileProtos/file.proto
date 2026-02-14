@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option csharp_namespace = "File.Grpc";
+
+package file;
+
+service FileService {
+  rpc GetSignedUrl (GetSignedUrlRequest) returns (GetSignedUrlResponse);
+}
+
+message GetSignedUrlRequest {
+  string file_id = 1;
+}
+
+message GetSignedUrlResponse {
+  string url = 1;
+}

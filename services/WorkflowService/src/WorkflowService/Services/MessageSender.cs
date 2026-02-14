@@ -1,3 +1,4 @@
+using System.Data;
 using MassTransit;
 using Newtonsoft.Json;
 using Shared.Application.Events;
@@ -36,13 +37,13 @@ public class MessageSender(
         if (node.Type == WorkflowNodeType.Media && node.Data is MediaNodeData mediaData)
         {
             messageKind = MessageKindMapper.FromMediaKind(mediaData.MediaKind);
-            var resolvedUrl = await ResolveMediaUrlAsync(mediaData.Value, ct);
-            if (string.IsNullOrEmpty(resolvedUrl))
-                throw new InvalidOperationException($"Could not resolve media URL for key or value: {mediaData.Value}");
+            var fileId = string.IsNullOrEmpty(mediaData.Value)
+                ? throw new NoNullAllowedException("File Id not presented")
+                : workflowTextRenderer.RenderText(mediaData.Value, action.Session);
             var caption = string.IsNullOrEmpty(mediaData.Caption)
                 ? null
                 : workflowTextRenderer.RenderText(mediaData.Caption, action.Session);
-            var payload = new MessagePayload(resolvedUrl, caption);
+            var payload = new MessagePayload(fileId, caption);
             messageJson = JsonConvert.SerializeObject(payload);
         }
         else
@@ -55,15 +56,5 @@ public class MessageSender(
             new BotOutgoingMessage(DefaultChannel.Telegram, message.ExternalUserId, messageJson, messageKind),
             ct
         );
-    }
-
-    private async Task<string?> ResolveMediaUrlAsync(string value, CancellationToken ct)
-    {
-        if (string.IsNullOrWhiteSpace(value)) return null;
-        var trimmed = value.Trim();
-        if (trimmed.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
-            trimmed.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
-            return trimmed;
-        return await fileUrlResolver.GetUrlAsync(trimmed, ct);
     }
 }

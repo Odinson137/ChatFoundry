@@ -1,19 +1,19 @@
 namespace BlazorClient.Interfaces;
 
 /// <summary>
-/// Результат загрузки файла в хранилище.
+/// Результат загрузки файла в хранилище (ID файла в файловом сервисе).
 /// </summary>
-public record FileUploadResult(string Key, string Url);
+public record FileUploadResult(string Id);
 
 /// <summary>
 /// Элемент списка файлов в хранилище (для выбора в блоке Медиа).
 /// </summary>
-public record FileInfoDto(string Key, string? Name, string? Url);
+public record FileInfoDto(string Id, string? Name);
 
 public interface IFileApiClient
 {
     /// <summary>
-    /// Загрузить файл в хранилище. Возвращает ключ и URL.
+    /// Загрузить файл в хранилище. Возвращает ID файла.
     /// </summary>
     Task<FileUploadResult?> UploadFileAsync(Stream content, string fileName, string? contentType, Guid? companyId = null, Guid? workflowId = null, CancellationToken ct = default);
 

@@ -1,4 +1,5 @@
 using Confluent.Kafka;
+using File.Grpc;
 using MassTransit;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -20,6 +21,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 services.AddScoped<ITelegramClient, TelegramClient>();
 services.AddScoped<IBotTokenProvider, GrpcBotTokenProvider>();
+services.AddScoped<IFileSignedUrlProvider, FileSignedUrlProvider>();
 
 services.AddLogging();
 
@@ -86,8 +88,13 @@ services.AddMassTransit(x =>
 
 builder.Services.AddGrpcClient<BotTokenService.BotTokenServiceClient>(o =>
 {
-    var address = builder.Configuration["Services:WorkflowServiceUrl"] 
-                  ?? "http://localhost:5001";
+    var address = builder.Configuration["Services:WorkflowServiceUrl"];
+    o.Address = new Uri(address);
+});
+
+builder.Services.AddGrpcClient<File.Grpc.FileService.FileServiceClient>(o =>
+{
+    var address = builder.Configuration["Services:FileServiceUrl"];
     o.Address = new Uri(address);
 });
 

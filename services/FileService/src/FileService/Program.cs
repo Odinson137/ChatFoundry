@@ -1,6 +1,7 @@
 using FileService.Data;
 using FileService.GraphQL;
 using FileService.GraphQL.Mutations;
+using FileService.Grpc;
 using FileService.Interfaces;
 using FileService.Options;
 using FileService.Repositories;
@@ -19,6 +20,7 @@ builder.Services.AddPostgreSql<FileDbContext>(builder.Configuration);
 builder.Services.AddScoped<IStorageService, GcsStorageService>();
 builder.Services.AddScoped<IFileRepository, FileRepository>();
 builder.Services.AddScoped<IFileUrlBuilder, FileUrlBuilder>();
+builder.Services.AddGrpc();
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 
@@ -41,6 +43,7 @@ using (var scope = app.Services.CreateScope())
     await db.Database.EnsureCreatedAsync();
 }
 
+app.MapGrpcService<FileGrpcService>();
 app.MapControllers();
 app.MapGraphQL();
 app.MapGet("/", () => "File Service is running");

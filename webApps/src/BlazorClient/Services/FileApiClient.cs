@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using BlazorClient.Configuration;
 using BlazorClient.Interfaces;
 
 namespace BlazorClient.Services;
@@ -25,12 +26,11 @@ public class FileApiClient(HttpClient http) : IFileApiClient
         if (workflowId.HasValue)
             form.Add(new StringContent(workflowId.Value.ToString()), "workflowId");
 
-        var response = await http.PostAsync("file/files", form, ct);
+        var response = await http.PostAsync($"{ApiEndpoints.Api}/file/files", form, ct);
         response.EnsureSuccessStatusCode();
         var json = await response.Content.ReadFromJsonAsync<JsonElement>(cancellationToken: ct);
-        var key = json.TryGetProperty("key", out var k) ? k.GetString() : null;
-        var url = json.TryGetProperty("url", out var u) ? u.GetString() : null;
-        return key != null ? new FileUploadResult(key, url ?? key) : null;
+        var id = json.TryGetProperty("id", out var idProp) ? idProp.GetGuid().ToString() : null;
+        return id != null ? new FileUploadResult(id) : null;
     }
 
     public async Task<List<FileInfoDto>> ListFilesAsync(Guid? companyId = null, Guid? workflowId = null, CancellationToken ct = default)
@@ -41,15 +41,13 @@ public class FileApiClient(HttpClient http) : IFileApiClient
                 query GetFiles {
                   files {
                     id
-                    key
-                    url
                     originalFileName
                   }
                 }
                 """;
             var body = new { query };
             var content = new StringContent(JsonSerializer.Serialize(body, JsonOptions), Encoding.UTF8, "application/json");
-            using var request = new HttpRequestMessage(HttpMethod.Post, "file/graphql") { Content = content };
+            using var request = new HttpRequestMessage(HttpMethod.Post, $"{ApiEndpoints.Api}/file/graphql") { Content = content };
             if (workflowId.HasValue)
                 request.Headers.TryAddWithoutValidation("X-Workflow-Id", workflowId.Value.ToString());
             var response = await http.SendAsync(request, ct);
@@ -60,10 +58,9 @@ public class FileApiClient(HttpClient http) : IFileApiClient
             var list = new List<FileInfoDto>();
             foreach (var f in files.EnumerateArray())
             {
-                var key = f.TryGetProperty("key", out var k) ? k.GetString() ?? "" : "";
+                var id = f.TryGetProperty("id", out var idProp) ? idProp.GetGuid().ToString() : "";
                 var name = f.TryGetProperty("originalFileName", out var n) ? n.GetString() : null;
-                var url = f.TryGetProperty("url", out var u) ? u.GetString() : null;
-                list.Add(new FileInfoDto(key, name, url));
+                list.Add(new FileInfoDto(id, name));
             }
             return list;
         }
