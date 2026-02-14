@@ -342,15 +342,6 @@
                     @if (node is WorkflowNodeModel { Data: MediaNodeData mediaData })
                     {
                         <div class="mb-3">
-                            <label class="form-label">Тип медиа</label>
-                            <select class="form-select" @bind="mediaData.MediaKind" @bind:event="onchange" @bind:after="OnWorkflowChanged">
-                                <option value="Image">Изображение</option>
-                                <option value="Video">Видео</option>
-                                <option value="Audio">Аудио</option>
-                                <option value="File">Файл</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
                             <label class="form-label">Загрузить файл</label>
                             <InputFile class="form-control" OnChange="@(e => OnMediaFileSelected(e, mediaData))"/>
                             <small class="form-text text-muted">Файл будет загружен в хранилище, к блоку привяжется ID файла.</small>

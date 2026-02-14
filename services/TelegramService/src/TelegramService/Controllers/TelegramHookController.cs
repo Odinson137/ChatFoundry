@@ -1,4 +1,4 @@
-﻿using MassTransit;
+using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Shared.Application.Events;
@@ -100,7 +100,7 @@ public class TelegramHookController(
                 [MessageParameter.FirstName] = message.From?.FirstName ?? "",
                 [MessageParameter.UserName] = message.From?.Username ?? ""
             },
-            MessageKind.Image
+            MessageKind.Media
         );
     }
 
@@ -116,7 +116,7 @@ public class TelegramHookController(
                 [MessageParameter.FirstName] = message.From?.FirstName ?? "",
                 [MessageParameter.UserName] = message.From?.Username ?? ""
             },
-            MessageKind.Sticker
+            MessageKind.Media
         );
     }
 
@@ -132,7 +132,7 @@ public class TelegramHookController(
                 [MessageParameter.FirstName] = message.From?.FirstName ?? "",
                 [MessageParameter.UserName] = message.From?.Username ?? ""
             },
-            MessageKind.File
+            MessageKind.Media
         );
     }
 
@@ -148,7 +148,7 @@ public class TelegramHookController(
                 [MessageParameter.FirstName] = message.From?.FirstName ?? "",
                 [MessageParameter.UserName] = message.From?.Username ?? ""
             },
-            MessageKind.Voice
+            MessageKind.Media
         );
     }
 }

@@ -1,3 +1,4 @@
+using System.IO;
 using File.Grpc;
 using FileService.Interfaces;
 using FileService.Services;
@@ -25,6 +26,9 @@ public sealed class FileGrpcService(
         if (string.IsNullOrEmpty(url))
             throw new RpcException(new Status(StatusCode.Unavailable, "Signed URL could not be generated"));
 
-        return new GetSignedUrlResponse { Url = url };
+        var extension = string.IsNullOrEmpty(file.OriginalFileName)
+            ? ""
+            : Path.GetExtension(file.OriginalFileName).ToLowerInvariant();
+        return new GetSignedUrlResponse { Url = url, Extension = extension };
     }
 }

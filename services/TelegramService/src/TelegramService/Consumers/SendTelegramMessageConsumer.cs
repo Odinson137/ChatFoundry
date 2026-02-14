@@ -40,33 +40,15 @@ public sealed class SendTelegramMessageConsumer(
             case MessageKind.Buttons:
                 var buttonsPayload = JsonConvert.DeserializeObject<AskMessagePayload>(messageJson)!;
                 await telegramClient.SendInlineKeyboardAsync(
-                    chatId, 
-                    buttonsPayload.Text, 
-                    buttonsPayload.Buttons, 
+                    chatId,
+                    buttonsPayload.Text,
+                    buttonsPayload.Buttons,
                     ct);
                 break;
 
-            case MessageKind.File:
-                var filePayload = JsonConvert.DeserializeObject<MessagePayload>(messageJson)!;
-                await telegramClient.SendDocumentAsync(chatId, filePayload.Text, filePayload.Caption, ct);
-                break;
-
-            case MessageKind.Image:
-                var imagePayload = JsonConvert.DeserializeObject<MessagePayload>(messageJson)!;
-                await telegramClient.SendPhotoAsync(chatId, imagePayload.Text, imagePayload.Caption, ct);
-                break;
-
-            case MessageKind.Video:
-                var videoPayload = JsonConvert.DeserializeObject<MessagePayload>(messageJson)!;
-                await telegramClient.SendVideoAsync(chatId, videoPayload.Text, videoPayload.Caption, ct);
-                break;
-
-            case MessageKind.Audio:
-            case MessageKind.Voice:
-            case MessageKind.Sticker:
-                // пока так
-                var fallbackText = JsonConvert.DeserializeObject<MessagePayload>(messageJson)?.Text ?? "Unsupported media";
-                await telegramClient.SendTextAsync(chatId, fallbackText, ct);
+            case MessageKind.Media:
+                var mediaPayload = JsonConvert.DeserializeObject<MessagePayload>(messageJson)!;
+                await telegramClient.SendMediaAsync(chatId, mediaPayload.Text, mediaPayload.Caption, ct);
                 break;
 
             default:

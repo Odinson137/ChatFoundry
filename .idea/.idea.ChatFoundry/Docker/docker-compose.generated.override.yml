@@ -16,7 +16,7 @@ services:
     - "--mode=server"
     - "--frontend-port=57000"
     - "--backend-port=57200"
-    - "--roslyn-worker-port=55044"
+    - "--roslyn-worker-port=50715"
     - "--timeout=60"
     environment:
       DOTNET_USE_POLLING_FILE_WATCHER: "true"
@@ -24,9 +24,9 @@ services:
       RESHARPER_LOG_CONF: "/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
     image: "fileservice:dev"
     ports:
-    - "127.0.0.1:57010:57000"
-    - "127.0.0.1:57210:57200"
-    - "127.0.0.1:55044:55044"
+    - "127.0.0.1:57018:57000"
+    - "127.0.0.1:57218:57200"
+    - "127.0.0.1:50715:50715"
     volumes:
     - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry\\services\\FileService\\src\\\
       FileService:/app:rw"
@@ -36,7 +36,7 @@ services:
       Linux64:/opt/JetBrains/RiderDebuggerTools"
     - "C:\\Program Files\\JetBrains\\JetBrains Rider 2025.1.4\\bin\\backend-log.xml:/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
     - "C:\\Users\\buryy\\AppData\\Local\\JetBrains\\Rider2025.1\\log\\DebuggerWorker\\\
-      JetBrains.Debugger.Worker.2026_2_14_19_16_27:/var/opt/JetBrains/RiderDebuggerTools:rw"
+      JetBrains.Debugger.Worker.2026_2_14_20_37_54:/var/opt/JetBrains/RiderDebuggerTools:rw"
     working_dir: "/app"
   telegram-service:
     build:
@@ -53,7 +53,7 @@ services:
     - "--mode=server"
     - "--frontend-port=57000"
     - "--backend-port=57200"
-    - "--roslyn-worker-port=55045"
+    - "--roslyn-worker-port=50716"
     - "--timeout=60"
     environment:
       DOTNET_USE_POLLING_FILE_WATCHER: "true"
@@ -61,9 +61,9 @@ services:
       RESHARPER_LOG_CONF: "/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
     image: "telegramservice:dev"
     ports:
-    - "127.0.0.1:57011:57000"
-    - "127.0.0.1:57211:57200"
-    - "127.0.0.1:55045:55045"
+    - "127.0.0.1:57019:57000"
+    - "127.0.0.1:57219:57200"
+    - "127.0.0.1:50716:50716"
     volumes:
     - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry\\services\\TelegramService\\src\\\
       TelegramService:/app:rw"
@@ -73,5 +73,5 @@ services:
       Linux64:/opt/JetBrains/RiderDebuggerTools"
     - "C:\\Program Files\\JetBrains\\JetBrains Rider 2025.1.4\\bin\\backend-log.xml:/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
     - "C:\\Users\\buryy\\AppData\\Local\\JetBrains\\Rider2025.1\\log\\DebuggerWorker\\\
-      JetBrains.Debugger.Worker.2026_2_14_19_16_27:/var/opt/JetBrains/RiderDebuggerTools:rw"
+      JetBrains.Debugger.Worker.2026_2_14_20_37_54:/var/opt/JetBrains/RiderDebuggerTools:rw"
     working_dir: "/app"

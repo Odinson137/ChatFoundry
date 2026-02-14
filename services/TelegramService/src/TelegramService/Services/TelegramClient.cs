@@ -112,58 +112,143 @@ public sealed class TelegramClient(
         return System.Text.Encoding.UTF8.GetString(truncated).TrimEnd('\uFFFD');
     }
 
-    private async Task<string> ResolveMediaUrlAsync(string value, CancellationToken ct)
+    private async Task<(string Url, string Extension)> ResolveMediaAsync(string value, CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(value)) return value;
+        if (string.IsNullOrWhiteSpace(value))
+            return (value ?? "", "");
         var trimmed = value.Trim();
         if (Guid.TryParse(trimmed, out var fileId))
         {
-            var url = await fileSignedUrlProvider.GetSignedUrlAsync(fileId, ct);
-            if (!string.IsNullOrEmpty(url)) return url;
+            var resolved = await fileSignedUrlProvider.GetSignedUrlAsync(fileId, ct);
+            if (resolved != null)
+                return (resolved.Url, resolved.Extension ?? "");
         }
-        return trimmed;
+        var ext = "";
+        if (Uri.TryCreate(trimmed, UriKind.Absolute, out var uri) && !string.IsNullOrEmpty(uri.AbsolutePath))
+            ext = Path.GetExtension(uri.AbsolutePath).ToLowerInvariant();
+        return (trimmed, ext);
+    }
+
+    public async Task SendMediaAsync(string clientid, string value, string? caption, CancellationToken ct)
+    {
+        var (url, extension) = await ResolveMediaAsync(value, ct);
+        if (string.IsNullOrEmpty(url))
+        {
+            logger.LogWarning("SendMedia: empty url for chat {ChatId}", clientid);
+            return;
+        }
+        var sendType = MediaExtensionMapping.GetSendTypeByExtension(extension);
+        var client = await InitializeClientAsync(clientid, ct);
+        var cap = TruncateToUtf8Bytes(caption ?? "", 1024);
+        var captionOrNull = cap.Length > 0 ? cap : null;
+
+        switch (sendType)
+        {
+            case MediaSendType.Photo:
+                await TrySendPhotoOrFallbackAsync(client, clientid, url, captionOrNull, ct);
+                break;
+            case MediaSendType.Video:
+                await TrySendVideoOrFallbackAsync(client, clientid, url, captionOrNull, ct);
+                break;
+            case MediaSendType.Audio:
+                await TrySendAudioOrFallbackAsync(client, clientid, url, captionOrNull, ct);
+                break;
+            default:
+                await TrySendDocumentOrFallbackAsync(client, clientid, url, captionOrNull, ct);
+                break;
+        }
+    }
+
+    private async Task TrySendPhotoOrFallbackAsync(ITelegramBotClient client, string chatId, string url, string? caption, CancellationToken ct)
+    {
+        try
+        {
+            await client.SendPhoto(chatId: chatId, photo: url, caption: caption, cancellationToken: ct);
+            logger.LogInformation("Photo sent to {ChatId}", chatId);
+        }
+        catch
+        {
+            await client.SendDocument(chatId: chatId, document: url, caption: caption, cancellationToken: ct);
+            logger.LogInformation("Photo sent as document to {ChatId}", chatId);
+        }
+    }
+
+    private async Task TrySendVideoOrFallbackAsync(ITelegramBotClient client, string chatId, string url, string? caption, CancellationToken ct)
+    {
+        try
+        {
+            await client.SendVideo(chatId: chatId, video: url, caption: caption, cancellationToken: ct);
+            logger.LogInformation("Video sent to {ChatId}", chatId);
+        }
+        catch
+        {
+            await client.SendDocument(chatId: chatId, document: url, caption: caption, cancellationToken: ct);
+            logger.LogInformation("Video sent as document to {ChatId}", chatId);
+        }
+    }
+
+    private async Task TrySendAudioOrFallbackAsync(ITelegramBotClient client, string chatId, string url, string? caption, CancellationToken ct)
+    {
+        try
+        {
+            await client.SendAudio(chatId: chatId, audio: url, caption: caption, cancellationToken: ct);
+            logger.LogInformation("Audio sent to {ChatId}", chatId);
+        }
+        catch
+        {
+            await client.SendDocument(chatId: chatId, document: url, caption: caption, cancellationToken: ct);
+            logger.LogInformation("Audio sent as document to {ChatId}", chatId);
+        }
+    }
+
+    private async Task TrySendDocumentOrFallbackAsync(ITelegramBotClient client, string chatId, string url, string? caption, CancellationToken ct)
+    {
+        try
+        {
+            await client.SendDocument(chatId: chatId, document: url, caption: caption, cancellationToken: ct);
+            logger.LogInformation("Document sent to {ChatId}", chatId);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Document send failed for {ChatId}, sending as text", chatId);
+            await client.SendMessage(chatId: chatId, text: !string.IsNullOrEmpty(caption) ? $"{url}\n{caption}" : url, cancellationToken: ct);
+        }
     }
 
     public async Task SendDocumentAsync(string clientid, string fileId, string? caption, CancellationToken ct)
     {
-        var urlOrFileId = await ResolveMediaUrlAsync(fileId, ct);
+        var (url, _) = await ResolveMediaAsync(fileId, ct);
         var client = await InitializeClientAsync(clientid, ct);
         var cap = TruncateToUtf8Bytes(caption ?? "", 1024);
-        await client.SendDocument(
-            chatId: clientid,
-            document: urlOrFileId,
-            caption: cap.Length > 0 ? cap : null,
-            cancellationToken: ct);
-
+        await client.SendDocument(chatId: clientid, document: url, caption: cap.Length > 0 ? cap : null, cancellationToken: ct);
         logger.LogInformation("Document sent to {ChatId}", clientid);
     }
 
     public async Task SendPhotoAsync(string clientid, string photoUrl, string? caption, CancellationToken ct)
     {
-        var url = await ResolveMediaUrlAsync(photoUrl, ct);
+        var (url, _) = await ResolveMediaAsync(photoUrl, ct);
         var client = await InitializeClientAsync(clientid, ct);
         var cap = TruncateToUtf8Bytes(caption ?? "", 1024);
-        await client.SendPhoto(
-            chatId: clientid,
-            photo: url,
-            caption: cap.Length > 0 ? cap : null,
-            cancellationToken: ct);
-
+        await client.SendPhoto(chatId: clientid, photo: url, caption: cap.Length > 0 ? cap : null, cancellationToken: ct);
         logger.LogInformation("Photo sent to {ChatId}", clientid);
     }
 
     public async Task SendVideoAsync(string clientid, string videoUrl, string? caption, CancellationToken ct)
     {
-        var url = await ResolveMediaUrlAsync(videoUrl, ct);
+        var (url, _) = await ResolveMediaAsync(videoUrl, ct);
         var client = await InitializeClientAsync(clientid, ct);
         var cap = TruncateToUtf8Bytes(caption ?? "", 1024);
-        await client.SendVideo(
-            chatId: clientid,
-            video: url,
-            caption: cap.Length > 0 ? cap : null,
-            cancellationToken: ct);
-
+        await client.SendVideo(chatId: clientid, video: url, caption: cap.Length > 0 ? cap : null, cancellationToken: ct);
         logger.LogInformation("Video sent to {ChatId}", clientid);
+    }
+
+    public async Task SendAudioAsync(string clientid, string audioUrl, string? caption, CancellationToken ct)
+    {
+        var (url, _) = await ResolveMediaAsync(audioUrl, ct);
+        var client = await InitializeClientAsync(clientid, ct);
+        var cap = TruncateToUtf8Bytes(caption ?? "", 1024);
+        await client.SendAudio(chatId: clientid, audio: url, caption: cap.Length > 0 ? cap : null, cancellationToken: ct);
+        logger.LogInformation("Audio sent to {ChatId}", clientid);
     }
 
     public async Task<string?> GetFileAsync(string clientid, 

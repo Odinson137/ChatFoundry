@@ -20,8 +20,7 @@ public partial class WorkflowTextRenderer(IVariableService variableService)
     {
         BotMessagePayload messagePayload = messageKind switch
         {
-            MessageKind.Text or MessageKind.Link or MessageKind.File or MessageKind.Image or MessageKind.Video
-                or MessageKind.Audio or MessageKind.Voice or MessageKind.Sticker => RenderMessagePayload(node, session),
+            MessageKind.Text or MessageKind.Link or MessageKind.Media => RenderMessagePayload(node, session),
             MessageKind.Buttons => RenderButtonsPayload(node, session),
             _ => throw new InvalidOperationException($"MessageKind '{messageKind}' is not supported by text renderer")
         };
