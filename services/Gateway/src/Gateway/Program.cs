@@ -1,5 +1,7 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+using System.Net.Http.Headers;
+using Gateway;
+using OpenIddict.Validation.AspNetCore;
+using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,21 +26,25 @@ builder.Services.AddCors(options =>
         });
 });
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.Authority = "http://identity-service:8080";
-        options.RequireHttpsMetadata = false;
+var encryptionKeyBase64 = builder.Configuration["OpenIddict:EncryptionKey"];
+if (string.IsNullOrEmpty(encryptionKeyBase64))
+    throw new InvalidOperationException(
+        "OpenIddict:EncryptionKey не задан. Задайте переменную окружения OpenIddict__EncryptionKey (или в appsettings). ");
 
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidIssuer = "http://identity-service:8080/",
-            ValidateAudience = false,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true
-        };
+builder.Services.AddOpenIddict()
+    .AddValidation(options =>
+    {
+        options.SetIssuer(new Uri("http://identity-service:8080/"));
+        options.AddEncryptionKey(new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
+            Convert.FromBase64String(encryptionKeyBase64)));
+        options.UseSystemNetHttp();
+        options.UseAspNetCore();
     });
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
+});
 
 builder.Services.AddAuthorization(options =>
 {
@@ -106,7 +112,23 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services
     .AddReverseProxy()
-    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))
+    .AddTransforms(transformBuilderContext =>
+    {
+        var policy = transformBuilderContext.Route.AuthorizationPolicy;
+        if (string.IsNullOrEmpty(policy) || string.Equals("Anonymous", policy, StringComparison.OrdinalIgnoreCase))
+            return;
+        transformBuilderContext.AddRequestTransform(transformContext =>
+        {
+            if (transformContext.HttpContext.Items.TryGetValue(InnerJwtMiddleware.InnerJwtKey, out var value) &&
+                value is string jwt)
+            {
+                transformContext.ProxyRequest.Headers.Authorization =
+                    new AuthenticationHeaderValue("Bearer", jwt);
+            }
+            return default;
+        });
+    });
 
 var app = builder.Build();
 
@@ -116,6 +138,8 @@ app.UseCors("BlazorClientPolicy");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<InnerJwtMiddleware>();
 
 app.MapReverseProxy();
 

@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,8 +14,9 @@ public abstract class BaseGraphQl
     {
         HttpContextAccessor = httpContextAccessor;
         var user = HttpContextAccessor.HttpContext?.User;
-        
-        var userId = user?.FindFirstValue(ClaimTypes.NameIdentifier);
+        // OpenIddict выдаёт "sub", не ClaimTypes.NameIdentifier
+        var userId = user?.FindFirstValue(ClaimTypes.NameIdentifier)
+                     ?? user?.FindFirstValue("sub");
         UserId = Guid.TryParse(userId, out var guid) ? guid : Guid.Empty;
     }
 

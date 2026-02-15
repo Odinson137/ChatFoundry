@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
 using Blazored.LocalStorage;
@@ -45,29 +45,38 @@ public class ApiAuthenticationStateProvider : AuthenticationStateProvider
         NotifyAuthenticationStateChanged(authState);
     }
 
-    private static IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
+    private static IEnumerable<Claim> ParseClaimsFromJwt(string token)
     {
-        var claims = new List<Claim>();
-        var payload = jwt.Split('.')[1];
-        
-        var jsonBytes = ParseBase64WithoutPadding(payload);
-        
-        var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
+        var parts = token.Split('.');
+        // JWE (encrypted token) has 5 parts — клиент не может расшифровать, не парсим
+        if (parts.Length == 5)
+            return [new Claim(ClaimTypes.Name, "User")];
 
-        if (keyValuePairs != null)
+        if (parts.Length != 3)
+            return [new Claim(ClaimTypes.Name, "User")];
+
+        try
         {
-            keyValuePairs.TryGetValue(ClaimTypes.Name, out var name);
-            if (name != null)
-            {
-                claims.Add(new Claim(ClaimTypes.Name, name.ToString()!));
-            }
+            var payload = parts[1];
+            var jsonBytes = ParseBase64UrlWithoutPadding(payload);
+            var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
+            if (keyValuePairs != null && keyValuePairs.TryGetValue(ClaimTypes.Name, out var name) && name != null)
+                return [new Claim(ClaimTypes.Name, name.ToString()!)];
+        }
+        catch
+        {
+            // невалидный или нестандартный payload — считаем пользователя аутентифицированным без имени
         }
 
-        return claims;
+        return [new Claim(ClaimTypes.Name, "User")];
     }
 
-    private static byte[] ParseBase64WithoutPadding(string base64)
+    /// <summary>
+    /// Декодирует base64url (JWT использует его в segment'ах). Стандартный Base64 не подходит — даёт Format_BadBase64Char.
+    /// </summary>
+    private static byte[] ParseBase64UrlWithoutPadding(string base64Url)
     {
+        var base64 = base64Url.Replace('-', '+').Replace('_', '/');
         switch (base64.Length % 4)
         {
             case 2: base64 += "=="; break;

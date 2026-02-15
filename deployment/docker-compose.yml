@@ -68,6 +68,8 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8080
+    env_file:
+      - .env
     ports:
       - "5020:8080"
     depends_on:

@@ -1,6 +1,7 @@
 using IdentityServer.Data;
 using IdentityServer.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 using OpenIddict.Server;
 using Shared.Infrastructure.DependencyInjection;
@@ -47,9 +48,12 @@ services.AddOpenIddict()
             OpenIddictConstants.Scopes.OfflineAccess
         );
 
-        options.AddDevelopmentEncryptionCertificate();
+        var encryptionKeyBase64 = builder.Configuration["OpenIddict:EncryptionKey"]
+            ?? throw new InvalidOperationException(
+                "OpenIddict:EncryptionKey не задан. Задайте переменную окружения OpenIddict__EncryptionKey или значение в appsettings.");
+        options.AddEncryptionKey(new SymmetricSecurityKey(Convert.FromBase64String(encryptionKeyBase64)));
+
         options.AddDevelopmentSigningCertificate();
-        options.DisableAccessTokenEncryption(); // для теста
         options.SetIssuer(new Uri("http://identity-service:8080/"));
         
         options.UseAspNetCore().EnableTokenEndpointPassthrough().DisableTransportSecurityRequirement();
