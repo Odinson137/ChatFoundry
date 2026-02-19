@@ -118,7 +118,7 @@
             new KeyValuePair<string, string>("password", password),
             new KeyValuePair<string, string>("client_id", "client"),
             new KeyValuePair<string, string>("client_secret", "secret"),
-            new KeyValuePair<string, string>("scope", "workflow client"),
+            new KeyValuePair<string, string>("scope", "workflow client company identity file"),
         });
 
         try
@@ -133,7 +133,10 @@
             }
             else
             {
-                error = "Ошибка аутентификации. Проверьте логин и пароль.";
+                var body = await response.Content.ReadAsStringAsync();
+                error = string.IsNullOrWhiteSpace(body)
+                    ? "Ошибка аутентификации. Проверьте логин и пароль."
+                    : $"Ошибка: {body}";
             }
         }
         catch (Exception ex)

@@ -1,0 +1,21 @@
+@page "/no-access"
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject NavigationManager Navigation
+
+<PageTitle>Нет доступа — ChatFoundry</PageTitle>
+
+<div class="no-access-page">
+    <div class="no-access-card">
+        <div class="no-access-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2"/>
+                <path d="M7 11V7a5 5 0 0110 0v4"/>
+                <line x1="12" y1="16" x2="12" y2="16"/>
+            </svg>
+        </div>
+        <h1 class="no-access-title">Нет доступа</h1>
+        <p class="no-access-text">У вас нет доступа к компании или вы были исключены.</p>
+        <a href="/login" class="no-access-link">Войти в аккаунт</a>
+    </div>
+</div>

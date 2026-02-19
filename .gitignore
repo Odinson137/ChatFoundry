@@ -3,6 +3,7 @@
 **/bin
 **/obj
 .claude
+.cursor
 .gemini
 commit_message.tmp
 

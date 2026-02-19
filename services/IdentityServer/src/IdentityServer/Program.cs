@@ -1,9 +1,11 @@
 using IdentityServer.Data;
 using IdentityServer.Entities;
+using IdentityServer.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 using OpenIddict.Server;
+using Shared.Grpc.Company;
 using Shared.Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,8 +14,17 @@ var services = builder.Services;
 
 services.AddControllers();
 services.AddEndpointsApiExplorer();
+services.AddGrpc();
 
 services.AddPostgreSql<IdentityDbContext>(builder.Configuration);
+
+services.Configure<CompanyServiceOptions>(builder.Configuration.GetSection(CompanyServiceOptions.SectionName));
+services.AddGrpcClient<CompanyRegistrationService.CompanyRegistrationServiceClient>(o =>
+{
+    var address = builder.Configuration["CompanyService:GrpcAddress"];
+    o.Address = new Uri(address);
+});
+services.AddScoped<ICompanyRegistrationClient, CompanyRegistrationClient>();
 
 services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(opt =>
     {
@@ -45,6 +56,7 @@ services.AddOpenIddict()
             "telegram",
             "identity",
             "file",
+            "company",
             OpenIddictConstants.Scopes.OfflineAccess
         );
 
@@ -77,6 +89,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapGrpcService<IdentityServer.Grpc.UserCompanyGrpcService>();
 
 app.MapGet("/", () => "IdentityServer sample running");
 
@@ -85,7 +98,17 @@ using (var scope = app.Services.CreateScope())
 {
     var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     var user = new ApplicationUser { UserName = "bob", Email = "bob@example.com" };
-    await userMgr.CreateAsync(user, "Pass123!");
+    var createResult = await userMgr.CreateAsync(user, "Pass123!");
+    if (createResult.Succeeded)
+    {
+        var companyClient = scope.ServiceProvider.GetRequiredService<ICompanyRegistrationClient>();
+        var (companyId, success) = await companyClient.CreateCompanyWithOwnerAsync("Bob's Company", user.Id);
+        if (success)
+        {
+            user.CompanyId = companyId;
+            await userMgr.UpdateAsync(user);
+        }
+    }
 
     var appManager = scope.ServiceProvider.GetRequiredService<IOpenIddictApplicationManager>();
     if (await appManager.FindByClientIdAsync("client") == null)
@@ -105,6 +128,7 @@ using (var scope = app.Services.CreateScope())
                 OpenIddictConstants.Permissions.Prefixes.Scope + "telegram",
                 OpenIddictConstants.Permissions.Prefixes.Scope + "identity",
                 OpenIddictConstants.Permissions.Prefixes.Scope + "file",
+                OpenIddictConstants.Permissions.Prefixes.Scope + "company",
                 OpenIddictConstants.Permissions.Prefixes.Scope + "offline_access",
 
                 OpenIddictConstants.Permissions.ResponseTypes.Token,

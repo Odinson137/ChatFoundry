@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+option csharp_namespace = "Shared.Grpc.Identity";
+
+package identity.usercompany;
+
+service UserCompanyService {
+  rpc ClearUserCompany (ClearUserCompanyRequest) returns (ClearUserCompanyResponse);
+  rpc SetUserCompany (SetUserCompanyRequest) returns (SetUserCompanyResponse);
+}
+
+message ClearUserCompanyRequest {
+  string user_id = 1;
+}
+
+message ClearUserCompanyResponse {
+  bool success = 1;
+}
+
+message SetUserCompanyRequest {
+  string user_id = 1;
+  string company_id = 2;
+}
+
+message SetUserCompanyResponse {
+  bool success = 1;
+}

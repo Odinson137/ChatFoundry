@@ -4,12 +4,15 @@ using CompanyService.Enums;
 using HotChocolate;
 using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
+using Shared.Grpc.Identity;
 using Shared.Infrastructure.GraphQl;
 
 namespace CompanyService.GraphQL.Mutations;
 
 [ExtendObjectType(typeof(Mutation))]
-public class CompanyMemberMutation(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpContextAccessor)
+public class CompanyMemberMutation(
+    IHttpContextAccessor httpContextAccessor,
+    UserCompanyService.UserCompanyServiceClient identityGrpc) : BaseGraphQl(httpContextAccessor)
 {
     public async Task<CompanyMember> AddMember(
         Guid companyId,
@@ -56,13 +59,31 @@ public class CompanyMemberMutation(IHttpContextAccessor httpContextAccessor) : B
         [Service] CompanyDbContext context,
         CancellationToken ct)
     {
+        if (!CompanyId.HasValue || CompanyId.Value != companyId)
+            throw new GraphQLException("You can only remove members from your company.");
+
+        var caller = await context.CompanyMembers
+            .FirstOrDefaultAsync(m => m.CompanyId == companyId && m.UserId == UserId && m.IsActive, ct);
+        if (caller == null || (caller.Role != CompanyRole.Owner && caller.Role != CompanyRole.Admin))
+            throw new GraphQLException("Only Owner or Admin can remove members.");
+
         var member = await context.CompanyMembers
             .FirstOrDefaultAsync(m => m.CompanyId == companyId && m.UserId == userId, ct)
             ?? throw new GraphQLException("Member not found.");
 
-        context.CompanyMembers.Remove(member);
+        if (member.Role == CompanyRole.Owner)
+        {
+            var ownerCount = await context.CompanyMembers
+                .CountAsync(m => m.CompanyId == companyId && m.Role == CompanyRole.Owner && m.IsActive, ct);
+            if (ownerCount <= 1)
+                throw new GraphQLException("Cannot remove the last Owner.");
+        }
+
+        member.IsActive = false;
+        member.ModifiedAt = DateTime.UtcNow;
         await context.SaveChangesAsync(ct);
 
+        await identityGrpc.ClearUserCompanyAsync(new ClearUserCompanyRequest { UserId = userId.ToString() }, cancellationToken: ct);
         return true;
     }
 }

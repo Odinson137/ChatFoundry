@@ -22,6 +22,8 @@
         <Protobuf Include="WorkflowProtos\bot_token.proto" GrpcServices="Both" />
         <Protobuf Include="ClientProtos\client.proto" GrpcServices="Both" />
         <Protobuf Include="FileProtos\file.proto" GrpcServices="Both" />
+        <Protobuf Include="CompanyProtos\company_registration.proto" GrpcServices="Both" />
+        <Protobuf Include="IdentityProtos\user_company.proto" GrpcServices="Both" />
     </ItemGroup>
 
 </Project>

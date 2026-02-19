@@ -1,12 +1,6 @@
 @page "/register"
-@using BlazorClient.Auth
-@using Blazored.LocalStorage
-@using Microsoft.AspNetCore.Components.Authorization
-
 @inject HttpClient Http
 @inject NavigationManager Navigation
-@inject AuthenticationStateProvider AuthenticationStateProvider
-@inject ILocalStorageService LocalStorage
 
 <PageTitle>Регистрация — ChatFoundry</PageTitle>
 
@@ -93,6 +87,21 @@
                 </div>
             </div>
 
+            @if (!hasInvite)
+            {
+                <div class="register-field">
+                    <label class="register-label" for="reg-company">Название компании</label>
+                    <div class="register-input-wrap">
+                        <input id="reg-company"
+                               type="text"
+                               class="register-input"
+                               placeholder="Моя компания"
+                               @bind="companyName"
+                               @onkeydown="OnKeyDown" />
+                    </div>
+                </div>
+            }
+
             <button class="register-btn" @onclick="HandleRegister" disabled="@isLoading">
                 @if (isLoading)
                 {
@@ -119,8 +128,25 @@
     private string email = "";
     private string password = "";
     private string confirmPassword = "";
+    private string companyName = "";
     private string? error;
     private bool isLoading;
+    private bool hasInvite;
+
+    protected override void OnInitialized()
+    {
+        hasInvite = !string.IsNullOrWhiteSpace(GetInviteToken());
+    }
+
+    private string? GetInviteToken()
+    {
+        var u = Navigation.Uri;
+        var i = u.IndexOf("invite=", StringComparison.OrdinalIgnoreCase);
+        if (i < 0) return null;
+        i += 7;
+        var end = u.IndexOf('&', i);
+        return end < 0 ? u[i..] : u[i..end];
+    }
 
     private async Task HandleRegister()
     {
@@ -144,16 +170,23 @@
             return;
         }
 
+        if (!hasInvite && string.IsNullOrWhiteSpace(companyName))
+        {
+            error = "Введите название компании.";
+            return;
+        }
+
         isLoading = true;
 
         try
         {
-            // Register
-            var registerResponse = await Http.PostAsJsonAsync("https://localhost:5000/identity/auth/register", new
-            {
-                Email = email,
-                Password = password
-            });
+        var inviteToken = GetInviteToken();
+
+        var payload = hasInvite && !string.IsNullOrWhiteSpace(inviteToken)
+            ? (object)new { Email = email, Password = password, InviteToken = inviteToken }
+            : new { Email = email, Password = password, CompanyName = companyName.Trim() };
+
+            var registerResponse = await Http.PostAsJsonAsync("https://localhost:5000/identity/auth/register", payload);
 
             if (!registerResponse.IsSuccessStatusCode)
             {
@@ -164,30 +197,7 @@
                 return;
             }
 
-            // Auto-login after registration
-            var tokenRequest = new FormUrlEncodedContent(new[]
-            {
-                new KeyValuePair<string, string>("grant_type", "password"),
-                new KeyValuePair<string, string>("username", email),
-                new KeyValuePair<string, string>("password", password),
-                new KeyValuePair<string, string>("client_id", "client"),
-                new KeyValuePair<string, string>("client_secret", "secret"),
-                new KeyValuePair<string, string>("scope", "workflow")
-            });
-
-            var tokenResponse = await Http.PostAsync("https://localhost:5000/identity/connect/token", tokenRequest);
-            if (tokenResponse.IsSuccessStatusCode)
-            {
-                var token = await tokenResponse.Content.ReadFromJsonAsync<TokenResponse>();
-                await LocalStorage.SetItemAsync("authToken", token!.AccessToken);
-                ((ApiAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(token.AccessToken);
-                Navigation.NavigateTo("/");
-            }
-            else
-            {
-                // Registration succeeded but auto-login failed — redirect to login
-                Navigation.NavigateTo("/login");
-            }
+            Navigation.NavigateTo("/login");
         }
         catch (Exception ex)
         {

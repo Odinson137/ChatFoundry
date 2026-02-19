@@ -1,4 +1,4 @@
-﻿using ClientService.Data;
+using ClientService.Data;
 using ClientService.Entities;
 using HotChocolate;
 using HotChocolate.Data;
@@ -16,7 +16,8 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
     [UseSorting]
     public IQueryable<Client> GetClients([Service] ClientDbContext context)
     {
-        return context.Clients;
+        if (!CompanyId.HasValue) return context.Clients.Where(_ => false);
+        return context.Clients.Where(c => c.CompanyId != null && c.CompanyId == CompanyId.Value);
     }
 
     [UsePaging(IncludeTotalCount = true)]
@@ -25,7 +26,8 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
     [UseSorting]
     public IQueryable<ClientChannel> GetClientChannels([Service] ClientDbContext context)
     {
-        return context.ClientChannels;
+        if (!CompanyId.HasValue) return context.ClientChannels.Where(_ => false);
+        return context.ClientChannels.Where(ch => ch.Client.CompanyId != null && ch.Client.CompanyId == CompanyId.Value);
     }
 
     [UsePaging(IncludeTotalCount = true)]

@@ -134,6 +134,17 @@ var app = builder.Build();
 
 app.UseRouting();
 
+// Ensure POST body is buffered so YARP can forward it to IdentityServer (otherwise body is empty at backend)
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path.StartsWithSegments("/identity/connect/token", StringComparison.OrdinalIgnoreCase) &&
+        string.Equals(context.Request.Method, "POST", StringComparison.OrdinalIgnoreCase))
+    {
+        context.Request.EnableBuffering();
+    }
+    await next(context);
+});
+
 app.UseCors("BlazorClientPolicy");
 
 app.UseAuthentication();

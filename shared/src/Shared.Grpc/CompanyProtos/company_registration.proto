@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+option csharp_namespace = "Shared.Grpc.Company";
+
+package company.registration;
+
+service CompanyRegistrationService {
+  rpc CreateCompanyWithOwner (CreateCompanyWithOwnerRequest) returns (CreateCompanyWithOwnerResponse);
+  rpc ConsumeInvite (ConsumeInviteRequest) returns (ConsumeInviteResponse);
+  rpc RollbackMember (RollbackMemberRequest) returns (RollbackMemberResponse);
+}
+
+message CreateCompanyWithOwnerRequest {
+  string name = 1;
+  string owner_user_id = 2;
+}
+
+message CreateCompanyWithOwnerResponse {
+  string company_id = 1;
+}
+
+message ConsumeInviteRequest {
+  string invite_token = 1;
+  string user_id = 2;
+}
+
+message ConsumeInviteResponse {
+  string company_id = 1;
+}
+
+message RollbackMemberRequest {
+  string company_id = 1;
+  string user_id = 2;
+}
+
+message RollbackMemberResponse {
+  bool success = 1;
+}

@@ -67,11 +67,16 @@ services:
       dockerfile: services/IdentityServer/src/IdentityServer/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+:8080
+      - ASPNETCORE_URLS=http://+:8080;http://+:8081
+      - ASPNETCORE_Kestrel__Endpoints__Http__Url=http://+:8080
+      - ASPNETCORE_Kestrel__Endpoints__Http__Protocols=Http1
+      - ASPNETCORE_Kestrel__Endpoints__Grpc__Url=http://+:8081
+      - ASPNETCORE_Kestrel__Endpoints__Grpc__Protocols=Http2
     env_file:
       - .env
     ports:
       - "5020:8080"
+      - "5021:8081"
     depends_on:
       - identity-db
       - redis
@@ -136,9 +141,14 @@ services:
       dockerfile: services/CompanyService/src/CompanyService/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+:8080
+      - ASPNETCORE_URLS=http://+:8080;http://+:8081
+      - ASPNETCORE_Kestrel__Endpoints__Http__Url=http://+:8080
+      - ASPNETCORE_Kestrel__Endpoints__Http__Protocols=Http1
+      - ASPNETCORE_Kestrel__Endpoints__Grpc__Url=http://+:8081
+      - ASPNETCORE_Kestrel__Endpoints__Grpc__Protocols=Http2
     ports:
       - "5050:8080"
+      - "5051:8081"
     depends_on:
       - company-db
       - redis

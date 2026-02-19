@@ -1,4 +1,4 @@
-﻿using ClientService.Entities;
+using ClientService.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shared.Infrastructure.EntityTypeConfiguration;
@@ -10,7 +10,8 @@ public class ClientEntityConfiguration : BaseEntityTypeConfiguration<Client>
     public override void Configure(EntityTypeBuilder<Client> builder)
     {
         base.Configure(builder);
-        
+
+        builder.HasIndex(x => x.CompanyId);
         builder.Property(x => x.DisplayName)
             .HasMaxLength(200);
 

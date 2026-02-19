@@ -17,17 +17,7 @@ public class CompanyMutation(IHttpContextAccessor httpContextAccessor) : BaseGra
         [Service] CompanyDbContext context,
         CancellationToken ct)
     {
-        var company = new Company
-        {
-            Name = name,
-            Description = description,
-            MaxUsers = maxUsers
-        };
-
-        context.Companies.Add(company);
-        await context.SaveChangesAsync(ct);
-
-        return company;
+        throw new GraphQLException("Company can only be created during registration.");
     }
 
     public async Task<Company> UpdateCompany(

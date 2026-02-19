@@ -14,7 +14,8 @@ public class Query(IHttpContextAccessor httpContextAccessor, CompanyDbContext co
     [UseSorting]
     public IQueryable<Company> GetCompanies()
     {
-        return context.Companies;
+        if (!CompanyId.HasValue) return context.Companies.Where(_ => false);
+        return context.Companies.Where(c => c.Id == CompanyId.Value);
     }
 
     [UsePaging(IncludeTotalCount = true)]
@@ -23,6 +24,17 @@ public class Query(IHttpContextAccessor httpContextAccessor, CompanyDbContext co
     [UseSorting]
     public IQueryable<CompanyMember> GetCompanyMembers()
     {
-        return context.CompanyMembers;
+        if (!CompanyId.HasValue) return context.CompanyMembers.Where(_ => false);
+        return context.CompanyMembers.Where(m => m.CompanyId == CompanyId.Value);
+    }
+
+    [UsePaging(IncludeTotalCount = true)]
+    [UseProjection]
+    [UseFiltering]
+    [UseSorting]
+    public IQueryable<Invitation> GetInvitations()
+    {
+        if (!CompanyId.HasValue) return context.Invitations.Where(_ => false);
+        return context.Invitations.Where(i => i.CompanyId == CompanyId.Value);
     }
 }
