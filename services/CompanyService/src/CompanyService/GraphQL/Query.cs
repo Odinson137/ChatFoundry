@@ -8,7 +8,7 @@ namespace CompanyService.GraphQL;
 
 public class Query(IHttpContextAccessor httpContextAccessor, CompanyDbContext context) : BaseGraphQl(httpContextAccessor)
 {
-    [UsePaging(IncludeTotalCount = true)]
+    [UsePaging(IncludeTotalCount = true, MaxPageSize = 100)]
     [UseProjection]
     [UseFiltering]
     [UseSorting]
@@ -18,7 +18,7 @@ public class Query(IHttpContextAccessor httpContextAccessor, CompanyDbContext co
         return context.Companies.Where(c => c.Id == CompanyId.Value);
     }
 
-    [UsePaging(IncludeTotalCount = true)]
+    [UsePaging(IncludeTotalCount = true, MaxPageSize = 100)]
     [UseProjection]
     [UseFiltering]
     [UseSorting]
@@ -28,7 +28,7 @@ public class Query(IHttpContextAccessor httpContextAccessor, CompanyDbContext co
         return context.CompanyMembers.Where(m => m.CompanyId == CompanyId.Value);
     }
 
-    [UsePaging(IncludeTotalCount = true)]
+    [UsePaging(IncludeTotalCount = true, MaxPageSize = 100)]
     [UseProjection]
     [UseFiltering]
     [UseSorting]

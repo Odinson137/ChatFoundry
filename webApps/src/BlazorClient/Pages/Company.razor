@@ -1,0 +1,279 @@
+@page "/company"
+@using BlazorClient.Interfaces
+@using Microsoft.AspNetCore.Authorization
+
+@attribute [Authorize]
+
+@inject ICompanyApiClient CompanyApi
+@inject NavigationManager Navigation
+@inject IJSRuntime JsRuntime
+
+<PageTitle>Компания — ChatFoundry</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Компания</h1>
+</div>
+
+@if (loadError != null)
+{
+    <div class="alert alert-danger">@loadError</div>
+}
+else if (company == null && !isLoading)
+{
+    <div class="alert alert-info">Нет доступа к компании или компания не найдена.</div>
+}
+else if (company != null)
+{
+    <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+            <button type="button" class="nav-link @(activeTab == 0 ? "active" : "")" @onclick='() => activeTab = 0'>Обзор</button>
+        </li>
+        <li class="nav-item">
+            <button type="button" class="nav-link @(activeTab == 1 ? "active" : "")" @onclick='() => activeTab = 1'>Участники</button>
+        </li>
+        <li class="nav-item">
+            <button type="button" class="nav-link @(activeTab == 2 ? "active" : "")" @onclick='() => activeTab = 2'>Приглашения</button>
+        </li>
+    </ul>
+
+    @if (activeTab == 0)
+    {
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">@company.Name</h5>
+                @if (!string.IsNullOrWhiteSpace(company.Description))
+                {
+                    <p class="card-text text-muted">@company.Description</p>
+                }
+                <p class="card-text">
+                    <strong>Лимит участников:</strong> @company.MaxUsers<br/>
+                    <strong>Участников:</strong> @membersCount<br/>
+                    <strong>Приглашений:</strong> @invitationsCount
+                </p>
+            </div>
+        </div>
+    }
+    else if (activeTab == 1)
+    {
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+            <tr>
+                <th>UserId</th>
+                <th>Роль</th>
+                <th>Активен</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var m in members)
+            {
+                <tr>
+                    <td><code>@m.UserId.ToString("N")</code></td>
+                    <td><span class="badge bg-secondary">@m.Role</span></td>
+                    <td>@(m.IsActive ? "Да" : "Нет")</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        @if (!members.Any())
+        {
+            <p class="text-muted">Нет участников.</p>
+        }
+    }
+    else if (activeTab == 2)
+    {
+        <div class="mb-3">
+            <button class="btn btn-primary" @onclick="OpenCreateInviteModal">
+                <span class="oi oi-plus"></span> Создать приглашение
+            </button>
+        </div>
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+            <tr>
+                <th>Email</th>
+                <th>Роль</th>
+                <th>Истекает</th>
+                <th>Статус</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var inv in invitations)
+            {
+                <tr>
+                    <td>@(inv.Email ?? "—")</td>
+                    <td><span class="badge bg-secondary">@inv.Role</span></td>
+                    <td>@inv.ExpiresAt.ToLocalTime().ToString("g")</td>
+                    <td>@(inv.UsedAt.HasValue ? "Использовано" : "Активно")</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        @if (!invitations.Any())
+        {
+            <p class="text-muted">Нет приглашений. Создайте ссылку для приглашения в компанию.</p>
+        }
+    }
+}
+
+@if (isLoading)
+{
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Загрузка...</span></div>
+    </div>
+}
+
+@* Модалка: создать приглашение *@
+@if (showInviteModal)
+{
+    <div class="modal-backdrop fade show"></div>
+    <div class="modal fade show d-block" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Новое приглашение</h5>
+                    <button type="button" class="btn-close" @onclick="CloseInviteModal"></button>
+                </div>
+                <div class="modal-body">
+                    @if (createdInviteLink == null)
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">Email (необязательно)</label>
+                            <input type="email" class="form-control" @bind="inviteEmail" placeholder="user@example.com" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Роль</label>
+                            <select class="form-select" @bind="inviteRole">
+                                <option value="MEMBER">Участник</option>
+                                <option value="ADMIN">Админ</option>
+                                <option value="OWNER">Владелец</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Срок действия (дней)</label>
+                            <input type="number" class="form-control" @bind="inviteExpiresDays" min="1" max="365" />
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success">Приглашение создано. Отправьте ссылку приглашённому.</div>
+                        <div class="mb-2">
+                            <label class="form-label">Ссылка для регистрации</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" readonly value="@createdInviteLink" id="invite-link-input" />
+                                <button class="btn btn-outline-secondary" type="button" @onclick="CopyInviteLink">Копировать</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    @if (createdInviteLink == null)
+                    {
+                        <button type="button" class="btn btn-secondary" @onclick="CloseInviteModal">Отмена</button>
+                        <button type="button" class="btn btn-primary" @onclick="CreateInvitation" disabled="@isCreating">
+                            @if (isCreating) { <span class="spinner-border spinner-border-sm me-1"></span> }
+                            Создать
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-primary" @onclick="CloseInviteModal">Готово</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private CompanyDto? company;
+    private List<CompanyMemberDto> members = new();
+    private List<InvitationDto> invitations = new();
+    private bool isLoading = true;
+    private string? loadError;
+
+    private int activeTab;
+    private int membersCount => members.Count;
+    private int invitationsCount => invitations.Count;
+
+    private bool showInviteModal;
+    private string? inviteEmail;
+    private string inviteRole = "MEMBER";
+    private int inviteExpiresDays = 7;
+    private bool isCreating;
+    private string? createdInviteLink;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAll();
+    }
+
+    private async Task LoadAll()
+    {
+        isLoading = true;
+        loadError = null;
+        try
+        {
+            company = await CompanyApi.GetCurrentCompanyAsync();
+            if (company != null)
+            {
+                members = await CompanyApi.GetMembersAsync();
+                invitations = await CompanyApi.GetInvitationsAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            loadError = ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void OpenCreateInviteModal()
+    {
+        createdInviteLink = null;
+        inviteEmail = null;
+        inviteRole = "MEMBER";
+        inviteExpiresDays = 7;
+        showInviteModal = true;
+    }
+
+    private void CloseInviteModal()
+    {
+        showInviteModal = false;
+        createdInviteLink = null;
+    }
+
+    private async Task CreateInvitation()
+    {
+        if (company == null) return;
+        if (inviteExpiresDays < 1 || inviteExpiresDays > 365) return;
+
+        isCreating = true;
+        try
+        {
+            var baseUrl = new Uri(Navigation.Uri).GetLeftPart(UriPartial.Authority);
+            var result = await CompanyApi.CreateInvitationAsync(inviteEmail, inviteRole, inviteExpiresDays, baseUrl);
+            createdInviteLink = result.InviteLink;
+            invitations = await CompanyApi.GetInvitationsAsync();
+        }
+        catch (Exception ex)
+        {
+            loadError = ex.Message;
+        }
+        finally
+        {
+            isCreating = false;
+        }
+    }
+
+    private async Task CopyInviteLink()
+    {
+        if (string.IsNullOrEmpty(createdInviteLink)) return;
+        try
+        {
+            await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", createdInviteLink);
+        }
+        catch { }
+    }
+}

@@ -15,6 +15,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 
 builder.Services.AddScoped<IWorkflowApiClient, WorkflowApiClient>();
 builder.Services.AddScoped<IClientApiClient, ClientApiClient>();
+builder.Services.AddScoped<ICompanyApiClient, CompanyApiClient>();
 builder.Services.AddScoped<IFileApiClient, FileApiClient>();
 builder.Services.AddScoped<IWorkflowSchemaService, WorkflowSchemaService>();
 

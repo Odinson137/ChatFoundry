@@ -1,29 +1,53 @@
 using CompanyService.Data;
 using CompanyService.GraphQL;
 using CompanyService.GraphQL.Mutations;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Shared.Infrastructure.GraphQl;
+using Microsoft.IdentityModel.Tokens;
 using Shared.Grpc.Identity;
 using Shared.Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
+var services = builder.Services;
 
-builder.Services.AddPostgreSql<CompanyDbContext>(builder.Configuration);
+services.AddControllers();
+services.AddEndpointsApiExplorer();
 
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddGrpc();
-builder.Services.AddGrpcClient<UserCompanyService.UserCompanyServiceClient>(o =>
+services.AddPostgreSql<CompanyDbContext>(builder.Configuration);
+
+services.AddHttpContextAccessor();
+
+services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = "http://identity-service:8080";
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = "http://identity-service:8080/",
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true
+        };
+    });
+
+services.AddGrpc();
+services.AddGrpcClient<UserCompanyService.UserCompanyServiceClient>(o =>
 {
     var address = builder.Configuration["IdentityService:GrpcAddress"] ?? "http://identity-service:8081";
     o.Address = new Uri(address);
 });
 
-builder.Services.AddScoped<Query>();
-builder.Services.AddScoped<CompanyMutation>();
-builder.Services.AddScoped<CompanyMemberMutation>();
-builder.Services.AddScoped<InvitationMutation>();
+services.AddScoped<Query>();
+services.AddScoped<CompanyMutation>();
+services.AddScoped<CompanyMemberMutation>();
+services.AddScoped<InvitationMutation>();
 
-builder.Services
+services
     .AddGraphQLServer()
     .AddQueryType<Query>()
+    .AddMutationType<Mutation>()
     .AddTypeExtension<CompanyMutation>()
     .AddTypeExtension<CompanyMemberMutation>()
     .AddTypeExtension<InvitationMutation>()
@@ -33,10 +57,13 @@ builder.Services
 
 var app = builder.Build();
 
+app.UseHttpsRedirection();
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapGraphQL();
 app.MapGrpcService<CompanyService.Grpc.CompanyRegistrationGrpcService>();
-
-app.UseHttpsRedirection();
 
 app.MapGet("/", () => "Company Service is running");
 

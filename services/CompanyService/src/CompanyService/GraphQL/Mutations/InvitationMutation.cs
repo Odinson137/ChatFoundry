@@ -12,7 +12,6 @@ namespace CompanyService.GraphQL.Mutations;
 public class InvitationMutation(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpContextAccessor)
 {
     public async Task<InvitationResult> CreateInvitation(
-        Guid companyId,
         string? email,
         CompanyRole role,
         int expiresInDays,
@@ -20,8 +19,10 @@ public class InvitationMutation(IHttpContextAccessor httpContextAccessor) : Base
         [Service] CompanyDbContext context,
         CancellationToken ct)
     {
-        if (!CompanyId.HasValue || CompanyId.Value != companyId)
-            throw new GraphQLException("You can only create invitations for your company.");
+        if (!CompanyId.HasValue)
+            throw new GraphQLException("Company is not set in the token.");
+
+        var companyId = CompanyId.Value;
 
         var member = await context.CompanyMembers
             .FirstOrDefaultAsync(m => m.CompanyId == companyId && m.UserId == UserId && m.IsActive, ct);
