@@ -1,4 +1,4 @@
-﻿namespace BlazorClient.Models;
+namespace BlazorClient.Models;
 
 public enum NodeType
 {
@@ -9,6 +9,7 @@ public enum NodeType
     Condition,
     Wait,
     SetVariable,
+    SetAttribute,
     HttpRequest,
     AIFilter,
     AIGenerate,

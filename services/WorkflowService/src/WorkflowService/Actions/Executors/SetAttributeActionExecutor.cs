@@ -9,7 +9,11 @@ using WorkflowService.Utils;
 
 namespace WorkflowService.Actions.Executors;
 
-public class SetVariableActionExecutor(
+/// <summary>
+/// Исполнитель блока «Атрибут» — запись в глобальные атрибуты клиента (сохраняются между сессиями).
+/// Атрибуты доступны как переменные $client.* и загружаются при открытии workflow.
+/// </summary>
+public class SetAttributeActionExecutor(
     ITopicProducer<ActionCompletedEvent> producer,
     ISessionRepository sessionRepository,
     IVariableService variableService,
@@ -17,13 +21,10 @@ public class SetVariableActionExecutor(
     WorkflowTextRenderer workflowTextRenderer)
     : IActionExecutor
 {
-    public WorkflowNodeType WorkflowNodeType => WorkflowNodeType.SetVariable;
+    public WorkflowNodeType WorkflowNodeType => WorkflowNodeType.SetAttribute;
 
     public async Task ExecuteAsync(ActionEntity action, ExecuteActionCommand message, CancellationToken ct)
     {
-        Console.WriteLine("SetVariableActionExecutor");
-
-        // TODO как-то оптимизировать потом, а то слишком часто идёт обращение к сессии
         var session = await sessionRepository.GetAsync(action.SessionId, ct);
         if (session == null)
             return;
@@ -31,13 +32,13 @@ public class SetVariableActionExecutor(
         var graph = workflowGraphParser.Parse(session.Workflow.NodesDefinition, session.Workflow.EdgesDefinition);
         var node = graph.GetNode(session.CurrentNodeId!.Value);
 
-        if (node.Data is not SetVariableNodeData setVariableData)
+        if (node.Data is not SetAttributeNodeData setAttributeData)
             return;
 
-        var renderedValue = workflowTextRenderer.RenderText(setVariableData.Value, session);
+        var renderedValue = workflowTextRenderer.RenderText(setAttributeData.Value, session);
 
-        variableService.SetVariable(session, setVariableData.Variable, renderedValue);
-        //await variableService.SyncIfDirtyAsync(session, ct);
+        variableService.SetAttribute(session, setAttributeData.Attribute, renderedValue);
+        await variableService.SyncIfDirtyAsync(session, ct);
         await sessionRepository.SaveAsync(session, ct);
 
         await producer.Produce(new ActionCompletedEvent(message.Channel, message.ExternalUserId), ct);

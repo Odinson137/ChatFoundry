@@ -168,16 +168,79 @@ public class ClientApiClient(HttpClient http) : IClientApiClient
         };
     }
 
+    // ─── Attribute definitions (company) ─────────────────────────────────────
+
+    public async Task<List<AttributeDefinitionDto>> GetCompanyAttributeDefinitionsAsync(CancellationToken ct = default)
+    {
+        var query = """
+            query GetCompanyAttributeDefinitions {
+                companyAttributeDefinitions {
+                    id key displayName description type scope scopeEntityId
+                }
+            }
+            """;
+        var result = await ExecuteGraphQl<CompanyAttributeDefinitionsResponse>(query, null, ct);
+        return result.CompanyAttributeDefinitions;
+    }
+
+    /// <summary>
+    /// Создать атрибут компании. Scope = Company и ссылка на компанию берутся из JWT на сервере.
+    /// </summary>
+    public async Task<AttributeDefinitionDto> CreateCompanyAttributeDefinitionAsync(string key, string? displayName,
+        string? description, CancellationToken ct = default)
+    {
+        var query = """
+            mutation CreateCompanyAttributeDefinition($key: String!, $displayName: String, $description: String) {
+                createCompanyAttributeDefinition(key: $key, displayName: $displayName, description: $description) {
+                    id key displayName description type scope scopeEntityId
+                }
+            }
+            """;
+        var variables = new
+        {
+            key,
+            displayName,
+            description
+        };
+        var result = await ExecuteGraphQl<CreateCompanyAttributeDefinitionResponse>(query, variables, ct);
+        return result.CreateCompanyAttributeDefinition;
+    }
+
+    public async Task<AttributeDefinitionDto?> UpdateAttributeDefinitionAsync(Guid id, string? displayName, string? description, AttributeType? type, CancellationToken ct = default)
+    {
+        var query = """
+            mutation UpdateAttributeDefinition($id: UUID!, $displayName: String, $description: String) {
+                updateAttributeDefinition(id: $id, displayName: $displayName, description: $description) {
+                    id key displayName description type scope scopeEntityId
+                }
+            }
+            """;
+        var variables = new { id, displayName, description, type = type?.ToString() };
+        var result = await ExecuteGraphQl<UpdateAttributeDefinitionResponse>(query, variables, ct);
+        return result.UpdateAttributeDefinition;
+    }
+
+    public async Task<bool> DeleteAttributeDefinitionAsync(Guid id, CancellationToken ct = default)
+    {
+        var query = """
+            mutation DeleteAttributeDefinition($id: UUID!) {
+                deleteAttributeDefinition(id: $id)
+            }
+            """;
+        var result = await ExecuteGraphQl<DeleteAttributeDefinitionResponse>(query, new { id }, ct);
+        return result.DeleteAttributeDefinition;
+    }
+
     // ─── Shared ──────────────────────────────────────────────────────────────
 
-    private async Task<T> ExecuteGraphQl<T>(string query, object? variables = null)
+    private async Task<T> ExecuteGraphQl<T>(string query, object? variables = null, CancellationToken ct = default)
     {
         var request = new HttpRequestMessage(HttpMethod.Post, $"{ApiEndpoints.Api}/client/graphql");
         var payload = new { query, variables };
         request.Content = JsonContent.Create(payload);
 
-        var response = await http.SendAsync(request);
-        var jsonString = await response.Content.ReadAsStringAsync();
+        var response = await http.SendAsync(request, ct);
+        var jsonString = await response.Content.ReadAsStringAsync(ct);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -222,5 +285,30 @@ public class ClientApiClient(HttpClient http) : IClientApiClient
         public int TotalCount { get; set; }
         public PageInfoDto PageInfo { get; set; } = new();
         public List<MessageDto> Nodes { get; set; } = [];
+    }
+
+    private class CompanyAttributeDefinitionsResponse
+    {
+        public List<AttributeDefinitionDto> CompanyAttributeDefinitions { get; set; } = [];
+    }
+
+    private class CreateAttributeDefinitionResponse
+    {
+        public AttributeDefinitionDto CreateAttributeDefinition { get; set; } = new();
+    }
+
+    private class CreateCompanyAttributeDefinitionResponse
+    {
+        public AttributeDefinitionDto CreateCompanyAttributeDefinition { get; set; } = new();
+    }
+
+    private class UpdateAttributeDefinitionResponse
+    {
+        public AttributeDefinitionDto? UpdateAttributeDefinition { get; set; }
+    }
+
+    private class DeleteAttributeDefinitionResponse
+    {
+        public bool DeleteAttributeDefinition { get; set; }
     }
 }

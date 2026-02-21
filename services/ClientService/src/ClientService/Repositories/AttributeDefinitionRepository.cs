@@ -13,6 +13,11 @@ public class AttributeDefinitionRepository(ClientDbContext context) : IAttribute
         await context.SaveChangesAsync(ct);
     }
 
+    public async Task<AttributeDefinition?> FindByIdAsync(Guid id, CancellationToken ct)
+    {
+        return await context.AttributeDefinitions.FirstOrDefaultAsync(ad => ad.Id == id, ct);
+    }
+
     public async Task<AttributeDefinition?> FindByKeyAsync(Guid scopeEntityId, string key, CancellationToken ct)
     {
         return await context.AttributeDefinitions
@@ -25,5 +30,17 @@ public class AttributeDefinitionRepository(ClientDbContext context) : IAttribute
             .Where(a => a.ScopeEntityId == scopeEntityId)
             .OrderBy(a => a.Key)
             .ToListAsync(ct);
+    }
+
+    public async Task UpdateAsync(AttributeDefinition attributeDefinition, CancellationToken ct)
+    {
+        context.AttributeDefinitions.Update(attributeDefinition);
+        await context.SaveChangesAsync(ct);
+    }
+
+    public async Task DeleteAsync(AttributeDefinition attributeDefinition, CancellationToken ct)
+    {
+        context.AttributeDefinitions.Remove(attributeDefinition);
+        await context.SaveChangesAsync(ct);
     }
 }

@@ -1,4 +1,4 @@
-﻿/* ============================================
+/* ============================================
    СТИЛИ ДЛЯ WORKFLOW DESIGNER С ПЕРЕМЕННЫМИ
    WorkflowDesigner.razor.css
    ============================================ */
@@ -279,12 +279,12 @@
     box-shadow: 2px 2px 8px rgba(0,0,0,0.05);
 }
 
-.variable-item.var-contact {
+.variable-item.var-global {
     border-left: 3px solid #f59e0b;
     background: #fffbeb;
 }
 
-.variable-item.var-contact:hover {
+.variable-item.var-global:hover {
     border-color: #d97706;
     background: #fef3c7;
 }

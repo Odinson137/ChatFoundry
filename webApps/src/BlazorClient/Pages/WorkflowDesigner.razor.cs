@@ -8,6 +8,7 @@ using Blazor.Diagrams.Core.Routers;
 using Blazor.Diagrams.Options;
 using BlazorClient.Interfaces;
 using BlazorClient.Models;
+using BlazorClient.Models.DTO;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
@@ -33,7 +34,7 @@ public class VariableInfo
 
 public enum VariableType
 {
-    Contact,
+    GlobalAttribute,
     System,
     User,
     Custom
@@ -45,12 +46,16 @@ public partial class WorkflowDesigner : IDisposable
     [Inject] private IWorkflowApiClient ApiClient { get; set; } = null!;
     [Inject] private IWorkflowSchemaService SchemaService { get; set; } = null!;
     [Inject] private IFileApiClient FileApiClient { get; set; } = null!;
+    [Inject] private IClientApiClient ClientApiClient { get; set; } = null!;
 
     [Parameter] public Guid WorkflowId { get; set; }
 
     private BlazorDiagram Diagram { get; set; } = null!;
     private NodeType? _draggedType;
     private Model? SelectedModel { get; set; }
+
+    // Атрибуты компании (для правой панели)
+    private List<AttributeDefinitionDto> CompanyAttributeDefinitions { get; set; } = new();
 
     // Переменные - управление панелью
     private bool IsVariablesPanelOpen { get; set; } = true;
@@ -69,7 +74,53 @@ public partial class WorkflowDesigner : IDisposable
     {
         InitializeDiagram();
         await LoadWorkflowData();
+        await LoadCompanyAttributes();
         RefreshVariables();
+    }
+
+    private async Task LoadCompanyAttributes()
+    {
+        try
+        {
+            CompanyAttributeDefinitions = await ClientApiClient.GetCompanyAttributeDefinitionsAsync();
+        }
+        catch
+        {
+            CompanyAttributeDefinitions = new List<AttributeDefinitionDto>();
+        }
+    }
+
+    /// <summary>
+    /// Ключи атрибутов для выпадающего списка в блоке «Атрибут»: базовые + из компании, без дубликатов.
+    /// </summary>
+    private IEnumerable<string> GetAttributeKeysForDropdown()
+    {
+        var baseKeys = new[] { "name", "username", "phone", "email" };
+        var fromCompany = CompanyAttributeDefinitions.Select(a => a.Key).Where(k => !string.IsNullOrWhiteSpace(k));
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var k in baseKeys)
+        {
+            if (seen.Add(k)) yield return k;
+        }
+        foreach (var k in fromCompany)
+        {
+            if (seen.Add(k)) yield return k;
+        }
+    }
+
+    private static string NormalizeAttributeKey(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return "";
+        var v = value.Trim();
+        if (v.StartsWith("$global.", StringComparison.OrdinalIgnoreCase))
+            return v["$global.".Length..];
+        return v;
+    }
+
+    private void OnAttributeKeyChanged(SetAttributeNodeData attrData, ChangeEventArgs e)
+    {
+        attrData.Attribute = (e.Value as string) ?? "";
+        OnWorkflowChanged();
     }
 
     private void InitializeDiagram()
@@ -200,6 +251,10 @@ public partial class WorkflowDesigner : IDisposable
         {
             data = new SetVariableNodeData { Variable = "", Value = "" };
         }
+        else if (data == null && type.ToLower() == "setattribute")
+        {
+            data = new SetAttributeNodeData { Attribute = "", Value = "" };
+        }
         else if (data == null && type.ToLower() == "media")
         {
             data = new MediaNodeData { SourceType = MediaSourceType.Attachment };
@@ -248,6 +303,7 @@ public partial class WorkflowDesigner : IDisposable
             NodeType.Condition => "Условие",
             NodeType.Wait => "Задержка",
             NodeType.SetVariable => "Переменная",
+            NodeType.SetAttribute => "Атрибут",
             NodeType.HttpRequest => "API запрос",
             NodeType.AIFilter => "AI Фильтр",
             NodeType.AIGenerate => "AI Текст",
@@ -260,6 +316,7 @@ public partial class WorkflowDesigner : IDisposable
             NodeType.Message => new MessageNodeData { Text = "" },
             NodeType.Ask => new AskNodeData { Text = "" },
             NodeType.SetVariable => new SetVariableNodeData { Variable = "", Value = "" },
+            NodeType.SetAttribute => new SetAttributeNodeData { Attribute = "", Value = "" },
             NodeType.HttpRequest => new HttpRequestNodeData { Method = "GET", Headers = new(), Url = "" },
             NodeType.AIGenerate => new AIGenerateNodeData { Prompt = "", Variable = ""},
             NodeType.Media => new MediaNodeData { SourceType = MediaSourceType.Attachment },
@@ -367,26 +424,39 @@ public partial class WorkflowDesigner : IDisposable
 
     #region Работа с переменными - Обнаружение
 
-    private static readonly List<(string Name, string Description)> ContactVariables =
+    private static readonly List<(string Name, string Description)> GlobalAttributeVariables =
     [
-        ("$client.name", "Имя"),
-        ("$client.username", "Username"),
-        ("$client.phone", "Телефон"),
-        ("$client.email", "Email")
+        ("$global.name", "Имя"),
+        ("$global.username", "Username"),
+        ("$global.phone", "Телефон"),
+        ("$global.email", "Email")
     ];
 
     private void RefreshVariables()
     {
         var variables = new Dictionary<string, VariableInfo>();
 
-        foreach (var (name, description) in ContactVariables)
+        foreach (var (name, description) in GlobalAttributeVariables)
         {
             variables[name] = new VariableInfo
             {
                 Name = name,
-                Type = VariableType.Contact,
+                Type = VariableType.GlobalAttribute,
                 SourceNode = description
             };
+        }
+        foreach (var attr in CompanyAttributeDefinitions)
+        {
+            var name = "$global." + attr.Key;
+            if (!variables.ContainsKey(name))
+            {
+                variables[name] = new VariableInfo
+                {
+                    Name = name,
+                    Type = VariableType.GlobalAttribute,
+                    SourceNode = attr.DisplayName ?? attr.Key
+                };
+            }
         }
 
         foreach (var node in Diagram.Nodes.Cast<WorkflowNodeModel>())
@@ -409,6 +479,32 @@ public partial class WorkflowDesigner : IDisposable
                 if (!string.IsNullOrWhiteSpace(varData.Value))
                 {
                     var usedVars = ExtractVariables(varData.Value);
+                    foreach (var usedVar in usedVars)
+                    {
+                        EnsureVariableExists(variables, usedVar);
+                        variables[usedVar].UsageNodes.Add(nodeTitle);
+                    }
+                }
+            }
+
+            if (node.Data is SetAttributeNodeData attrData && !string.IsNullOrWhiteSpace(attrData.Attribute))
+            {
+                var attrKey = attrData.Attribute.Trim();
+                if (attrKey.StartsWith("$global.", StringComparison.OrdinalIgnoreCase))
+                    attrKey = attrKey["$global.".Length..];
+                var varName = "$global." + attrKey;
+                if (!variables.ContainsKey(varName))
+                {
+                    variables[varName] = new VariableInfo
+                    {
+                        Name = varName,
+                        Type = VariableType.GlobalAttribute,
+                        SourceNode = nodeTitle
+                    };
+                }
+                if (!string.IsNullOrWhiteSpace(attrData.Value))
+                {
+                    var usedVars = ExtractVariables(attrData.Value);
                     foreach (var usedVar in usedVars)
                     {
                         EnsureVariableExists(variables, usedVar);
@@ -674,8 +770,8 @@ if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].Usage
     {
         var lower = varName.ToLower();
 
-        if (lower.StartsWith("$client."))
-            return VariableType.Contact;
+        if (lower.StartsWith("$global."))
+            return VariableType.GlobalAttribute;
 
         if (lower.StartsWith("$system.") || lower.StartsWith("$bot."))
             return VariableType.System;
@@ -690,7 +786,7 @@ if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].Usage
     {
         return variable.Type switch
         {
-            VariableType.Contact => "var-contact",
+            VariableType.GlobalAttribute => "var-global",
             VariableType.System => "var-system",
             VariableType.User => "var-user",
             VariableType.Custom => "var-custom",
@@ -707,10 +803,10 @@ if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].Usage
 
         return filtered.GroupBy(v => v.Type switch
         {
-            VariableType.Contact => "Контакт",
+            VariableType.GlobalAttribute => "Атрибуты ($global.*)",
             VariableType.System => "Системные",
             VariableType.User => "Пользователь",
-            VariableType.Custom => "Пользовательские",
+            VariableType.Custom => "Переменные",
             _ => "Другие"
         }).ToDictionary(g => g.Key, g => g.ToList());
     }

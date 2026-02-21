@@ -9,6 +9,7 @@ namespace BlazorClient.Models;
 [JsonDerivedType(typeof(EmptyNodeData), "Empty")] // 'Empty' - если нет специфичных данных
 [JsonDerivedType(typeof(MessageNodeData), "Message")] // 'Message' - для узла сообщения
 [JsonDerivedType(typeof(SetVariableNodeData), "SetVariable")] // 'SetVariable' - для узла установки переменной
+[JsonDerivedType(typeof(SetAttributeNodeData), "SetAttribute")] // 'SetAttribute' - запись в атрибуты клиента
 [JsonDerivedType(typeof(AskNodeData), "Ask")]
 [JsonDerivedType(typeof(HttpRequestNodeData), "HttpRequest")]
 [JsonDerivedType(typeof(AIGenerateNodeData), "AIGenerate")]
@@ -50,12 +51,28 @@ public class MessageNodeData : NodeData
 public class SetVariableNodeData : NodeData
 {
     /// <summary>
-    /// Имя переменной, куда будет сохранено значение (например, "user_name" или "client.name")
+    /// Имя переменной, куда будет сохранено значение (например, "user_name"). Не используйте $client.* — для атрибутов клиента есть блок «Атрибут».
     /// </summary>
     public string Variable { get; set; } = string.Empty;
     
     /// <summary>
     /// Значение, которое будет установлено. Может быть статическим текстом или ссылкой на другую переменную через {{variable_name}}
+    /// </summary>
+    public string Value { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// Данные узла «Атрибут» — запись в глобальные атрибуты клиента (имя, почта, телефон и др.), сохраняются между сессиями.
+/// </summary>
+public class SetAttributeNodeData : NodeData
+{
+    /// <summary>
+    /// Ключ атрибута: name, username, phone, email — или произвольный ключ для кастомного атрибута.
+    /// </summary>
+    public string Attribute { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Значение. Может содержать шаблоны {{variable_name}}.
     /// </summary>
     public string Value { get; set; } = string.Empty;
 }

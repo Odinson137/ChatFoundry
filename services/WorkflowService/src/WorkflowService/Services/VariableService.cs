@@ -6,7 +6,7 @@ namespace WorkflowService.Services;
 
 public class VariableService(ClientAttributesService.ClientAttributesServiceClient grpcClient) : IVariableService
 {
-    private const string ClientPrefix = "$client.";
+    private const string GlobalPrefix = "$global.";
 
     private static readonly Dictionary<string, Func<BaseAttributes, string?>> BaseAttrGetters = new()
     {
@@ -34,14 +34,14 @@ public class VariableService(ClientAttributesService.ClientAttributesServiceClie
                     var value = getter(response.BaseAttributes);
                     if (value != null)
                     {
-                        session.Variables[ClientPrefix + key] = value;
+                        session.Variables[GlobalPrefix + key] = value;
                     }
                 }
             }
 
             foreach (var (key, value) in response.CustomAttributes)
             {
-                session.Variables[ClientPrefix + key] = value;
+                session.Variables[GlobalPrefix + key] = value;
             }
         }
         catch (global::Grpc.Core.RpcException ex) when (ex.StatusCode == global::Grpc.Core.StatusCode.NotFound)
@@ -55,12 +55,24 @@ public class VariableService(ClientAttributesService.ClientAttributesServiceClie
         if (string.IsNullOrWhiteSpace(key))
             throw new ArgumentException("Variable key cannot be empty", nameof(key));
 
-        if (key.StartsWith(ClientPrefix))
-        {
-            session.ClientProfileDirty = true;
-        }
+        if (key.StartsWith(GlobalPrefix, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException(
+                "Запись в глобальные атрибуты ($global.*) разрешена только через блок «Атрибут». Используйте узел «Атрибут» для сохранения имени, почты, телефона и других атрибутов.");
 
         session.Variables[key] = value?.ToString() ?? string.Empty;
+    }
+
+    public void SetAttribute(Session session, string attributeName, object? value)
+    {
+        if (string.IsNullOrWhiteSpace(attributeName))
+            throw new ArgumentException("Attribute name cannot be empty", nameof(attributeName));
+
+        var name = attributeName.Trim();
+        if (name.StartsWith(GlobalPrefix, StringComparison.OrdinalIgnoreCase))
+            name = name[GlobalPrefix.Length..];
+        var key = GlobalPrefix + name;
+        session.Variables[key] = value?.ToString() ?? string.Empty;
+        session.ClientProfileDirty = true;
     }
 
     public string? GetVariable(Session session, string key)
@@ -94,9 +106,9 @@ public class VariableService(ClientAttributesService.ClientAttributesServiceClie
 
         foreach (var (key, value) in session.Variables)
         {
-            if (!key.StartsWith(ClientPrefix)) continue;
+            if (!key.StartsWith(GlobalPrefix)) continue;
 
-            var attributeName = key[ClientPrefix.Length..];
+            var attributeName = key[GlobalPrefix.Length..];
 
             if (BaseAttrGetters.ContainsKey(attributeName))
             {

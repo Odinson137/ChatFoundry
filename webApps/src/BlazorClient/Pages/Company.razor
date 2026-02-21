@@ -5,8 +5,10 @@
 @attribute [Authorize]
 
 @inject ICompanyApiClient CompanyApi
+@inject IClientApiClient ClientApi
 @inject NavigationManager Navigation
 @inject IJSRuntime JsRuntime
+@using BlazorClient.Models.DTO
 
 <PageTitle>Компания — ChatFoundry</PageTitle>
 
@@ -33,6 +35,9 @@ else if (company != null)
         </li>
         <li class="nav-item">
             <button type="button" class="nav-link @(activeTab == 2 ? "active" : "")" @onclick='() => activeTab = 2'>Приглашения</button>
+        </li>
+        <li class="nav-item">
+            <button type="button" class="nav-link @(activeTab == 3 ? "active" : "")" @onclick='() => { activeTab = 3; _ = LoadAttributes(); }'>Атрибуты</button>
         </li>
     </ul>
 
@@ -112,6 +117,43 @@ else if (company != null)
             <p class="text-muted">Нет приглашений. Создайте ссылку для приглашения в компанию.</p>
         }
     }
+    else if (activeTab == 3)
+    {
+        <div class="mb-3">
+            <button class="btn btn-primary" @onclick="OpenCreateAttributeModal">
+                <span class="oi oi-plus"></span> Добавить атрибут
+            </button>
+        </div>
+        <p class="text-muted small">Глобальные атрибуты компании. В workflow доступны как <code>$global.ключ</code>. Базовые: name, username, phone, email.</p>
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+            <tr>
+                <th>Ключ</th>
+                <th>Название</th>
+                <th>Описание</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var attr in attributeDefinitions)
+            {
+                <tr>
+                    <td><code>$global.@attr.Key</code></td>
+                    <td>@(attr.DisplayName ?? "—")</td>
+                    <td>@(attr.Description ?? "—")</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-outline-primary me-1" @onclick="() => OpenEditAttributeModal(attr)">Изменить</button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" @onclick="() => DeleteAttribute(attr)">Удалить</button>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        @if (!attributeDefinitions.Any())
+        {
+            <p class="text-muted">Нет атрибутов. Добавьте атрибуты для использования в workflow (имя, почта, телефон или свои поля).</p>
+        }
+    }
 }
 
 @if (isLoading)
@@ -183,10 +225,52 @@ else if (company != null)
     </div>
 }
 
+@* Модалка: создать/редактировать атрибут *@
+@if (showAttributeModal)
+{
+    <div class="modal-backdrop fade show"></div>
+    <div class="modal fade show d-block" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(editingAttributeId == null ? "Новый атрибут" : "Редактировать атрибут")</h5>
+                    <button type="button" class="btn-close" @onclick="CloseAttributeModal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Ключ (латиница, без пробелов)</label>
+                        <input type="text" class="form-control font-monospace" @bind="attrKey" placeholder="например email или company_name" disabled="@(editingAttributeId != null)" />
+                        @if (editingAttributeId != null)
+                        {
+                            <small class="text-muted">Ключ нельзя изменить после создания.</small>
+                        }
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Название (отображаемое)</label>
+                        <input type="text" class="form-control" @bind="attrDisplayName" placeholder="Например: Email" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Описание (необязательно)</label>
+                        <textarea class="form-control" rows="2" @bind="attrDescription" placeholder="Подсказка для дизайнера workflow"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseAttributeModal">Отмена</button>
+                    <button type="button" class="btn btn-primary" @onclick="SaveAttribute" disabled="@isSavingAttribute">
+                        @if (isSavingAttribute) { <span class="spinner-border spinner-border-sm me-1"></span> }
+                        @(editingAttributeId == null ? "Создать" : "Сохранить")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     private CompanyDto? company;
     private List<CompanyMemberDto> members = new();
     private List<InvitationDto> invitations = new();
+    private List<AttributeDefinitionDto> attributeDefinitions = new();
     private bool isLoading = true;
     private string? loadError;
 
@@ -195,6 +279,12 @@ else if (company != null)
     private int invitationsCount => invitations.Count;
 
     private bool showInviteModal;
+    private bool showAttributeModal;
+    private Guid? editingAttributeId;
+    private string attrKey = "";
+    private string? attrDisplayName;
+    private string? attrDescription;
+    private bool isSavingAttribute;
     private string? inviteEmail;
     private string inviteRole = "MEMBER";
     private int inviteExpiresDays = 7;
@@ -217,6 +307,7 @@ else if (company != null)
             {
                 members = await CompanyApi.GetMembersAsync();
                 invitations = await CompanyApi.GetInvitationsAsync();
+                await LoadAttributes();
             }
         }
         catch (Exception ex)
@@ -275,5 +366,90 @@ else if (company != null)
             await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", createdInviteLink);
         }
         catch { }
+    }
+
+    private async Task LoadAttributes()
+    {
+        try
+        {
+            attributeDefinitions = await ClientApi.GetCompanyAttributeDefinitionsAsync();
+        }
+        catch (Exception ex)
+        {
+            loadError = ex.Message;
+        }
+    }
+
+    private void OpenCreateAttributeModal()
+    {
+        editingAttributeId = null;
+        attrKey = "";
+        attrDisplayName = null;
+        attrDescription = null;
+        showAttributeModal = true;
+    }
+
+    private void OpenEditAttributeModal(AttributeDefinitionDto attr)
+    {
+        editingAttributeId = attr.Id;
+        attrKey = attr.Key;
+        attrDisplayName = attr.DisplayName;
+        attrDescription = attr.Description;
+        showAttributeModal = true;
+    }
+
+    private void CloseAttributeModal()
+    {
+        showAttributeModal = false;
+        editingAttributeId = null;
+    }
+
+    private async Task SaveAttribute()
+    {
+        if (company == null) return;
+        if (string.IsNullOrWhiteSpace(attrKey))
+        {
+            loadError = "Укажите ключ атрибута.";
+            return;
+        }
+        isSavingAttribute = true;
+        loadError = null;
+        try
+        {
+            if (editingAttributeId == null)
+            {
+                await ClientApi.CreateCompanyAttributeDefinitionAsync(attrKey.Trim(), attrDisplayName?.Trim(), attrDescription?.Trim());
+            }
+            else
+            {
+                await ClientApi.UpdateAttributeDefinitionAsync(editingAttributeId.Value, attrDisplayName?.Trim(), attrDescription?.Trim(), type: null);
+            }
+            await LoadAttributes();
+            CloseAttributeModal();
+        }
+        catch (Exception ex)
+        {
+            loadError = ex.Message;
+        }
+        finally
+        {
+            isSavingAttribute = false;
+        }
+    }
+
+    private async Task DeleteAttribute(AttributeDefinitionDto attr)
+    {
+        if (!await JsRuntime.InvokeAsync<bool>("confirm", $"Удалить атрибут «{attr.Key}»?"))
+            return;
+        try
+        {
+            var ok = await ClientApi.DeleteAttributeDefinitionAsync(attr.Id);
+            if (ok) await LoadAttributes();
+            else loadError = "Не удалось удалить атрибут.";
+        }
+        catch (Exception ex)
+        {
+            loadError = ex.Message;
+        }
     }
 }

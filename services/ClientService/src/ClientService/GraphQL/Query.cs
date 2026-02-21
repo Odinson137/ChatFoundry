@@ -1,5 +1,7 @@
 using ClientService.Data;
+using ClientService.Data.Enums;
 using ClientService.Entities;
+using ClientService.Interfaces;
 using HotChocolate;
 using HotChocolate.Data;
 using HotChocolate.Types;
@@ -64,5 +66,17 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
     public DbSet<AttributeDefinition> GetAttributes([Service] ClientDbContext context)
     {
         return context.AttributeDefinitions;
+    }
+
+    /// <summary>
+    /// Атрибуты компании текущего пользователя (Scope = Company, ScopeEntityId = CompanyId из JWT).
+    /// Для вкладки «Атрибуты» на странице компании и для списка в редакторе workflow.
+    /// </summary>
+    public async Task<List<AttributeDefinition>> GetCompanyAttributeDefinitions(
+        [Service] IAttributeDefinitionRepository repository,
+        CancellationToken ct)
+    {
+        if (!CompanyId.HasValue) return new List<AttributeDefinition>();
+        return await repository.GetByScopeEntityIdAsync(CompanyId.Value, ct);
     }
 }

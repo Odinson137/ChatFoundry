@@ -56,6 +56,9 @@
                     <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.SetVariable)">
                         <span class="oi oi-list"></span> Переменная
                     </div>
+                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.SetAttribute)">
+                        <span class="oi oi-person"></span> Атрибут
+                    </div>
                     <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.AIFilter)">
                         <span class="oi oi-eye"></span> AI Фильтр
                     </div>
@@ -207,9 +210,9 @@
                                    class="form-control font-monospace" 
                                    @bind="varData.Variable" 
                                    @oninput="OnWorkflowChanged"
-                                   placeholder="$user_name или $client.name"/>
+                                   placeholder="$user_name (атрибуты: $global.* только в блоке «Атрибут»)"/>
                             <small class="form-text text-muted">
-                                Имя переменной должно начинаться с $
+                                Имя переменной с $. Глобальные атрибуты ($global.*) задаются только блоком «Атрибут».
                             </small>
                         </div>
                         <div class="mb-3">
@@ -227,6 +230,42 @@
                                    placeholder="Значение или {{variable_name}}"/>
                             <small class="form-text text-muted">
                                 Можно использовать переменные
+                            </small>
+                        </div>
+                    }
+
+                    @if (node is WorkflowNodeModel { Data: SetAttributeNodeData attrData })
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">Ключ атрибута</label>
+                            <select class="form-select font-monospace" 
+                                    value="@NormalizeAttributeKey(attrData.Attribute)"
+                                    @onchange="@(e => OnAttributeKeyChanged(attrData, e))">
+                                <option value="">— Выберите атрибут —</option>
+                                @foreach (var key in GetAttributeKeysForDropdown())
+                                {
+                                    <option value="@key">$global.@key</option>
+                                }
+                            </select>
+                            <small class="form-text text-muted">
+                                Список из атрибутов компании (Компания → Атрибуты) и базовых: name, username, phone, email
+                            </small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label d-flex justify-content-between align-items-center">
+                                <span>Значение</span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" 
+                                        @onclick="() => ShowVariablePicker(v => InsertVariable(attrData, nameof(attrData.Value), v))">
+                                    <span class="oi oi-code"></span> {}
+                                </button>
+                            </label>
+                            <input type="text" 
+                                   class="form-control font-monospace" 
+                                   @bind="attrData.Value" 
+                                   @oninput="OnWorkflowChanged"
+                                   placeholder="Текст или {{variable_name}}"/>
+                            <small class="form-text text-muted">
+                                В шаблоне можно использовать переменные
                             </small>
                         </div>
                     }
@@ -481,7 +520,7 @@
         </div>
     }
 
-    <!-- Панель переменных (справа) -->
+    <!-- Панель переменных и атрибутов (справа) -->
     <div class="variables-panel @(IsVariablesPanelOpen ? "open" : "")">
         <button class="variables-toggle" @onclick="ToggleVariablesPanel">
             <span class="oi oi-@(IsVariablesPanelOpen ? "chevron-right" : "chevron-left")"></span>
@@ -489,14 +528,14 @@
         
         <div class="variables-content">
             <div class="variables-header">
-                <h6><span class="oi oi-code"></span> Переменные</h6>
+                <h6><span class="oi oi-code"></span> Переменные и атрибуты</h6>
                 <span class="badge bg-secondary">@DiscoveredVariables.Count</span>
             </div>
 
             <div class="variables-search mb-3">
                 <input type="text" 
                        class="form-control form-control-sm" 
-                       placeholder="Поиск переменных..."
+                       placeholder="Поиск..."
                        @bind="VariableSearchQuery"
                        @bind:event="oninput"/>
             </div>
@@ -506,7 +545,7 @@
                 {
                     <div class="text-center text-muted py-4">
                         <span class="oi oi-info"></span>
-                        <p class="small mt-2">Переменные появятся автоматически<br/>при их использовании в узлах</p>
+                        <p class="small mt-2">Переменные и атрибуты появятся при использовании в узлах<br/>Атрибуты настраиваются в разделе Компания → Атрибуты</p>
                     </div>
                 }
                 else
@@ -516,7 +555,7 @@
                         <div class="variable-group mb-3">
                             <div class="variable-group-title">
                                 <small class="text-muted">
-                                    @if (group.Key == "Контакт")
+                                    @if (group.Key.StartsWith("Атрибуты"))
                                     {
                                         <span class="oi oi-person"></span>
                                     }
