@@ -29,7 +29,7 @@
             </svg>
             <input type="text"
                    class="clients-search"
-                   placeholder="Поиск по имени..."
+                   placeholder="Поиск по имени, телефону, почте..."
                    @bind="searchText"
                    @bind:event="oninput"
                    @bind:after="OnSearchChanged" />
@@ -108,6 +108,8 @@
                         </th>
                         <th class="clients-th">Каналы</th>
                         <th class="clients-th">Контакт</th>
+                        <th class="clients-th">Телефон</th>
+                        <th class="clients-th">Почта</th>
                         <th class="clients-th clients-th-sortable" @onclick='() => ToggleSort("createdAt")'>
                             Создан
                             @if (sortField == "createdAt")
@@ -133,7 +135,7 @@
                                 <div class="clients-avatar">
                                     @(GetInitials(client))
                                 </div>
-                                <span>@(client.DisplayName ?? "—")</span>
+                                <span>@GetDisplayName(client)</span>
                             </td>
                             <td class="clients-td">
                                 <div class="clients-badges">
@@ -144,26 +146,13 @@
                                 </div>
                             </td>
                             <td class="clients-td clients-td-contact">
-                                @{ var primary = client.ClientChannels.FirstOrDefault(); }
-                                @if (primary != null)
-                                {
-                                    @if (!string.IsNullOrEmpty(primary.Username))
-                                    {
-                                        <span>@@@primary.Username</span>
-                                    }
-                                    else if (!string.IsNullOrEmpty(primary.Phone))
-                                    {
-                                        <span>@primary.Phone</span>
-                                    }
-                                    else if (!string.IsNullOrEmpty(primary.Email))
-                                    {
-                                        <span>@primary.Email</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="clients-muted">@primary.ExternalUserId</span>
-                                    }
-                                }
+                                @GetContactDisplay(client)
+                            </td>
+                            <td class="clients-td clients-td-contact">
+                                @GetFirstPhone(client)
+                            </td>
+                            <td class="clients-td clients-td-contact">
+                                @GetFirstEmail(client)
                             </td>
                             <td class="clients-td clients-td-date">
                                 @client.CreatedAt.ToString("dd.MM.yyyy")
@@ -352,20 +341,53 @@
         Navigation.NavigateTo($"/clients/{clientId}");
     }
 
+    private static string GetDisplayName(ClientDto client)
+    {
+        var ch = client.ClientChannels.FirstOrDefault();
+        if (ch != null)
+        {
+            var namePart = string.Join(" ", new[] { ch.Name, ch.LastName }.Where(s => !string.IsNullOrWhiteSpace(s)).ToArray()).Trim();
+            if (!string.IsNullOrEmpty(namePart)) return namePart;
+            if (!string.IsNullOrWhiteSpace(ch.Username)) return "@" + ch.Username;
+        }
+        if (!string.IsNullOrWhiteSpace(client.DisplayName)) return client.DisplayName;
+        return "—";
+    }
+
+    private static string GetContactDisplay(ClientDto client)
+    {
+        var ch = client.ClientChannels.FirstOrDefault();
+        if (ch == null) return "—";
+        if (!string.IsNullOrWhiteSpace(ch.Username)) return "@" + ch.Username;
+        if (!string.IsNullOrWhiteSpace(ch.Phone)) return ch.Phone;
+        if (!string.IsNullOrWhiteSpace(ch.Email)) return ch.Email;
+        return ch.ExternalUserId ?? "—";
+    }
+
+    private static string GetFirstPhone(ClientDto client)
+    {
+        var phone = client.ClientChannels.Select(ch => ch.Phone).FirstOrDefault(p => !string.IsNullOrWhiteSpace(p));
+        return phone ?? "—";
+    }
+
+    private static string GetFirstEmail(ClientDto client)
+    {
+        var email = client.ClientChannels.Select(ch => ch.Email).FirstOrDefault(e => !string.IsNullOrWhiteSpace(e));
+        return email ?? "—";
+    }
+
     private static string GetInitials(ClientDto client)
     {
+        var ch = client.ClientChannels.FirstOrDefault();
+        if (ch != null && !string.IsNullOrWhiteSpace(ch.Name))
+            return ch.Name[..1].ToUpper();
+        if (ch != null && !string.IsNullOrWhiteSpace(ch.Username))
+            return ch.Username[..1].ToUpper();
         if (!string.IsNullOrWhiteSpace(client.DisplayName))
         {
             var parts = client.DisplayName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            return parts.Length >= 2
-                ? $"{parts[0][0]}{parts[1][0]}".ToUpper()
-                : $"{parts[0][0]}".ToUpper();
+            return parts.Length >= 2 ? $"{parts[0][0]}{parts[1][0]}".ToUpper() : $"{parts[0][0]}".ToUpper();
         }
-
-        var ch = client.ClientChannels.FirstOrDefault();
-        if (ch != null && !string.IsNullOrEmpty(ch.Name))
-            return ch.Name[..1].ToUpper();
-
         return "?";
     }
 

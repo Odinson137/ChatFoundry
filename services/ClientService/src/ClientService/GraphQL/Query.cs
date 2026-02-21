@@ -14,10 +14,28 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public IQueryable<Client> GetClients([Service] ClientDbContext context)
+    public IQueryable<Client> GetClients(
+        [Service] ClientDbContext context,
+        string? search = null)
     {
         if (!CompanyId.HasValue) return context.Clients.Where(_ => false);
-        return context.Clients.Where(c => c.CompanyId != null && c.CompanyId == CompanyId.Value);
+        var query = context.Clients
+            .Where(c => c.CompanyId != null && c.CompanyId == CompanyId.Value);
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = search.Trim().ToLower();
+            query = query.Where(c =>
+                (c.DisplayName != null && c.DisplayName.ToLower().Contains(term)) ||
+                c.ClientChannels.Any(ch =>
+                    (ch.Name != null && ch.Name.ToLower().Contains(term)) ||
+                    (ch.LastName != null && ch.LastName.ToLower().Contains(term)) ||
+                    (ch.Username != null && ch.Username.ToLower().Contains(term)) ||
+                    (ch.Phone != null && ch.Phone.Contains(term)) ||
+                    (ch.Email != null && ch.Email.ToLower().Contains(term))));
+        }
+
+        return query;
     }
 
     [UsePaging(IncludeTotalCount = true)]

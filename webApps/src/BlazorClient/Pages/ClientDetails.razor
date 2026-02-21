@@ -8,7 +8,7 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
 
-<PageTitle>@(client?.DisplayName ?? "Клиент")</PageTitle>
+<PageTitle>@(client != null ? GetDisplayName(client) : "Клиент")</PageTitle>
 
 <div class="cd-page">
     @if (isLoading)
@@ -31,7 +31,7 @@
         <nav class="cd-breadcrumb">
             <a href="/clients" class="cd-breadcrumb-link">Клиенты</a>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-            <span class="cd-breadcrumb-current">@(client.DisplayName ?? "Без имени")</span>
+            <span class="cd-breadcrumb-current">@GetDisplayName(client)</span>
         </nav>
 
         <!-- Client Info Card -->
@@ -39,7 +39,7 @@
             <div class="cd-info-header">
                 <div class="cd-avatar-lg">@GetInitials(client)</div>
                 <div class="cd-info-main">
-                    <h1 class="cd-client-name">@(client.DisplayName ?? "Без имени")</h1>
+                    <h1 class="cd-client-name">@GetDisplayName(client)</h1>
                     <div class="cd-info-meta">
                         <span class="cd-meta-item">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
@@ -49,6 +49,20 @@
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg>
                             Обновлён @client.ModifiedAt.ToString("dd.MM.yyyy HH:mm")
                         </span>
+                        @if (!string.IsNullOrWhiteSpace(GetFirstPhone(client)) && GetFirstPhone(client) != "—")
+                        {
+                            <span class="cd-meta-item">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                @GetFirstPhone(client)
+                            </span>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(GetFirstEmail(client)) && GetFirstEmail(client) != "—")
+                        {
+                            <span class="cd-meta-item">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                                @GetFirstEmail(client)
+                            </span>
+                        }
                     </div>
                 </div>
             </div>
@@ -128,13 +142,13 @@
                         <button class="cd-tab @(selectedChannelId == ch.Id ? "cd-tab-active" : "")"
                                 @onclick="() => SelectChannel(ch.Id)">
                             <span class="cd-badge cd-badge-@(ch.Channel.ToLowerInvariant()) cd-badge-sm">@ch.Channel</span>
-                            @if (!string.IsNullOrEmpty(ch.Username))
+                            @if (!string.IsNullOrEmpty(ch.Name) || !string.IsNullOrEmpty(ch.LastName))
+                            {
+                                <span>@(string.Join(" ", new[] { ch.Name, ch.LastName }.Where(s => !string.IsNullOrWhiteSpace(s)).ToArray()).Trim())</span>
+                            }
+                            else if (!string.IsNullOrEmpty(ch.Username))
                             {
                                 <span>@@@ch.Username</span>
-                            }
-                            else if (!string.IsNullOrEmpty(ch.Name))
-                            {
-                                <span>@ch.Name</span>
                             }
                         </button>
                     }
@@ -335,18 +349,43 @@
         }
     }
 
+    private static string GetDisplayName(ClientDto c)
+    {
+        var ch = c.ClientChannels.FirstOrDefault();
+        if (ch != null)
+        {
+            var namePart = string.Join(" ", new[] { ch.Name, ch.LastName }.Where(s => !string.IsNullOrWhiteSpace(s)).ToArray()).Trim();
+            if (!string.IsNullOrEmpty(namePart)) return namePart;
+            if (!string.IsNullOrWhiteSpace(ch.Username)) return "@" + ch.Username;
+        }
+        if (!string.IsNullOrWhiteSpace(c.DisplayName)) return c.DisplayName;
+        return "Без имени";
+    }
+
+    private static string GetFirstPhone(ClientDto client)
+    {
+        var phone = client.ClientChannels.Select(ch => ch.Phone).FirstOrDefault(p => !string.IsNullOrWhiteSpace(p));
+        return phone ?? "—";
+    }
+
+    private static string GetFirstEmail(ClientDto client)
+    {
+        var email = client.ClientChannels.Select(ch => ch.Email).FirstOrDefault(e => !string.IsNullOrWhiteSpace(e));
+        return email ?? "—";
+    }
+
     private static string GetInitials(ClientDto c)
     {
+        var ch = c.ClientChannels.FirstOrDefault();
+        if (ch != null && !string.IsNullOrWhiteSpace(ch.Name))
+            return ch.Name[..1].ToUpper();
+        if (ch != null && !string.IsNullOrWhiteSpace(ch.Username))
+            return ch.Username[..1].ToUpper();
         if (!string.IsNullOrWhiteSpace(c.DisplayName))
         {
             var parts = c.DisplayName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            return parts.Length >= 2
-                ? $"{parts[0][0]}{parts[1][0]}".ToUpper()
-                : $"{parts[0][0]}".ToUpper();
+            return parts.Length >= 2 ? $"{parts[0][0]}{parts[1][0]}".ToUpper() : $"{parts[0][0]}".ToUpper();
         }
-        var ch = c.ClientChannels.FirstOrDefault();
-        if (ch != null && !string.IsNullOrEmpty(ch.Name))
-            return ch.Name[..1].ToUpper();
         return "?";
     }
 

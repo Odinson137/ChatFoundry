@@ -16,25 +16,14 @@ public class ClientApiClient(HttpClient http) : IClientApiClient
         string sortField = "createdAt",
         string sortDirection = "DESC")
     {
-        var whereClauses = new List<string>();
-
-        if (!string.IsNullOrWhiteSpace(search))
-        {
-            whereClauses.Add("""{ displayName: { contains: $search } }""");
-        }
-
-        if (!string.IsNullOrWhiteSpace(channelFilter))
-        {
-            whereClauses.Add("""{ clientChannels: { some: { channel: { eq: $channel } } } }""");
-        }
-
-        var whereArg = whereClauses.Count > 0
-            ? $"where: {{ and: [{string.Join(", ", whereClauses)}] }}"
+        var whereArg = !string.IsNullOrWhiteSpace(channelFilter)
+            ? "where: { clientChannels: { some: { channel: { eq: $channel } } } }"
             : "";
 
         var orderArg = $"order: [{{ {sortField}: {sortDirection} }}]";
 
         var afterArg = after != null ? ", after: $after" : "";
+        var searchArg = !string.IsNullOrWhiteSpace(search) ? ", search: $search" : "";
 
         // Build variable declarations
         var varDecls = new List<string> { "$first: Int!" };
@@ -44,7 +33,7 @@ public class ClientApiClient(HttpClient http) : IClientApiClient
 
         var query = $$"""
                 query GetClients({{string.Join(", ", varDecls)}}) {
-                    clients(first: $first{{afterArg}}, {{orderArg}}{{(whereArg.Length > 0 ? ", " + whereArg : "")}}) {
+                    clients(first: $first{{afterArg}}{{searchArg}}, {{orderArg}}{{(whereArg.Length > 0 ? ", " + whereArg : "")}}) {
                         totalCount
                         pageInfo {
                             hasNextPage
