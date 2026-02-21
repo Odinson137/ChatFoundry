@@ -3,28 +3,53 @@ using ClientService.Data;
 using ClientService.GraphQL;
 using ClientService.GraphQL.Mutations;
 using ClientService.Interfaces;
-using Shared.Infrastructure.GraphQl;
 using ClientService.Repositories;
+using ClientService.Services;
+using Shared.Infrastructure.GraphQl;
 using Confluent.Kafka;
 using MassTransit;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Shared.Application.Events;
 using Shared.Infrastructure.DependencyInjection;
+using Workflow.Grpc;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-
 services.AddHttpContextAccessor();
 services.AddGrpc();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = "http://identity-service:8080";
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = "http://identity-service:8080/",
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<IClientChannelRepository, ClientChannelRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IAttributeDefinitionRepository, AttributeDefinitionRepository>();
+builder.Services.AddScoped<IBotCompanyResolver, BotCompanyResolver>();
 
 builder.Services.AddPostgreSql<ClientDbContext>(builder.Configuration);
+
+builder.Services.AddGrpcClient<BotTokenService.BotTokenServiceClient>(o =>
+{
+    var address = builder.Configuration["Services:WorkflowServiceUrl"];
+    o.Address = new Uri(address ?? "http://workflow-service:8081");
+});
 
 var kafkaConnectionString = builder.Configuration.GetConnectionString("Kafka");
 builder.Services.AddSingleton(new AdminClientConfig
@@ -86,6 +111,10 @@ builder.Services
     .ModifyRequestOptions(opt => opt.IncludeExceptionDetails = true);
 
 var app = builder.Build();
+
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapGraphQL();
 app.MapGrpcService<ClientService.Grpc.ClientAttributesGrpcService>();

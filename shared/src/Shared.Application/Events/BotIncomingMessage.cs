@@ -1,13 +1,14 @@
-﻿using Shared.Domain.Enums;
+using Shared.Domain.Enums;
 
 namespace Shared.Application.Events;
 
 public record BotIncomingMessage(
-    Guid BotId, 
-    string ExternalUserId, 
-    DefaultChannel Channel, 
+    Guid BotId,
+    string ExternalUserId,
+    DefaultChannel Channel,
     string Payload,
     string MessageExternalId,
     IReadOnlyDictionary<MessageParameter, string> Parameters,
-    MessageKind MessageKind = MessageKind.Text
-    );
+    MessageKind MessageKind = MessageKind.Text,
+    Guid? CompanyId = null
+);

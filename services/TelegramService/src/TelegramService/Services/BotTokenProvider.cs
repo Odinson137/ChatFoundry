@@ -1,4 +1,4 @@
-﻿using TelegramService.Interfaces;
+using TelegramService.Interfaces;
 
 namespace TelegramService.Services;
 

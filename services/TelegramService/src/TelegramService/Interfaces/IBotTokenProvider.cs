@@ -1,4 +1,4 @@
-﻿namespace TelegramService.Interfaces;
+namespace TelegramService.Interfaces;
 
 public interface IBotTokenProvider
 {

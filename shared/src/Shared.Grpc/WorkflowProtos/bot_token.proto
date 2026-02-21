@@ -1,4 +1,4 @@
-﻿syntax = "proto3";
+syntax = "proto3";
 
 option csharp_namespace = "Workflow.Grpc";
 
@@ -19,4 +19,5 @@ message GetTokenByBotIdRequest {
 
 message GetTokenResponse {
   string token = 1;
+  string company_id = 2;  // optional, UUID of the bot's company
 }

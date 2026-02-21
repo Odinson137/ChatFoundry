@@ -1,4 +1,4 @@
-﻿using ClientService.Entities;
+using ClientService.Entities;
 using ClientService.Interfaces;
 using MassTransit;
 using Shared.Application.Events;
@@ -20,6 +20,7 @@ public class BotOutgoingMessageConsumer(
         var clientChannel = await channelRepository.FindAsync(
             msg.Channel,
             msg.ExternalUserId,
+            msg.CompanyId,
             ct
         );
 

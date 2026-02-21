@@ -52,8 +52,10 @@ public class MessageSender(
             messageJson = workflowTextRenderer.RenderNodeText(node, action.Session, messageKind);
         }
 
+        var companyId = workflow.Bot?.CompanyId;
+
         await producer.Produce(
-            new BotOutgoingMessage(DefaultChannel.Telegram, message.ExternalUserId, messageJson, messageKind),
+            new BotOutgoingMessage(DefaultChannel.Telegram, message.ExternalUserId, messageJson, messageKind, companyId),
             ct
         );
     }

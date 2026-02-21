@@ -1,4 +1,4 @@
-﻿using ClientService.Entities;
+using ClientService.Entities;
 using ClientService.Interfaces;
 using MassTransit;
 using Shared.Application.Events;
@@ -9,7 +9,8 @@ namespace ClientService.Consumers;
 public class BotIncomingMessageConsumer(
     IClientRepository clientRepository,
     IClientChannelRepository channelRepository,
-    IMessageRepository messageRepository) : IConsumer<BotIncomingMessage>
+    IMessageRepository messageRepository,
+    IBotCompanyResolver botCompanyResolver) : IConsumer<BotIncomingMessage>
 {
     public async Task Consume(ConsumeContext<BotIncomingMessage> context)
     {
@@ -17,8 +18,10 @@ public class BotIncomingMessageConsumer(
         var ct = context.CancellationToken;
         var channel = msg.Channel;
 
+        var companyId = msg.CompanyId ?? await botCompanyResolver.GetCompanyIdByBotIdAsync(msg.BotId, ct);
+
         var clientChannel = await channelRepository
-            .FindAsync(channel, msg.ExternalUserId, ct);
+            .FindAsync(channel, msg.ExternalUserId, companyId, ct);
 
         var userName = msg.Parameters.GetValueOrDefault(MessageParameter.UserName);
         var name = msg.Parameters.GetValueOrDefault(MessageParameter.FirstName);
@@ -31,7 +34,8 @@ public class BotIncomingMessageConsumer(
         {
             client = new Client
             {
-                DisplayName = userName
+                DisplayName = userName,
+                CompanyId = companyId
             };
 
             await clientRepository.AddAsync(client, ct);

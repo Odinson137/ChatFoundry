@@ -1,4 +1,4 @@
-﻿using Shared.Domain.Enums;
+using Shared.Domain.Enums;
 
 namespace Shared.Application.Events;
 
@@ -6,4 +6,5 @@ public record BotOutgoingMessage(
     DefaultChannel Channel,
     string ExternalUserId,
     string MessageJson,
-    MessageKind MessageKind);
+    MessageKind MessageKind,
+    Guid? CompanyId = null);

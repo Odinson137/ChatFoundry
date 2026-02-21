@@ -1,4 +1,4 @@
-﻿using Grpc.Core;
+using Grpc.Core;
 using Workflow.Grpc;
 using WorkflowService.Interfaces;
 
@@ -37,14 +37,17 @@ public sealed class BotTokenGrpcService : BotTokenService.BotTokenServiceBase
         {
             throw new InvalidCastException($"Invalid Bot Id: {request.BotId}");
         }
-        
-        var token = await _botRepository.GetBotTokenAsync(
+
+        var (token, companyId) = await _botRepository.GetBotTokenAndCompanyIdAsync(
             botId,
             context.CancellationToken);
 
         if (token == null)
             throw new RpcException(new Status(StatusCode.NotFound, "Token not found"));
 
-        return new GetTokenResponse { Token = token };
+        var response = new GetTokenResponse { Token = token };
+        if (companyId.HasValue)
+            response.CompanyId = companyId.Value.ToString();
+        return response;
     }
 }

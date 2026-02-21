@@ -1,4 +1,4 @@
-﻿using HotChocolate;
+using HotChocolate;
 using HotChocolate.Types;
 using MassTransit;
 using Shared.Application.Events;
@@ -20,7 +20,8 @@ public class BotMutation(IHttpContextAccessor httpContextAccessor) : BaseGraphQl
         {
             Name = input.Name,
             Token = input.Token,
-            CreatedUserId = UserId
+            CreatedUserId = UserId,
+            CompanyId = CompanyId
         };
 
         context.Bots.Add(bot);

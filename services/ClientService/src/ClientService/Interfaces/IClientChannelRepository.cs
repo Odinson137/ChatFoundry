@@ -1,4 +1,4 @@
-﻿using ClientService.Entities;
+using ClientService.Entities;
 using Shared.Domain.Enums;
 
 namespace ClientService.Interfaces;
@@ -8,6 +8,7 @@ public interface IClientChannelRepository
     Task<ClientChannel?> FindAsync(
         DefaultChannel channel,
         string externalUserId,
+        Guid? companyId = null,
         CancellationToken ct = default);
 
     Task<ClientChannel?> GetByIdAsync(Guid id, CancellationToken ct = default);

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shared.Infrastructure.EntityTypeConfiguration;
 using WorkflowService.Entities;
@@ -25,6 +25,7 @@ public class BotConfiguration : BaseEntityTypeConfiguration<Bot>
             .HasMaxLength(100);
 
         builder.HasIndex(x => x.CreatedUserId);
+        builder.HasIndex(x => x.CompanyId);
         
         builder.HasMany(b => b.Workflows)
             .WithOne(w => w.Bot)

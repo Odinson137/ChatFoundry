@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using WorkflowService.Data;
 using WorkflowService.Entities;
 using WorkflowService.Interfaces;
@@ -30,6 +30,11 @@ public class WorkflowRepository(WorkflowDbContext db) : IWorkflowRepository
 
     public async Task<BotWorkflow?> GetActionWorkflowAsync(Guid actionId)
     {
-        return await db.Actions.Where(c => c.Id == actionId).Select(x => x.Session.Workflow).FirstOrDefaultAsync();
+        var action = await db.Actions
+            .Include(a => a.Session)
+            .ThenInclude(s => s.Workflow)
+            .ThenInclude(w => w.Bot)
+            .FirstOrDefaultAsync(a => a.Id == actionId);
+        return action?.Session?.Workflow;
     }
 }
