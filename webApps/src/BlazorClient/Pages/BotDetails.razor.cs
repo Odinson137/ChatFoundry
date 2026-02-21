@@ -1,4 +1,4 @@
-﻿using BlazorClient.Interfaces;
+using BlazorClient.Interfaces;
 using BlazorClient.Models.DTO;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -76,7 +76,7 @@ public partial class BotDetails
         if (_bot != null) await Js.InvokeVoidAsync("navigator.clipboard.writeText", _bot.Token);
     }
 
-    private void NavigateToDesigner(Guid workflowId) => Navigation.NavigateTo($"/designer/{workflowId}");
+    private string GetDesignerUrl(Guid workflowId) => Navigation.ToAbsoluteUri($"/designer/{workflowId}").ToString();
 
     private async Task CreateNewWorkflow()
     {

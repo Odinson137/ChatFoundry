@@ -57,10 +57,47 @@ public partial class WorkflowDesigner : IDisposable
     // Атрибуты компании (для правой панели)
     private List<AttributeDefinitionDto> CompanyAttributeDefinitions { get; set; } = new();
 
-    // Переменные - управление панелью
-    private bool IsVariablesPanelOpen { get; set; } = true;
+    // Модальное окно «Переменные / Атрибуты / Параметры» (просмотр)
+    private bool IsVariablesModalOpen { get; set; }
+    private int VariablesModalTab { get; set; } // 0=Переменные, 1=Атрибуты, 2=Параметры
+
     private List<VariableInfo> DiscoveredVariables { get; set; } = new();
     private string VariableSearchQuery { get; set; } = "";
+
+    // Поиск узлов в левой панели
+    private string NodeSearchQuery { get; set; } = "";
+
+    // Зум канваса
+    private double _zoomLevel = 1.0;
+    private int ZoomPercent => (int)Math.Round(_zoomLevel * 100);
+
+    // Время последнего сохранения (для подписи «Сохранено N мин назад»)
+    private DateTime? LastSavedAt { get; set; }
+
+    /// <summary>Текст «Сохранено N мин назад» или «Не сохранено».</summary>
+    private string LastSavedText
+    {
+        get
+        {
+            if (LastSavedAt == null) return "Не сохранено";
+            var diff = DateTime.UtcNow - LastSavedAt.Value;
+            if (diff.TotalMinutes < 1) return "Сохранено только что";
+            if (diff.TotalMinutes < 60) return $"Сохранено {(int)diff.TotalMinutes} мин назад";
+            return $"Сохранено {(int)diff.TotalHours} ч назад";
+        }
+    }
+
+    // Undo/Redo
+    private readonly List<(string N, string E, string L)> _undoStack = new();
+    private int _undoIndex = -1;
+    private bool _isRestoring;
+    private const int MaxUndoSteps = 30;
+
+    // Ввод @ для выбора переменной (вставка на место @, в т.ч. в середине текста)
+    private object? _atMentionTargetObj;
+    private string? _atMentionTargetProp;
+    private string _atMentionFullValue = "";
+    private int _atMentionIndex;
 
     // Переменные - модальное окно выбора
     private bool IsVariablePickerOpen { get; set; }
@@ -93,6 +130,31 @@ public partial class WorkflowDesigner : IDisposable
     /// <summary>
     /// Ключи атрибутов для выпадающего списка в блоке «Атрибут»: базовые + из компании, без дубликатов.
     /// </summary>
+    /// <summary>Ключи для вкладки Атрибуты в модалке: базовые + из компании, без дубликатов.</summary>
+    private IEnumerable<string> GetAttributeKeysForModal()
+    {
+        var baseKeys = new[] { "name", "username", "phone", "email" };
+        var fromCompany = CompanyAttributeDefinitions.Select(a => a.Key).Where(k => !string.IsNullOrWhiteSpace(k));
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var k in baseKeys)
+        {
+            if (seen.Add(k)) yield return k;
+        }
+        foreach (var k in fromCompany)
+        {
+            if (seen.Add(k)) yield return k;
+        }
+    }
+
+    private static string GetAttributeDisplayName(string key) => key?.ToLowerInvariant() switch
+    {
+        "name" => "Имя",
+        "username" => "Username",
+        "phone" => "Телефон",
+        "email" => "Email",
+        _ => key ?? ""
+    };
+
     private IEnumerable<string> GetAttributeKeysForDropdown()
     {
         var baseKeys = new[] { "name", "username", "phone", "email" };
@@ -151,7 +213,10 @@ public partial class WorkflowDesigner : IDisposable
 
     private void OnDiagramChanged()
     {
+        if (_isRestoring) return;
+        PushUndoState();
         RefreshVariables();
+        StateHasChanged();
     }
 
     private void OnWorkflowChanged()
@@ -168,6 +233,24 @@ public partial class WorkflowDesigner : IDisposable
         if (data == null) return;
 
         var schema = SchemaService.Deserialize(data.NodesDefinition, data.EdgesDefinition, data.LayoutDefinition);
+        _isRestoring = true;
+        try
+        {
+            ApplySchemaToDiagram(schema);
+        }
+        finally
+        {
+            _isRestoring = false;
+        }
+        _undoStack.Clear();
+        _undoIndex = -1;
+        PushUndoState();
+    }
+
+    private void ApplySchemaToDiagram(WorkflowSchema schema)
+    {
+        Diagram.Nodes.Clear();
+        Diagram.Links.Clear();
         var nodeMap = new Dictionary<Guid, NodeModel>();
 
         foreach (var nDef in schema.Nodes)
@@ -184,15 +267,12 @@ public partial class WorkflowDesigner : IDisposable
         {
             if (nodeMap.TryGetValue(eDef.From, out var source) && nodeMap.TryGetValue(eDef.To, out var target))
             {
-                var sourcePort = source.Ports.FirstOrDefault(p => p.Alignment == PortAlignment.Bottom) ??
-                                 source.Ports.FirstOrDefault();
-                var targetPort = target.Ports.FirstOrDefault(p => p.Alignment == PortAlignment.Top) ??
-                                 target.Ports.FirstOrDefault();
+                var sourcePort = source.Ports.FirstOrDefault(p => p.Alignment == PortAlignment.Right) ?? source.Ports.FirstOrDefault();
+                var targetPort = target.Ports.FirstOrDefault(p => p.Alignment == PortAlignment.Left) ?? target.Ports.FirstOrDefault();
 
                 if (sourcePort != null && targetPort != null)
                 {
-                    var link = new WorkflowLinkModel(new SinglePortAnchor(sourcePort),
-                        new SinglePortAnchor(targetPort))
+                    var link = new WorkflowLinkModel(new SinglePortAnchor(sourcePort), new SinglePortAnchor(targetPort))
                     {
                         Condition = eDef.Condition,
                         Label = eDef.Label
@@ -201,6 +281,61 @@ public partial class WorkflowDesigner : IDisposable
                 }
             }
         }
+    }
+
+    private void PushUndoState()
+    {
+        var nodes = Diagram.Nodes.Cast<WorkflowNodeModel>().Select(n => new NodeDefinition(
+            Guid.Parse(n.Id), n.NodeType, n.Title ?? "", n.Data is EmptyNodeData ? null : n.Data)).ToList();
+        var edges = Diagram.Links.Cast<WorkflowLinkModel>().Select(l =>
+        {
+            var fromId = GetNodeIdFromAnchor(l.Source);
+            var toId = GetNodeIdFromAnchor(l.Target);
+            return (fromId.HasValue && toId.HasValue) ? new EdgeDefinition(fromId.Value, toId.Value, l.Label, l.Condition) : null;
+        }).Where(e => e != null).Select(e => e!).ToList();
+        var layout = Diagram.Nodes.Select(n => new LayoutDefinition(Guid.Parse(n.Id), n.Position.X, n.Position.Y)).ToList();
+        var schema = new WorkflowSchema(nodes, edges, layout);
+        var (nStr, eStr, lStr) = SchemaService.Serialize(schema);
+
+        if (_undoIndex < _undoStack.Count - 1)
+            _undoStack.RemoveRange(_undoIndex + 1, _undoStack.Count - _undoIndex - 1);
+        if (_undoStack.Count >= MaxUndoSteps)
+        {
+            _undoStack.RemoveAt(0);
+            _undoIndex = Math.Max(-1, _undoIndex - 1);
+        }
+        _undoStack.Add((nStr, eStr, lStr));
+        _undoIndex = _undoStack.Count - 1;
+    }
+
+    private void Undo()
+    {
+        if (_undoIndex <= 0) return;
+        _undoIndex--;
+        RestoreUndoState(_undoStack[_undoIndex]);
+    }
+
+    private void Redo()
+    {
+        if (_undoIndex >= _undoStack.Count - 1) return;
+        _undoIndex++;
+        RestoreUndoState(_undoStack[_undoIndex]);
+    }
+
+    private void RestoreUndoState((string N, string E, string L) state)
+    {
+        var schema = SchemaService.Deserialize(state.N, state.E, state.L);
+        _isRestoring = true;
+        try
+        {
+            ApplySchemaToDiagram(schema);
+        }
+        finally
+        {
+            _isRestoring = false;
+        }
+        RefreshVariables();
+        StateHasChanged();
     }
 
     private async Task SaveWorkflow()
@@ -230,6 +365,7 @@ public partial class WorkflowDesigner : IDisposable
         var (nStr, eStr, lStr) = SchemaService.Serialize(schema);
 
         await ApiClient.UpdateWorkflowDefinitionsAsync(WorkflowId, nStr, eStr, lStr);
+        LastSavedAt = DateTime.UtcNow;
     }
 
     #endregion
@@ -266,23 +402,24 @@ public partial class WorkflowDesigner : IDisposable
 
         var node = new WorkflowNodeModel(position, type, label, id, data);
 
+        // Направление схемы: слева направо (вход Left, выход Right)
         switch (type.ToLower())
         {
             case "start":
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Bottom));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right)); // только выход вправо
                 break;
             case "end":
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Top));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Left)); // только вход слева
                 break;
             case "condition":
             case "aifilter":
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Top));
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Left));
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Left));  // вход
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right)); // выход 1
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right)); // выход 2
                 break;
             default:
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Top));
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Bottom));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Left));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right));
                 break;
         }
 
@@ -811,13 +948,63 @@ if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].Usage
         }).ToDictionary(g => g.Key, g => g.ToList());
     }
 
+    /// <summary>Только переменные (без атрибутов $global.*) для вкладки «Переменные».</summary>
+    private Dictionary<string, List<VariableInfo>> GetGroupedVariablesOnlyVariables()
+    {
+        var onlyVars = DiscoveredVariables.Where(v => v.Type != VariableType.GlobalAttribute).ToList();
+        var filtered = string.IsNullOrWhiteSpace(VariableSearchQuery)
+            ? onlyVars
+            : onlyVars.Where(v => v.Name.Contains(VariableSearchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+
+        return filtered.GroupBy(v => v.Type switch
+        {
+            VariableType.System => "Системные",
+            VariableType.User => "Пользователь",
+            VariableType.Custom => "Переменные",
+            _ => "Другие"
+        }).ToDictionary(g => g.Key, g => g.ToList());
+    }
+
     #endregion
 
     #region Работа с переменными - UI Actions
 
-    private void ToggleVariablesPanel()
+    private void OpenVariablesModal()
     {
-        IsVariablesPanelOpen = !IsVariablesPanelOpen;
+        IsVariablesModalOpen = true;
+        VariablesModalTab = 0;
+        RefreshVariables();
+    }
+
+    private void CloseVariablesModal()
+    {
+        IsVariablesModalOpen = false;
+    }
+
+    private async Task ZoomIn()
+    {
+        _zoomLevel = Math.Min(2.0, _zoomLevel + 0.1);
+        await ApplyZoom();
+        StateHasChanged();
+    }
+
+    private async Task ZoomOut()
+    {
+        _zoomLevel = Math.Max(0.25, _zoomLevel - 0.1);
+        await ApplyZoom();
+        StateHasChanged();
+    }
+
+    private async Task ApplyZoom()
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("window.__designerZoom", "designer-canvas-area", _zoomLevel);
+        }
+        catch
+        {
+            // Fallback: библиотека может не поддерживать вызов zoom извне
+        }
     }
 
     private async Task CopyVariableToClipboard(string variableName)
@@ -841,9 +1028,38 @@ if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].Usage
 
     private void SelectVariableFromPicker(string variableName)
     {
-        OnVariableSelected?.Invoke(variableName);
+        if (_atMentionTargetObj != null && !string.IsNullOrEmpty(_atMentionTargetProp))
+        {
+            var insert = "{{" + variableName.TrimStart('$') + "}}";
+            var newVal = _atMentionFullValue.Substring(0, _atMentionIndex) + insert + _atMentionFullValue.Substring(_atMentionIndex + 1);
+            var prop = _atMentionTargetObj.GetType().GetProperty(_atMentionTargetProp);
+            prop?.SetValue(_atMentionTargetObj, newVal);
+            _atMentionTargetObj = null;
+            _atMentionTargetProp = null;
+            OnWorkflowChanged();
+        }
+        else
+        {
+            OnVariableSelected?.Invoke(variableName);
+        }
         CloseVariablePicker();
         StateHasChanged();
+    }
+
+    /// <summary>Обновляет поле из e.Value; при вводе @ (в любом месте) открывает выбор переменной, вставка на место @.</summary>
+    private void UpdateFieldAndCheckAtMention(ChangeEventArgs e, object dataObject, string propertyName)
+    {
+        var value = e.Value?.ToString() ?? "";
+        var prop = dataObject.GetType().GetProperty(propertyName);
+        prop?.SetValue(dataObject, value);
+        if (value.Contains('@'))
+        {
+            _atMentionFullValue = value;
+            _atMentionIndex = value.LastIndexOf('@');
+            _atMentionTargetObj = dataObject;
+            _atMentionTargetProp = propertyName;
+            ShowVariablePicker(_ => { });
+        }
     }
 
     private List<VariableInfo> GetFilteredVariablesForPicker()
@@ -855,6 +1071,40 @@ if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].Usage
             .Where(v => v.Name.Contains(VariablePickerSearch, StringComparison.OrdinalIgnoreCase))
             .ToList();
     }
+
+    private Dictionary<string, List<VariableInfo>> GetGroupedVariablesForPicker()
+    {
+        var filtered = GetFilteredVariablesForPicker();
+        return filtered.GroupBy(v => v.Type switch
+        {
+            VariableType.GlobalAttribute => "Контактные данные и атрибуты",
+            VariableType.System => "Системные",
+            VariableType.User => "Пользователь",
+            VariableType.Custom => "Пользовательские",
+            _ => "Другие"
+        }).ToDictionary(g => g.Key, g => g.ToList());
+    }
+
+    private static string GetVariableTypeCss(VariableType type) => type switch
+    {
+        VariableType.GlobalAttribute => "global",
+        VariableType.System => "system",
+        VariableType.User => "user",
+        VariableType.Custom => "custom",
+        _ => "custom"
+    };
+
+    private static string GetVariableDisplayName(VariableInfo v) =>
+        !string.IsNullOrWhiteSpace(v.SourceNode) ? v.SourceNode : v.Name;
+
+    private static string GetVariableIcon(VariableType type) => type switch
+    {
+        VariableType.GlobalAttribute => "oi-person",
+        VariableType.System => "oi-cog",
+        VariableType.User => "oi-person",
+        VariableType.Custom => "oi-tag",
+        _ => "oi-tag"
+    };
 
     private void InsertVariable(object dataObject, string propertyName, string variableName)
     {
@@ -892,6 +1142,34 @@ if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].Usage
     }
 
     private void OnDragStart(DragEventArgs e, NodeType type) => _draggedType = type;
+
+    private static readonly List<NodeToolItem> AllNodeTools =
+    [
+        new NodeToolItem("Логика", "Старт", NodeType.Start, "oi-media-play", "green"),
+        new NodeToolItem("Логика", "Условие", NodeType.Condition, "oi-fork", "orange"),
+        new NodeToolItem("Логика", "Ожидание", NodeType.Wait, "oi-timer", "blue"),
+        new NodeToolItem("Логика", "Конец", NodeType.End, "oi-media-stop", "red"),
+        new NodeToolItem("Контент", "Сообщение", NodeType.Message, "oi-chat", "indigo"),
+        new NodeToolItem("Контент", "Вопрос", NodeType.Ask, "oi-question-mark", "indigo"),
+        new NodeToolItem("Контент", "Медиа", NodeType.Media, "oi-image", "indigo"),
+        new NodeToolItem("AI и интеграции", "API Запрос", NodeType.HttpRequest, "oi-cloud-download", "violet"),
+        new NodeToolItem("AI и интеграции", "Переменная", NodeType.SetVariable, "oi-list", "violet"),
+        new NodeToolItem("AI и интеграции", "Атрибут", NodeType.SetAttribute, "oi-person", "violet"),
+        new NodeToolItem("AI и интеграции", "AI Фильтр", NodeType.AIFilter, "oi-eye", "violet"),
+        new NodeToolItem("AI и интеграции", "AI Текст", NodeType.AIGenerate, "oi-bolt", "violet"),
+    ];
+
+    private IEnumerable<NodeToolItem> GetFilteredNodeTools()
+    {
+        var q = (NodeSearchQuery ?? "").Trim();
+        if (string.IsNullOrEmpty(q))
+            return AllNodeTools;
+        return AllNodeTools.Where(t =>
+            t.Label.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+            t.Section.Contains(q, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private sealed record NodeToolItem(string Section, string Label, NodeType Type, string Icon, string IconClass);
 
     private void OnConditionTypeChanged(WorkflowLinkModel link, string? type)
     {

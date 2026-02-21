@@ -5,95 +5,133 @@
 @using System.Text.RegularExpressions
 @using BlazorClient.Models.Diagram
 @using Microsoft.AspNetCore.Components.Forms
-@layout MainLayout
+@layout DesignerLayout
 
 <PageTitle>Редактор Workflow</PageTitle>
 
 <div class="designer-page-container">
-    <!-- Левая панель с узлами -->
-    <div class="designer-sidebar">
-        <div class="sidebar-header">
-            <h5>Узлы</h5>
+    <!-- Левая панель с узлами (референс code.html) -->
+    <aside class="designer-sidebar">
+        <div class="sidebar-brand">
+            <span class="sidebar-brand-icon oi oi-project"></span>
+            <span class="sidebar-brand-text">ChatFoundry</span>
+        </div>
+        <div class="sidebar-search">
+            <span class="sidebar-search-icon oi oi-magnifying-glass"></span>
+            <input type="text" class="sidebar-search-input" placeholder="Поиск узлов..." 
+                   @bind="NodeSearchQuery" @bind:event="oninput" />
         </div>
         <div class="sidebar-content">
             <div class="sidebar-section">
-                <small>ЛОГИКА</small>
-                <div class="node-grid">
-                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.Start)">
-                        <span class="oi oi-media-play"></span> Старт
-                    </div>
-                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.Condition)">
-                        <span class="oi oi-fork"></span> Условие
-                    </div>
-                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.Wait)">
-                        <span class="oi oi-timer"></span> Ожидание
-                    </div>
-                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.End)">
-                        <span class="oi oi-media-stop"></span> Конец
-                    </div>
+                <h3 class="sidebar-section-title">Логика</h3>
+                <div class="node-list">
+                    @foreach (var item in GetFilteredNodeTools().Where(x => x.Section == "Логика"))
+                    {
+                        <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, item.Type)">
+                            <span class="node-tool-icon node-tool-icon--@item.IconClass"><span class="oi @item.Icon"></span></span>
+                            <span class="node-tool-label">@item.Label</span>
+                        </div>
+                    }
                 </div>
             </div>
             <div class="sidebar-section">
-                <small>КОНТЕНТ</small>
-                <div class="node-grid">
-                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.Message)">
-                        <span class="oi oi-chat"></span> Сообщение
-                    </div>
-                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.Ask)">
-                        <span class="oi oi-question-mark"></span> Вопрос
-                    </div>
-                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.Media)">
-                        <span class="oi oi-image"></span> Медиа
-                    </div>
+                <h3 class="sidebar-section-title">Контент</h3>
+                <div class="node-list">
+                    @foreach (var item in GetFilteredNodeTools().Where(x => x.Section == "Контент"))
+                    {
+                        <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, item.Type)">
+                            <span class="node-tool-icon node-tool-icon--@item.IconClass"><span class="oi @item.Icon"></span></span>
+                            <span class="node-tool-label">@item.Label</span>
+                        </div>
+                    }
                 </div>
             </div>
             <div class="sidebar-section">
-                <small>ИНТЕГРАЦИИ</small>
-                <div class="node-grid">
-                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.HttpRequest)">
-                        <span class="oi oi-cloud-download"></span> API Запрос
-                    </div>
-                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.SetVariable)">
-                        <span class="oi oi-list"></span> Переменная
-                    </div>
-                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.SetAttribute)">
-                        <span class="oi oi-person"></span> Атрибут
-                    </div>
-                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.AIFilter)">
-                        <span class="oi oi-eye"></span> AI Фильтр
-                    </div>
-                    <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, NodeType.AIGenerate)">
-                        <span class="oi oi-bolt"></span> AI Текст
-                    </div>
+                <h3 class="sidebar-section-title">AI и интеграции</h3>
+                <div class="node-list">
+                    @foreach (var item in GetFilteredNodeTools().Where(x => x.Section == "AI и интеграции"))
+                    {
+                        <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, item.Type)">
+                            <span class="node-tool-icon node-tool-icon--@item.IconClass"><span class="oi @item.Icon"></span></span>
+                            <span class="node-tool-label">@item.Label</span>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
-        <div class="sidebar-footer">
-            <button class="btn btn-primary w-100" @onclick="SaveWorkflow">
-                <span class="oi oi-circle-check"></span> Сохранить
-            </button>
+    </aside>
+
+    <!-- Основная область: топ-бар + канвас -->
+    <main class="designer-main">
+        <header class="designer-header">
+            <div class="designer-header-left">
+                <span class="designer-workflow-title">Редактор Workflow</span>
+                <span class="designer-badge">Editor</span>
+                <span class="designer-header-divider"></span>
+                <span class="designer-last-saved">@LastSavedText</span>
+            </div>
+            <div class="designer-header-right">
+                <div class="designer-undo-redo">
+                    <button type="button" class="designer-undo-btn" @onclick="Undo" disabled="@(_undoIndex <= 0)" title="Назад">
+                        <span class="oi oi-arrow-left"></span>
+                    </button>
+                    <button type="button" class="designer-redo-btn" @onclick="Redo" disabled="@(_undoIndex >= _undoStack.Count - 1)" title="Вперёд">
+                        <span class="oi oi-arrow-right"></span>
+                    </button>
+                </div>
+                <button type="button" class="designer-btn-secondary" @onclick="OpenVariablesModal" title="Переменные">
+                    <span class="oi oi-code"></span> Переменные
+                </button>
+                <button type="button" class="designer-btn-primary designer-header-save" @onclick="SaveWorkflow" title="Сохранить">
+                    <span class="oi oi-circle-check"></span> Сохранить
+                </button>
+            </div>
+        </header>
+        <div id="designer-canvas-area" class="canvas-area" 
+             @ondrop="OnDrop" 
+             @ondragover="OnDragOver" 
+             @ondragover:preventDefault="true">
+            <CascadingValue Value="Diagram">
+                <DiagramCanvas class="designer-canvas">
+                    <Widgets>
+                        <GridWidget Size="24" Mode="GridMode.Point" BackgroundColor="#ffffff"/>
+                        <SelectionBoxWidget/>
+                    </Widgets>
+                </DiagramCanvas>
+            </CascadingValue>
+
+            <!-- Зум: слева снизу -->
+            <div class="designer-zoom-controls">
+                <button type="button" class="designer-zoom-btn" @onclick="ZoomOut" title="Уменьшить">
+                    <span class="oi oi-minus"></span>
+                </button>
+                <span class="designer-zoom-value">@(ZoomPercent)%</span>
+                <button type="button" class="designer-zoom-btn" @onclick="ZoomIn" title="Увеличить">
+                    <span class="oi oi-plus"></span>
+                </button>
+            </div>
+
+            <!-- Мини-карта: справа снизу -->
+            <div class="designer-minimap">
+                <div class="designer-minimap-title">Карта</div>
+                <div class="designer-minimap-content">
+                    @if (Diagram != null)
+                    {
+                        @foreach (var node in Diagram.Nodes.Cast<WorkflowNodeModel>())
+                        {
+                            <div class="designer-minimap-node" 
+                                 style="left: @(node.Position.X / 25)px; top: @(node.Position.Y / 25)px;"
+                                 title="@node.Title"></div>
+                        }
+                    }
+                </div>
+            </div>
         </div>
-    </div>
 
-    <!-- Canvas -->
-    <div class="canvas-wrapper @(IsVariablesPanelOpen ? "with-variables-panel" : "")" 
-         @ondrop="OnDrop" 
-         @ondragover="OnDragOver" 
-         @ondragover:preventDefault="true">
-        <CascadingValue Value="Diagram">
-            <DiagramCanvas>
-                <Widgets>
-                    <GridWidget Size="25" Mode="GridMode.Point" BackgroundColor="#f9fafb"/>
-                    <SelectionBoxWidget/>
-                </Widgets>
-            </DiagramCanvas>
-        </CascadingValue>
-    </div>
-
-    <!-- Панель настроек узла (центр) -->
-    @if (SelectedModel != null)
-    {
-        <div class="designer-settings-panel">
+        <!-- Панель настроек узла (справа, референс code.html) -->
+        @if (SelectedModel != null)
+        {
+            <div class="designer-settings-panel">
             <div class="panel-header">
                 <h6>Настройки</h6>
                 <button type="button" class="btn-close" @onclick="() => SelectedModel = null"></button>
@@ -116,12 +154,12 @@
                                     <span class="oi oi-code"></span> {}
                                 </button>
                             </label>
-                            <textarea class="form-control font-monospace" 
-                                      @bind="msgData.Text" 
-                                      @oninput="OnWorkflowChanged"
+                            <textarea class="form-control font-monospace variable-input" 
+                                      value="@msgData.Text"
+                                      @oninput="e => { UpdateFieldAndCheckAtMention(e, msgData, nameof(msgData.Text)); OnWorkflowChanged(); }"
                                       rows="4"></textarea>
                             <small class="form-text text-muted">
-                                Используйте <code>{{variable_name}}</code> или <code>${{variable_name}}</code>
+                                Введите <kbd>@@</kbd> для выбора переменной. Или <code>{{variable_name}}</code>
                             </small>
                         </div>
                         <div class="mb-3">
@@ -150,12 +188,12 @@
                                     <span class="oi oi-code"></span> {}
                                 </button>
                             </label>
-                            <textarea class="form-control font-monospace" 
-                                      @bind="askData.Text" 
-                                      @oninput="OnWorkflowChanged"
+                            <textarea class="form-control font-monospace variable-input" 
+                                      value="@askData.Text"
+                                      @oninput="e => { UpdateFieldAndCheckAtMention(e, askData, nameof(askData.Text)); OnWorkflowChanged(); }"
                                       rows="4"></textarea>
                             <small class="form-text text-muted">
-                                Используйте <code>{{variable_name}}</code> или <code>${{variable_name}}</code>
+                                Введите <kbd>@@</kbd> для выбора переменной. Или <code>{{variable_name}}</code>
                             </small>
                         </div>
                         <div class="mb-3">
@@ -518,140 +556,156 @@
                 </div>
             </div>
         </div>
-    }
+        }
 
-    <!-- Панель переменных и атрибутов (справа) -->
-    <div class="variables-panel @(IsVariablesPanelOpen ? "open" : "")">
-        <button class="variables-toggle" @onclick="ToggleVariablesPanel">
-            <span class="oi oi-@(IsVariablesPanelOpen ? "chevron-right" : "chevron-left")"></span>
-        </button>
-        
-        <div class="variables-content">
-            <div class="variables-header">
-                <h6><span class="oi oi-code"></span> Переменные и атрибуты</h6>
-                <span class="badge bg-secondary">@DiscoveredVariables.Count</span>
-            </div>
-
-            <div class="variables-search mb-3">
-                <input type="text" 
-                       class="form-control form-control-sm" 
-                       placeholder="Поиск..."
-                       @bind="VariableSearchQuery"
-                       @bind:event="oninput"/>
-            </div>
-
-            <div class="variables-list">
-                @if (!DiscoveredVariables.Any())
-                {
-                    <div class="text-center text-muted py-4">
-                        <span class="oi oi-info"></span>
-                        <p class="small mt-2">Переменные и атрибуты появятся при использовании в узлах<br/>Атрибуты настраиваются в разделе Компания → Атрибуты</p>
-                    </div>
-                }
-                else
-                {
-                    @foreach (var group in GetGroupedVariables())
-                    {
-                        <div class="variable-group mb-3">
-                            <div class="variable-group-title">
-                                <small class="text-muted">
-                                    @if (group.Key.StartsWith("Атрибуты"))
-                                    {
-                                        <span class="oi oi-person"></span>
-                                    }
-                                    @group.Key
-                                </small>
-                            </div>
-                            @foreach (var variable in group.Value)
-                            {
-                                <div class="variable-item @GetVariableCssClass(variable)" 
-                                     @onclick="() => CopyVariableToClipboard(variable.Name)"
-                                     title="Клик для копирования">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div class="flex-grow-1">
-                                            <code class="variable-name">@variable.Name</code>
-                                            @if (!string.IsNullOrEmpty(variable.SourceNode))
-                                            {
-                                                <small class="d-block text-muted mt-1">
-                                                    <span class="oi oi-arrow-thick-right"></span> @variable.SourceNode
-                                                </small>
-                                            }
-                                        </div>
-                                        <span class="badge bg-light text-dark">@variable.UsageCount</span>
-                                    </div>
-                                    @if (variable.UsageNodes.Any())
-                                    {
-                                        <div class="variable-usage mt-2">
-                                            <small class="text-muted">Используется в:</small>
-                                            @foreach (var usage in variable.UsageNodes.Take(3))
-                                            {
-                                                <span class="badge bg-info text-dark me-1">@usage</span>
-                                            }
-                                            @if (variable.UsageNodes.Count > 3)
-                                            {
-                                                <span class="badge bg-secondary">+@(variable.UsageNodes.Count - 3)</span>
-                                            }
-                                        </div>
-                                    }
-                                </div>
-                            }
-                        </div>
-                    }
-                }
-            </div>
-
-            <div class="variables-footer">
-                <button class="btn btn-sm btn-outline-primary w-100" @onclick="RefreshVariables">
-                    <span class="oi oi-reload"></span> Обновить список
-                </button>
-            </div>
-        </div>
-    </div>
+    </main>
 </div>
 
-<!-- Modal для выбора переменной -->
-@if (IsVariablePickerOpen)
+<!-- Модальное окно «Переменные / Атрибуты / Параметры» (просмотр, 3 вкладки) -->
+@if (IsVariablesModalOpen)
 {
-    <div class="modal-backdrop show"></div>
-    <div class="modal show d-block" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Выбрать переменную</h5>
-                    <button type="button" class="btn-close" @onclick="CloseVariablePicker"></button>
+    <div class="variables-modal-backdrop" @onclick="CloseVariablesModal"></div>
+    <div class="variables-modal">
+        <div class="variables-modal-header">
+            <h2 class="variables-modal-title">Переменные и атрибуты</h2>
+            <button type="button" class="variables-modal-close" @onclick="CloseVariablesModal" aria-label="Закрыть">
+                <span class="oi oi-x"></span>
+            </button>
+        </div>
+        <div class="variables-modal-tabs">
+            <button type="button" class="variables-modal-tab @(VariablesModalTab == 0 ? "active" : "")" @onclick="() => VariablesModalTab = 0">
+                Переменные
+            </button>
+            <button type="button" class="variables-modal-tab @(VariablesModalTab == 1 ? "active" : "")" @onclick="() => VariablesModalTab = 1">
+                Атрибуты
+            </button>
+            <button type="button" class="variables-modal-tab @(VariablesModalTab == 2 ? "active" : "")" @onclick="() => VariablesModalTab = 2">
+                Параметры
+            </button>
+        </div>
+        <div class="variables-modal-body">
+            @if (VariablesModalTab == 0)
+            {
+                <div class="variables-modal-search">
+                    <span class="oi oi-magnifying-glass"></span>
+                    <input type="text" placeholder="Поиск..." @bind="VariableSearchQuery" @bind:event="oninput" />
                 </div>
-                <div class="modal-body">
-                    <input type="text" 
-                           class="form-control mb-3" 
-                           placeholder="Поиск..."
-                           @bind="VariablePickerSearch"
-                           @bind:event="oninput"/>
-                    
-                    @if (!GetFilteredVariablesForPicker().Any())
+                <div class="variables-modal-list">
+                    @{
+                        var varsOnly = GetGroupedVariablesOnlyVariables();
+                    }
+                    @if (!varsOnly.Any())
                     {
-                        <div class="text-center text-muted py-3">
-                            <p>Нет доступных переменных</p>
-                            <small>Создайте переменные в узлах</small>
-                        </div>
+                        <p class="variables-modal-empty">Переменные появятся при использовании в узлах.</p>
                     }
                     else
                     {
-                        <div class="list-group">
-                            @foreach (var variable in GetFilteredVariablesForPicker())
-                            {
-                                <button type="button" 
-                                        class="list-group-item list-group-item-action"
-                                        @onclick="() => SelectVariableFromPicker(variable.Name)">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <code>@variable.Name</code>
-                                        <small class="text-muted">@variable.SourceNode</small>
+                        @foreach (var group in varsOnly)
+                        {
+                            <div class="variables-modal-group">
+                                <div class="variables-modal-group-title">@group.Key</div>
+                                @foreach (var v in group.Value)
+                                {
+                                    <div class="variables-modal-item @GetVariableCssClass(v)">
+                                        <code>@v.Name</code>
+                                        @if (!string.IsNullOrEmpty(v.SourceNode)) { <span class="text-muted">— @v.SourceNode</span> }
                                     </div>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            }
+            else if (VariablesModalTab == 1)
+            {
+                <div class="variables-modal-list">
+                    @{
+                        var attrKeys = GetAttributeKeysForModal().ToList();
+                        var attrDisplay = CompanyAttributeDefinitions.ToDictionary(a => a.Key, a => a.DisplayName ?? a.Key, StringComparer.OrdinalIgnoreCase);
+                    }
+                    @if (!attrKeys.Any())
+                    {
+                        <p class="variables-modal-empty">Атрибуты настраиваются в разделе Компания → Атрибуты.</p>
+                    }
+                    else
+                    {
+                        @foreach (var key in attrKeys)
+                        {
+                            <div class="variables-modal-item var-global">
+                                <code>$global.@key</code>
+                                <span class="text-muted">@(attrDisplay.TryGetValue(key, out var dn) ? dn : GetAttributeDisplayName(key))</span>
+                            </div>
+                        }
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="variables-modal-empty">Параметры (содержимое пока пусто).</p>
+            }
+        </div>
+    </div>
+}
+
+<!-- Модальное окно выбора переменной (референс code1.html) -->
+@if (IsVariablePickerOpen)
+{
+    <div class="variable-picker-backdrop" @onclick="CloseVariablePicker"></div>
+    <div class="variable-picker-modal" role="dialog">
+        <div class="variable-picker-header">
+            <h2 class="variable-picker-title">Выбрать переменную</h2>
+            <button type="button" class="variable-picker-close" @onclick="CloseVariablePicker" aria-label="Закрыть">
+                <span class="oi oi-x"></span>
+            </button>
+        </div>
+        <div class="variable-picker-search-wrap">
+            <span class="variable-picker-search-icon oi oi-magnifying-glass"></span>
+            <input type="text"
+                   class="variable-picker-search"
+                   placeholder="Поиск..."
+                   @bind="VariablePickerSearch"
+                   @bind:event="oninput" />
+        </div>
+        <div class="variable-picker-list">
+            @if (!GetFilteredVariablesForPicker().Any())
+            {
+                <div class="variable-picker-empty">
+                    <p>Нет доступных переменных</p>
+                    <small>Создайте переменные в узлах</small>
+                </div>
+            }
+            else
+            {
+                @foreach (var group in GetGroupedVariablesForPicker())
+                {
+                    <div class="variable-picker-category">
+                        <div class="variable-picker-category-title">@group.Key</div>
+                        <div class="variable-picker-items">
+                            @foreach (var variable in group.Value)
+                            {
+                                <button type="button"
+                                        class="variable-picker-item variable-picker-item--@GetVariableTypeCss(variable.Type)"
+                                        @onclick="() => SelectVariableFromPicker(variable.Name)">
+                                    <span class="variable-picker-item-icon">
+                                        <span class="oi @GetVariableIcon(variable.Type)"></span>
+                                    </span>
+                                    <div class="variable-picker-item-body">
+                                        <span class="variable-picker-item-name">@GetVariableDisplayName(variable)</span>
+                                        <span class="variable-picker-item-code">@variable.Name</span>
+                                    </div>
+                                    <span class="variable-picker-item-add oi oi-plus"></span>
                                 </button>
                             }
                         </div>
-                    }
-                </div>
-            </div>
+                    </div>
+                }
+            }
+        </div>
+        <div class="variable-picker-footer">
+            <p class="variable-picker-footer-tip">
+                <span class="oi oi-info"></span>
+                Нажмите на переменную, чтобы вставить её в текущий узел.
+            </p>
         </div>
     </div>
 }

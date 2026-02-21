@@ -1,195 +1,658 @@
 /* ============================================
-   СТИЛИ ДЛЯ WORKFLOW DESIGNER С ПЕРЕМЕННЫМИ
-   WorkflowDesigner.razor.css
+   Workflow Designer — полноэкранно, без скроллов
+   Референс: code.html (страница), code1.html (модалка переменных)
    ============================================ */
 
-/* Основной контейнер */
-.designer-page-container {
-    display: flex;
-    height: 100vh;
-    overflow: hidden;
-    background: #f9fafb;
+:root {
+    --designer-primary: #6366f1;
+    --designer-primary-end: #8b5cf6;
+    --designer-primary-gradient: linear-gradient(135deg, var(--designer-primary) 0%, var(--designer-primary-end) 100%);
+    --designer-slate-50: #f8fafc;
+    --designer-slate-100: #f1f5f9;
+    --designer-slate-200: #e2e8f0;
+    --designer-slate-400: #94a3b8;
+    --designer-slate-500: #64748b;
+    --designer-slate-600: #475569;
+    --designer-slate-700: #334155;
+    --designer-slate-800: #1e293b;
+    --designer-slate-900: #0f172a;
+    --designer-indigo-50: #eef2ff;
+    --designer-indigo-600: #4f46e5;
+    --designer-emerald-50: #ecfdf5;
+    --designer-emerald-600: #059669;
+    --designer-orange-50: #fff7ed;
+    --designer-orange-600: #ea580c;
+    --designer-violet-50: #f5f3ff;
+    --designer-violet-600: #7c3aed;
 }
 
-/* ============================================
-   ЛЕВАЯ ПАНЕЛЬ С УЗЛАМИ
-   ============================================ */
+/* Основной контейнер — на весь экран, без скроллов */
+.designer-page-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
+    overflow: hidden;
+    background: #fff;
+}
+
+/* ========== Левая панель (референс code.html) ========== */
 .designer-sidebar {
     width: 280px;
-    background: white;
-    border-right: 1px solid #e5e7eb;
+    min-width: 280px;
+    background: var(--designer-slate-50);
+    border-right: 1px solid var(--designer-slate-200);
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    z-index: 20;
 }
 
-.sidebar-header {
-    padding: 1rem;
-    border-bottom: 1px solid #e5e7eb;
+.sidebar-brand {
+    padding: 1.25rem 1.25rem;
+    border-bottom: 1px solid var(--designer-slate-200);
+    background: #fff;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.sidebar-header h5 {
-    margin: 0;
+.sidebar-brand-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--designer-primary-gradient);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 1rem;
-    font-weight: 600;
+}
+
+.sidebar-brand-icon.oi {
+    font-size: 1.1rem;
+}
+
+.sidebar-brand-text {
+    font-weight: 700;
+    font-size: 0.875rem;
+    letter-spacing: -0.02em;
+    color: var(--designer-slate-800);
+}
+
+.sidebar-search {
+    position: relative;
+    padding: 1rem;
+}
+
+.sidebar-search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--designer-slate-400);
+    font-size: 0.875rem;
+    pointer-events: none;
+}
+
+.sidebar-search-input {
+    width: 100%;
+    padding: 0.5rem 1rem 0.5rem 2.25rem;
+    background: #fff;
+    border: 1px solid var(--designer-slate-200);
+    border-radius: 12px;
+    font-size: 0.75rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.sidebar-search-input:focus {
+    border-color: var(--designer-primary);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
 }
 
 .sidebar-content {
     flex: 1;
     overflow-y: auto;
-    padding: 1rem;
+    padding: 0 1rem 1rem;
 }
 
 .sidebar-section {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
 }
 
-.sidebar-section small {
-    display: block;
-    font-weight: 600;
-    color: #6b7280;
-    margin-bottom: 0.5rem;
-    letter-spacing: 0.05em;
+.sidebar-section-title {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--designer-slate-400);
+    margin: 0 0 0.75rem 4px;
 }
 
-.node-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+.node-list {
+    display: flex;
+    flex-direction: column;
     gap: 0.5rem;
 }
 
 .node-tool {
-    padding: 0.75rem 0.5rem;
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.375rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: #fff;
+    border: 1px solid var(--designer-slate-200);
+    border-radius: 12px;
     cursor: grab;
-    text-align: center;
-    font-size: 0.875rem;
-    transition: all 0.2s;
+    transition: box-shadow 0.2s, border-color 0.2s;
 }
 
 .node-tool:hover {
-    background: #f3f4f6;
-    border-color: #3b82f6;
-    transform: translateY(-2px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    border-color: var(--designer-slate-200);
 }
 
 .node-tool:active {
     cursor: grabbing;
 }
 
-.node-tool .oi {
-    display: block;
-    margin-bottom: 0.25rem;
-    font-size: 1.25rem;
-    color: #3b82f6;
+.node-tool-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
-.sidebar-footer {
-    padding: 1rem;
-    border-top: 1px solid #e5e7eb;
+.node-tool-icon .oi {
+    font-size: 1rem;
 }
 
-/* ============================================
-   CANVAS
-   ============================================ */
-.canvas-wrapper {
+.node-tool-icon--green {
+    background: var(--designer-emerald-50);
+    color: var(--designer-emerald-600);
+}
+
+.node-tool-icon--orange {
+    background: var(--designer-orange-50);
+    color: var(--designer-orange-600);
+}
+
+.node-tool-icon--blue {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.node-tool-icon--red {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.node-tool-icon--indigo {
+    background: var(--designer-indigo-50);
+    color: var(--designer-indigo-600);
+}
+
+.node-tool-icon--violet {
+    background: var(--designer-violet-50);
+    color: var(--designer-violet-600);
+}
+
+.node-tool-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--designer-slate-700);
+}
+
+/* ========== Основная область ========== */
+.designer-main {
     flex: 1;
-    position: relative;
-    transition: margin-right 0.3s ease;
-}
-
-.canvas-wrapper.with-variables-panel {
-    margin-right: 320px;
-}
-
-/* ============================================
-   ПАНЕЛЬ НАСТРОЕК УЗЛА (ЦЕНТР)
-   ============================================ */
-.designer-settings-panel {
-    position: absolute;
-    right: 20px;
-    top: 20px;
-    width: 340px;
-    background: white;
-    border-radius: 0.5rem;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    z-index: 100;
-    max-height: calc(100vh - 40px);
     display: flex;
     flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+    position: relative;
 }
 
-.panel-header {
-    padding: 1rem;
-    border-bottom: 1px solid #e5e7eb;
+.designer-header {
+    height: 64px;
+    border-bottom: 1px solid var(--designer-slate-100);
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    z-index: 10;
+}
+
+.designer-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.designer-workflow-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--designer-slate-900);
+}
+
+.designer-badge {
+    padding: 0.2rem 0.5rem;
+    background: var(--designer-indigo-50);
+    color: var(--designer-indigo-600);
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.designer-header-divider {
+    width: 1px;
+    height: 1rem;
+    background: var(--designer-slate-200);
+}
+
+.designer-last-saved {
+    font-size: 0.75rem;
+    color: var(--designer-slate-400);
+}
+
+.designer-undo-redo {
+    display: flex;
+    align-items: center;
+    background: var(--designer-slate-100);
+    padding: 0.25rem;
+    border-radius: 12px;
+}
+
+.designer-undo-btn,
+.designer-redo-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--designer-slate-500);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.designer-undo-btn:hover:not(:disabled),
+.designer-redo-btn:hover:not(:disabled) {
+    background: #fff;
+    color: var(--designer-slate-700);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.designer-undo-btn:disabled,
+.designer-redo-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.designer-header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.designer-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--designer-primary);
+    background: var(--designer-indigo-50);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.designer-btn-secondary:hover {
+    background: #e0e7ff;
+}
+
+.designer-btn-secondary .oi {
+    font-size: 1rem;
+}
+
+.designer-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #fff !important;
+    background: var(--designer-primary-gradient) !important;
+    border: none !important;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+    cursor: pointer;
+    transition: opacity 0.2s, box-shadow 0.2s;
+}
+
+.designer-btn-primary:hover {
+    opacity: 0.95;
+    color: #fff !important;
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+}
+
+.designer-btn-primary .oi {
+    font-size: 1rem;
+    color: #fff !important;
+}
+
+/* Кнопка «Сохранить» в шапке: явный контраст (белый текст на фиолетовом), переопределяет глобальные стили */
+.designer-header .designer-btn-primary.designer-header-save,
+.designer-header .designer-header-save.designer-btn-primary {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff;
+}
+
+.designer-header .designer-header-save.designer-btn-primary .oi {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff;
+}
+
+/* Канвас с точечной сеткой (референс code.html dot-grid) */
+.canvas-area {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background-color: #fff;
+    background-image: radial-gradient(var(--designer-slate-200) 1px, transparent 1px);
+    background-size: 24px 24px;
+}
+
+.designer-canvas {
+    position: absolute;
+    inset: 0;
+}
+
+/* Зум: слева снизу */
+.designer-zoom-controls {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: #fff;
+    border: 1px solid var(--designer-slate-200);
+    border-radius: 16px;
+    padding: 0.25rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    z-index: 15;
+}
+
+.designer-zoom-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--designer-slate-600);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.designer-zoom-btn:hover {
+    background: var(--designer-slate-100);
+    color: var(--designer-slate-900);
+}
+
+.designer-zoom-value {
+    min-width: 3rem;
+    padding: 0 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--designer-slate-600);
+    text-align: center;
+    border-left: 1px solid var(--designer-slate-100);
+    border-right: 1px solid var(--designer-slate-100);
+}
+
+/* Мини-карта: справа снизу */
+.designer-minimap {
+    position: absolute;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 160px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid var(--designer-slate-200);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    z-index: 15;
+}
+
+.designer-minimap-title {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--designer-slate-500);
+    border-bottom: 1px solid var(--designer-slate-100);
+}
+
+.designer-minimap-content {
+    position: relative;
+    width: 100%;
+    height: calc(100% - 24px);
+    background: var(--designer-slate-50);
+}
+
+.designer-minimap-node {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    background: var(--designer-primary);
+    border: 1px solid rgba(255,255,255,0.8);
+    pointer-events: none;
+}
+
+/* Подсказка про @ */
+.designer-tip {
+    font-size: 0.75rem;
+    color: var(--designer-slate-500);
+    margin: 0 0 1rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--designer-slate-50);
+    border-radius: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.designer-tip .oi {
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+}
+
+.designer-tip kbd {
+    padding: 0.1rem 0.35rem;
+    font-size: 0.7rem;
+    background: #fff;
+    border: 1px solid var(--designer-slate-200);
+    border-radius: 4px;
+}
+
+/* ========== Панель настроек узла (референс code.html) ========== */
+.designer-settings-panel {
+    position: absolute;
+    right: 2rem;
+    top: 5rem;
+    width: 340px;
+    max-height: calc(100vh - 120px);
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--designer-slate-100);
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.designer-settings-panel .panel-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--designer-slate-50);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background: #fff;
 }
 
-.panel-header h6 {
+.designer-settings-panel .panel-header h6 {
     margin: 0;
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: var(--designer-slate-900);
 }
 
-.panel-body {
-    padding: 1rem;
+.designer-settings-panel .panel-body {
+    padding: 1.5rem;
     overflow-y: auto;
     flex: 1;
 }
 
-.font-monospace {
-    font-family: 'Courier New', monospace;
-    font-size: 1rem;
+.designer-settings-panel .btn-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--designer-slate-400);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
 }
 
-/* ============================================
-   ПАНЕЛЬ ПЕРЕМЕННЫХ (СПРАВА)
-   ============================================ */
+.designer-settings-panel .btn-close:hover {
+    background: var(--designer-slate-100);
+    color: var(--designer-slate-700);
+}
+
+.designer-settings-panel .form-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--designer-slate-500);
+}
+
+.designer-settings-panel .form-control,
+.designer-settings-panel .form-select {
+    border-radius: 12px;
+    border: 1px solid var(--designer-slate-200);
+}
+
+.designer-settings-panel textarea.form-control {
+    border-radius: 12px;
+    min-height: 100px;
+}
+
+.font-monospace {
+    font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, monospace;
+    font-size: 0.875rem;
+}
+
+/* ========== Панель переменных (правый край — полоска как data_object в code.html) ========== */
 .variables-panel {
-    position: fixed;
+    position: absolute;
     right: 0;
-    top: 0;
+    top: 64px;
     bottom: 0;
     width: 320px;
-    background: white;
-    border-left: 1px solid #e5e7eb;
+    max-width: 90vw;
+    background: #fff;
+    border-left: 1px solid var(--designer-slate-200);
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.06);
     transform: translateX(100%);
     transition: transform 0.3s ease;
-    z-index: 90;
+    z-index: 25;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .variables-panel.open {
     transform: translateX(0);
 }
 
-.variables-toggle {
+/* Полоска «Переменные» на правом краю — всегда видна (референс code.html) */
+.variables-tab {
     position: absolute;
-    left: -40px;
+    right: 0;
     top: 50%;
     transform: translateY(-50%);
-    width: 40px;
-    height: 80px;
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-right: none;
-    border-radius: 0.5rem 0 0 0.5rem;
+    display: flex;
+    align-items: center;
+    z-index: 40;
     cursor: pointer;
+    border: none;
+    background: transparent;
+    padding: 0;
+    transition: transform 0.2s;
+}
+
+.variables-tab:hover {
+    transform: translateY(-50%) translateX(-2px);
+}
+
+.variables-tab-bar {
+    width: 4px;
+    height: 96px;
+    background: var(--designer-primary);
+    border-radius: 4px 0 0 4px;
+    transition: width 0.2s;
+}
+
+.variables-tab:hover .variables-tab-bar {
+    width: 6px;
+}
+
+.variables-tab-icon {
+    margin-left: -1px;
+    width: 48px;
+    height: 48px;
+    background: #fff;
+    border: 1px solid var(--designer-slate-200);
+    border-right: none;
+    border-radius: 12px 0 0 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
-    box-shadow: -2px 0 8px rgba(0,0,0,0.05);
+    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.06);
+    color: var(--designer-slate-400);
+    transition: color 0.2s;
 }
 
-.variables-toggle:hover {
-    background: #f9fafb;
-    left: -42px;
+.variables-tab:hover .variables-tab-icon {
+    color: var(--designer-primary);
 }
 
 .variables-content {
@@ -197,6 +660,7 @@
     flex-direction: column;
     height: 100%;
     padding: 1rem;
+    overflow: hidden;
 }
 
 .variables-header {
@@ -205,78 +669,60 @@
     align-items: center;
     margin-bottom: 1rem;
     padding-bottom: 0.75rem;
-    border-bottom: 2px solid #e5e7eb;
+    border-bottom: 1px solid var(--designer-slate-200);
 }
 
 .variables-header h6 {
     margin: 0;
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 0.875rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    color: var(--designer-slate-900);
 }
 
 .variables-search {
     margin-bottom: 1rem;
 }
 
+.variables-search .form-control {
+    border-radius: 8px;
+    border: 1px solid var(--designer-slate-200);
+    font-size: 0.875rem;
+}
+
 .variables-list {
     flex: 1;
     overflow-y: auto;
-    scroll-behavior: smooth;
-}
-
-.variables-list::-webkit-scrollbar {
-    width: 6px;
-}
-
-.variables-list::-webkit-scrollbar-track {
-    background: #f9fafb;
-}
-
-.variables-list::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-    border-radius: 3px;
-}
-
-.variables-list::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af;
-}
-
-.variable-group {
-    margin-bottom: 1rem;
-}
-
-.variable-group + .variable-group {
-    margin-top: 1.5rem;
-    padding-top: 1rem;
-    border-top: 1px solid #e5e7eb;
+    min-height: 0;
 }
 
 .variable-group-title {
-    margin-bottom: 0.5rem;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 700;
     text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
+    color: var(--designer-slate-400);
+    margin-bottom: 0.5rem;
+    padding: 0 0.25rem;
 }
 
 .variable-item {
     padding: 0.75rem;
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.375rem;
+    background: var(--designer-slate-50);
+    border: 1px solid var(--designer-slate-200);
+    border-radius: 8px;
     margin-bottom: 0.5rem;
     cursor: pointer;
     transition: all 0.2s;
-    position: relative;
+    text-align: left;
 }
 
 .variable-item:hover {
-    background: #f3f4f6;
-    border-color: #3b82f6;
-    transform: translateX(-2px);
-    box-shadow: 2px 2px 8px rgba(0,0,0,0.05);
+    background: #fff;
+    border-color: var(--designer-primary);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
 }
 
 .variable-item.var-global {
@@ -284,159 +730,499 @@
     background: #fffbeb;
 }
 
-.variable-item.var-global:hover {
-    border-color: #d97706;
-    background: #fef3c7;
-}
-
 .variable-item.var-system {
-    border-left: 3px solid #8b5cf6;
+    border-left: 3px solid var(--designer-violet-600);
 }
 
 .variable-item.var-user {
-    border-left: 3px solid #3b82f6;
+    border-left: 3px solid var(--designer-primary);
 }
 
 .variable-item.var-custom {
-    border-left: 3px solid #10b981;
+    border-left: 3px solid var(--designer-emerald-600);
 }
 
 .variable-name {
     font-size: 0.875rem;
-    color: #1f2937;
     font-weight: 500;
-}
-
-.variable-usage {
-    margin-top: 0.5rem;
-    padding-top: 0.5rem;
-    border-top: 1px solid #e5e7eb;
-}
-
-.variable-item .badge {
-    min-width: 1.5rem;
-    height: 1.5rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    font-weight: 600;
+    color: var(--designer-slate-800);
 }
 
 .variables-footer {
     padding-top: 1rem;
-    border-top: 1px solid #e5e7eb;
-    margin-top: 1rem;
+    border-top: 1px solid var(--designer-slate-200);
+    margin-top: auto;
+    flex-shrink: 0;
 }
 
-/* ============================================
-   МОДАЛЬНОЕ ОКНО ВЫБОРА ПЕРЕМЕННОЙ
-   ============================================ */
-.modal-backdrop.show {
-    opacity: 0.5;
+/* ========== Модальное окно выбора переменной (референс code1.html) ========== */
+.variable-picker-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
 }
 
-.modal.show {
-    display: block;
+.variable-picker-modal {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    max-width: 32rem;
+    max-height: 85vh;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--designer-slate-200);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 1001;
 }
 
-.modal-body .list-group-item {
+.variable-picker-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--designer-slate-100);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.variable-picker-title {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--designer-slate-900);
+}
+
+.variable-picker-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: var(--designer-slate-400);
+    border-radius: 8px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
 }
 
-.modal-body .list-group-item:hover {
-    background: #f3f4f6;
-    border-left: 3px solid #3b82f6;
-    padding-left: calc(1rem - 3px);
+.variable-picker-close:hover {
+    background: var(--designer-slate-100);
+    color: var(--designer-slate-700);
 }
 
-.modal-body .list-group-item code {
-    font-weight: 600;
-    color: #3b82f6;
+.variable-picker-search-wrap {
+    position: relative;
+    padding: 0 1.5rem 1rem;
 }
 
-/* ============================================
-   ВСПОМОГАТЕЛЬНЫЕ КЛАССЫ
-   ============================================ */
-code {
-    background: #f3f4f6;
-    padding: 0.125rem 0.375rem;
-    border-radius: 0.25rem;
+.variable-picker-search-icon {
+    position: absolute;
+    left: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--designer-slate-400);
+    font-size: 1rem;
+}
+
+.variable-picker-search {
+    width: 100%;
+    padding: 0.625rem 1rem 0.625rem 2.75rem;
+    background: var(--designer-slate-50);
+    border: 1px solid var(--designer-slate-200);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.variable-picker-search:focus {
+    background: #fff;
+    border-color: var(--designer-primary);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.variable-picker-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 0.5rem 0.5rem;
+    min-height: 0;
+}
+
+.variable-picker-empty {
+    text-align: center;
+    color: var(--designer-slate-500);
+    padding: 2rem 1rem;
+}
+
+.variable-picker-empty p {
+    margin: 0 0 0.25rem;
+}
+
+.variable-picker-category {
+    margin-bottom: 1.5rem;
+}
+
+.variable-picker-category-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--designer-slate-400);
+    padding: 0.5rem 0.75rem;
+}
+
+.variable-picker-items {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.variable-picker-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.625rem 0.75rem;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s;
+}
+
+.variable-picker-item:hover {
+    background: var(--designer-slate-50);
+}
+
+.variable-picker-item-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.variable-picker-item--global .variable-picker-item-icon {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.variable-picker-item--system .variable-picker-item-icon {
+    background: #ede9fe;
+    color: var(--designer-violet-600);
+}
+
+.variable-picker-item--user .variable-picker-item-icon {
+    background: var(--designer-indigo-50);
+    color: var(--designer-indigo-600);
+}
+
+.variable-picker-item--custom .variable-picker-item-icon {
+    background: var(--designer-emerald-50);
+    color: var(--designer-emerald-600);
+}
+
+.variable-picker-item-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.variable-picker-item-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--designer-slate-700);
+}
+
+.variable-picker-item-code {
+    font-size: 0.75rem;
+    font-family: ui-monospace, monospace;
+    color: var(--designer-slate-400);
+}
+
+.variable-picker-item-add {
+    color: var(--designer-slate-300);
+    font-size: 1.25rem;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.variable-picker-item:hover .variable-picker-item-add {
+    opacity: 1;
+}
+
+.variable-picker-footer {
+    padding: 1rem 1.5rem;
+    background: var(--designer-slate-50);
+    border-top: 1px solid var(--designer-slate-100);
+}
+
+.variable-picker-footer-tip {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--designer-slate-500);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.variable-picker-footer-tip .oi {
+    font-size: 0.875rem;
+    flex-shrink: 0;
+}
+
+/* Панель настроек — совместимость с существующими form-control внутри */
+.designer-settings-panel .mb-3 {
+    margin-bottom: 1rem;
+}
+
+.designer-settings-panel .form-text.text-muted {
+    font-size: 0.75rem;
+    color: var(--designer-slate-500);
+}
+
+.designer-settings-panel .btn-outline-danger {
+    border-radius: 8px;
+}
+
+.designer-settings-panel .section-title {
     font-size: 0.875rem;
 }
 
-.btn-outline-secondary .oi-code {
-    color: #3b82f6;
+.designer-settings-panel .badge {
+    font-size: 0.7rem;
 }
 
-/* ============================================
-   АНИМАЦИИ
-   ============================================ */
-@keyframes slideInRight {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
+/* ========== Модальное окно «Переменные / Атрибуты / Параметры» ========== */
+.variables-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+.variables-modal {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 90vw;
+    max-width: 560px;
+    height: 480px;
+    min-height: 400px;
+    max-height: 85vh;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--designer-slate-200);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 1001;
 }
 
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+.variables-modal-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--designer-slate-100);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-.variables-panel.open {
-    animation: slideInRight 0.3s ease-out;
+.variables-modal-title {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--designer-slate-900);
 }
 
-.variable-item.copied {
-    animation: pulse 0.3s ease-in-out;
-    background: #dbeafe !important;
+.variables-modal-close {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    color: var(--designer-slate-400);
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
 }
 
-/* ============================================
-   RESPONSIVE
-   ============================================ */
-@media (max-width: 1400px) {
-    .variables-panel {
-        width: 280px;
-    }
-
-    .canvas-wrapper.with-variables-panel {
-        margin-right: 280px;
-    }
+.variables-modal-close:hover {
+    background: var(--designer-slate-100);
+    color: var(--designer-slate-700);
 }
 
-@media (max-width: 1200px) {
-    .variables-panel {
-        position: fixed;
-        box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
-    }
-
-    .canvas-wrapper.with-variables-panel {
-        margin-right: 0;
-    }
+.variables-modal-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--designer-slate-200);
+    padding: 0 1rem;
+    gap: 0.25rem;
 }
 
-/* ============================================
-   ACCESSIBILITY
-   ============================================ */
-.variable-item:focus-visible {
-    outline: 2px solid #3b82f6;
-    outline-offset: 2px;
+.variables-modal-tab {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--designer-slate-500);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
 }
 
-.variables-toggle:focus-visible {
-    outline: 2px solid #3b82f6;
-    outline-offset: 2px;
+.variables-modal-tab:hover {
+    color: var(--designer-slate-700);
 }
 
+.variables-modal-tab.active {
+    color: var(--designer-primary);
+    border-bottom-color: var(--designer-primary);
+}
+
+.variables-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem 1.5rem;
+    min-height: 280px;
+    height: 0;
+}
+
+.variables-modal-search {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.variables-modal-search .oi {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--designer-slate-400);
+}
+
+.variables-modal-search input {
+    width: 100%;
+    padding: 0.5rem 1rem 0.5rem 2.25rem;
+    border: 1px solid var(--designer-slate-200);
+    border-radius: 8px;
+    font-size: 0.875rem;
+}
+
+.variables-modal-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.variables-modal-group {
+    margin-bottom: 1rem;
+}
+
+.variables-modal-group-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--designer-slate-400);
+    margin-bottom: 0.5rem;
+}
+
+.variables-modal-item {
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    border-left: 3px solid var(--designer-slate-200);
+    background: var(--designer-slate-50);
+}
+
+.variables-modal-item code {
+    font-weight: 500;
+    margin-right: 0.5rem;
+}
+
+.variables-modal-empty {
+    color: var(--designer-slate-500);
+    font-size: 0.875rem;
+    margin: 1rem 0 0;
+}
+
+/* Узлы диаграммы — карточки с левой акцентной полосой (border), тень, скругления */
+.canvas-area ::deep .diagram-node,
+.canvas-area ::deep .bd-node,
+.canvas-area ::deep .default-node,
+.canvas-area ::deep [class*="node"] {
+    border-radius: 12px !important;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    border: 1px solid var(--designer-slate-200) !important;
+    border-left: 4px solid var(--designer-primary) !important;
+    overflow: visible !important;
+    min-width: 140px;
+    background: #ffffff !important;
+}
+
+.canvas-area ::deep .bd-node .bd-node-header,
+.canvas-area ::deep [class*="node"] [class*="header"] {
+    padding: 0.5rem 0.75rem;
+    background: var(--designer-slate-50);
+    border-bottom: 1px solid var(--designer-slate-100);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--designer-slate-700);
+    border-radius: 12px 12px 0 0;
+}
+
+.canvas-area ::deep .bd-node .bd-node-content,
+.canvas-area ::deep [class*="node"] [class*="content"] {
+    padding: 0.5rem 0.75rem;
+    color: var(--designer-slate-800);
+    font-size: 0.8125rem;
+}
+
+/* Порты: видимые, удобный размер для перетаскивания линии связи */
+.canvas-area ::deep .diagram-port,
+.canvas-area ::deep .bd-port,
+.canvas-area ::deep [class*="port"] {
+    width: 14px !important;
+    height: 14px !important;
+    min-width: 14px !important;
+    min-height: 14px !important;
+    border-radius: 50% !important;
+    background: var(--designer-primary) !important;
+    border: 2px solid #fff !important;
+    box-shadow: 0 0 0 1px var(--designer-slate-200);
+    cursor: crosshair !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    z-index: 10;
+}
+
+.canvas-area ::deep .diagram-port:hover,
+.canvas-area ::deep .bd-port:hover,
+.canvas-area ::deep [class*="port"]:hover {
+    transform: scale(1.2);
+    background: var(--designer-indigo-600) !important;
+}
+
+/* Убираем глобальные скроллы */
+.designer-page-container * {
+    box-sizing: border-box;
+}

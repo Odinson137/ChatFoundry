@@ -1,0 +1,14 @@
+/* Полноэкранный лейаут редактора: без хэдера и футера, на всю ширину, без скроллов */
+.designer-layout {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}
+
+.designer-layout ::deep * {
+    box-sizing: border-box;
+}

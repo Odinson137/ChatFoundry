@@ -1,4 +1,4 @@
-﻿@page "/bots/{BotId:guid}"
+@page "/bots/{BotId:guid}"
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
 
@@ -142,9 +142,9 @@
                                     </button>
                                 }
                 
-                                <button class="btn btn-sm btn-primary" @onclick="() => NavigateToDesigner(wf.Id)">
+                                <a class="btn btn-sm btn-primary" target="_blank" rel="noopener noreferrer" href="@GetDesignerUrl(wf.Id)">
                                     <span class="oi oi-pencil"></span> Редактор
-                                </button>
+                                </a>
                             </td>
                         </tr>
                     }

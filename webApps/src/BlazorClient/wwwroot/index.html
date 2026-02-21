@@ -8,6 +8,7 @@
     <base href="/" />
     <link rel="preload" id="webassembly" />
     <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css" />
     <link rel="stylesheet" href="css/app.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <link href="BlazorClient.styles.css" rel="stylesheet" />
@@ -34,6 +35,17 @@
     </div>
     <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
     <script src="_content/Z.Blazor.Diagrams/script.min.js"></script>
+    <script>
+        window.__designerZoom = function(containerId, level) {
+            var el = document.getElementById(containerId);
+            if (!el) return;
+            var layer = el.querySelector('.bd-layer') || el.querySelector('[class*="layer"]') || el.querySelector('.designer-canvas > div') || el.firstElementChild;
+            if (layer) {
+                layer.style.transform = 'scale(' + level + ')';
+                layer.style.transformOrigin = '0 0';
+            }
+        };
+    </script>
 </body>
 
 </html>
