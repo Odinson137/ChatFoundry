@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using BlazorClient.Interfaces;
 using BlazorClient.Models; // Убедитесь, что эта using-директива присутствует
 using System.Collections.Generic;
@@ -10,15 +10,17 @@ public class WorkflowSchemaService : IWorkflowSchemaService
     private readonly JsonSerializerOptions _options = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        PropertyNameCaseInsensitive = true
+        PropertyNameCaseInsensitive = true,
+        // Дискриминатор $type может быть не в начале объекта (например: {"text":"...","$type":"Message"})
+        AllowOutOfOrderMetadataProperties = true
     };
 
-    public WorkflowSchema Deserialize(string nodes, string edges, string layout)
+    public WorkflowSchema Deserialize(string? nodes, string? edges, string? layout)
     {
         return new WorkflowSchema(
-            JsonSerializer.Deserialize<List<NodeDefinition>>(nodes, _options) ?? [],
-            JsonSerializer.Deserialize<List<EdgeDefinition>>(edges, _options) ?? [],
-            JsonSerializer.Deserialize<List<LayoutDefinition>>(layout, _options) ?? []
+            JsonSerializer.Deserialize<List<NodeDefinition>>(string.IsNullOrWhiteSpace(nodes) ? "[]" : nodes, _options) ?? [],
+            JsonSerializer.Deserialize<List<EdgeDefinition>>(string.IsNullOrWhiteSpace(edges) ? "[]" : edges, _options) ?? [],
+            JsonSerializer.Deserialize<List<LayoutDefinition>>(string.IsNullOrWhiteSpace(layout) ? "[]" : layout, _options) ?? []
         );
     }
 

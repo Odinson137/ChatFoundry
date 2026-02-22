@@ -34,7 +34,7 @@
                                 ?? authContext.User.FindFirst("email")?.Value
                                 ?? authContext.User.Identity?.Name
                                 ?? "";
-                            var displayName = string.IsNullOrEmpty(nameOrEmail)
+                            var displayName = string.IsNullOrEmpty(nameOrEmail) || nameOrEmail == "User"
                                 ? "Профиль"
                                 : (nameOrEmail.Contains('@') ? nameOrEmail[..nameOrEmail.IndexOf('@')] : nameOrEmail);
                         }

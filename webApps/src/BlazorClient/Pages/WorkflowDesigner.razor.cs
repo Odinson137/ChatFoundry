@@ -231,24 +231,41 @@ public partial class WorkflowDesigner : IDisposable
 
     #region Загрузка и сохранение
 
+    private string? _loadError;
+
     private async Task LoadWorkflowData()
     {
+        _loadError = null;
         var data = await ApiClient.GetWorkflowByIdAsync(WorkflowId);
-        if (data == null) return;
+        if (data == null)
+        {
+            _loadError = "Workflow не найден.";
+            return;
+        }
 
-        var schema = SchemaService.Deserialize(data.NodesDefinition, data.EdgesDefinition, data.LayoutDefinition);
-        _isRestoring = true;
         try
         {
-            ApplySchemaToDiagram(schema);
+            var schema = SchemaService.Deserialize(
+                data.NodesDefinition,
+                data.EdgesDefinition,
+                data.LayoutDefinition);
+            _isRestoring = true;
+            try
+            {
+                ApplySchemaToDiagram(schema);
+            }
+            finally
+            {
+                _isRestoring = false;
+            }
+            _undoStack.Clear();
+            _undoIndex = -1;
+            PushUndoState();
         }
-        finally
+        catch (Exception ex)
         {
-            _isRestoring = false;
+            _loadError = $"Не удалось загрузить схему: {ex.Message}";
         }
-        _undoStack.Clear();
-        _undoIndex = -1;
-        PushUndoState();
     }
 
     private void ApplySchemaToDiagram(WorkflowSchema schema)

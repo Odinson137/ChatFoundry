@@ -1,9 +1,11 @@
 @page "/designer/{WorkflowId:guid}"
 @using Blazor.Diagrams.Components
+@attribute [Authorize]
 @using Blazor.Diagrams.Components.Widgets
 @using Blazor.Diagrams.Core.Models
 @using System.Text.RegularExpressions
 @using BlazorClient.Models.Diagram
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Forms
 @layout DesignerLayout
 
@@ -118,6 +120,12 @@
                 </button>
             </div>
         </header>
+        @if (!string.IsNullOrEmpty(_loadError))
+        {
+            <div class="alert alert-danger m-3" role="alert">
+                @_loadError
+            </div>
+        }
         <div id="designer-canvas-area" class="canvas-area" 
              @ondrop="OnDrop" 
              @ondragover="OnDragOver" 

@@ -128,7 +128,9 @@
             {
                 var tokenResponse = await response.Content.ReadFromJsonAsync<TokenResponse>();
                 await LocalStorage.SetItemAsync("authToken", tokenResponse!.AccessToken);
-                ((ApiAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(tokenResponse.AccessToken);
+                var emailToStore = email.Trim();
+                await LocalStorage.SetItemAsync("userEmail", emailToStore);
+                ((ApiAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(tokenResponse.AccessToken, emailToStore);
                 Navigation.NavigateTo("/");
             }
             else
