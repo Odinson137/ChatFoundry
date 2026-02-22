@@ -1,4 +1,6 @@
+@page "/settings/channels"
 @page "/channels"
+@layout SettingsLayout
 @using BlazorClient.Models.DTO
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
@@ -6,7 +8,7 @@
 @inject BlazorClient.Interfaces.IWorkflowApiClient ApiClient
 @inject IJSRuntime JsRuntime
 
-<PageTitle>Каналы</PageTitle>
+<PageTitle>Настройки — Каналы — ChatFoundry</PageTitle>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Каналы</h1>
@@ -256,7 +258,6 @@ else
         error = null;
     }
 
-    /// <summary>Отображаемое имя типа канала (GraphQL отдаёт UPPER_SNAKE: TELEGRAM, WEB и т.д.).</summary>
     private static string ChannelTypeDisplayName(string? channelType)
     {
         return channelType switch

@@ -28,12 +28,22 @@
 
             <div class="cf-header-actions">
                 <AuthorizeView>
-                    <Authorized>
-                        <a href="/bots" class="cf-btn cf-btn-primary">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right: 6px;">
-                                <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <Authorized Context="authContext">
+                        @{
+                            var nameOrEmail = authContext.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
+                                ?? authContext.User.FindFirst("email")?.Value
+                                ?? authContext.User.Identity?.Name
+                                ?? "";
+                            var displayName = string.IsNullOrEmpty(nameOrEmail)
+                                ? "Профиль"
+                                : (nameOrEmail.Contains('@') ? nameOrEmail[..nameOrEmail.IndexOf('@')] : nameOrEmail);
+                        }
+                        <a href="/profile" class="cf-user-link">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+                                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
                             </svg>
-                            Создать бота
+                            @displayName
                         </a>
                         <a href="/logout" class="cf-auth-link cf-auth-logout">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

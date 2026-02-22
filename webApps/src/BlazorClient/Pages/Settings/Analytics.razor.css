@@ -1,7 +1,7 @@
 .coming-soon {
     max-width: 720px;
     margin: 0 auto;
-    padding: 5rem 2rem;
+    padding: 2rem 0;
     text-align: center;
 }
 
@@ -64,7 +64,7 @@
     }
 
     .coming-soon {
-        padding: 3rem 1.5rem;
+        padding: 1.5rem 0;
     }
 }
 

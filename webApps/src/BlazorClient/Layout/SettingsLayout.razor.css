@@ -1,0 +1,102 @@
+.settings-layout {
+    display: flex;
+    min-height: 0;
+    flex: 1;
+}
+
+.settings-sidebar {
+    flex-shrink: 0;
+    width: 240px;
+    padding: 1.5rem 0;
+    border-right: 1px solid #f1f5f9;
+    background: #fafbfc;
+}
+
+.settings-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.settings-nav-group-title {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #94a3b8;
+    padding: 1rem 1rem 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.settings-nav-group-title:first-child {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+.settings-nav-item {
+    display: block;
+    padding: 8px 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #64748b;
+    text-decoration: none;
+    border-radius: 8px;
+    margin: 0 0.5rem;
+    transition: color 0.15s ease, background 0.15s ease;
+}
+
+.settings-nav-item:hover {
+    color: #0f172a;
+    background: #f1f5f9;
+    text-decoration: none;
+}
+
+.settings-nav-item.active {
+    color: #6366f1;
+    background: #eef2ff;
+}
+
+.settings-content {
+    flex: 1;
+    min-width: 0;
+    padding: 1.5rem 2rem;
+}
+
+/* Shared placeholder styles for Api, Sessions pages */
+.settings-content .coming-soon {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 0;
+    text-align: center;
+}
+
+.settings-content .coming-soon-icon {
+    margin-bottom: 1.5rem;
+    opacity: 0.9;
+}
+
+.settings-content .coming-soon-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.03em;
+    margin: 0 0 0.75rem;
+}
+
+.settings-content .coming-soon-desc {
+    font-size: 1.05rem;
+    color: #64748b;
+    line-height: 1.7;
+    margin: 0 0 2rem;
+}
+
+@media (max-width: 768px) {
+    .settings-sidebar {
+        width: 200px;
+        padding: 1rem 0;
+    }
+
+    .settings-content {
+        padding: 1rem;
+    }
+}

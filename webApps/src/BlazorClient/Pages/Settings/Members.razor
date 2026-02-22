@@ -1,0 +1,82 @@
+@page "/settings/members"
+@layout SettingsLayout
+@using BlazorClient.Interfaces
+@using BlazorClient.Models.DTO
+@using Microsoft.AspNetCore.Authorization
+
+@attribute [Authorize]
+
+@inject ICompanyApiClient CompanyApi
+
+<PageTitle>Настройки — Участники — ChatFoundry</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Участники</h1>
+</div>
+
+@if (loadError != null)
+{
+    <div class="alert alert-danger">@loadError</div>
+}
+else if (!isLoading)
+{
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+        <tr>
+            <th>UserId</th>
+            <th>Роль</th>
+            <th>Активен</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var m in members)
+        {
+            <tr>
+                <td><code>@m.UserId.ToString("N")</code></td>
+                <td><span class="badge bg-secondary">@m.Role</span></td>
+                <td>@(m.IsActive ? "Да" : "Нет")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    @if (!members.Any())
+    {
+        <p class="text-muted">Нет участников.</p>
+    }
+}
+
+@if (isLoading)
+{
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Загрузка...</span></div>
+    </div>
+}
+
+@code {
+    private List<CompanyMemberDto> members = new();
+    private bool isLoading = true;
+    private string? loadError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMembers();
+    }
+
+    private async Task LoadMembers()
+    {
+        isLoading = true;
+        loadError = null;
+        try
+        {
+            members = await CompanyApi.GetMembersAsync();
+        }
+        catch (Exception ex)
+        {
+            loadError = ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

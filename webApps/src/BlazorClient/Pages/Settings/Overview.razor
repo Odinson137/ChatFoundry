@@ -1,0 +1,88 @@
+@page "/settings"
+@page "/company"
+@layout SettingsLayout
+@using BlazorClient.Interfaces
+@using BlazorClient.Models.DTO
+@using Microsoft.AspNetCore.Authorization
+
+@attribute [Authorize]
+
+@inject ICompanyApiClient CompanyApi
+
+<PageTitle>Настройки — Обзор — ChatFoundry</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Обзор</h1>
+</div>
+
+@if (loadError != null)
+{
+    <div class="alert alert-danger">@loadError</div>
+}
+else if (company == null && !isLoading)
+{
+    <div class="alert alert-info">Нет доступа к компании или компания не найдена.</div>
+}
+else if (company != null)
+{
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">@company.Name</h5>
+            @if (!string.IsNullOrWhiteSpace(company.Description))
+            {
+                <p class="card-text text-muted">@company.Description</p>
+            }
+            <p class="card-text">
+                <strong>Лимит участников:</strong> @company.MaxUsers<br/>
+                <strong>Участников:</strong> @membersCount<br/>
+                <strong>Приглашений:</strong> @invitationsCount
+            </p>
+        </div>
+    </div>
+}
+
+@if (isLoading)
+{
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Загрузка...</span></div>
+    </div>
+}
+
+@code {
+    private CompanyDto? company;
+    private List<CompanyMemberDto> members = new();
+    private List<InvitationDto> invitations = new();
+    private bool isLoading = true;
+    private string? loadError;
+
+    private int membersCount => members.Count;
+    private int invitationsCount => invitations.Count;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAll();
+    }
+
+    private async Task LoadAll()
+    {
+        isLoading = true;
+        loadError = null;
+        try
+        {
+            company = await CompanyApi.GetCurrentCompanyAsync();
+            if (company != null)
+            {
+                members = await CompanyApi.GetMembersAsync();
+                invitations = await CompanyApi.GetInvitationsAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            loadError = ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

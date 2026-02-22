@@ -109,6 +109,26 @@
     gap: 12px;
 }
 
+.cf-user-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    font-size: 0.84rem;
+    font-weight: 500;
+    color: #64748b;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: color 0.15s ease, background 0.15s ease;
+    white-space: nowrap;
+}
+
+.cf-user-link:hover {
+    color: #0f172a;
+    background: #f8fafc;
+    text-decoration: none;
+}
+
 .cf-auth-link {
     display: inline-flex;
     align-items: center;

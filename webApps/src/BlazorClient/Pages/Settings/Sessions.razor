@@ -1,0 +1,26 @@
+@page "/settings/sessions"
+@layout SettingsLayout
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+
+<PageTitle>Настройки — Сессии — ChatFoundry</PageTitle>
+
+<div class="coming-soon">
+    <div class="coming-soon-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v4"/>
+            <path d="M12 18v4"/>
+            <path d="m4.93 4.93 2.83 2.83"/>
+            <path d="m16.24 16.24 2.83 2.83"/>
+            <path d="M2 12h4"/>
+            <path d="M18 12h4"/>
+            <path d="m4.93 19.07 2.83-2.83"/>
+            <path d="m16.24 7.76 2.83-2.83"/>
+        </svg>
+    </div>
+    <h1 class="coming-soon-title">Сессии</h1>
+    <p class="coming-soon-desc">
+        Список всех сессий пользователей с возможностью открыть workflow и посмотреть, по каким блокам
+        переходил пользователь и сколько раз. Удобно для отладки и анализа поведения в диалогах.
+    </p>
+</div>
