@@ -1,26 +1,15 @@
 using TelegramService.Interfaces;
+using Workflow.Grpc;
 
 namespace TelegramService.Services;
 
-using Workflow.Grpc;
-
 public sealed class GrpcBotTokenProvider(BotTokenService.BotTokenServiceClient client) : IBotTokenProvider
 {
-    public async Task<string> GetByChatIdAsync(string clientId, CancellationToken ct)
+    public async Task<string> GetByChannelIdAsync(Guid channelId, CancellationToken ct)
     {
-        var response = await client.GetTokenByChatIdAsync(
-            new GetTokenByClientIdRequest { ClientId = clientId },
+        var response = await client.GetTokenByChannelIdAsync(
+            new GetTokenByChannelIdRequest { ChannelId = channelId.ToString() },
             cancellationToken: ct);
-
-        return response.Token;
-    }
-
-    public async Task<string> GetByBotIdAsync(Guid botId, CancellationToken ct)
-    {
-        var response = await client.GetTokenByBotIdAsync(
-            new GetTokenByBotIdRequest { BotId = botId.ToString() },
-            cancellationToken: ct);
-
         return response.Token;
     }
 }

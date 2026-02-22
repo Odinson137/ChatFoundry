@@ -6,19 +6,11 @@ namespace WorkflowService.Repositories;
 
 public class BotRepository(WorkflowDbContext db) : IBotRepository
 {
-    public async Task<string?> GetBotTokenAsync(Guid botId, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<Guid>> GetBotIdsByChannelIdAsync(Guid channelId, CancellationToken cancellationToken = default)
     {
-        return await db.Bots.Where(c => c.Id == botId)
-            .Select(c => c.Token)
-            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
-    }
-
-    public async Task<(string? Token, Guid? CompanyId)> GetBotTokenAndCompanyIdAsync(Guid botId, CancellationToken cancellationToken)
-    {
-        var bot = await db.Bots
-            .Where(c => c.Id == botId)
-            .Select(c => new { c.Token, c.CompanyId })
-            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
-        return bot == null ? (null, null) : (bot.Token, bot.CompanyId);
+        return await db.BotChannels
+            .Where(bc => bc.ChannelId == channelId)
+            .Select(bc => bc.BotId)
+            .ToListAsync(cancellationToken);
     }
 }

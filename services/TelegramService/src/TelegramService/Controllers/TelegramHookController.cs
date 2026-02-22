@@ -16,17 +16,17 @@ public class TelegramHookController(
     ITelegramClient telegramClient)
     : ControllerBase
 {
-    [HttpPost("{BotId:guid}")]
-    public async Task<IActionResult> ReceivedMessage([FromRoute] Guid botId, [FromBody] TelegramUpdateDto body,
+    [HttpPost("{ChannelId:guid}")]
+    public async Task<IActionResult> ReceivedMessage([FromRoute] Guid channelId, [FromBody] TelegramUpdateDto body,
         CancellationToken token)
     {
-        if (body.UpdateId == 0 || botId == Guid.Empty)
+        if (body.UpdateId == 0 || channelId == Guid.Empty)
         {
-            logger.LogError($"Invalid update: {JsonConvert.SerializeObject(body)} for bot {botId}");
+            logger.LogError("Invalid update: {Body} for channel {ChannelId}", JsonConvert.SerializeObject(body), channelId);
             return Ok();
         }
 
-        var messageEvent = ProcessUpdate(botId, body);
+        var messageEvent = ProcessUpdate(channelId, body);
         if (messageEvent != null)
         {
             await producer.Produce(messageEvent, token);
@@ -35,12 +35,12 @@ public class TelegramHookController(
         return Ok();
     }
 
-    private BotIncomingMessage? ProcessUpdate(Guid botId, TelegramUpdateDto update)
+    private BotIncomingMessage? ProcessUpdate(Guid channelId, TelegramUpdateDto update)
     {
         if (update.CallbackQuery != null)
         {
             return new BotIncomingMessage(
-                botId,
+                channelId,
                 update.CallbackQuery.From.Id.ToString(),
                 DefaultChannel.Telegram,
                 update.CallbackQuery.Data ?? "",
@@ -58,26 +58,25 @@ public class TelegramHookController(
         if (message == null) return null;
 
         var chatId = message.Chat.Id.ToString();
-
         var messageId = message.MessageId.ToString();
 
         return message.Text != null
-            ? CreateTextMessage(botId, message, chatId, messageId)
+            ? CreateTextMessage(channelId, message, chatId, messageId)
             : message switch
             {
-                { Photo.Count: > 0 } => CreatePhotoMessage(botId, message, chatId, messageId),
-                { Sticker: not null } => CreateStickerMessage(botId, message, chatId, messageId),
-                { Document: not null } => CreateDocumentMessage(botId, message, chatId, messageId),
-                { Voice: not null } => CreateVoiceMessage(botId, message, chatId, messageId),
+                { Photo.Count: > 0 } => CreatePhotoMessage(channelId, message, chatId, messageId),
+                { Sticker: not null } => CreateStickerMessage(channelId, message, chatId, messageId),
+                { Document: not null } => CreateDocumentMessage(channelId, message, chatId, messageId),
+                { Voice: not null } => CreateVoiceMessage(channelId, message, chatId, messageId),
                 _ => null
             };
     }
 
-    private BotIncomingMessage CreateTextMessage(Guid botId, TelegramMessageDto message, string chatId,
+    private static BotIncomingMessage CreateTextMessage(Guid channelId, TelegramMessageDto message, string chatId,
         string messageId)
     {
         return new BotIncomingMessage(
-            botId, chatId, DefaultChannel.Telegram, message.Text!, messageId,
+            channelId, chatId, DefaultChannel.Telegram, message.Text!, messageId,
             new Dictionary<MessageParameter, string>
             {
                 [MessageParameter.FirstName] = message.From?.FirstName ?? "",
@@ -86,14 +85,12 @@ public class TelegramHookController(
         );
     }
 
-    private BotIncomingMessage CreatePhotoMessage(Guid botId, TelegramMessageDto message, string chatId,
+    private static BotIncomingMessage CreatePhotoMessage(Guid channelId, TelegramMessageDto message, string chatId,
         string messageId)
     {
-        // берём самую качественную фотку
         var largePhoto = message.Photo!.OrderBy(c => c.FileSize).Last();
-
         return new BotIncomingMessage(
-            botId, chatId, DefaultChannel.Telegram, largePhoto.FileId, messageId,
+            channelId, chatId, DefaultChannel.Telegram, largePhoto.FileId, messageId,
             new Dictionary<MessageParameter, string>
             {
                 [MessageParameter.FirstName] = message.From?.FirstName ?? "",
@@ -103,11 +100,11 @@ public class TelegramHookController(
         );
     }
 
-    private BotIncomingMessage CreateStickerMessage(Guid botId, TelegramMessageDto message, string chatId,
+    private static BotIncomingMessage CreateStickerMessage(Guid channelId, TelegramMessageDto message, string chatId,
         string messageId)
     {
         return new BotIncomingMessage(
-            botId, chatId, DefaultChannel.Telegram, message.Sticker!.FileId, messageId,
+            channelId, chatId, DefaultChannel.Telegram, message.Sticker!.FileId, messageId,
             new Dictionary<MessageParameter, string>
             {
                 [MessageParameter.FirstName] = message.From?.FirstName ?? "",
@@ -117,11 +114,11 @@ public class TelegramHookController(
         );
     }
 
-    private BotIncomingMessage CreateDocumentMessage(Guid botId, TelegramMessageDto message, string chatId,
+    private static BotIncomingMessage CreateDocumentMessage(Guid channelId, TelegramMessageDto message, string chatId,
         string messageId)
     {
         return new BotIncomingMessage(
-            botId, chatId, DefaultChannel.Telegram, message.Document!.FileId, messageId,
+            channelId, chatId, DefaultChannel.Telegram, message.Document!.FileId, messageId,
             new Dictionary<MessageParameter, string>
             {
                 [MessageParameter.FirstName] = message.From?.FirstName ?? "",
@@ -131,11 +128,11 @@ public class TelegramHookController(
         );
     }
 
-    private BotIncomingMessage CreateVoiceMessage(Guid botId, TelegramMessageDto message, string chatId,
+    private static BotIncomingMessage CreateVoiceMessage(Guid channelId, TelegramMessageDto message, string chatId,
         string messageId)
     {
         return new BotIncomingMessage(
-            botId, chatId, DefaultChannel.Telegram, message.Voice!.FileId, messageId,
+            channelId, chatId, DefaultChannel.Telegram, message.Voice!.FileId, messageId,
             new Dictionary<MessageParameter, string>
             {
                 [MessageParameter.FirstName] = message.From?.FirstName ?? "",

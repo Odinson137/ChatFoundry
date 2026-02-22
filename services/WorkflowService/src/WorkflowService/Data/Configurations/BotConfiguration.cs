@@ -15,11 +15,7 @@ public class BotConfiguration : BaseEntityTypeConfiguration<Bot>
         builder.Property(x => x.Name)
             .IsRequired()
             .HasMaxLength(200);
-        
-        builder.Property(x => x.Token)
-            .IsRequired()
-            .HasMaxLength(100);
-        
+
         builder.Property(x => x.CreatedUserId)
             .IsRequired()
             .HasMaxLength(100);
@@ -30,6 +26,11 @@ public class BotConfiguration : BaseEntityTypeConfiguration<Bot>
         builder.HasMany(b => b.Workflows)
             .WithOne(w => w.Bot)
             .HasForeignKey(w => w.BotId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasMany(b => b.BotChannels)
+            .WithOne(bc => bc.Bot)
+            .HasForeignKey(bc => bc.BotId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

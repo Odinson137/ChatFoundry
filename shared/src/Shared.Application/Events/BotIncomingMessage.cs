@@ -3,7 +3,7 @@ using Shared.Domain.Enums;
 namespace Shared.Application.Events;
 
 public record BotIncomingMessage(
-    Guid BotId,
+    Guid ChannelId,
     string ExternalUserId,
     DefaultChannel Channel,
     string Payload,

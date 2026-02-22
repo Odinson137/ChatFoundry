@@ -1,4 +1,4 @@
-﻿using Shared.Application.Events;
+using Shared.Application.Events;
 using Shared.Domain.Enums;
 using WorkflowService.Entities;
 using WorkflowService.Interfaces;
@@ -13,23 +13,23 @@ public class SessionResolver(
     WorkflowGraphParser workflowGraphParser)
     : ISessionResolver
 {
-    public async Task<Session> ResolveAsync(
-        BotIncomingMessage message,
-        CancellationToken ct)
+    public async Task<Session> ResolveForBotAsync(BotIncomingMessage message, Guid botId, CancellationToken ct)
     {
-        var session = await sessionRepository.FindActiveAsync(message.ExternalUserId, message.Channel, ct);
+        var session = await sessionRepository.FindActiveAsync(message.ChannelId, message.ExternalUserId, botId, ct);
         if (session == null)
         {
             var workflow = await workflowRepository
-                .GetActiveWorkflowAsync(message.BotId, ct) ?? throw new InvalidOperationException("Active workflow not found.");
+                .GetActiveWorkflowAsync(botId, ct) ?? throw new InvalidOperationException($"Active workflow not found for bot {botId}.");
 
             var node = workflowGraphParser.Parse(workflow.NodesDefinition, workflow.EdgesDefinition).GetStartNode();
 
             session = new Session
             {
                 Workflow = workflow,
+                WorkflowId = workflow.Id,
                 ClientId = message.ExternalUserId,
                 Channel = message.Channel,
+                ChannelId = message.ChannelId,
                 CurrentNodeId = node.Id,
                 Status = SessionStatus.Active,
             };

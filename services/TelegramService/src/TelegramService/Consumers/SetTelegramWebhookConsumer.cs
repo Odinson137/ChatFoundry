@@ -1,4 +1,4 @@
-﻿using MassTransit;
+using MassTransit;
 using Shared.Application.Events;
 using TelegramService.Interfaces;
 
@@ -17,7 +17,7 @@ public sealed class SetTelegramWebhookConsumer(
             "Setting telegram token: {token}",
             token);
 
-        await telegramClient.SetWebhookAsync(context.Message.BotId, token,
+        await telegramClient.SetWebhookAsync(context.Message.ChannelId, token,
             context.CancellationToken);
     }
 }

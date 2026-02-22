@@ -5,19 +5,19 @@ option csharp_namespace = "Workflow.Grpc";
 package workflow;
 
 service BotTokenService {
-  rpc GetTokenByChatId (GetTokenByClientIdRequest) returns (GetTokenResponse);
-  rpc GetTokenByBotId  (GetTokenByBotIdRequest)  returns (GetTokenResponse);
+  rpc GetTokenByChannelId (GetTokenByChannelIdRequest) returns (GetTokenResponse);
+  rpc GetCompanyIdByChannelId (GetTokenByChannelIdRequest) returns (GetCompanyIdByChannelIdResponse);
 }
 
-message GetTokenByClientIdRequest {
-  string client_id = 1;
-}
-
-message GetTokenByBotIdRequest {
-  string bot_id = 1;
+message GetTokenByChannelIdRequest {
+  string channel_id = 1;
 }
 
 message GetTokenResponse {
   string token = 1;
-  string company_id = 2;  // optional, UUID of the bot's company
+  string company_id = 2;  // optional, UUID of the channel's company
+}
+
+message GetCompanyIdByChannelIdResponse {
+  string company_id = 1;  // optional
 }

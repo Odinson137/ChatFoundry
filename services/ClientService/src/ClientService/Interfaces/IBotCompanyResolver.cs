@@ -2,5 +2,5 @@ namespace ClientService.Interfaces;
 
 public interface IBotCompanyResolver
 {
-    Task<Guid?> GetCompanyIdByBotIdAsync(Guid botId, CancellationToken ct = default);
+    Task<Guid?> GetCompanyIdByChannelIdAsync(Guid channelId, CancellationToken ct = default);
 }

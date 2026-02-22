@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+using System.Reflection;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using WorkflowService.Entities;
@@ -14,6 +15,8 @@ public class WorkflowDbContext : DbContext
     }
     
     public DbSet<Bot> Bots => Set<Bot>();
+    public DbSet<MessengerChannel> MessengerChannels => Set<MessengerChannel>();
+    public DbSet<BotChannel> BotChannels => Set<BotChannel>();
     public DbSet<BotWorkflow> Workflows => Set<BotWorkflow>();
     public DbSet<WorkflowVersion> WorkflowVersions => Set<WorkflowVersion>();
     public DbSet<ActionEntity> Actions => Set<ActionEntity>();
@@ -22,6 +25,7 @@ public class WorkflowDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
         modelBuilder.Entity<Session>()
             .Property(s => s.Variables)

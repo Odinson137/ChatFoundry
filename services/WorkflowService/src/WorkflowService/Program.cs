@@ -46,6 +46,7 @@ services.AddScoped<IWorkflowRepository, WorkflowRepository>();
 services.AddScoped<IActionRepository, ActionRepository>();
 services.AddScoped<ISessionRepository, SessionRepository>();
 services.AddScoped<IBotRepository, BotRepository>();
+services.AddScoped<IChannelRepository, ChannelRepository>();
 
 services.AddScoped<ISessionResolver, SessionResolver>();
 services.AddScoped<IActionFactory, ActionFactory>();
@@ -158,6 +159,7 @@ builder.Services
     .AddQueryType<Query>()
     .AddMutationType<Mutation>()
     .AddTypeExtension<BotMutation>()
+    .AddTypeExtension<ChannelMutation>()
     .AddTypeExtension<BotWorkflowMutation>()
     .AddProjections() 
     .AddFiltering()

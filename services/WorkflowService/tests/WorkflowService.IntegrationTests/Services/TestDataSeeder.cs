@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using WorkflowService.Entities;
 using WorkflowService.Interfaces;
 

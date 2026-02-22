@@ -16,72 +16,37 @@ public sealed class TelegramClient(
     IOptions<TelegramOptions> options)
     : ITelegramClient
 {
-    private ITelegramBotClient? _botClient;
-    
-    private async Task<ITelegramBotClient> InitializeClientAsync(string clientId, CancellationToken ct)
+    private async Task<ITelegramBotClient> GetClientAsync(Guid channelId, CancellationToken ct)
     {
-        if (_botClient == null)
-        {
-            var token= await botTokenProvider.GetByChatIdAsync(clientId, ct);
-            if (token == null)
-            {
-                throw new InvalidOperationException($"Token for clientId {clientId} not found");
-            }
-            _botClient = new TelegramBotClient(token);
-        }
-
-        return _botClient;
+        var token = await botTokenProvider.GetByChannelIdAsync(channelId, ct);
+        if (string.IsNullOrEmpty(token))
+            throw new InvalidOperationException($"Token for channelId {channelId} not found");
+        return new TelegramBotClient(token);
     }
 
-    private async Task<ITelegramBotClient> InitializeClientByBotIdAsync(Guid botId, CancellationToken ct)
-    {
-        if (_botClient != null) return _botClient;
-        
-        var token= await botTokenProvider.GetByBotIdAsync(botId, ct);
-        if (token == null)
-        {
-            throw new InvalidOperationException($"Token for clientId {botId} not found");
-        }
-        
-        _botClient = new TelegramBotClient(token);
-        return _botClient;
-    }
-    
-    private ITelegramBotClient InitializeClientByBotIdAsync(string token)
-    {
-        _botClient = new TelegramBotClient(token);
-        return _botClient;
-    }
-    
-    public async Task SendTextAsync(string clientid, string text, CancellationToken ct)
-    {
-        var client = await InitializeClientAsync(clientid, ct);
-        
-        await client.SendMessage(
-            chatId: clientid,
-            text: text,
-            cancellationToken: ct);
+    private static ITelegramBotClient GetClientFromToken(string token) => new TelegramBotClient(token);
 
-        logger.LogInformation("Telegram message sent to {ChatId}", clientid);
+    public async Task SendTextAsync(Guid channelId, string chatId, string text, CancellationToken ct)
+    {
+        var client = await GetClientAsync(channelId, ct);
+        await client.SendMessage(chatId: chatId, text: text, cancellationToken: ct);
+        logger.LogInformation("Telegram message sent to {ChatId}", chatId);
     }
 
-    public async Task SetWebhookAsync(Guid botId, string token, CancellationToken ct)
+    public Task SetWebhookAsync(Guid channelId, string token, CancellationToken ct)
     {
-        var client = InitializeClientByBotIdAsync(token);
-
-        var url = $"{options.Value.WebhookUrl}/telegram/hook/{botId}";
-        await client.SetWebhook(
+        var client = GetClientFromToken(token);
+        var url = $"{options.Value.WebhookUrl}/telegram/hook/{channelId}";
+        return client.SetWebhook(
             url,
-            maxConnections: 40, // default
+            maxConnections: 40,
             secretToken: options.Value.SecretToken,
             cancellationToken: ct);
-
-        logger.LogInformation("Telegram webhook set: {Url}", url);
     }
 
-    public async Task SendInlineKeyboardAsync(string clientid, string text, List<InlineButton> buttons, CancellationToken ct)
+    public async Task SendInlineKeyboardAsync(Guid channelId, string chatId, string text, List<InlineButton> buttons, CancellationToken ct)
     {
-        var client = await InitializeClientAsync(clientid, ct);
+        var client = await GetClientAsync(channelId, ct);
 
         var rows = buttons
             .Select(b =>
@@ -94,13 +59,13 @@ public sealed class TelegramClient(
         var markup = new InlineKeyboardMarkup(rows);
 
         await client.SendMessage(
-            chatId: clientid,
+            chatId: chatId,
             text: text,
             parseMode: ParseMode.Html,
             replyMarkup: markup,
             cancellationToken: ct);
 
-        logger.LogInformation("Inline keyboard (attached to message) sent to {ChatId}", clientid);
+        logger.LogInformation("Inline keyboard sent to {ChatId}", chatId);
     }
 
     private static string TruncateToUtf8Bytes(string value, int maxBytes)
@@ -129,32 +94,32 @@ public sealed class TelegramClient(
         return (trimmed, ext);
     }
 
-    public async Task SendMediaAsync(string clientid, string value, string? caption, CancellationToken ct)
+    public async Task SendMediaAsync(Guid channelId, string chatId, string value, string? caption, CancellationToken ct)
     {
         var (url, extension) = await ResolveMediaAsync(value, ct);
         if (string.IsNullOrEmpty(url))
         {
-            logger.LogWarning("SendMedia: empty url for chat {ChatId}", clientid);
+            logger.LogWarning("SendMedia: empty url for chat {ChatId}", chatId);
             return;
         }
         var sendType = MediaExtensionMapping.GetSendTypeByExtension(extension);
-        var client = await InitializeClientAsync(clientid, ct);
+        var client = await GetClientAsync(channelId, ct);
         var cap = TruncateToUtf8Bytes(caption ?? "", 1024);
         var captionOrNull = cap.Length > 0 ? cap : null;
 
         switch (sendType)
         {
             case MediaSendType.Photo:
-                await TrySendPhotoOrFallbackAsync(client, clientid, url, captionOrNull, ct);
+                await TrySendPhotoOrFallbackAsync(client, chatId, url, captionOrNull, ct);
                 break;
             case MediaSendType.Video:
-                await TrySendVideoOrFallbackAsync(client, clientid, url, captionOrNull, ct);
+                await TrySendVideoOrFallbackAsync(client, chatId, url, captionOrNull, ct);
                 break;
             case MediaSendType.Audio:
-                await TrySendAudioOrFallbackAsync(client, clientid, url, captionOrNull, ct);
+                await TrySendAudioOrFallbackAsync(client, chatId, url, captionOrNull, ct);
                 break;
             default:
-                await TrySendDocumentOrFallbackAsync(client, clientid, url, captionOrNull, ct);
+                await TrySendDocumentOrFallbackAsync(client, chatId, url, captionOrNull, ct);
                 break;
         }
     }
@@ -215,47 +180,45 @@ public sealed class TelegramClient(
         }
     }
 
-    public async Task SendDocumentAsync(string clientid, string fileId, string? caption, CancellationToken ct)
+    public async Task SendDocumentAsync(Guid channelId, string chatId, string fileId, string? caption, CancellationToken ct)
     {
         var (url, _) = await ResolveMediaAsync(fileId, ct);
-        var client = await InitializeClientAsync(clientid, ct);
+        var client = await GetClientAsync(channelId, ct);
         var cap = TruncateToUtf8Bytes(caption ?? "", 1024);
-        await client.SendDocument(chatId: clientid, document: url, caption: cap.Length > 0 ? cap : null, cancellationToken: ct);
-        logger.LogInformation("Document sent to {ChatId}", clientid);
+        await client.SendDocument(chatId: chatId, document: url, caption: cap.Length > 0 ? cap : null, cancellationToken: ct);
+        logger.LogInformation("Document sent to {ChatId}", chatId);
     }
 
-    public async Task SendPhotoAsync(string clientid, string photoUrl, string? caption, CancellationToken ct)
+    public async Task SendPhotoAsync(Guid channelId, string chatId, string photoUrl, string? caption, CancellationToken ct)
     {
         var (url, _) = await ResolveMediaAsync(photoUrl, ct);
-        var client = await InitializeClientAsync(clientid, ct);
+        var client = await GetClientAsync(channelId, ct);
         var cap = TruncateToUtf8Bytes(caption ?? "", 1024);
-        await client.SendPhoto(chatId: clientid, photo: url, caption: cap.Length > 0 ? cap : null, cancellationToken: ct);
-        logger.LogInformation("Photo sent to {ChatId}", clientid);
+        await client.SendPhoto(chatId: chatId, photo: url, caption: cap.Length > 0 ? cap : null, cancellationToken: ct);
+        logger.LogInformation("Photo sent to {ChatId}", chatId);
     }
 
-    public async Task SendVideoAsync(string clientid, string videoUrl, string? caption, CancellationToken ct)
+    public async Task SendVideoAsync(Guid channelId, string chatId, string videoUrl, string? caption, CancellationToken ct)
     {
         var (url, _) = await ResolveMediaAsync(videoUrl, ct);
-        var client = await InitializeClientAsync(clientid, ct);
+        var client = await GetClientAsync(channelId, ct);
         var cap = TruncateToUtf8Bytes(caption ?? "", 1024);
-        await client.SendVideo(chatId: clientid, video: url, caption: cap.Length > 0 ? cap : null, cancellationToken: ct);
-        logger.LogInformation("Video sent to {ChatId}", clientid);
+        await client.SendVideo(chatId: chatId, video: url, caption: cap.Length > 0 ? cap : null, cancellationToken: ct);
+        logger.LogInformation("Video sent to {ChatId}", chatId);
     }
 
-    public async Task SendAudioAsync(string clientid, string audioUrl, string? caption, CancellationToken ct)
+    public async Task SendAudioAsync(Guid channelId, string chatId, string audioUrl, string? caption, CancellationToken ct)
     {
         var (url, _) = await ResolveMediaAsync(audioUrl, ct);
-        var client = await InitializeClientAsync(clientid, ct);
+        var client = await GetClientAsync(channelId, ct);
         var cap = TruncateToUtf8Bytes(caption ?? "", 1024);
-        await client.SendAudio(chatId: clientid, audio: url, caption: cap.Length > 0 ? cap : null, cancellationToken: ct);
-        logger.LogInformation("Audio sent to {ChatId}", clientid);
+        await client.SendAudio(chatId: chatId, audio: url, caption: cap.Length > 0 ? cap : null, cancellationToken: ct);
+        logger.LogInformation("Audio sent to {ChatId}", chatId);
     }
 
-    public async Task<string?> GetFileAsync(string clientid, 
-        string fileId, CancellationToken cancellationToken)
+    public async Task<string?> GetFileAsync(Guid channelId, string chatId, string fileId, CancellationToken cancellationToken)
     {
-        var client = await InitializeClientAsync(clientid, cancellationToken);
-        
+        var client = await GetClientAsync(channelId, cancellationToken);
         var file = await client.GetFile(fileId, cancellationToken);
         return file.FilePath;
     }

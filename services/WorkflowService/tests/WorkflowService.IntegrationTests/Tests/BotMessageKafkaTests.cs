@@ -1,4 +1,4 @@
-﻿using MassTransit;
+using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Application.Events;
 using Shared.Domain.Enums;
@@ -35,8 +35,22 @@ namespace WorkflowService.IntegrationTests.Tests
             await db.Database.EnsureCreatedAsync();
             // ===== Arrange =====
 
+            var channelId = Guid.NewGuid();
             var botId = Guid.NewGuid();
 
+            var channel = new MessengerChannel
+            {
+                Id = channelId,
+                Name = "Test channel",
+                Token = "test-token",
+                ChannelType = DefaultChannel.Telegram,
+                CreatedUserId = Guid.NewGuid(),
+            };
+            var bot = new Bot
+            {
+                Id = botId,
+                Name = "Test bot",
+            };
             var workflow = new BotWorkflow
             {
                 Id = Guid.NewGuid(),
@@ -48,20 +62,16 @@ namespace WorkflowService.IntegrationTests.Tests
                 IsActiveBotWorkflow = true,
             };
 
-            var bot = new Bot
-            {
-                Id = botId,
-                Name = "Test bot"
-            };
-
+            db.MessengerChannels.Add(channel);
             db.Bots.Add(bot);
+            db.BotChannels.Add(new BotChannel { BotId = botId, ChannelId = channelId });
             db.Workflows.Add(workflow);
             await db.SaveChangesAsync();
 
             // ===== Act =====
 
             var incoming = new BotIncomingMessage(
-                botId,
+                channelId,
                 ExternalUserId: "test-chat",
                 Channel: DefaultChannel.Telegram,
                 Payload: "hello",
@@ -78,7 +88,7 @@ namespace WorkflowService.IntegrationTests.Tests
                 await Task.Delay(TimeSpan.FromSeconds(1));
 
             var ackIncoming = new BotIncomingMessage(
-                botId,
+                channelId,
                 ExternalUserId: "test-chat",
                 Channel: DefaultChannel.Telegram,
                 Payload: "order",

@@ -1,4 +1,4 @@
-﻿using HotChocolate;
+using HotChocolate;
 using HotChocolate.Data;
 using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
@@ -11,13 +11,25 @@ namespace WorkflowService.GraphQL;
 public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpContextAccessor)
 {
     [UsePaging(IncludeTotalCount = true)]
-    [UseProjection] 
+    [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public IQueryable<Bot> GetBots([Service] WorkflowDbContext context) 
+    public IQueryable<Bot> GetBots([Service] WorkflowDbContext context)
     {
-        var userId = UserId;
+        if (CompanyId.HasValue)
+            return context.Bots.Where(c => c.CompanyId == CompanyId.Value);
         return context.Bots;
+    }
+
+    [UsePaging(IncludeTotalCount = true)]
+    [UseProjection]
+    [UseFiltering]
+    [UseSorting]
+    public IQueryable<MessengerChannel> GetChannels([Service] WorkflowDbContext context)
+    {
+        if (CompanyId.HasValue)
+            return context.MessengerChannels.Where(c => c.CompanyId == CompanyId.Value);
+        return context.MessengerChannels.Where(c => c.CreatedUserId == UserId);
     }
     
     [UsePaging(IncludeTotalCount = true)]

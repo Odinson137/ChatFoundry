@@ -18,7 +18,7 @@ public class BotIncomingMessageConsumer(
         var ct = context.CancellationToken;
         var channel = msg.Channel;
 
-        var companyId = msg.CompanyId ?? await botCompanyResolver.GetCompanyIdByBotIdAsync(msg.BotId, ct);
+        var companyId = msg.CompanyId ?? await botCompanyResolver.GetCompanyIdByChannelIdAsync(msg.ChannelId, ct);
 
         var clientChannel = await channelRepository
             .FindAsync(channel, msg.ExternalUserId, companyId, ct);

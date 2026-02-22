@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shared.Infrastructure.EntityTypeConfiguration;
 using WorkflowService.Entities;
@@ -29,12 +29,21 @@ public class SessionConfiguration : BaseEntityTypeConfiguration<Session>
 
         builder.Property(x => x.CompletedAt);
 
+        builder.Property(x => x.ChannelId)
+            .IsRequired();
+
         builder.HasIndex(x => x.WorkflowId);
         builder.HasIndex(x => new { x.ClientId, x.Channel });
+        builder.HasIndex(x => new { x.ChannelId, x.ClientId, x.WorkflowId });
 
         builder.HasOne(x => x.Workflow)
             .WithMany()
             .HasForeignKey(x => x.WorkflowId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(x => x.MessengerChannel)
+            .WithMany()
+            .HasForeignKey(x => x.ChannelId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

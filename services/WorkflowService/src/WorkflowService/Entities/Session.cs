@@ -11,6 +11,8 @@ public class Session : EntityBase
 
     public string ClientId { get; set; } = null!;
     public DefaultChannel Channel { get; set; }
+    public Guid ChannelId { get; set; }
+    public MessengerChannel MessengerChannel { get; set; } = null!;
 
     public Guid? CurrentNodeId { get; set; }
 

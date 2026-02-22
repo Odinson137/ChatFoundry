@@ -1,4 +1,4 @@
-﻿using MassTransit;
+using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Application.DTO;
 using Shared.Application.Events;
@@ -12,13 +12,13 @@ public class TelegramManagementController(
     ILogger<TelegramManagementController> logger)
     : ControllerBase
 {
-    [HttpPost("{botId:guid}/set-webhook")]
+    [HttpPost("{channelId:guid}/set-webhook")]
     public async Task<IActionResult> SetupWebhook(
-        Guid botId, 
+        Guid channelId,
         [FromBody] SetWebhookRequest request)
     {
-        logger.LogInformation("setup webhook");
-        await producer.Produce(new TelegramSetWebhookEvent(botId, request.Token));
+        logger.LogInformation("Setup webhook for channel {ChannelId}", channelId);
+        await producer.Produce(new TelegramSetWebhookEvent(channelId, request.Token));
         return Accepted();
     }
 }
