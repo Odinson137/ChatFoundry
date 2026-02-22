@@ -1,4 +1,4 @@
-﻿@page "/bots"
+@page "/bots"
 @using BlazorClient.Models.DTO
 @using Microsoft.AspNetCore.Authorization
 
@@ -11,7 +11,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Управление ботами</h1>
-    <button class="btn btn-primary" @onclick="OpenCreateModal">
+    <button class="btn btn-primary" @onclick="OnOpenCreateModal">
         <span class="oi oi-plus"></span> Добавить бота
     </button>
 </div>
@@ -43,7 +43,7 @@ else
             <thead class="table-light">
             <tr>
                 <th>Имя</th>
-                <th>Токен</th>
+                <th>Каналы</th>
                 <th>Активный Workflow</th>
                 <th>Создан</th>
                 <th class="text-end">Действия</th>
@@ -55,7 +55,24 @@ else
                 <tr>
                     <td class="fw-bold">@bot.Name</td>
                     <td>
-                        <code class="text-muted">@(bot.Token.Length > 10 ? bot.Token.Substring(0, 10) + "..." : bot.Token)</code>
+                        @{
+                            var channelNames = bot.BotChannels?
+                                .Where(bc => bc.Channel != null)
+                                .Select(bc => bc.Channel!.Name)
+                                .ToList() ?? new List<string>();
+                            if (channelNames.Count == 0)
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                            else if (channelNames.Count <= 2)
+                            {
+                                @string.Join(", ", channelNames)
+                            }
+                            else
+                            {
+                                <span title="@string.Join(", ", channelNames)">@channelNames.Count каналов</span>
+                            }
+                        }
                     </td>
                     <td>
                         @{
@@ -75,7 +92,7 @@ else
                         <a href="@($"bots/{bot.Id}")" class="btn btn-sm btn-primary me-2" title="Открыть воркфлоу">
                             <span class="oi oi-eye"></span> Открыть
                         </a>
-                        <button class="btn btn-sm btn-outline-primary me-2" @onclick="() => OpenEditModal(bot)">
+                        <button class="btn btn-sm btn-outline-primary me-2" @onclick="() => OnOpenEditModal(bot)">
                             <span class="oi oi-pencil"></span>
                         </button>
                         <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteBot(bot)">
@@ -105,17 +122,29 @@ else
                         <label class="form-label">Имя бота</label>
                         <input type="text" class="form-control" @bind="currentBotModel.Name" placeholder="My Super Bot" />
                     </div>
-                    @if (!isEditMode)
-                    {
-                        <div class="mb-3">
-                            <label class="form-label">Токен (Telegram/Other)</label>
-                            <input type="text" class="form-control" @bind="currentBotModel.Token" />
-                        </div>
-                    }
+                    <div class="mb-3">
+                        <label class="form-label">Каналы</label>
+                        @if (availableChannels.Count == 0)
+                        {
+                            <p class="text-muted small mb-0">Нет доступных каналов. Создайте каналы на странице <a href="/channels">Каналы</a>.</p>
+                        }
+                        else
+                        {
+                            <div class="border rounded p-2" style="max-height: 180px; overflow-y: auto;">
+                                @foreach (var ch in availableChannels)
+                                {
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="ch_@ch.Id" checked="@currentBotModel.SelectedChannelIds.Contains(ch.Id)" @onchange="() => ToggleChannel(ch.Id)" />
+                                        <label class="form-check-label" for="ch_@ch.Id">@ch.Name <span class="text-muted small">(@ch.ChannelType)</span></label>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" @onclick="CloseModal">Отмена</button>
-                    <button type="button" class="btn btn-primary" @onclick="SaveBot" disabled="@isSaving">
+                    <button type="button" class="btn btn-primary" @onclick="SaveBot" disabled="@(isSaving || string.IsNullOrWhiteSpace(currentBotModel.Name))">
                         @if (isSaving) { <span class="spinner-border spinner-border-sm me-1"></span> }
                         Сохранить
                     </button>
@@ -127,6 +156,7 @@ else
 
 @code {
     private List<BotDto> bots = new();
+    private List<ChannelDto> availableChannels = new();
     private bool isLoading = true;
     private bool isSaving;
     private string? error;
@@ -158,21 +188,40 @@ else
         }
     }
 
+    private async Task LoadChannelsForModal()
+    {
+        try
+        {
+            availableChannels = await ApiClient.GetChannelsAsync();
+        }
+        catch
+        {
+            availableChannels = new List<ChannelDto>();
+        }
+    }
+
+    private void ToggleChannel(Guid channelId)
+    {
+        if (currentBotModel.SelectedChannelIds.Contains(channelId))
+            currentBotModel.SelectedChannelIds.Remove(channelId);
+        else
+            currentBotModel.SelectedChannelIds.Add(channelId);
+        StateHasChanged();
+    }
+
     private async Task SaveBot()
     {
-        if (string.IsNullOrWhiteSpace(currentBotModel.Name)
-            || (!isEditMode && string.IsNullOrWhiteSpace(currentBotModel.Token)))
-        {
+        if (string.IsNullOrWhiteSpace(currentBotModel.Name))
             return;
-        }
 
         isSaving = true;
         try
         {
+            var channelIds = currentBotModel.SelectedChannelIds.ToList();
             if (isEditMode)
-                await ApiClient.UpdateBotAsync(currentBotModel.Id, currentBotModel.Name);
+                await ApiClient.UpdateBotAsync(currentBotModel.Id, currentBotModel.Name.Trim(), channelIds);
             else
-                await ApiClient.AddBotAsync(currentBotModel.Name, currentBotModel.Token);
+                await ApiClient.AddBotAsync(currentBotModel.Name.Trim(), channelIds);
 
             CloseModal();
             await LoadBots();
@@ -203,23 +252,25 @@ else
         }
     }
 
-    private void OpenCreateModal()
+    private async Task OnOpenCreateModal()
     {
         currentBotModel = new BotInputModel();
         isEditMode = false;
         showModal = true;
+        await LoadChannelsForModal();
     }
 
-    private void OpenEditModal(BotDto bot)
+    private async Task OnOpenEditModal(BotDto bot)
     {
         currentBotModel = new BotInputModel
         {
             Id = bot.Id,
             Name = bot.Name,
-            Token = bot.Token
+            SelectedChannelIds = bot.BotChannels?.Select(bc => bc.ChannelId).ToList() ?? new List<Guid>()
         };
         isEditMode = true;
         showModal = true;
+        await LoadChannelsForModal();
     }
 
     private void CloseModal()
@@ -232,6 +283,6 @@ else
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = "";
-        public string Token { get; set; } = "";
+        public List<Guid> SelectedChannelIds { get; set; } = new();
     }
 }

@@ -17,36 +17,6 @@ public partial class BotDetails
     private bool _isLoading = true;
     private string? _error;
 
-    private bool _isRefreshingWebhook;
-    private bool _webhookRefreshed;
-
-    private async Task RefreshWebhook()
-    {
-        _isRefreshingWebhook = true;
-        _webhookRefreshed = false;
-        try
-        {
-            await ApiClient.RefreshBotWebhookAsync(_bot.Id);
-            _webhookRefreshed = true;
-        }
-        catch (Exception ex)
-        {
-            _error = $"Не удалось обновить хук: {ex.Message}";
-        }
-        finally
-        {
-            _isRefreshingWebhook = false;
-            StateHasChanged();
-
-            if (_webhookRefreshed)
-            {
-                await Task.Delay(2000);
-                _webhookRefreshed = false;
-                StateHasChanged();
-            }
-        }
-    }
-    
     protected override async Task OnInitializedAsync()
     {
         await LoadBotData();
@@ -69,11 +39,6 @@ public partial class BotDetails
         {
             _isLoading = false;
         }
-    }
-
-    private async Task CopyToken()
-    {
-        if (_bot != null) await Js.InvokeVoidAsync("navigator.clipboard.writeText", _bot.Token);
     }
 
     private string GetDesignerUrl(Guid workflowId) => Navigation.ToAbsoluteUri($"/designer/{workflowId}").ToString();

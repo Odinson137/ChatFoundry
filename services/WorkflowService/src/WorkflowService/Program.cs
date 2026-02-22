@@ -161,6 +161,7 @@ builder.Services
     .AddTypeExtension<BotMutation>()
     .AddTypeExtension<ChannelMutation>()
     .AddTypeExtension<BotWorkflowMutation>()
+    .AddType<MessengerChannelType>()
     .AddProjections() 
     .AddFiltering()
     .AddSorting();

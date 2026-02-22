@@ -8,6 +8,75 @@ namespace BlazorClient.Services;
 
 public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
 {
+    // ─── Channels ─────────────────────────────────────────────────────────────
+
+    public async Task<List<ChannelDto>> GetChannelsAsync()
+    {
+        var query = """
+                query GetChannels {
+                    channels(order: [{ createdAt: DESC }]) {
+                        nodes {
+                            id
+                            name
+                            maskedToken
+                            channelType
+                        }
+                    }
+                }
+                """;
+
+        var result = await ExecuteGraphQl<ChannelsConnectionResponse>(query);
+        return result.Channels.Nodes;
+    }
+
+    public async Task<ChannelDto> AddChannelAsync(string name, string token, string channelType)
+    {
+        var query = """
+                mutation AddChannel($input: AddChannelInput!) {
+                    addChannel(input: $input) {
+                        channel { id name maskedToken channelType }
+                    }
+                }
+                """;
+
+        var variables = new { input = new { name, token, channelType } };
+        var result = await ExecuteGraphQl<AddChannelResponse>(query, variables);
+        return result.AddChannel.Channel;
+    }
+
+    public async Task<ChannelDto> UpdateChannelAsync(Guid channelId, string name, string? token, string channelType)
+    {
+        var query = """
+                mutation UpdateChannel($input: UpdateChannelInput!) {
+                    updateChannel(input: $input) {
+                        channel { id name maskedToken channelType }
+                    }
+                }
+                """;
+
+        var variables = new { input = new { channelId, name, token, channelType } };
+        var result = await ExecuteGraphQl<UpdateChannelResponse>(query, variables);
+        return result.UpdateChannel.Channel ?? throw new InvalidOperationException("Channel not found");
+    }
+
+    public async Task DeleteChannelAsync(Guid channelId)
+    {
+        var query = """
+                mutation DeleteChannel($input: DeleteChannelInput!) {
+                    deleteChannel(input: $input) {
+                        channel { id }
+                        error
+                    }
+                }
+                """;
+
+        var variables = new { input = new { channelId } };
+        var result = await ExecuteGraphQl<DeleteChannelResponse>(query, variables);
+        var payload = result.DeleteChannel;
+        if (!string.IsNullOrEmpty(payload.Error))
+            throw new InvalidOperationException(payload.Error);
+    }
+
     // ─── Bots ────────────────────────────────────────────────────────────────
 
     public async Task<List<BotDto>> GetBotsAsync()
@@ -18,13 +87,16 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
                         nodes {
                             id
                             name
-                            token
                             createdAt
                             modifiedAt
                             workflows {
                                 id
                                 version
                                 isActiveBotWorkflow
+                            }
+                            botChannels {
+                                channelId
+                                channel { id name }
                             }
                         }
                     }
@@ -43,7 +115,6 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
                         nodes {
                             id
                             name
-                            token
                             createdAt
                             modifiedAt
                             workflows {
@@ -51,6 +122,10 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
                                 version
                                 isActiveBotWorkflow
                                 createdAt
+                            }
+                            botChannels {
+                                channelId
+                                channel { id name }
                             }
                         }
                     }
@@ -62,7 +137,7 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
         return result.Bots.Nodes.FirstOrDefault();
     }
 
-    public async Task<BotDto> AddBotAsync(string name, string token)
+    public async Task<BotDto> AddBotAsync(string name, IReadOnlyList<Guid>? channelIds = null)
     {
         var query = """
                 mutation Add($input: AddBotInput!) {
@@ -72,12 +147,13 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
                 }
                 """;
 
-        var variables = new { input = new { name, token } };
+        var channelIdsArray = channelIds?.ToArray() ?? Array.Empty<Guid>();
+        var variables = new { input = new { name, channelIds = channelIdsArray } };
         var result = await ExecuteGraphQl<AddBotResponse>(query, variables);
-        return result.AddBot.Bot;
+        return result.AddBot.Bot ?? throw new InvalidOperationException("AddBot returned no bot");
     }
 
-    public async Task<BotDto> UpdateBotAsync(Guid botId, string name)
+    public async Task<BotDto> UpdateBotAsync(Guid botId, string name, IReadOnlyList<Guid>? channelIds = null)
     {
         var query = """
                 mutation Update($input: UpdateBotInput!) {
@@ -87,9 +163,10 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
                 }
                 """;
 
-        var variables = new { input = new { botId, name } };
+        var channelIdsArray = channelIds?.ToArray() ?? Array.Empty<Guid>();
+        var variables = new { input = new { botId, name, channelIds = channelIdsArray } };
         var result = await ExecuteGraphQl<UpdateBotResponse>(query, variables);
-        return result.UpdateBot.Bot;
+        return result.UpdateBot.Bot ?? throw new InvalidOperationException("Bot not found");
     }
 
     public async Task DeleteBotAsync(Guid botId)
@@ -241,17 +318,17 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
         return gqlResponse!.Data!;
     }
     
-    public async Task RefreshBotWebhookAsync(Guid botId)
+    public async Task RefreshChannelWebhookAsync(Guid channelId)
     {
         var query = """
-                    mutation Refresh($input: RefreshBotWebhookInput!) {
-                        refreshBotWebhook(input: $input) {
-                            bot { id name }
+                    mutation RefreshChannelWebhook($input: RefreshChannelWebhookInput!) {
+                        refreshChannelWebhook(input: $input) {
+                            channel { id name }
                         }
                     }
                     """;
 
-        var variables = new { input = new { botId } };
+        var variables = new { input = new { channelId } };
         await ExecuteGraphQl<object>(query, variables);
     }
 
@@ -289,6 +366,47 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
 
     private class BotMutationPayload
     {
-        public BotDto Bot { get; set; } = new();
+        public BotDto? Bot { get; set; }
+    }
+
+    private class ChannelsConnectionResponse
+    {
+        public ChannelConnection Channels { get; set; } = new();
+    }
+
+    private class ChannelConnection
+    {
+        public List<ChannelDto> Nodes { get; set; } = [];
+    }
+
+    private class AddChannelResponse
+    {
+        public AddChannelPayload AddChannel { get; set; } = new();
+    }
+
+    private class AddChannelPayload
+    {
+        public ChannelDto Channel { get; set; } = new();
+    }
+
+    private class UpdateChannelResponse
+    {
+        public UpdateChannelPayload UpdateChannel { get; set; } = new();
+    }
+
+    private class UpdateChannelPayload
+    {
+        public ChannelDto? Channel { get; set; }
+    }
+
+    private class DeleteChannelResponse
+    {
+        public DeleteChannelPayload DeleteChannel { get; set; } = new();
+    }
+
+    private class DeleteChannelPayload
+    {
+        public ChannelDto? Channel { get; set; }
+        public string? Error { get; set; }
     }
 }

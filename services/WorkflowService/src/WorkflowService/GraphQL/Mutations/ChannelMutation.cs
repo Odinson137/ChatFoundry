@@ -1,5 +1,7 @@
 using HotChocolate;
 using HotChocolate.Types;
+using MassTransit;
+using Shared.Application.Events;
 using Shared.Domain.Enums;
 using Shared.Infrastructure.GraphQl;
 using WorkflowService.Data;
@@ -9,7 +11,9 @@ using WorkflowService.Interfaces;
 namespace WorkflowService.GraphQL.Mutations;
 
 [ExtendObjectType(typeof(Mutation))]
-public class ChannelMutation(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpContextAccessor)
+public class ChannelMutation(
+    IHttpContextAccessor httpContextAccessor,
+    ITopicProducer<TelegramSetWebhookEvent> producer) : BaseGraphQl(httpContextAccessor)
 {
     public async Task<AddChannelPayload> AddChannelAsync(
         AddChannelInput input,
@@ -65,6 +69,19 @@ public class ChannelMutation(IHttpContextAccessor httpContextAccessor) : BaseGra
 
         return new DeleteChannelPayload(channel, null);
     }
+
+    /// <summary>Актуализирует webhook для одного канала (отправляет TelegramSetWebhookEvent).</summary>
+    public async Task<RefreshChannelWebhookPayload> RefreshChannelWebhookAsync(
+        RefreshChannelWebhookInput input,
+        [Service] WorkflowDbContext context)
+    {
+        var channel = await context.MessengerChannels.FindAsync(input.ChannelId);
+        if (channel is null)
+            return new RefreshChannelWebhookPayload(null);
+
+        await producer.Produce(new TelegramSetWebhookEvent(channel.Id, channel.Token));
+        return new RefreshChannelWebhookPayload(channel);
+    }
 }
 
 public record AddChannelInput(string Name, string Token, DefaultChannel ChannelType);
@@ -75,3 +92,6 @@ public record UpdateChannelPayload(MessengerChannel? Channel);
 
 public record DeleteChannelInput(Guid ChannelId);
 public record DeleteChannelPayload(MessengerChannel? Channel, string? Error);
+
+public record RefreshChannelWebhookInput(Guid ChannelId);
+public record RefreshChannelWebhookPayload(MessengerChannel? Channel);

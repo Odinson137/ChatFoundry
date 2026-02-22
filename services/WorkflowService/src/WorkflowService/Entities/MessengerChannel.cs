@@ -12,4 +12,15 @@ public class MessengerChannel : EntityBase
     public Guid? CompanyId { get; set; }
 
     public ICollection<BotChannel> BotChannels { get; set; } = [];
+
+    /// <summary>Маскированный токен для GraphQL (первые 8 символов + …). Токен в API не отдаётся — только это поле.</summary>
+    public string MaskedToken
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(Token)) return "—";
+            if (Token.Length <= 10) return new string('*', Token.Length);
+            return Token.Length > 8 ? Token[..8] + "…" : Token + "…";
+        }
+    }
 }

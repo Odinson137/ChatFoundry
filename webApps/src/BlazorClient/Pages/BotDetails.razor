@@ -42,30 +42,25 @@
             <div class="col-md-4">
                 <div class="card h-100 border-0 shadow-sm">
                     <div class="card-body">
-                        <label class="form-label fw-bold text-muted small uppercase">Telegram API Token</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control bg-light border-0" value="@_bot.Token" readonly>
-                            <button class="btn btn-outline-primary" @onclick="CopyToken">
-                                <span class="oi oi-copywriting"></span>
-                            </button>
-                        </div>
-                        <button class="btn btn-sm btn-outline-secondary mt-2 w-100" 
-                                @onclick="RefreshWebhook" 
-                                disabled="@_isRefreshingWebhook">
-                            @if (_isRefreshingWebhook)
-                            {
-                                <span class="spinner-border spinner-border-sm me-1"></span>
-                            }
-                            else if (_webhookRefreshed)
-                            {
-                                <span class="oi oi-check me-1"></span>
-                            }
-                            else
-                            {
-                                <span class="oi oi-reload me-1"></span>
-                            }
-                            @(_isRefreshingWebhook ? "Обновляется..." : _webhookRefreshed ? "Готово" : "Актуализировать хук")
-                        </button>
+                        <label class="form-label fw-bold text-muted small uppercase">Каналы</label>
+                        @{
+                            var chNames = _bot.BotChannels?.Where(bc => bc.Channel != null).Select(bc => bc.Channel!.Name).ToList() ?? new List<string>();
+                        }
+                        @if (chNames.Count == 0)
+                        {
+                            <p class="text-muted small mb-2">К боту не привязаны каналы. Привяжите каналы в <a href="/bots">списке ботов</a>.</p>
+                        }
+                        else
+                        {
+                            <ul class="list-unstyled mb-2">
+                                @foreach (var name in chNames)
+                                {
+                                    <li><span class="oi oi-check text-success me-1"></span>@name</li>
+                                }
+                            </ul>
+                        }
+                        <a href="/channels" class="d-block small">Управление каналами →</a>
+                        <p class="text-muted small mt-2 mb-0">Актуализация webhook — на странице <a href="/channels">Каналы</a> у каждого канала.</p>
                     </div>
                 </div>
             </div>

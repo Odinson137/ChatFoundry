@@ -22,7 +22,6 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
     }
 
     [UsePaging(IncludeTotalCount = true)]
-    [UseProjection]
     [UseFiltering]
     [UseSorting]
     public IQueryable<MessengerChannel> GetChannels([Service] WorkflowDbContext context)

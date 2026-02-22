@@ -1,16 +1,24 @@
-﻿using BlazorClient.Models.DTO;
+using BlazorClient.Models.DTO;
 
 namespace BlazorClient.Interfaces;
 
 public interface IWorkflowApiClient
 {
+    // ─── Channels ───────────────────────────────────────────────────────────
+    Task<List<ChannelDto>> GetChannelsAsync();
+    Task<ChannelDto> AddChannelAsync(string name, string token, string channelType);
+    Task<ChannelDto> UpdateChannelAsync(Guid channelId, string name, string? token, string channelType);
+    /// <summary>Удаляет канал. Если бэкенд вернул error (канал привязан к ботам), выбрасывает исключение с текстом ошибки.</summary>
+    Task DeleteChannelAsync(Guid channelId);
+    /// <summary>Актуализирует webhook для канала (Telegram и др.).</summary>
+    Task RefreshChannelWebhookAsync(Guid channelId);
+
     // ─── Bots ────────────────────────────────────────────────────────────────
     Task<List<BotDto>> GetBotsAsync();
     Task<BotDto?> GetBotWithWorkflowsAsync(Guid botId);
-    Task<BotDto> AddBotAsync(string name, string token);
-    Task<BotDto> UpdateBotAsync(Guid botId, string name);
+    Task<BotDto> AddBotAsync(string name, IReadOnlyList<Guid>? channelIds = null);
+    Task<BotDto> UpdateBotAsync(Guid botId, string name, IReadOnlyList<Guid>? channelIds = null);
     Task DeleteBotAsync(Guid botId);
-    Task RefreshBotWebhookAsync(Guid botId);
 
     // ─── Workflows ───────────────────────────────────────────────────────────
     Task<WorkflowResponse?> GetWorkflowByIdAsync(Guid id);
