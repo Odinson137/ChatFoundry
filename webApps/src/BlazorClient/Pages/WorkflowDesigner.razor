@@ -82,6 +82,22 @@
                 <button type="button" class="designer-btn-secondary" @onclick="OpenVariablesModal" title="Переменные">
                     <span class="oi oi-code"></span> Переменные
                 </button>
+                <div class="designer-json-dropdown">
+                    <button type="button" class="designer-btn-secondary" @onclick="() => _jsonMenuOpen = !_jsonMenuOpen" title="Экспорт / импорт JSON">
+                        <span class="oi oi-document"></span> JSON <span class="oi oi-chevron-bottom"></span>
+                    </button>
+                    @if (_jsonMenuOpen)
+                    {
+                        <div class="designer-json-dropdown-backdrop" @onclick="() => _jsonMenuOpen = false"></div>
+                        <ul class="dropdown-menu dropdown-menu-end show">
+                            <li><button type="button" class="dropdown-item" @onclick="CloseJsonMenuAndDownload"><span class="oi oi-data-transfer-download"></span> Скачать</button></li>
+                            <li><button type="button" class="dropdown-item" @onclick="TriggerImportJsonFile"><span class="oi oi-data-transfer-upload"></span> Загрузить</button></li>
+                        </ul>
+                    }
+                </div>
+                <div id="workflow-json-file-wrap" class="d-none">
+                    <InputFile accept=".json,application/json" OnChange="OnImportWorkflowJson" />
+                </div>
                 <button type="button" class="designer-btn-primary designer-header-save" @onclick="SaveWorkflow" title="Сохранить">
                     <span class="oi oi-circle-check"></span> Сохранить
                 </button>

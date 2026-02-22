@@ -45,6 +45,24 @@
                 layer.style.transformOrigin = '0 0';
             }
         };
+        window.__triggerWorkflowJsonFileInput = function() {
+            var wrap = document.getElementById('workflow-json-file-wrap');
+            if (wrap) {
+                var input = wrap.querySelector('input[type=file]');
+                if (input) input.click();
+            }
+        };
+        window.__downloadWorkflowJson = function(filename, jsonContent) {
+            var blob = new Blob([jsonContent], { type: 'application/json' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
     </script>
 </body>
 

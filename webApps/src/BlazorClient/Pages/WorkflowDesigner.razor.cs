@@ -16,6 +16,7 @@ using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BlazorClient.Models.Diagram;
@@ -103,6 +104,9 @@ public partial class WorkflowDesigner : IDisposable
     private bool IsVariablePickerOpen { get; set; }
     private string VariablePickerSearch { get; set; } = "";
     private Action<string>? OnVariableSelected { get; set; }
+
+    // JSON-меню (открыто/закрыто)
+    private bool _jsonMenuOpen;
 
     // Файловое хранилище — список для выбора в блоке Медиа
     private List<FileInfoDto>? StorageFiles { get; set; }
@@ -366,6 +370,86 @@ public partial class WorkflowDesigner : IDisposable
 
         await ApiClient.UpdateWorkflowDefinitionsAsync(WorkflowId, nStr, eStr, lStr);
         LastSavedAt = DateTime.UtcNow;
+    }
+
+    private static readonly JsonSerializerOptions WorkflowJsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        PropertyNameCaseInsensitive = true,
+        WriteIndented = true
+    };
+
+    private WorkflowSchema GetCurrentSchema()
+    {
+        var nodes = Diagram.Nodes.Cast<WorkflowNodeModel>().Select(n => new NodeDefinition(
+            Guid.Parse(n.Id),
+            n.NodeType,
+            n.Title ?? "",
+            n.Data is EmptyNodeData ? null : n.Data)).ToList();
+        var edges = Diagram.Links.Cast<WorkflowLinkModel>().Select(l =>
+        {
+            var fromId = GetNodeIdFromAnchor(l.Source);
+            var toId = GetNodeIdFromAnchor(l.Target);
+            return (fromId.HasValue && toId.HasValue)
+                ? new EdgeDefinition(fromId.Value, toId.Value, l.Label, l.Condition)
+                : null;
+        }).Where(e => e != null).Select(e => e!).ToList();
+        var layout = Diagram.Nodes.Select(n => new LayoutDefinition(
+            Guid.Parse(n.Id),
+            n.Position.X,
+            n.Position.Y)).ToList();
+        return new WorkflowSchema(nodes, edges, layout);
+    }
+
+    private async Task CloseJsonMenuAndDownload()
+    {
+        _jsonMenuOpen = false;
+        await DownloadWorkflowJson();
+    }
+
+    private async Task TriggerImportJsonFile()
+    {
+        _jsonMenuOpen = false;
+        StateHasChanged();
+        await JSRuntime.InvokeVoidAsync("window.__triggerWorkflowJsonFileInput");
+    }
+
+    private async Task DownloadWorkflowJson()
+    {
+        var schema = GetCurrentSchema();
+        var json = JsonSerializer.Serialize(schema, WorkflowJsonOptions);
+        var fileName = $"workflow-{DateTime.UtcNow:yyyyMMdd-HHmmss}.json";
+        await JSRuntime.InvokeVoidAsync("window.__downloadWorkflowJson", fileName, json);
+    }
+
+    private async Task OnImportWorkflowJson(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file == null || file.Size == 0) return;
+        try
+        {
+            await using var stream = file.OpenReadStream(maxAllowedSize: 2 * 1024 * 1024); // 2 MB
+            var schema = await JsonSerializer.DeserializeAsync<WorkflowSchema>(stream, WorkflowJsonOptions);
+            if (schema == null) return;
+            _isRestoring = true;
+            try
+            {
+                ApplySchemaToDiagram(schema);
+            }
+            finally
+            {
+                _isRestoring = false;
+            }
+            _undoStack.Clear();
+            _undoIndex = -1;
+            PushUndoState();
+            RefreshVariables();
+            _jsonMenuOpen = false;
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Ошибка загрузки JSON: {ex.Message}");
+        }
     }
 
     #endregion

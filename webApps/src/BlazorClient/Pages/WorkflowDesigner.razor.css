@@ -306,6 +306,30 @@
     gap: 0.75rem;
 }
 
+/* JSON dropdown (Blazor-controlled, без Bootstrap JS) */
+.designer-json-dropdown {
+    position: relative;
+}
+
+.designer-json-dropdown .oi-chevron-bottom {
+    font-size: 0.65rem;
+    margin-left: 0.15rem;
+}
+
+.designer-json-dropdown-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+}
+
+.designer-json-dropdown .dropdown-menu {
+    position: absolute;
+    right: 0;
+    left: auto;
+    z-index: 1001;
+    margin-top: 0.25rem;
+}
+
 .designer-btn-secondary {
     display: inline-flex;
     align-items: center;
