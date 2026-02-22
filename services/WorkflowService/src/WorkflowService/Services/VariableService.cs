@@ -1,10 +1,13 @@
+using Shared.Domain.Enums;
 using Workflow.Grpc.Client;
 using WorkflowService.Entities;
 using WorkflowService.Interfaces;
 
 namespace WorkflowService.Services;
 
-public class VariableService(ClientAttributesService.ClientAttributesServiceClient grpcClient) : IVariableService
+public class VariableService(
+    ClientAttributesService.ClientAttributesServiceClient grpcClient,
+    ILogger<VariableService> logger) : IVariableService
 {
     private const string GlobalPrefix = "$global.";
 
@@ -16,37 +19,61 @@ public class VariableService(ClientAttributesService.ClientAttributesServiceClie
         ["email"] = a => a.Email
     };
 
+    private static readonly Dictionary<MessageParameter, string> EventParamToGlobalKey = new()
+    {
+        [MessageParameter.FirstName] = "name",
+        [MessageParameter.UserName] = "username",
+        [MessageParameter.Mail] = "email",
+        [MessageParameter.Phone] = "phone"
+    };
+
+    public void PopulateFromEventParameters(Session session, IReadOnlyDictionary<MessageParameter, string> parameters)
+    {
+        if (parameters == null) return;
+        foreach (var (param, key) in EventParamToGlobalKey)
+        {
+            if (parameters.TryGetValue(param, out var value) && !string.IsNullOrWhiteSpace(value))
+                session.Variables[GlobalPrefix + key] = value;
+        }
+    }
+
     public async Task LoadClientVariablesAsync(Session session, CancellationToken ct)
     {
-        try
+        const int maxAttempts = 3;
+        var delayMs = 200;
+        for (var attempt = 0; attempt < maxAttempts; attempt++)
         {
-            var response = await grpcClient.GetClientAttributesAsync(
-                new GetClientAttributesRequest
-                {
-                    ExternalUserId = session.ClientId,
-                    Channel = session.Channel.ToString()
-                }, cancellationToken: ct);
-
-            if (response.BaseAttributes != null)
+            try
             {
-                foreach (var (key, getter) in BaseAttrGetters)
-                {
-                    var value = getter(response.BaseAttributes);
-                    if (value != null)
+                var response = await grpcClient.GetClientAttributesAsync(
+                    new GetClientAttributesRequest
                     {
-                        session.Variables[GlobalPrefix + key] = value;
+                        ExternalUserId = session.ClientId,
+                        Channel = session.Channel.ToString()
+                    }, cancellationToken: ct);
+
+                if (response.BaseAttributes != null)
+                {
+                    foreach (var (key, getter) in BaseAttrGetters)
+                    {
+                        var value = getter(response.BaseAttributes);
+                        if (value != null)
+                            session.Variables[GlobalPrefix + key] = value;
                     }
                 }
-            }
 
-            foreach (var (key, value) in response.CustomAttributes)
-            {
-                session.Variables[GlobalPrefix + key] = value;
+                foreach (var (key, value) in response.CustomAttributes)
+                    session.Variables[GlobalPrefix + key] = value;
+
+                return;
             }
-        }
-        catch (global::Grpc.Core.RpcException ex) when (ex.StatusCode == global::Grpc.Core.StatusCode.NotFound)
-        {
-            // Client channel not found yet — no variables to load
+            catch (global::Grpc.Core.RpcException ex) when (ex.StatusCode == global::Grpc.Core.StatusCode.NotFound)
+            {
+                if (attempt == maxAttempts - 1)
+                    return; // Client still not created; PopulateFromEventParameters already set base attrs
+                await Task.Delay(delayMs, ct);
+                delayMs *= 2;
+            }
         }
     }
 
@@ -140,10 +167,31 @@ public class VariableService(ClientAttributesService.ClientAttributesServiceClie
             request.BaseAttributes = null;
         }
 
-        if (hasBaseChanges || request.CustomAttributes.Any())
+        if (!hasBaseChanges && !request.CustomAttributes.Any())
+            return;
+
+        const int maxAttempts = 3;
+        var delayMs = 200;
+        for (var attempt = 0; attempt < maxAttempts; attempt++)
         {
-            await grpcClient.SetClientAttributesAsync(request, cancellationToken: ct);
-            session.ClientProfileDirty = false;
+            try
+            {
+                await grpcClient.SetClientAttributesAsync(request, cancellationToken: ct);
+                session.ClientProfileDirty = false;
+                return;
+            }
+            catch (global::Grpc.Core.RpcException ex) when (ex.StatusCode == global::Grpc.Core.StatusCode.NotFound)
+            {
+                if (attempt == maxAttempts - 1)
+                {
+                    logger.LogWarning(
+                        "SetClientAttributes failed after {Attempts} retries (NotFound). ClientId={ClientId}, Channel={Channel}. Attributes will be retried on next sync.",
+                        maxAttempts, session.ClientId, session.Channel);
+                    return; // Do not throw — workflow continues; ClientProfileDirty stays true for next sync
+                }
+                await Task.Delay(delayMs, ct);
+                delayMs *= 2;
+            }
         }
     }
 }

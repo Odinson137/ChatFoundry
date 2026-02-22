@@ -37,6 +37,7 @@ public class SessionResolver(
             await sessionRepository.AddAsync(session, ct);
         }
 
+        variableService.PopulateFromEventParameters(session, message.Parameters);
         await variableService.LoadClientVariablesAsync(session, ct);
 
         return session;

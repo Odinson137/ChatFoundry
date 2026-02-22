@@ -145,11 +145,11 @@ services.AddMassTransit(x =>
 
 services.AddGrpc();
 
-// TODO потом придумать способ 
 services.AddGrpcClient<ClientAttributesService.ClientAttributesServiceClient>(o =>
 {
     o.Address = new Uri("http://client-service:8081");
-});
+})
+.AddStandardResilienceHandler();
 
 services.AddScoped<Query>();
 services.AddScoped<BotMutation>();
