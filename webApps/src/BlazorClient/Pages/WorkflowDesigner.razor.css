@@ -57,6 +57,17 @@
     gap: 0.5rem;
 }
 
+.sidebar-brand-logo {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    text-decoration: none;
+}
+
+.sidebar-brand-logo:hover .sidebar-brand-icon--svg svg {
+    opacity: 0.9;
+}
+
 .sidebar-brand-icon {
     width: 32px;
     height: 32px;
@@ -71,6 +82,22 @@
 
 .sidebar-brand-icon.oi {
     font-size: 1.1rem;
+}
+
+.sidebar-brand-icon--svg {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+}
+
+.sidebar-brand-icon--svg svg {
+    display: block;
+    width: 28px;
+    height: 28px;
+    transition: opacity 0.2s;
 }
 
 .sidebar-brand-text {
