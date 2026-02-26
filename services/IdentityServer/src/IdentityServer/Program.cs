@@ -1,10 +1,12 @@
 using IdentityServer.Data;
 using IdentityServer.Entities;
+using IdentityServer.GraphQL;
 using IdentityServer.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 using OpenIddict.Server;
+using OpenIddict.Validation.AspNetCore;
 using Shared.Grpc.Company;
 using Shared.Infrastructure.DependencyInjection;
 
@@ -15,6 +17,7 @@ var services = builder.Services;
 services.AddControllers();
 services.AddEndpointsApiExplorer();
 services.AddGrpc();
+services.AddHttpContextAccessor();
 
 services.AddPostgreSql<IdentityDbContext>(builder.Configuration);
 
@@ -80,8 +83,21 @@ services.AddOpenIddict()
         });
     });
 
+services.AddOpenIddict()
+    .AddValidation(options =>
+    {
+        options.UseLocalServer();
+        options.UseAspNetCore();
+    });
 
 services.AddAuthentication(options => { options.DefaultScheme = IdentityConstants.ApplicationScheme; });
+
+services.AddAuthorization();
+
+services.AddScoped<MeQuery>();
+
+services.AddGraphQLServer()
+    .AddQueryType<MeQuery>();
 
 var app = builder.Build();
 
@@ -89,6 +105,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapGraphQL();
 app.MapGrpcService<IdentityServer.Grpc.UserCompanyGrpcService>();
 
 app.MapGet("/", () => "IdentityServer sample running");

@@ -1,4 +1,5 @@
 @page "/profile"
+@using BlazorClient.Interfaces
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
 
@@ -8,4 +9,60 @@
     <h1>Профиль</h1>
 </div>
 
-<p class="text-muted">Здесь будут настройки профиля.</p>
+@if (loadError != null)
+{
+    <div class="alert alert-danger">@loadError</div>
+}
+else if (me != null)
+{
+    var nameFromEmail = string.IsNullOrEmpty(me.Email) ? "—" : (me.Email.Contains('@') ? me.Email[..me.Email.IndexOf('@')] : me.Email);
+    var createdAtFormatted = me.CreatedAt == default ? "—" : me.CreatedAt.ToString("dd.MM.yyyy");
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Данные аккаунта</h5>
+            <p class="card-text mb-1"><strong>Почта:</strong> @(me.Email ?? "—")</p>
+            <p class="card-text mb-1"><strong>Имя:</strong> @nameFromEmail</p>
+            <p class="card-text mb-3"><strong>Дата регистрации:</strong> @createdAtFormatted</p>
+            <button type="button" class="btn btn-outline-primary" @onclick="OnChangePasswordClick">
+                Сменить пароль
+            </button>
+        </div>
+    </div>
+}
+
+@if (isLoading)
+{
+    <div class="d-flex justify-content-center mt-3">
+        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Загрузка...</span></div>
+    </div>
+}
+
+@code {
+    [Inject] private IIdentityApiClient IdentityApi { get; set; } = null!;
+
+    private MeDto? me;
+    private bool isLoading = true;
+    private string? loadError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            me = await IdentityApi.GetMeAsync();
+        }
+        catch (Exception ex)
+        {
+            loadError = ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void OnChangePasswordClick()
+    {
+        // Заглушка: логика смены пароля на бэкенде пока не реализована
+    }
+}

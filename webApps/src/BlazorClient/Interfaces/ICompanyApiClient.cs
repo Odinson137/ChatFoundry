@@ -1,5 +1,12 @@
 namespace BlazorClient.Interfaces;
 
+public interface IIdentityApiClient
+{
+    Task<MeDto?> GetMeAsync(CancellationToken ct = default);
+}
+
+public record MeDto(Guid Id, string? Email, string? UserName, DateTime CreatedAt);
+
 public interface ICompanyApiClient
 {
     Task<CompanyDto?> GetCurrentCompanyAsync(CancellationToken ct = default);
