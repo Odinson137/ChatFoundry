@@ -32,12 +32,24 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
     }
     
     [UsePaging(IncludeTotalCount = true)]
-    [UseProjection] 
     [UseFiltering]
     [UseSorting]
     public IQueryable<Session> GetSessions([Service] WorkflowDbContext context)
     {
-        return context.Sessions;
+        var query = context.Sessions
+            .Include(s => s.Workflow).ThenInclude(w => w.Bot)
+            .Include(s => s.Actions)
+            .AsQueryable();
+
+        if (CompanyId.HasValue)
+        {
+            var companyWorkflowIds = context.Workflows
+                .Where(w => w.Bot.CompanyId == CompanyId.Value)
+                .Select(w => w.Id);
+            query = query.Where(s => companyWorkflowIds.Contains(s.WorkflowId));
+        }
+
+        return query.OrderByDescending(s => s.CreatedAt);
     }
     
     [UsePaging(IncludeTotalCount = true)]

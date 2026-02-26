@@ -1,0 +1,207 @@
+@page "/settings/sessions/{SessionId:guid}"
+@using Blazor.Diagrams.Components
+@using Blazor.Diagrams.Components.Widgets
+@using Blazor.Diagrams.Core.Models
+@using BlazorClient.Models.Diagram
+@using BlazorClient.Models.DTO
+@using Microsoft.AspNetCore.Authorization
+@layout DesignerLayout
+@attribute [Authorize]
+
+@inject BlazorClient.Interfaces.IWorkflowApiClient ApiClient
+@inject BlazorClient.Interfaces.IWorkflowSchemaService SchemaService
+@inject NavigationManager Navigation
+
+<PageTitle>Путь пользователя — ChatFoundry</PageTitle>
+
+<div class="replay-page-container">
+    <!-- Левая панель: информация о сессии и шаги -->
+    <aside class="replay-sidebar">
+        <div class="replay-sidebar-header">
+            <button class="replay-back-btn" @onclick="GoBack" title="Назад к сессиям">
+                <span class="oi oi-arrow-left"></span>
+            </button>
+            <div>
+                <div class="replay-sidebar-title">Путь пользователя</div>
+                <div class="replay-sidebar-subtitle">Просмотр сессии</div>
+            </div>
+        </div>
+
+        @if (_session != null)
+        {
+            <div class="replay-session-info">
+                <div class="replay-info-row">
+                    <span class="replay-info-label">Бот</span>
+                    <span class="replay-info-value">@(_session.Workflow?.Bot?.Name ?? "—")</span>
+                </div>
+                <div class="replay-info-row">
+                    <span class="replay-info-label">Клиент</span>
+                    <span class="replay-info-value"><code>@_session.ClientId</code></span>
+                </div>
+                <div class="replay-info-row">
+                    <span class="replay-info-label">Канал</span>
+                    <span class="replay-info-value">@FormatChannel(_session.Channel)</span>
+                </div>
+                <div class="replay-info-row">
+                    <span class="replay-info-label">Статус</span>
+                    <span class="badge @StatusBadgeClass(_session.Status)">@StatusLabel(_session.Status)</span>
+                </div>
+                <div class="replay-info-row">
+                    <span class="replay-info-label">Создана</span>
+                    <span class="replay-info-value">@_session.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+                </div>
+                @if (_session.CompletedAt.HasValue)
+                {
+                    <div class="replay-info-row">
+                        <span class="replay-info-label">Завершена</span>
+                        <span class="replay-info-value">@_session.CompletedAt.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+                    </div>
+                }
+            </div>
+
+            <!-- Вкладки -->
+            <div class="replay-tabs">
+                <button class="replay-tab @(_activeTab == 0 ? "active" : "")" @onclick="() => _activeTab = 0">
+                    Шаги (@(_session.Actions?.Count ?? 0))
+                </button>
+                <button class="replay-tab @(_activeTab == 1 ? "active" : "")" @onclick="() => _activeTab = 1">
+                    Переменные
+                </button>
+            </div>
+
+            <div class="replay-sidebar-content">
+                @if (_activeTab == 0)
+                {
+                    <!-- Шаги -->
+                    <div class="replay-steps">
+                        @if (_orderedActions != null)
+                        {
+                            @foreach (var (action, index) in _orderedActions.Select((a, i) => (a, i)))
+                            {
+                                var nodeLabel = GetNodeLabel(action.NodeId);
+                                var isSelected = _selectedStepIndex == index;
+                                var isCurrent = _session.CurrentNodeId.HasValue && action.NodeId == _session.CurrentNodeId.Value;
+
+                                <button class="replay-step @(isSelected ? "selected" : "") @(isCurrent ? "current" : "")"
+                                        @onclick="() => SelectStep(index)">
+                                    <div class="replay-step-number">@(index + 1)</div>
+                                    <div class="replay-step-body">
+                                        <div class="replay-step-title">@nodeLabel</div>
+                                        <div class="replay-step-meta">
+                                            <span class="replay-step-type">@action.WorkflowNodeType</span>
+                                            <span class="replay-step-status @ActionStatusClass(action.Status)">@ActionStatusLabel(action.Status)</span>
+                                        </div>
+                                        <div class="replay-step-time">@action.CreatedAt.ToLocalTime().ToString("HH:mm:ss")</div>
+                                    </div>
+                                </button>
+                            }
+                        }
+                    </div>
+                }
+                else
+                {
+                    <!-- Переменные -->
+                    <div class="replay-variables">
+                        @if (_variables.Any())
+                        {
+                            <div class="replay-var-search">
+                                <span class="oi oi-magnifying-glass"></span>
+                                <input type="text" placeholder="Поиск..." @bind="_varSearch" @bind:event="oninput"/>
+                            </div>
+
+                            @if (GetGlobalVariables().Any())
+                            {
+                                <div class="replay-var-group-title">Атрибуты ($global)</div>
+                                @foreach (var kv in GetGlobalVariables())
+                                {
+                                    <div class="replay-var-item var-global">
+                                        <code class="replay-var-name">@kv.Key</code>
+                                        <span class="replay-var-value">@kv.Value</span>
+                                    </div>
+                                }
+                            }
+
+                            @if (GetSessionVariables().Any())
+                            {
+                                <div class="replay-var-group-title">Переменные сессии</div>
+                                @foreach (var kv in GetSessionVariables())
+                                {
+                                    <div class="replay-var-item var-session">
+                                        <code class="replay-var-name">@kv.Key</code>
+                                        <span class="replay-var-value">@(string.IsNullOrEmpty(kv.Value) ? "(пусто)" : kv.Value)</span>
+                                    </div>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <div class="replay-empty-state">
+                                Переменные отсутствуют
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </aside>
+
+    <!-- Основная область: канвас -->
+    <main class="replay-main">
+        <header class="replay-header">
+            <div class="replay-header-left">
+                <span class="replay-workflow-title">Просмотр пути</span>
+                <span class="replay-badge">Replay</span>
+                @if (_session?.Workflow?.Bot != null)
+                {
+                    <span class="replay-header-divider"></span>
+                    <span class="replay-header-bot">@_session.Workflow.Bot.Name v@_session.Workflow.Version</span>
+                }
+            </div>
+            <div class="replay-header-right">
+                <div class="replay-legend">
+                    <span class="replay-legend-item"><span class="replay-legend-dot legend-visited"></span> Пройден</span>
+                    <span class="replay-legend-item"><span class="replay-legend-dot legend-current"></span> Текущий</span>
+                    <span class="replay-legend-item"><span class="replay-legend-dot legend-failed"></span> Ошибка</span>
+                    <span class="replay-legend-item"><span class="replay-legend-dot legend-unvisited"></span> Не пройден</span>
+                </div>
+            </div>
+        </header>
+
+        @if (!string.IsNullOrEmpty(_loadError))
+        {
+            <div class="alert alert-danger m-3" role="alert">@_loadError</div>
+        }
+        else if (_isLoading)
+        {
+            <div class="d-flex justify-content-center align-items-center" style="flex:1">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
+            </div>
+        }
+        else if (Diagram != null)
+        {
+            <div class="replay-canvas-area">
+                <CascadingValue Value="@((IReplayDataProvider)this)" Name="ReplayDataProvider">
+                    <CascadingValue Value="Diagram">
+                        <DiagramCanvas class="replay-canvas">
+                            <Widgets>
+                                <GridWidget Size="24" Mode="GridMode.Point" BackgroundColor="#ffffff"/>
+                            </Widgets>
+                        </DiagramCanvas>
+                    </CascadingValue>
+                </CascadingValue>
+
+                <div class="replay-zoom-controls">
+                    <button class="replay-zoom-btn" @onclick="ZoomOut" title="Уменьшить">
+                        <span class="oi oi-minus"></span>
+                    </button>
+                    <span class="replay-zoom-value">@ZoomPercent%</span>
+                    <button class="replay-zoom-btn" @onclick="ZoomIn" title="Увеличить">
+                        <span class="oi oi-plus"></span>
+                    </button>
+                </div>
+            </div>
+        }
+    </main>
+</div>

@@ -1,0 +1,102 @@
+/* ============================================
+   ReplayNodeWidget — custom node for session replay
+   Rendered by Z.Blazor.Diagrams inside its canvas,
+   so these styles must be global (not scoped).
+   ============================================ */
+
+.replay-node {
+    min-width: 140px;
+    border-radius: 12px;
+    background: #fff;
+    border: 2px solid #e2e8f0;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+    overflow: visible;
+    cursor: default;
+    position: relative;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Color variants (left accent border) */
+.replay-node--green  { border-left: 4px solid #059669; }
+.replay-node--red    { border-left: 4px solid #dc2626; }
+.replay-node--blue   { border-left: 4px solid #2563eb; }
+.replay-node--orange { border-left: 4px solid #ea580c; }
+.replay-node--indigo { border-left: 4px solid #4f46e5; }
+.replay-node--violet { border-left: 4px solid #7c3aed; }
+.replay-node--default { border-left: 4px solid #94a3b8; }
+
+/* Highlight states */
+.replay-node--visited {
+    border-color: #22c55e;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2), 0 4px 20px rgba(15, 23, 42, 0.08);
+}
+
+.replay-node--current {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3), 0 4px 20px rgba(99, 102, 241, 0.15);
+}
+
+.replay-node--selected {
+    border-color: #6366f1;
+    background: #eef2ff;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.35), 0 4px 24px rgba(99, 102, 241, 0.2);
+}
+
+.replay-node--has-errors {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2), 0 4px 20px rgba(15, 23, 42, 0.08);
+}
+
+.replay-node--unvisited {
+    opacity: 0.5;
+}
+
+/* Header */
+.replay-node-header {
+    padding: 0.5rem 0.75rem;
+    background: #f8fafc;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #334155;
+    border-radius: 10px 10px 0 0;
+}
+
+/* Badges row — sits below the header inside the node */
+.replay-node-badges {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0.375rem 0.625rem;
+    flex-wrap: wrap;
+}
+
+.replay-badge-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    background: #334155;
+    color: #fff;
+    min-width: 20px;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.replay-badge-pill.pill-ok {
+    background: #22c55e;
+}
+
+.replay-badge-pill.pill-fail {
+    background: #ef4444;
+}
+
+.replay-badge-pill.pill-current {
+    background: #6366f1;
+    font-size: 0.5rem;
+}

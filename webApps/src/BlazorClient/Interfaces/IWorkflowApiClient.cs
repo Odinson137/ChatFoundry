@@ -20,6 +20,10 @@ public interface IWorkflowApiClient
     Task<BotDto> UpdateBotAsync(Guid botId, string name, IReadOnlyList<Guid>? channelIds = null);
     Task DeleteBotAsync(Guid botId);
 
+    // ─── Sessions ────────────────────────────────────────────────────────────
+    Task<List<SessionDto>> GetSessionsAsync(string? statusFilter = null);
+    Task<SessionDto?> GetSessionByIdAsync(Guid sessionId);
+
     // ─── Workflows ───────────────────────────────────────────────────────────
     Task<WorkflowResponse?> GetWorkflowByIdAsync(Guid id);
     Task<bool> AddBotWorkflowAsync(Guid botId, int version);

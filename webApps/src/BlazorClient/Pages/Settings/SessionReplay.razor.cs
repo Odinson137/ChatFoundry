@@ -1,0 +1,331 @@
+using Blazor.Diagrams;
+using Blazor.Diagrams.Core.Anchors;
+using Blazor.Diagrams.Core.Geometry;
+using Blazor.Diagrams.Core.Models;
+using Blazor.Diagrams.Core.PathGenerators;
+using Blazor.Diagrams.Core.Routers;
+using Blazor.Diagrams.Options;
+using BlazorClient.Components;
+using BlazorClient.Models;
+using BlazorClient.Models.Diagram;
+using BlazorClient.Models.DTO;
+using Microsoft.AspNetCore.Components;
+
+namespace BlazorClient.Pages.Settings;
+
+public interface IReplayDataProvider
+{
+    NodeStats? GetStats(Guid nodeId);
+    bool IsCurrentNode(Guid nodeId);
+    bool IsSelectedStep(Guid nodeId);
+}
+
+public partial class SessionReplay : IDisposable, IReplayDataProvider
+{
+    [Parameter] public Guid SessionId { get; set; }
+
+    private BlazorDiagram? Diagram { get; set; }
+    private SessionDto? _session;
+    private List<SessionActionDto>? _orderedActions;
+    private Dictionary<Guid, NodeStats>? _nodeStats;
+    private Dictionary<Guid, string> _nodeLabels = new();
+    private Dictionary<string, string> _variables = new();
+
+    private bool _isLoading = true;
+    private string? _loadError;
+    private int _activeTab;
+    private int _selectedStepIndex = -1;
+    private string _varSearch = "";
+
+    private double _zoomLevel = 1.0;
+    private int ZoomPercent => (int)Math.Round(_zoomLevel * 100);
+
+    protected override async Task OnInitializedAsync()
+    {
+        InitializeDiagram();
+        await LoadData();
+    }
+
+    private void InitializeDiagram()
+    {
+        var options = new BlazorDiagramOptions
+        {
+            AllowMultiSelection = false,
+            Zoom = { Enabled = true },
+            Links =
+            {
+                DefaultRouter = new NormalRouter(),
+                DefaultPathGenerator = new SmoothPathGenerator()
+            }
+        };
+
+        Diagram = new BlazorDiagram(options);
+        Diagram.RegisterComponent<WorkflowNodeModel, ReplayNodeWidget>();
+    }
+
+    private async Task LoadData()
+    {
+        _isLoading = true;
+        _loadError = null;
+
+        try
+        {
+            _session = await ApiClient.GetSessionByIdAsync(SessionId);
+            if (_session == null)
+            {
+                _loadError = "Сессия не найдена.";
+                return;
+            }
+
+            _orderedActions = _session.Actions?.OrderBy(a => a.CreatedAt).ToList() ?? [];
+            _variables = _session.GetVariablesDict();
+            BuildNodeStats();
+
+            if (_session.Workflow != null)
+            {
+                var schema = SchemaService.Deserialize(
+                    _session.Workflow.NodesDefinition,
+                    _session.Workflow.EdgesDefinition,
+                    _session.Workflow.LayoutDefinition);
+
+                ApplySchemaToDiagram(schema);
+                BuildNodeLabels(schema);
+            }
+            else
+            {
+                _loadError = "Workflow для этой сессии не найден.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _loadError = $"Ошибка загрузки: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void ApplySchemaToDiagram(WorkflowSchema schema)
+    {
+        if (Diagram == null) return;
+
+        Diagram.Nodes.Clear();
+        Diagram.Links.Clear();
+        var nodeMap = new Dictionary<Guid, NodeModel>();
+
+        foreach (var nDef in schema.Nodes)
+        {
+            var layout = schema.Layout.FirstOrDefault(l => l.NodeId == nDef.Id);
+            var position = layout != null ? new Point(layout.X, layout.Y) : new Point(50, 50);
+            var node = CreateNodeInstance(nDef.Type, nDef.Label, position, nDef.Id, nDef.Data);
+            nodeMap[nDef.Id] = node;
+            Diagram.Nodes.Add(node);
+        }
+
+        foreach (var eDef in schema.Edges)
+        {
+            if (nodeMap.TryGetValue(eDef.From, out var source) && nodeMap.TryGetValue(eDef.To, out var target))
+            {
+                var sourcePort = source.Ports.FirstOrDefault(p => p.Alignment == PortAlignment.Right) ?? source.Ports.FirstOrDefault();
+                var targetPort = target.Ports.FirstOrDefault(p => p.Alignment == PortAlignment.Left) ?? target.Ports.FirstOrDefault();
+
+                if (sourcePort != null && targetPort != null)
+                {
+                    var link = new WorkflowLinkModel(new SinglePortAnchor(sourcePort), new SinglePortAnchor(targetPort))
+                    {
+                        Condition = eDef.Condition,
+                        Label = eDef.Label
+                    };
+                    Diagram.Links.Add(link);
+                }
+            }
+        }
+
+        foreach (var node in Diagram.Nodes)
+            node.Locked = true;
+        foreach (var link in Diagram.Links)
+            link.Locked = true;
+    }
+
+    private NodeModel CreateNodeInstance(string type, string label, Point position, Guid? id = null, NodeData? data = null)
+    {
+        data ??= type.ToLower() switch
+        {
+            "message" => new MessageNodeData { Text = "" },
+            "ask" => new AskNodeData { Text = "" },
+            "setvariable" => new SetVariableNodeData { Variable = "", Value = "" },
+            "setattribute" => new SetAttributeNodeData { Attribute = "", Value = "" },
+            "media" => new MediaNodeData { SourceType = MediaSourceType.Attachment },
+            _ => new EmptyNodeData()
+        };
+
+        var node = new WorkflowNodeModel(position, type, label, id, data);
+
+        switch (type.ToLower())
+        {
+            case "start":
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right));
+                break;
+            case "end":
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Left));
+                break;
+            case "condition":
+            case "aifilter":
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Left));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right));
+                break;
+            default:
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Left));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right));
+                break;
+        }
+
+        return node;
+    }
+
+    private void BuildNodeLabels(WorkflowSchema schema)
+    {
+        _nodeLabels = schema.Nodes.ToDictionary(n => n.Id, n => n.Label);
+    }
+
+    private void BuildNodeStats()
+    {
+        _nodeStats = new Dictionary<Guid, NodeStats>();
+        if (_orderedActions == null) return;
+
+        foreach (var action in _orderedActions)
+        {
+            if (!_nodeStats.TryGetValue(action.NodeId, out var stats))
+            {
+                stats = new NodeStats();
+                _nodeStats[action.NodeId] = stats;
+            }
+
+            stats.Visits++;
+            switch (action.Status?.ToUpperInvariant())
+            {
+                case "COMPLETED":
+                    stats.Completed++;
+                    break;
+                case "FAILED":
+                    stats.Failed++;
+                    break;
+            }
+        }
+    }
+
+    // IReplayDataProvider
+    public NodeStats? GetStats(Guid nodeId) => _nodeStats?.GetValueOrDefault(nodeId);
+
+    public bool IsCurrentNode(Guid nodeId) => _session?.CurrentNodeId == nodeId;
+
+    public bool IsSelectedStep(Guid nodeId) =>
+        _selectedStepIndex >= 0
+        && _orderedActions != null
+        && _selectedStepIndex < _orderedActions.Count
+        && _orderedActions[_selectedStepIndex].NodeId == nodeId;
+
+    private string GetNodeLabel(Guid nodeId)
+    {
+        return _nodeLabels.TryGetValue(nodeId, out var label) ? label : nodeId.ToString()[..8];
+    }
+
+    private void SelectStep(int index)
+    {
+        _selectedStepIndex = _selectedStepIndex == index ? -1 : index;
+        StateHasChanged();
+    }
+
+    private void ZoomIn()
+    {
+        if (Diagram == null) return;
+        _zoomLevel = Math.Min(_zoomLevel + 0.1, 3.0);
+        Diagram.SetZoom(_zoomLevel);
+    }
+
+    private void ZoomOut()
+    {
+        if (Diagram == null) return;
+        _zoomLevel = Math.Max(_zoomLevel - 0.1, 0.2);
+        Diagram.SetZoom(_zoomLevel);
+    }
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/settings/sessions");
+    }
+
+    private IEnumerable<KeyValuePair<string, string>> GetFilteredVariables()
+    {
+        if (_variables.Count == 0) return [];
+        if (string.IsNullOrWhiteSpace(_varSearch))
+            return _variables;
+        return _variables.Where(kv =>
+            kv.Key.Contains(_varSearch, StringComparison.OrdinalIgnoreCase) ||
+            kv.Value.Contains(_varSearch, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private List<KeyValuePair<string, string>> GetGlobalVariables()
+        => GetFilteredVariables().Where(kv => kv.Key.StartsWith("$global.")).ToList();
+
+    private List<KeyValuePair<string, string>> GetSessionVariables()
+        => GetFilteredVariables().Where(kv => !kv.Key.StartsWith("$global.")).ToList();
+
+    private static string FormatChannel(string? channel) => channel?.ToUpperInvariant() switch
+    {
+        "TELEGRAM" => "Telegram",
+        "WEB" => "Web",
+        "WHATSAPP" => "WhatsApp",
+        "API" => "API",
+        "EMAIL" => "Email",
+        _ => channel ?? "—"
+    };
+
+    private static string StatusBadgeClass(string? status) => status?.ToUpperInvariant() switch
+    {
+        "ACTIVE" => "bg-primary",
+        "COMPLETED" => "bg-success",
+        "FAILED" => "bg-danger",
+        "CANCELLED" => "bg-warning text-dark",
+        _ => "bg-secondary"
+    };
+
+    private static string StatusLabel(string? status) => status?.ToUpperInvariant() switch
+    {
+        "ACTIVE" => "Активна",
+        "COMPLETED" => "Завершена",
+        "FAILED" => "Ошибка",
+        "CANCELLED" => "Отменена",
+        _ => status ?? "—"
+    };
+
+    private static string ActionStatusClass(string? status) => status?.ToUpperInvariant() switch
+    {
+        "COMPLETED" => "action-completed",
+        "FAILED" => "action-failed",
+        "PROCESSING" => "action-processing",
+        _ => "action-pending"
+    };
+
+    private static string ActionStatusLabel(string? status) => status?.ToUpperInvariant() switch
+    {
+        "COMPLETED" => "OK",
+        "FAILED" => "Ошибка",
+        "PROCESSING" => "В процессе",
+        "PENDING" => "Ожидание",
+        _ => status ?? "—"
+    };
+
+    public void Dispose()
+    {
+    }
+}
+
+public class NodeStats
+{
+    public int Visits { get; set; }
+    public int Completed { get; set; }
+    public int Failed { get; set; }
+}

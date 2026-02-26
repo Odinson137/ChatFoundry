@@ -1,26 +1,176 @@
 @page "/settings/sessions"
 @layout SettingsLayout
+@using BlazorClient.Models.DTO
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
 
+@inject BlazorClient.Interfaces.IWorkflowApiClient ApiClient
+@inject NavigationManager Navigation
+
 <PageTitle>Настройки — Сессии — ChatFoundry</PageTitle>
 
-<div class="coming-soon">
-    <div class="coming-soon-icon">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2v4"/>
-            <path d="M12 18v4"/>
-            <path d="m4.93 4.93 2.83 2.83"/>
-            <path d="m16.24 16.24 2.83 2.83"/>
-            <path d="M2 12h4"/>
-            <path d="M18 12h4"/>
-            <path d="m4.93 19.07 2.83-2.83"/>
-            <path d="m16.24 7.76 2.83-2.83"/>
-        </svg>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Сессии</h1>
+    <div class="d-flex gap-2 align-items-center">
+        <select class="form-select form-select-sm" style="width: auto;" @bind="StatusFilter" @bind:after="LoadSessions">
+            <option value="">Все статусы</option>
+            <option value="ACTIVE">Активные</option>
+            <option value="COMPLETED">Завершённые</option>
+            <option value="FAILED">Ошибка</option>
+            <option value="CANCELLED">Отменённые</option>
+        </select>
+        <button class="btn btn-sm btn-outline-secondary" @onclick="LoadSessions" title="Обновить">
+            <span class="oi oi-reload"></span>
+        </button>
     </div>
-    <h1 class="coming-soon-title">Сессии</h1>
-    <p class="coming-soon-desc">
-        Список всех сессий пользователей с возможностью открыть workflow и посмотреть, по каким блокам
-        переходил пользователь и сколько раз. Удобно для отладки и анализа поведения в диалогах.
-    </p>
 </div>
+
+@if (_isLoading)
+{
+    <div class="d-flex justify-content-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Загрузка...</span>
+        </div>
+    </div>
+}
+else if (!string.IsNullOrEmpty(_error))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @_error
+        <button type="button" class="btn-close" @onclick="() => _error = null"></button>
+    </div>
+}
+else if (!_sessions.Any())
+{
+    <div class="alert alert-info">
+        Сессий пока нет. Они появятся, когда пользователи начнут взаимодействовать с ботами.
+    </div>
+}
+else
+{
+    <table class="table table-hover align-middle sessions-table">
+        <thead class="table-light">
+        <tr>
+            <th>Клиент</th>
+            <th>Бот / Workflow</th>
+            <th>Канал</th>
+            <th>Статус</th>
+            <th>Шагов</th>
+            <th>Создана</th>
+            <th class="text-end">Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var s in _sessions)
+        {
+            <tr class="@(s.Status == "ACTIVE" ? "table-active-row" : "")">
+                <td>
+                    <code class="text-muted small">@TruncateClientId(s.ClientId)</code>
+                </td>
+                <td>
+                    <span class="fw-bold">@(s.Workflow?.Bot?.Name ?? "—")</span>
+                    <br/>
+                    <small class="text-muted">v@(s.Workflow?.Version ?? 0)</small>
+                </td>
+                <td>
+                    <span class="badge bg-secondary-subtle text-dark">@FormatChannel(s.Channel)</span>
+                </td>
+                <td>
+                    <span class="badge @StatusBadgeClass(s.Status)">@StatusLabel(s.Status)</span>
+                </td>
+                <td>
+                    <span>@(s.Actions?.Count ?? 0)</span>
+                </td>
+                <td>
+                    <small>@s.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</small>
+                    @if (s.CompletedAt.HasValue)
+                    {
+                        <br/>
+                        <small class="text-muted">→ @s.CompletedAt.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</small>
+                    }
+                </td>
+                <td class="text-end">
+                    <button class="btn btn-sm btn-outline-primary" @onclick="() => OpenReplay(s.Id)" title="Просмотр пути">
+                        <span class="oi oi-map-marker"></span> Путь
+                    </button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<SessionDto> _sessions = [];
+    private bool _isLoading = true;
+    private string? _error;
+    private string StatusFilter { get; set; } = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSessions();
+    }
+
+    private async Task LoadSessions()
+    {
+        _isLoading = true;
+        _error = null;
+        StateHasChanged();
+
+        try
+        {
+            var filter = string.IsNullOrEmpty(StatusFilter) ? null : StatusFilter;
+            _sessions = await ApiClient.GetSessionsAsync(filter);
+        }
+        catch (Exception ex)
+        {
+            _error = $"Не удалось загрузить сессии: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void OpenReplay(Guid sessionId)
+    {
+        Navigation.NavigateTo($"/settings/sessions/{sessionId}");
+    }
+
+    private static string TruncateClientId(string clientId)
+    {
+        if (string.IsNullOrEmpty(clientId)) return "—";
+        return clientId.Length > 16 ? clientId[..16] + "…" : clientId;
+    }
+
+    private static string FormatChannel(string? channel)
+    {
+        return channel?.ToUpperInvariant() switch
+        {
+            "TELEGRAM" => "Telegram",
+            "WEB" => "Web",
+            "WHATSAPP" => "WhatsApp",
+            "API" => "API",
+            "EMAIL" => "Email",
+            _ => channel ?? "—"
+        };
+    }
+
+    private static string StatusBadgeClass(string? status) => status?.ToUpperInvariant() switch
+    {
+        "ACTIVE" => "bg-primary",
+        "COMPLETED" => "bg-success",
+        "FAILED" => "bg-danger",
+        "CANCELLED" => "bg-warning text-dark",
+        _ => "bg-secondary"
+    };
+
+    private static string StatusLabel(string? status) => status?.ToUpperInvariant() switch
+    {
+        "ACTIVE" => "Активна",
+        "COMPLETED" => "Завершена",
+        "FAILED" => "Ошибка",
+        "CANCELLED" => "Отменена",
+        _ => status ?? "—"
+    };
+}

@@ -183,6 +183,89 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
         await ExecuteGraphQl<object>(query, variables);
     }
 
+    // ─── Sessions ─────────────────────────────────────────────────────────────
+
+    public async Task<List<SessionDto>> GetSessionsAsync(string? statusFilter = null)
+    {
+        var where = statusFilter != null
+            ? $", where: {{ status: {{ eq: {statusFilter} }} }}"
+            : "";
+
+        var query = $$"""
+                query GetSessions {
+                    sessions(order: [{ createdAt: DESC }]{{where}}) {
+                        nodes {
+                            id
+                            clientId
+                            channel
+                            channelId
+                            workflowId
+                            currentNodeId
+                            status
+                            createdAt
+                            completedAt
+                            workflow {
+                                id
+                                version
+                                bot { id name }
+                            }
+                            actions {
+                                id
+                                nodeId
+                                status
+                                workflowNodeType
+                                createdAt
+                            }
+                        }
+                    }
+                }
+                """;
+
+        var result = await ExecuteGraphQl<SessionsConnectionResponse>(query);
+        return result.Sessions.Nodes;
+    }
+
+    public async Task<SessionDto?> GetSessionByIdAsync(Guid sessionId)
+    {
+        var query = """
+                query GetSession($id: UUID!) {
+                    sessions(where: { id: { eq: $id } }) {
+                        nodes {
+                            id
+                            clientId
+                            channel
+                            channelId
+                            workflowId
+                            currentNodeId
+                            status
+                            createdAt
+                            completedAt
+                            variables { key value }
+                            workflow {
+                                id
+                                version
+                                nodesDefinition
+                                edgesDefinition
+                                layoutDefinition
+                                bot { id name }
+                            }
+                            actions {
+                                id
+                                nodeId
+                                status
+                                workflowNodeType
+                                createdAt
+                            }
+                        }
+                    }
+                }
+                """;
+
+        var variables = new { id = sessionId };
+        var result = await ExecuteGraphQl<SessionsConnectionResponse>(query, variables);
+        return result.Sessions.Nodes.FirstOrDefault();
+    }
+
     // ─── Workflows ───────────────────────────────────────────────────────────
 
     public async Task<WorkflowResponse?> GetWorkflowByIdAsync(Guid id)
@@ -408,5 +491,15 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
     {
         public ChannelDto? Channel { get; set; }
         public string? Error { get; set; }
+    }
+
+    private class SessionsConnectionResponse
+    {
+        public SessionConnection Sessions { get; set; } = new();
+    }
+
+    private class SessionConnection
+    {
+        public List<SessionDto> Nodes { get; set; } = [];
     }
 }
