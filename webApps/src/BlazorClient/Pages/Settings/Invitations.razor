@@ -12,113 +12,144 @@
 
 <PageTitle>Настройки — Приглашения — ChatFoundry</PageTitle>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Приглашения</h1>
+<div class="settings-page-header">
+    <div>
+        <h1 class="settings-page-title">Приглашения</h1>
+        <p class="settings-page-subtitle">Приглашайте участников в вашу компанию</p>
+    </div>
+    <button class="settings-btn-primary" @onclick="OpenCreateInviteModal">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Создать приглашение
+    </button>
 </div>
 
 @if (loadError != null)
 {
-    <div class="alert alert-danger">@loadError</div>
+    <div class="settings-alert settings-alert-danger">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        <span>@loadError</span>
+    </div>
 }
-else if (!isLoading)
+else if (isLoading)
 {
-    <div class="mb-3">
-        <button class="btn btn-primary" @onclick="OpenCreateInviteModal">
-            <span class="oi oi-plus"></span> Создать приглашение
+    <div class="settings-spinner-wrap">
+        <div class="settings-spinner"></div>
+    </div>
+}
+else if (!invitations.Any())
+{
+    <div class="settings-empty-state">
+        <div class="settings-empty-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div class="settings-empty-title">Нет приглашений</div>
+        <div class="settings-empty-desc">Создайте ссылку для приглашения участников в компанию.</div>
+        <button class="settings-btn-primary" @onclick="OpenCreateInviteModal">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Создать приглашение
         </button>
     </div>
-    <table class="table table-hover align-middle">
-        <thead class="table-light">
-        <tr>
-            <th>Email</th>
-            <th>Роль</th>
-            <th>Истекает</th>
-            <th>Статус</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var inv in invitations)
-        {
-            <tr>
-                <td>@(inv.Email ?? "—")</td>
-                <td><span class="badge bg-secondary">@inv.Role</span></td>
-                <td>@inv.ExpiresAt.ToLocalTime().ToString("g")</td>
-                <td>@(inv.UsedAt.HasValue ? "Использовано" : "Активно")</td>
-            </tr>
-        }
-        </tbody>
-    </table>
-    @if (!invitations.Any())
-    {
-        <p class="text-muted">Нет приглашений. Создайте ссылку для приглашения в компанию.</p>
-    }
 }
-
-@if (isLoading)
+else
 {
-    <div class="d-flex justify-content-center">
-        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Загрузка...</span></div>
+    <div class="settings-card">
+        <table class="settings-table">
+            <thead>
+            <tr>
+                <th>Email</th>
+                <th>Роль</th>
+                <th>Истекает</th>
+                <th>Статус</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var inv in invitations)
+            {
+                <tr>
+                    <td>
+                        <span class="inv-email">@(inv.Email ?? "Любой email")</span>
+                    </td>
+                    <td>
+                        <span class="settings-badge @InvRoleBadge(inv.Role)">@InvRoleLabel(inv.Role)</span>
+                    </td>
+                    <td>
+                        <span class="inv-date">@inv.ExpiresAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+                    </td>
+                    <td>
+                        @if (inv.UsedAt.HasValue)
+                        {
+                            <span class="settings-badge settings-badge-success">Использовано</span>
+                        }
+                        else
+                        {
+                            <span class="settings-badge settings-badge-primary">Активно</span>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
     </div>
 }
 
-@* Модалка: создать приглашение *@
 @if (showInviteModal)
 {
-    <div class="modal-backdrop fade show"></div>
-    <div class="modal fade show d-block" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Новое приглашение</h5>
-                    <button type="button" class="btn-close" @onclick="CloseInviteModal"></button>
+    <div class="settings-modal-backdrop" @onclick="CloseInviteModal"></div>
+    <div class="settings-modal">
+        <div class="settings-modal-header">
+            <h3 class="settings-modal-title">Новое приглашение</h3>
+            <button class="settings-modal-close" @onclick="CloseInviteModal">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="settings-modal-body">
+            @if (createdInviteLink == null)
+            {
+                <div class="settings-field">
+                    <label class="settings-label">Email (необязательно)</label>
+                    <input type="email" class="settings-input" @bind="inviteEmail" placeholder="user@example.com" />
                 </div>
-                <div class="modal-body">
-                    @if (createdInviteLink == null)
-                    {
-                        <div class="mb-3">
-                            <label class="form-label">Email (необязательно)</label>
-                            <input type="email" class="form-control" @bind="inviteEmail" placeholder="user@example.com" />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Роль</label>
-                            <select class="form-select" @bind="inviteRole">
-                                <option value="MEMBER">Участник</option>
-                                <option value="ADMIN">Админ</option>
-                                <option value="OWNER">Владелец</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Срок действия (дней)</label>
-                            <input type="number" class="form-control" @bind="inviteExpiresDays" min="1" max="365" />
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="alert alert-success">Приглашение создано. Отправьте ссылку приглашённому.</div>
-                        <div class="mb-2">
-                            <label class="form-label">Ссылка для регистрации</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" readonly value="@createdInviteLink" id="invite-link-input" />
-                                <button class="btn btn-outline-secondary" type="button" @onclick="CopyInviteLink">Копировать</button>
-                            </div>
-                        </div>
-                    }
+                <div class="settings-field">
+                    <label class="settings-label">Роль</label>
+                    <select class="settings-select" @bind="inviteRole">
+                        <option value="MEMBER">Участник</option>
+                        <option value="ADMIN">Админ</option>
+                        <option value="OWNER">Владелец</option>
+                    </select>
                 </div>
-                <div class="modal-footer">
-                    @if (createdInviteLink == null)
-                    {
-                        <button type="button" class="btn btn-secondary" @onclick="CloseInviteModal">Отмена</button>
-                        <button type="button" class="btn btn-primary" @onclick="CreateInvitation" disabled="@isCreating">
-                            @if (isCreating) { <span class="spinner-border spinner-border-sm me-1"></span> }
-                            Создать
-                        </button>
-                    }
-                    else
-                    {
-                        <button type="button" class="btn btn-primary" @onclick="CloseInviteModal">Готово</button>
-                    }
+                <div class="settings-field">
+                    <label class="settings-label">Срок действия (дней)</label>
+                    <input type="number" class="settings-input" @bind="inviteExpiresDays" min="1" max="365" />
                 </div>
-            </div>
+            }
+            else
+            {
+                <div class="settings-alert settings-alert-success">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    <span>Приглашение создано. Отправьте ссылку приглашённому.</span>
+                </div>
+                <div class="settings-field">
+                    <label class="settings-label">Ссылка для регистрации</label>
+                    <div class="inv-link-row">
+                        <input type="text" class="settings-input" readonly value="@createdInviteLink" />
+                        <button class="settings-btn-secondary" @onclick="CopyInviteLink">Копировать</button>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="settings-modal-footer">
+            @if (createdInviteLink == null)
+            {
+                <button class="settings-btn-secondary" @onclick="CloseInviteModal">Отмена</button>
+                <button class="settings-btn-primary" @onclick="CreateInvitation" disabled="@isCreating">
+                    @if (isCreating) { <div class="settings-spinner" style="width:16px;height:16px;border-width:2px;"></div> }
+                    Создать
+                </button>
+            }
+            else
+            {
+                <button class="settings-btn-primary" @onclick="CloseInviteModal">Готово</button>
+            }
         </div>
     </div>
 }
@@ -210,4 +241,19 @@ else if (!isLoading)
         }
         catch { }
     }
+
+    private static string InvRoleBadge(string? role) => role?.ToUpperInvariant() switch
+    {
+        "OWNER" => "settings-badge-primary",
+        "ADMIN" => "settings-badge-warning",
+        _ => "settings-badge-neutral"
+    };
+
+    private static string InvRoleLabel(string? role) => role?.ToUpperInvariant() switch
+    {
+        "OWNER" => "Владелец",
+        "ADMIN" => "Админ",
+        "MEMBER" => "Участник",
+        _ => role ?? "—"
+    };
 }

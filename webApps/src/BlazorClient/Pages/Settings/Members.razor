@@ -10,45 +10,79 @@
 
 <PageTitle>Настройки — Участники — ChatFoundry</PageTitle>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Участники</h1>
+<div class="settings-page-header">
+    <div>
+        <h1 class="settings-page-title">Участники</h1>
+        <p class="settings-page-subtitle">Управление участниками вашей компании</p>
+    </div>
 </div>
 
 @if (loadError != null)
 {
-    <div class="alert alert-danger">@loadError</div>
+    <div class="settings-alert settings-alert-danger">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        <span>@loadError</span>
+    </div>
 }
-else if (!isLoading)
+else if (isLoading)
 {
-    <table class="table table-hover align-middle">
-        <thead class="table-light">
-        <tr>
-            <th>UserId</th>
-            <th>Роль</th>
-            <th>Активен</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var m in members)
-        {
+    <div class="settings-spinner-wrap">
+        <div class="settings-spinner"></div>
+    </div>
+}
+else if (!members.Any())
+{
+    <div class="settings-empty-state">
+        <div class="settings-empty-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        </div>
+        <div class="settings-empty-title">Нет участников</div>
+        <div class="settings-empty-desc">Пригласите участников в компанию через раздел «Приглашения».</div>
+    </div>
+}
+else
+{
+    <div class="settings-card">
+        <table class="settings-table">
+            <thead>
             <tr>
-                <td><code>@m.UserId.ToString("N")</code></td>
-                <td><span class="badge bg-secondary">@m.Role</span></td>
-                <td>@(m.IsActive ? "Да" : "Нет")</td>
+                <th>Участник</th>
+                <th>Роль</th>
+                <th>Статус</th>
             </tr>
-        }
-        </tbody>
-    </table>
-    @if (!members.Any())
-    {
-        <p class="text-muted">Нет участников.</p>
-    }
-}
-
-@if (isLoading)
-{
-    <div class="d-flex justify-content-center">
-        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Загрузка...</span></div>
+            </thead>
+            <tbody>
+            @foreach (var m in members)
+            {
+                <tr>
+                    <td>
+                        <div class="member-row">
+                            <div class="member-avatar">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            </div>
+                            <code class="member-id">@m.UserId.ToString("N")[..12]...</code>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="settings-badge @RoleBadgeClass(m.Role)">@RoleLabel(m.Role)</span>
+                    </td>
+                    <td>
+                        @if (m.IsActive)
+                        {
+                            <span class="member-status member-status-active">
+                                <span class="member-status-dot"></span>
+                                Активен
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="member-status member-status-inactive">Неактивен</span>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
     </div>
 }
 
@@ -79,4 +113,19 @@ else if (!isLoading)
             isLoading = false;
         }
     }
+
+    private static string RoleBadgeClass(string? role) => role?.ToUpperInvariant() switch
+    {
+        "OWNER" => "settings-badge-primary",
+        "ADMIN" => "settings-badge-warning",
+        _ => "settings-badge-neutral"
+    };
+
+    private static string RoleLabel(string? role) => role?.ToUpperInvariant() switch
+    {
+        "OWNER" => "Владелец",
+        "ADMIN" => "Админ",
+        "MEMBER" => "Участник",
+        _ => role ?? "—"
+    };
 }

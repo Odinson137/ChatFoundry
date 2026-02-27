@@ -1,0 +1,22 @@
+.inv-email {
+    font-size: 0.875rem;
+    color: #475569;
+}
+
+.inv-date {
+    font-size: 0.82rem;
+    color: #64748b;
+}
+
+.inv-link-row {
+    display: flex;
+    gap: 8px;
+}
+
+.inv-link-row .settings-input {
+    flex: 1;
+    font-family: 'Courier New', monospace;
+    font-size: 0.82rem;
+    background: #f8fafc;
+    color: #64748b;
+}

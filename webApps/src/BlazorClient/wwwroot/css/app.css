@@ -21,6 +21,15 @@ a, .btn-link {
     color: #6366f1;
 }
 
+a.settings-nav-item,
+a.settings-nav-item:hover,
+a.settings-nav-item:focus,
+a.settings-nav-item:visited,
+a.settings-nav-item:active {
+    text-decoration: none !important;
+    color: inherit;
+}
+
 .btn-primary {
     color: #fff;
     background-color: #6366f1;

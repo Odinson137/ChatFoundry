@@ -1,0 +1,123 @@
+.ch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.ch-card {
+    background: #ffffff;
+    border: 1px solid #f1f5f9;
+    border-radius: 14px;
+    padding: 0;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+}
+
+.ch-card:hover {
+    border-color: #e2e8f0;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.ch-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.25rem 0;
+}
+
+.ch-card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ch-card-icon--telegram {
+    background: #eef2ff;
+    color: #6366f1;
+}
+
+.ch-card-icon--web {
+    background: #f0f9ff;
+    color: #0ea5e9;
+}
+
+.ch-card-icon--whatsapp {
+    background: #ecfdf5;
+    color: #10b981;
+}
+
+.ch-card-icon--api {
+    background: #fff7ed;
+    color: #f97316;
+}
+
+.ch-card-icon--email {
+    background: #faf5ff;
+    color: #8b5cf6;
+}
+
+.ch-card-icon--default {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.ch-card-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.ch-card-body {
+    padding: 1rem 1.25rem 0.5rem;
+}
+
+.ch-card-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 2px;
+}
+
+.ch-card-type {
+    font-size: 0.82rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.ch-card-footer {
+    padding: 0.75rem 1.25rem 1.25rem;
+}
+
+.ch-card-token {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    background: #f8fafc;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    display: inline-block;
+}
+
+.ch-alert-close {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    opacity: 0.6;
+    transition: opacity 0.15s;
+}
+
+.ch-alert-close:hover {
+    opacity: 1;
+}
+
+@media (max-width: 640px) {
+    .ch-grid {
+        grid-template-columns: 1fr;
+    }
+}

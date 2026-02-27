@@ -1,0 +1,25 @@
+.attr-key {
+    font-size: 0.82rem;
+    color: #6366f1;
+    background: #eef2ff;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    white-space: nowrap;
+}
+
+.attr-display-name {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.attr-desc {
+    font-size: 0.82rem;
+    color: #64748b;
+}
+
+.attr-actions {
+    display: flex;
+    gap: 4px;
+    justify-content: flex-end;
+}

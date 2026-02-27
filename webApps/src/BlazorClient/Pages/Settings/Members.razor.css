@@ -1,0 +1,48 @@
+.member-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.member-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    flex-shrink: 0;
+}
+
+.member-id {
+    font-size: 0.82rem;
+    color: #64748b;
+    background: none;
+    padding: 0;
+}
+
+.member-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    font-weight: 500;
+}
+
+.member-status-active {
+    color: #059669;
+}
+
+.member-status-inactive {
+    color: #94a3b8;
+}
+
+.member-status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #10b981;
+    flex-shrink: 0;
+}

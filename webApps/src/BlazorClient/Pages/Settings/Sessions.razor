@@ -9,95 +9,108 @@
 
 <PageTitle>Настройки — Сессии — ChatFoundry</PageTitle>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Сессии</h1>
-    <div class="d-flex gap-2 align-items-center">
-        <select class="form-select form-select-sm" style="width: auto;" @bind="StatusFilter" @bind:after="LoadSessions">
+<div class="settings-page-header">
+    <div>
+        <h1 class="settings-page-title">Сессии</h1>
+        <p class="settings-page-subtitle">Просмотр взаимодействий пользователей с ботами</p>
+    </div>
+    <div class="sess-filters">
+        <select class="settings-select" style="width: auto; min-width: 160px;" @bind="StatusFilter" @bind:after="LoadSessions">
             <option value="">Все статусы</option>
             <option value="ACTIVE">Активные</option>
             <option value="COMPLETED">Завершённые</option>
             <option value="FAILED">Ошибка</option>
             <option value="CANCELLED">Отменённые</option>
         </select>
-        <button class="btn btn-sm btn-outline-secondary" @onclick="LoadSessions" title="Обновить">
-            <span class="oi oi-reload"></span>
+        <button class="settings-icon-btn" @onclick="LoadSessions" title="Обновить">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
         </button>
     </div>
 </div>
 
 @if (_isLoading)
 {
-    <div class="d-flex justify-content-center py-5">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Загрузка...</span>
-        </div>
+    <div class="settings-spinner-wrap">
+        <div class="settings-spinner"></div>
     </div>
 }
 else if (!string.IsNullOrEmpty(_error))
 {
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @_error
-        <button type="button" class="btn-close" @onclick="() => _error = null"></button>
+    <div class="settings-alert settings-alert-danger">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        <span>@_error</span>
+        <button style="margin-left:auto;background:none;border:none;color:inherit;cursor:pointer;opacity:0.6;" @onclick="() => _error = null">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
     </div>
 }
 else if (!_sessions.Any())
 {
-    <div class="alert alert-info">
-        Сессий пока нет. Они появятся, когда пользователи начнут взаимодействовать с ботами.
+    <div class="settings-empty-state">
+        <div class="settings-empty-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+        <div class="settings-empty-title">Нет сессий</div>
+        <div class="settings-empty-desc">Сессии появятся, когда пользователи начнут взаимодействовать с ботами.</div>
     </div>
 }
 else
 {
-    <table class="table table-hover align-middle sessions-table">
-        <thead class="table-light">
-        <tr>
-            <th>Клиент</th>
-            <th>Бот / Workflow</th>
-            <th>Канал</th>
-            <th>Статус</th>
-            <th>Шагов</th>
-            <th>Создана</th>
-            <th class="text-end">Действия</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var s in _sessions)
-        {
-            <tr class="@(s.Status == "ACTIVE" ? "table-active-row" : "")">
-                <td>
-                    <code class="text-muted small">@TruncateClientId(s.ClientId)</code>
-                </td>
-                <td>
-                    <span class="fw-bold">@(s.Workflow?.Bot?.Name ?? "—")</span>
-                    <br/>
-                    <small class="text-muted">v@(s.Workflow?.Version ?? 0)</small>
-                </td>
-                <td>
-                    <span class="badge bg-secondary-subtle text-dark">@FormatChannel(s.Channel)</span>
-                </td>
-                <td>
-                    <span class="badge @StatusBadgeClass(s.Status)">@StatusLabel(s.Status)</span>
-                </td>
-                <td>
-                    <span>@(s.Actions?.Count ?? 0)</span>
-                </td>
-                <td>
-                    <small>@s.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</small>
-                    @if (s.CompletedAt.HasValue)
-                    {
-                        <br/>
-                        <small class="text-muted">→ @s.CompletedAt.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</small>
-                    }
-                </td>
-                <td class="text-end">
-                    <button class="btn btn-sm btn-outline-primary" @onclick="() => OpenReplay(s.Id)" title="Просмотр пути">
-                        <span class="oi oi-map-marker"></span> Путь
-                    </button>
-                </td>
+    <div class="settings-card">
+        <table class="settings-table">
+            <thead>
+            <tr>
+                <th>Клиент</th>
+                <th>Бот</th>
+                <th>Канал</th>
+                <th>Статус</th>
+                <th>Шагов</th>
+                <th>Создана</th>
+                <th style="text-align: right;"></th>
             </tr>
-        }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            @foreach (var s in _sessions)
+            {
+                <tr>
+                    <td>
+                        <code class="sess-client-id">@TruncateClientId(s.ClientId)</code>
+                    </td>
+                    <td>
+                        <div class="sess-bot-info">
+                            <span class="sess-bot-name">@(s.Workflow?.Bot?.Name ?? "—")</span>
+                            <span class="sess-bot-version">v@(s.Workflow?.Version ?? 0)</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="settings-badge settings-badge-neutral">@FormatChannel(s.Channel)</span>
+                    </td>
+                    <td>
+                        <span class="settings-badge @StatusBadgeClass(s.Status)">@StatusLabel(s.Status)</span>
+                    </td>
+                    <td>
+                        <span class="sess-step-count">@(s.Actions?.Count ?? 0)</span>
+                    </td>
+                    <td>
+                        <div class="sess-date-cell">
+                            <span>@s.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+                            @if (s.CompletedAt.HasValue)
+                            {
+                                <span class="sess-date-completed">→ @s.CompletedAt.Value.ToLocalTime().ToString("HH:mm")</span>
+                            }
+                        </div>
+                    </td>
+                    <td style="text-align: right;">
+                        <button class="settings-btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" @onclick="() => OpenReplay(s.Id)">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                            Путь
+                        </button>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
 }
 
 @code {
@@ -140,7 +153,7 @@ else
     private static string TruncateClientId(string clientId)
     {
         if (string.IsNullOrEmpty(clientId)) return "—";
-        return clientId.Length > 16 ? clientId[..16] + "…" : clientId;
+        return clientId.Length > 16 ? clientId[..16] + "..." : clientId;
     }
 
     private static string FormatChannel(string? channel)
@@ -158,11 +171,11 @@ else
 
     private static string StatusBadgeClass(string? status) => status?.ToUpperInvariant() switch
     {
-        "ACTIVE" => "bg-primary",
-        "COMPLETED" => "bg-success",
-        "FAILED" => "bg-danger",
-        "CANCELLED" => "bg-warning text-dark",
-        _ => "bg-secondary"
+        "ACTIVE" => "settings-badge-primary",
+        "COMPLETED" => "settings-badge-success",
+        "FAILED" => "settings-badge-danger",
+        "CANCELLED" => "settings-badge-warning",
+        _ => "settings-badge-neutral"
     };
 
     private static string StatusLabel(string? status) => status?.ToUpperInvariant() switch

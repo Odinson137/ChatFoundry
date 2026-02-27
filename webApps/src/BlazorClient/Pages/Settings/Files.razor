@@ -11,106 +11,146 @@
 
 <PageTitle>Настройки — Файлы — ChatFoundry</PageTitle>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Файлы</h1>
-    <button class="btn btn-primary" @onclick="() => showUploadModal = true">
-        <span class="oi oi-cloud-upload"></span> Загрузить файл
+<div class="settings-page-header">
+    <div>
+        <h1 class="settings-page-title">Файлы</h1>
+        <p class="settings-page-subtitle">Хранилище файлов для использования в workflow</p>
+    </div>
+    <button class="settings-btn-primary" @onclick="() => showUploadModal = true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Загрузить файл
     </button>
 </div>
 
-@if (isLoading)
+@if (!string.IsNullOrEmpty(error))
 {
-    <div class="d-flex justify-content-center">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Загрузка...</span>
-        </div>
+    <div class="settings-alert settings-alert-danger">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        <span>@error</span>
+        <button style="margin-left:auto;background:none;border:none;color:inherit;cursor:pointer;opacity:0.6;" @onclick="() => error = null">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
     </div>
 }
-else if (!string.IsNullOrEmpty(error))
+
+@if (isLoading)
 {
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @error
-        <button type="button" class="btn-close" @onclick="() => error = null"></button>
+    <div class="settings-spinner-wrap">
+        <div class="settings-spinner"></div>
+    </div>
+}
+else if (!files.Any())
+{
+    <div class="settings-empty-state">
+        <div class="settings-empty-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+        </div>
+        <div class="settings-empty-title">Нет файлов</div>
+        <div class="settings-empty-desc">Загрузите первый файл — изображения, документы или медиафайлы для ботов.</div>
+        <button class="settings-btn-primary" @onclick="() => showUploadModal = true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Загрузить файл
+        </button>
     </div>
 }
 else
 {
-    @if (!files.Any())
-    {
-        <div class="alert alert-info">Файлы не найдены. Загрузите первый файл.</div>
-    }
-    else
-    {
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
+    <div class="settings-card">
+        <table class="settings-table">
+            <thead>
             <tr>
-                <th>Имя</th>
+                <th>Файл</th>
                 <th>Тип</th>
                 <th>Размер</th>
-                <th>Дата загрузки</th>
-                <th class="text-end">Действия</th>
+                <th>Дата</th>
+                <th style="text-align: right;">Действия</th>
             </tr>
             </thead>
             <tbody>
             @foreach (var file in files)
             {
                 <tr style="cursor: pointer;" @onclick="() => OpenFile(file)">
-                    <td class="fw-bold">@(file.Name ?? "—")</td>
-                    <td><code class="text-muted">@(file.ContentType ?? "—")</code></td>
-                    <td>@FormatSize(file.Size)</td>
-                    <td>@(file.CreatedAt?.ToString("dd.MM.yyyy HH:mm") ?? "—")</td>
-                    <td class="text-end" @onclick:stopPropagation="true">
-                        <button class="btn btn-sm btn-outline-primary me-1" @onclick="() => OpenFile(file)" title="Подробнее">
-                            <span class="oi oi-eye"></span>
-                        </button>
-                        <button class="btn btn-sm btn-outline-secondary me-1" @onclick="() => DownloadFile(file)" title="Скачать">
-                            <span class="oi oi-data-transfer-download"></span>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteFile(file)" title="Удалить">
-                            <span class="oi oi-trash"></span>
-                        </button>
+                    <td>
+                        <div class="file-name-row">
+                            <div class="file-icon @FileIconClass(file.ContentType)">
+                                @if (IsImage(file.ContentType))
+                                {
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                }
+                                else if (IsVideo(file.ContentType))
+                                {
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                                }
+                                else if (IsAudio(file.ContentType))
+                                {
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                                }
+                                else
+                                {
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+                                }
+                            </div>
+                            <span class="file-name">@(file.Name ?? "—")</span>
+                        </div>
+                    </td>
+                    <td><code class="file-type">@(file.ContentType ?? "—")</code></td>
+                    <td class="file-size">@FormatSize(file.Size)</td>
+                    <td class="file-date">@(file.CreatedAt?.ToString("dd.MM.yyyy") ?? "—")</td>
+                    <td style="text-align: right;" @onclick:stopPropagation="true">
+                        <div class="file-actions">
+                            <button class="settings-icon-btn" @onclick="() => OpenFile(file)" title="Подробнее">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </button>
+                            <button class="settings-icon-btn" @onclick="() => DownloadFile(file)" title="Скачать">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            </button>
+                            <button class="settings-icon-btn settings-icon-btn-danger" @onclick="() => DeleteFile(file)" title="Удалить">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                            </button>
+                        </div>
                     </td>
                 </tr>
             }
             </tbody>
         </table>
-    }
+    </div>
 }
 
 @if (showUploadModal)
 {
-    <div class="modal-backdrop fade show"></div>
-    <div class="modal fade show d-block" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Загрузить файл</h5>
-                    <button type="button" class="btn-close" @onclick="CloseUploadModal" disabled="@isUploading"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Выберите файл (макс. 20 МБ)</label>
-                        <InputFile class="form-control" OnChange="OnFileSelected" disabled="@isUploading" />
-                    </div>
-                    @if (selectedFile != null)
-                    {
-                        <div class="text-muted small">
-                            <strong>@selectedFile.Name</strong> — @FormatSize(selectedFile.Size)
-                        </div>
-                    }
-                    @if (!string.IsNullOrEmpty(uploadError))
-                    {
-                        <div class="alert alert-danger mt-3 mb-0">@uploadError</div>
-                    }
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="CloseUploadModal" disabled="@isUploading">Отмена</button>
-                    <button type="button" class="btn btn-primary" @onclick="UploadFile" disabled="@(isUploading || selectedFile == null)">
-                        @if (isUploading) { <span class="spinner-border spinner-border-sm me-1"></span> }
-                        Загрузить
-                    </button>
-                </div>
+    <div class="settings-modal-backdrop" @onclick="@(() => { if (!isUploading) CloseUploadModal(); })"></div>
+    <div class="settings-modal">
+        <div class="settings-modal-header">
+            <h3 class="settings-modal-title">Загрузить файл</h3>
+            <button class="settings-modal-close" @onclick="CloseUploadModal" disabled="@isUploading">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="settings-modal-body">
+            <div class="settings-field">
+                <label class="settings-label">Выберите файл (макс. 20 МБ)</label>
+                <InputFile class="settings-input" OnChange="OnFileSelected" disabled="@isUploading" style="padding: 8px;" />
             </div>
+            @if (selectedFile != null)
+            {
+                <div class="upload-file-info">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+                    <strong>@selectedFile.Name</strong> — @FormatSize(selectedFile.Size)
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(uploadError))
+            {
+                <div class="settings-alert settings-alert-danger" style="margin-bottom: 0;">
+                    <span>@uploadError</span>
+                </div>
+            }
+        </div>
+        <div class="settings-modal-footer">
+            <button class="settings-btn-secondary" @onclick="CloseUploadModal" disabled="@isUploading">Отмена</button>
+            <button class="settings-btn-primary" @onclick="UploadFile" disabled="@(isUploading || selectedFile == null)">
+                @if (isUploading) { <div class="settings-spinner" style="width:16px;height:16px;border-width:2px;"></div> }
+                Загрузить
+            </button>
         </div>
     </div>
 }
@@ -232,6 +272,18 @@ else
         showUploadModal = false;
         uploadError = null;
         selectedFile = null;
+    }
+
+    private static bool IsImage(string? ct) => ct?.StartsWith("image/", StringComparison.OrdinalIgnoreCase) == true;
+    private static bool IsVideo(string? ct) => ct?.StartsWith("video/", StringComparison.OrdinalIgnoreCase) == true;
+    private static bool IsAudio(string? ct) => ct?.StartsWith("audio/", StringComparison.OrdinalIgnoreCase) == true;
+
+    private static string FileIconClass(string? ct)
+    {
+        if (IsImage(ct)) return "file-icon-image";
+        if (IsVideo(ct)) return "file-icon-video";
+        if (IsAudio(ct)) return "file-icon-audio";
+        return "file-icon-default";
     }
 
     private static string FormatSize(long? bytes)

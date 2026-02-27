@@ -10,120 +10,143 @@
 
 <PageTitle>Настройки — Каналы — ChatFoundry</PageTitle>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Каналы</h1>
-    <button class="btn btn-primary" @onclick="OpenCreateModal">
-        <span class="oi oi-plus"></span> Добавить канал
+<div class="settings-page-header">
+    <div>
+        <h1 class="settings-page-title">Каналы</h1>
+        <p class="settings-page-subtitle">Подключённые мессенджеры и платформы</p>
+    </div>
+    <button class="settings-btn-primary" @onclick="OpenCreateModal">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Добавить канал
     </button>
 </div>
 
-@if (isLoading)
+@if (!string.IsNullOrEmpty(error))
 {
-    <div class="d-flex justify-content-center">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Загрузка...</span>
-        </div>
+    <div class="settings-alert settings-alert-danger">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        <span>@error</span>
+        <button class="ch-alert-close" @onclick="() => error = null">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
     </div>
 }
-else if (!string.IsNullOrEmpty(error))
+
+@if (isLoading)
 {
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @error
-        <button type="button" class="btn-close" @onclick="() => error = null"></button>
+    <div class="settings-spinner-wrap">
+        <div class="settings-spinner"></div>
+    </div>
+}
+else if (!channels.Any())
+{
+    <div class="settings-empty-state">
+        <div class="settings-empty-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        </div>
+        <div class="settings-empty-title">Нет каналов</div>
+        <div class="settings-empty-desc">Добавьте первый канал, например Telegram, чтобы начать получать сообщения.</div>
+        <button class="settings-btn-primary" @onclick="OpenCreateModal">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Добавить канал
+        </button>
     </div>
 }
 else
 {
-    @if (!channels.Any())
-    {
-        <div class="alert alert-info">Каналы не найдены. Добавьте первый канал (например, Telegram).</div>
-    }
-    else
-    {
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
-            <tr>
-                <th>Имя</th>
-                <th>Тип</th>
-                <th>Токен</th>
-                <th class="text-end">Действия</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var ch in channels)
-            {
-                <tr>
-                    <td class="fw-bold">@ch.Name</td>
-                    <td>@ChannelTypeDisplayName(ch.ChannelType)</td>
-                    <td><code class="text-muted">@ch.MaskedToken</code></td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-secondary me-2" @onclick="() => RefreshWebhook(ch)" disabled="@(refreshingChannelId == ch.Id)" title="Актуализировать webhook">
+    <div class="ch-grid">
+        @foreach (var ch in channels)
+        {
+            <div class="ch-card">
+                <div class="ch-card-header">
+                    <div class="ch-card-icon ch-card-icon--@(ch.ChannelType?.ToLowerInvariant() ?? "default")">
+                        @switch (ch.ChannelType?.ToUpperInvariant())
+                        {
+                            case "TELEGRAM":
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                                break;
+                            case "WEB":
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                                break;
+                            case "WHATSAPP":
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+                                break;
+                            default:
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                                break;
+                        }
+                    </div>
+                    <div class="ch-card-actions">
+                        <button class="settings-icon-btn" @onclick="() => RefreshWebhook(ch)" disabled="@(refreshingChannelId == ch.Id)" title="Обновить webhook">
                             @if (refreshingChannelId == ch.Id)
                             {
-                                <span class="spinner-border spinner-border-sm"></span>
+                                <div class="settings-spinner" style="width:14px;height:14px;border-width:2px;"></div>
                             }
                             else
                             {
-                                <span class="oi oi-reload"></span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
                             }
                         </button>
-                        <button class="btn btn-sm btn-outline-primary me-2" @onclick="() => OpenEditModal(ch)">
-                            <span class="oi oi-pencil"></span>
+                        <button class="settings-icon-btn" @onclick="() => OpenEditModal(ch)" title="Редактировать">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                         </button>
-                        <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteChannel(ch)">
-                            <span class="oi oi-trash"></span>
+                        <button class="settings-icon-btn settings-icon-btn-danger" @onclick="() => DeleteChannel(ch)" title="Удалить">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
                         </button>
-                    </td>
-                </tr>
-            }
-            </tbody>
-        </table>
-    }
-}
-
-@* Модалка создания/редактирования канала *@
-@if (showModal)
-{
-    <div class="modal-backdrop fade show"></div>
-    <div class="modal fade show d-block" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">@(isEditMode ? "Редактировать канал" : "Новый канал")</h5>
-                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Имя</label>
-                        <input type="text" class="form-control" @bind="currentName" placeholder="Мой Telegram" />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Токен</label>
-                        <input type="text" class="form-control" @bind="currentToken" placeholder="@(isEditMode ? "Оставьте пустым, чтобы не менять" : "Токен бота от @BotFather")" />
-                        @if (isEditMode)
-                        {
-                            <div class="form-text">Оставьте поле пустым, чтобы не менять токен.</div>
-                        }
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Тип канала</label>
-                        <select class="form-select" @bind="currentChannelType">
-                            <option value="TELEGRAM">Telegram</option>
-                            <option value="WEB">Web</option>
-                            <option value="WHATSAPP">WhatsApp</option>
-                            <option value="API">Api</option>
-                            <option value="EMAIL">Email</option>
-                        </select>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="CloseModal">Отмена</button>
-                    <button type="button" class="btn btn-primary" @onclick="SaveChannel" disabled="@(isSaving || string.IsNullOrWhiteSpace(currentName) || (!isEditMode && string.IsNullOrWhiteSpace(currentToken)))">
-                        @if (isSaving) { <span class="spinner-border spinner-border-sm me-1"></span> }
-                        Сохранить
-                    </button>
+                <div class="ch-card-body">
+                    <div class="ch-card-name">@ch.Name</div>
+                    <div class="ch-card-type">@ChannelTypeDisplayName(ch.ChannelType)</div>
+                </div>
+                <div class="ch-card-footer">
+                    <code class="ch-card-token">@ch.MaskedToken</code>
                 </div>
             </div>
+        }
+    </div>
+}
+
+@if (showModal)
+{
+    <div class="settings-modal-backdrop" @onclick="CloseModal"></div>
+    <div class="settings-modal">
+        <div class="settings-modal-header">
+            <h3 class="settings-modal-title">@(isEditMode ? "Редактировать канал" : "Новый канал")</h3>
+            <button class="settings-modal-close" @onclick="CloseModal">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="settings-modal-body">
+            <div class="settings-field">
+                <label class="settings-label">Имя</label>
+                <input type="text" class="settings-input" @bind="currentName" placeholder="Мой Telegram" />
+            </div>
+            <div class="settings-field">
+                <label class="settings-label">Токен</label>
+                <input type="text" class="settings-input" style="font-family: 'Courier New', monospace;" @bind="currentToken" placeholder="@(isEditMode ? "Оставьте пустым, чтобы не менять" : "Токен бота от @BotFather")" />
+                @if (isEditMode)
+                {
+                    <div class="settings-hint">Оставьте поле пустым, чтобы не менять токен.</div>
+                }
+            </div>
+            <div class="settings-field">
+                <label class="settings-label">Тип канала</label>
+                <select class="settings-select" @bind="currentChannelType">
+                    <option value="TELEGRAM">Telegram</option>
+                    <option value="WEB">Web</option>
+                    <option value="WHATSAPP">WhatsApp</option>
+                    <option value="API">Api</option>
+                    <option value="EMAIL">Email</option>
+                </select>
+            </div>
+        </div>
+        <div class="settings-modal-footer">
+            <button class="settings-btn-secondary" @onclick="CloseModal">Отмена</button>
+            <button class="settings-btn-primary" @onclick="SaveChannel" disabled="@(isSaving || string.IsNullOrWhiteSpace(currentName) || (!isEditMode && string.IsNullOrWhiteSpace(currentToken)))">
+                @if (isSaving) { <div class="settings-spinner" style="width:16px;height:16px;border-width:2px;"></div> }
+                Сохранить
+            </button>
         </div>
     </div>
 }

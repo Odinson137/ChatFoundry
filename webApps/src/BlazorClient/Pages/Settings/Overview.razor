@@ -11,40 +11,85 @@
 
 <PageTitle>Настройки — Обзор — ChatFoundry</PageTitle>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Обзор</h1>
+<div class="settings-page-header">
+    <div>
+        <h1 class="settings-page-title">Обзор</h1>
+        <p class="settings-page-subtitle">Основная информация о вашей компании</p>
+    </div>
 </div>
 
 @if (loadError != null)
 {
-    <div class="alert alert-danger">@loadError</div>
-}
-else if (company == null && !isLoading)
-{
-    <div class="alert alert-info">Нет доступа к компании или компания не найдена.</div>
-}
-else if (company != null)
-{
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">@company.Name</h5>
-            @if (!string.IsNullOrWhiteSpace(company.Description))
-            {
-                <p class="card-text text-muted">@company.Description</p>
-            }
-            <p class="card-text">
-                <strong>Лимит участников:</strong> @company.MaxUsers<br/>
-                <strong>Участников:</strong> @membersCount<br/>
-                <strong>Приглашений:</strong> @invitationsCount
-            </p>
-        </div>
+    <div class="settings-alert settings-alert-danger">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        <span>@loadError</span>
     </div>
 }
-
-@if (isLoading)
+else if (isLoading)
 {
-    <div class="d-flex justify-content-center">
-        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Загрузка...</span></div>
+    <div class="settings-spinner-wrap">
+        <div class="settings-spinner"></div>
+    </div>
+}
+else if (company == null)
+{
+    <div class="settings-empty-state">
+        <div class="settings-empty-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <div class="settings-empty-title">Компания не найдена</div>
+        <div class="settings-empty-desc">Нет доступа к компании или она ещё не создана.</div>
+    </div>
+}
+else
+{
+    <div class="settings-stat-grid">
+        <div class="settings-stat-card">
+            <div class="settings-stat-icon" style="background: #eef2ff;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
+            <div class="settings-stat-label">Компания</div>
+            <div class="settings-stat-value" style="font-size: 1.25rem;">@company.Name</div>
+        </div>
+        <div class="settings-stat-card">
+            <div class="settings-stat-icon" style="background: #ecfdf5;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            </div>
+            <div class="settings-stat-label">Участников</div>
+            <div class="settings-stat-value">@membersCount</div>
+        </div>
+        <div class="settings-stat-card">
+            <div class="settings-stat-icon" style="background: #faf5ff;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+            <div class="settings-stat-label">Приглашений</div>
+            <div class="settings-stat-value">@invitationsCount</div>
+        </div>
+        <div class="settings-stat-card">
+            <div class="settings-stat-icon" style="background: #fff7ed;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            </div>
+            <div class="settings-stat-label">Лимит участников</div>
+            <div class="settings-stat-value">@company.MaxUsers</div>
+        </div>
+    </div>
+
+    <div class="settings-card">
+        <div class="settings-card-body">
+            <div class="overview-info-grid">
+                <div class="overview-info-item">
+                    <div class="overview-info-label">Название компании</div>
+                    <div class="overview-info-value">@company.Name</div>
+                </div>
+                @if (!string.IsNullOrWhiteSpace(company.Description))
+                {
+                    <div class="overview-info-item overview-info-full">
+                        <div class="overview-info-label">Описание</div>
+                        <div class="overview-info-value">@company.Description</div>
+                    </div>
+                }
+            </div>
+        </div>
     </div>
 }
 

@@ -1,0 +1,50 @@
+.sess-filters {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sess-client-id {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    background: #f8fafc;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+}
+
+.sess-bot-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sess-bot-name {
+    font-weight: 600;
+    color: #0f172a;
+    font-size: 0.875rem;
+}
+
+.sess-bot-version {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-family: 'Courier New', monospace;
+}
+
+.sess-step-count {
+    font-weight: 600;
+    color: #475569;
+}
+
+.sess-date-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 0.82rem;
+    color: #64748b;
+}
+
+.sess-date-completed {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
