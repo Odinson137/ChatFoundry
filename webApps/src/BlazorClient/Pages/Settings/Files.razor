@@ -1,0 +1,246 @@
+@page "/settings/files"
+@layout SettingsLayout
+@using BlazorClient.Interfaces
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+
+@inject IFileApiClient FileApi
+@inject ICompanyApiClient CompanyApi
+@inject NavigationManager Navigation
+@inject IJSRuntime JsRuntime
+
+<PageTitle>Настройки — Файлы — ChatFoundry</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Файлы</h1>
+    <button class="btn btn-primary" @onclick="() => showUploadModal = true">
+        <span class="oi oi-cloud-upload"></span> Загрузить файл
+    </button>
+</div>
+
+@if (isLoading)
+{
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Загрузка...</span>
+        </div>
+    </div>
+}
+else if (!string.IsNullOrEmpty(error))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @error
+        <button type="button" class="btn-close" @onclick="() => error = null"></button>
+    </div>
+}
+else
+{
+    @if (!files.Any())
+    {
+        <div class="alert alert-info">Файлы не найдены. Загрузите первый файл.</div>
+    }
+    else
+    {
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+            <tr>
+                <th>Имя</th>
+                <th>Тип</th>
+                <th>Размер</th>
+                <th>Дата загрузки</th>
+                <th class="text-end">Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var file in files)
+            {
+                <tr style="cursor: pointer;" @onclick="() => OpenFile(file)">
+                    <td class="fw-bold">@(file.Name ?? "—")</td>
+                    <td><code class="text-muted">@(file.ContentType ?? "—")</code></td>
+                    <td>@FormatSize(file.Size)</td>
+                    <td>@(file.CreatedAt?.ToString("dd.MM.yyyy HH:mm") ?? "—")</td>
+                    <td class="text-end" @onclick:stopPropagation="true">
+                        <button class="btn btn-sm btn-outline-primary me-1" @onclick="() => OpenFile(file)" title="Подробнее">
+                            <span class="oi oi-eye"></span>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary me-1" @onclick="() => DownloadFile(file)" title="Скачать">
+                            <span class="oi oi-data-transfer-download"></span>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteFile(file)" title="Удалить">
+                            <span class="oi oi-trash"></span>
+                        </button>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+}
+
+@if (showUploadModal)
+{
+    <div class="modal-backdrop fade show"></div>
+    <div class="modal fade show d-block" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Загрузить файл</h5>
+                    <button type="button" class="btn-close" @onclick="CloseUploadModal" disabled="@isUploading"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Выберите файл (макс. 20 МБ)</label>
+                        <InputFile class="form-control" OnChange="OnFileSelected" disabled="@isUploading" />
+                    </div>
+                    @if (selectedFile != null)
+                    {
+                        <div class="text-muted small">
+                            <strong>@selectedFile.Name</strong> — @FormatSize(selectedFile.Size)
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(uploadError))
+                    {
+                        <div class="alert alert-danger mt-3 mb-0">@uploadError</div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseUploadModal" disabled="@isUploading">Отмена</button>
+                    <button type="button" class="btn btn-primary" @onclick="UploadFile" disabled="@(isUploading || selectedFile == null)">
+                        @if (isUploading) { <span class="spinner-border spinner-border-sm me-1"></span> }
+                        Загрузить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<FileInfoDto> files = new();
+    private bool isLoading = true;
+    private string? error;
+
+    private bool showUploadModal;
+    private bool isUploading;
+    private string? uploadError;
+    private IBrowserFile? selectedFile;
+
+    private const long MaxFileSize = 20 * 1024 * 1024;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadFiles();
+    }
+
+    private async Task LoadFiles()
+    {
+        isLoading = true;
+        error = null;
+        try
+        {
+            files = await FileApi.ListFilesAsync();
+        }
+        catch (Exception ex)
+        {
+            error = $"Ошибка загрузки: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void OpenFile(FileInfoDto file)
+    {
+        Navigation.NavigateTo($"/settings/files/{file.Id}");
+    }
+
+    private async Task DownloadFile(FileInfoDto file)
+    {
+        if (string.IsNullOrEmpty(file.Key)) return;
+        try
+        {
+            var url = await FileApi.GetDownloadUrlAsync(file.Key, forceDownload: true);
+            if (!string.IsNullOrEmpty(url))
+                await JsRuntime.InvokeVoidAsync("__triggerFileDownload", url);
+        }
+        catch (Exception ex)
+        {
+            error = $"Ошибка скачивания: {ex.Message}";
+        }
+    }
+
+    private async Task DeleteFile(FileInfoDto file)
+    {
+        if (!await JsRuntime.InvokeAsync<bool>("confirm", $"Удалить файл «{file.Name}»?"))
+            return;
+
+        error = null;
+        try
+        {
+            await FileApi.DeleteFileAsync(Guid.Parse(file.Id));
+            await LoadFiles();
+        }
+        catch (Exception ex)
+        {
+            error = $"Ошибка удаления: {ex.Message}";
+        }
+    }
+
+    private void OnFileSelected(InputFileChangeEventArgs e)
+    {
+        uploadError = null;
+        selectedFile = e.File;
+        if (selectedFile.Size > MaxFileSize)
+        {
+            uploadError = "Файл превышает 20 МБ.";
+            selectedFile = null;
+        }
+    }
+
+    private async Task UploadFile()
+    {
+        if (selectedFile == null) return;
+
+        isUploading = true;
+        uploadError = null;
+        try
+        {
+            var company = await CompanyApi.GetCurrentCompanyAsync();
+            await using var stream = selectedFile.OpenReadStream(MaxFileSize);
+            var result = await FileApi.UploadFileAsync(stream, selectedFile.Name, selectedFile.ContentType, company?.Id);
+            if (result == null)
+            {
+                uploadError = "Не удалось загрузить файл.";
+                return;
+            }
+            CloseUploadModal();
+            await LoadFiles();
+        }
+        catch (Exception ex)
+        {
+            uploadError = $"Ошибка загрузки: {ex.Message}";
+        }
+        finally
+        {
+            isUploading = false;
+        }
+    }
+
+    private void CloseUploadModal()
+    {
+        showUploadModal = false;
+        uploadError = null;
+        selectedFile = null;
+    }
+
+    private static string FormatSize(long? bytes)
+    {
+        if (bytes is null) return "—";
+        var b = bytes.Value;
+        if (b < 1024) return $"{b} Б";
+        if (b < 1024 * 1024) return $"{b / 1024.0:F1} КБ";
+        if (b < 1024L * 1024 * 1024) return $"{b / (1024.0 * 1024):F1} МБ";
+        return $"{b / (1024.0 * 1024 * 1024):F2} ГБ";
+    }
+}

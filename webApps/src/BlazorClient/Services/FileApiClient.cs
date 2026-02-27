@@ -42,6 +42,10 @@ public class FileApiClient(HttpClient http) : IFileApiClient
                   files {
                     id
                     originalFileName
+                    contentType
+                    size
+                    createdAt
+                    key
                   }
                 }
                 """;
@@ -58,9 +62,7 @@ public class FileApiClient(HttpClient http) : IFileApiClient
             var list = new List<FileInfoDto>();
             foreach (var f in files.EnumerateArray())
             {
-                var id = f.TryGetProperty("id", out var idProp) ? idProp.GetGuid().ToString() : "";
-                var name = f.TryGetProperty("originalFileName", out var n) ? n.GetString() : null;
-                list.Add(new FileInfoDto(id, name));
+                list.Add(ParseFileEntity(f));
             }
             return list;
         }
@@ -68,5 +70,70 @@ public class FileApiClient(HttpClient http) : IFileApiClient
         {
             return new List<FileInfoDto>();
         }
+    }
+
+    public async Task<FileInfoDto?> GetFileAsync(Guid id, CancellationToken ct = default)
+    {
+        try
+        {
+            var query = """
+                query GetFile($id: UUID!) {
+                  file(id: $id) {
+                    id
+                    originalFileName
+                    contentType
+                    size
+                    createdAt
+                    key
+                  }
+                }
+                """;
+            var body = new { query, variables = new { id } };
+            var content = new StringContent(JsonSerializer.Serialize(body, JsonOptions), Encoding.UTF8, "application/json");
+            var response = await http.PostAsync($"{ApiEndpoints.Api}/file/graphql", content, ct);
+            response.EnsureSuccessStatusCode();
+            var doc = await response.Content.ReadFromJsonAsync<JsonElement>(JsonOptions, ct);
+            if (!doc.TryGetProperty("data", out var data) || !data.TryGetProperty("file", out var file) || file.ValueKind == JsonValueKind.Null)
+                return null;
+            return ParseFileEntity(file);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public async Task DeleteFileAsync(Guid id, CancellationToken ct = default)
+    {
+        var response = await http.DeleteAsync($"{ApiEndpoints.Api}/file/files/{id}", ct);
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<string?> GetDownloadUrlAsync(string key, bool forceDownload = false, CancellationToken ct = default)
+    {
+        try
+        {
+            var downloadParam = forceDownload ? "&download=true" : "";
+            var response = await http.GetFromJsonAsync<JsonElement>(
+                $"{ApiEndpoints.Api}/file/files/url?key={Uri.EscapeDataString(key)}{downloadParam}", ct);
+            return response.TryGetProperty("url", out var urlProp) ? urlProp.GetString() : null;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static FileInfoDto ParseFileEntity(JsonElement f)
+    {
+        var id = f.TryGetProperty("id", out var idProp) ? idProp.GetGuid().ToString() : "";
+        var name = f.TryGetProperty("originalFileName", out var n) ? n.GetString() : null;
+        var contentType = f.TryGetProperty("contentType", out var ct) ? ct.GetString() : null;
+        long? size = f.TryGetProperty("size", out var s) && s.ValueKind == JsonValueKind.Number ? s.GetInt64() : null;
+        DateTime? createdAt = f.TryGetProperty("createdAt", out var ca) && ca.ValueKind == JsonValueKind.String
+            ? DateTime.TryParse(ca.GetString(), out var dt) ? dt : null
+            : null;
+        var key = f.TryGetProperty("key", out var k) ? k.GetString() : null;
+        return new FileInfoDto(id, name, contentType, size, createdAt, key);
     }
 }

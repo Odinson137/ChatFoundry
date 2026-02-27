@@ -1,0 +1,235 @@
+@page "/settings/files/{FileId:guid}"
+@layout SettingsLayout
+@using BlazorClient.Interfaces
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+
+@inject IFileApiClient FileApi
+@inject NavigationManager Navigation
+@inject IJSRuntime JsRuntime
+
+<PageTitle>Настройки — Файл — ChatFoundry</PageTitle>
+
+<div class="mb-4">
+    <a href="/settings/files" class="text-decoration-none text-muted d-inline-flex align-items-center gap-1 mb-3">
+        <span class="oi oi-arrow-left"></span> Назад к файлам
+    </a>
+
+    @if (isLoading)
+    {
+        <div class="d-flex justify-content-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(error))
+    {
+        <div class="alert alert-danger">@error</div>
+    }
+    else if (file == null)
+    {
+        <div class="alert alert-warning">Файл не найден.</div>
+    }
+    else
+    {
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0">@(file.Name ?? "Без имени")</h1>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary" @onclick="DownloadFile">
+                    <span class="oi oi-data-transfer-download"></span> Скачать
+                </button>
+                <button class="btn btn-outline-danger" @onclick="DeleteFile" disabled="@isDeleting">
+                    @if (isDeleting) { <span class="spinner-border spinner-border-sm me-1"></span> }
+                    <span class="oi oi-trash"></span> Удалить
+                </button>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="text-muted small">Имя файла</div>
+                        <div class="fw-bold">@(file.Name ?? "—")</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-muted small">Тип контента</div>
+                        <div><code>@(file.ContentType ?? "—")</code></div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-muted small">Размер</div>
+                        <div>@FormatSize(file.Size)</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-muted small">Дата загрузки</div>
+                        <div>@(file.CreatedAt?.ToString("dd.MM.yyyy HH:mm:ss") ?? "—")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (IsPreviewable)
+        {
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">Предпросмотр</span>
+                </div>
+                <div class="card-body text-center">
+                    @if (IsImage)
+                    {
+                        @if (previewUrl != null)
+                        {
+                            <img src="@previewUrl" alt="@file.Name" class="img-fluid rounded" style="max-height: 500px;" />
+                        }
+                        else
+                        {
+                            <div class="text-muted py-4">Загрузка превью...</div>
+                        }
+                    }
+                    else if (IsVideo)
+                    {
+                        @if (previewUrl != null)
+                        {
+                            <video controls class="rounded" style="max-width: 100%; max-height: 500px;">
+                                <source src="@previewUrl" type="@file.ContentType" />
+                                Ваш браузер не поддерживает видео.
+                            </video>
+                        }
+                        else
+                        {
+                            <div class="text-muted py-4">Загрузка превью...</div>
+                        }
+                    }
+                    else if (IsAudio)
+                    {
+                        @if (previewUrl != null)
+                        {
+                            <audio controls class="w-100">
+                                <source src="@previewUrl" type="@file.ContentType" />
+                                Ваш браузер не поддерживает аудио.
+                            </audio>
+                        }
+                        else
+                        {
+                            <div class="text-muted py-4">Загрузка превью...</div>
+                        }
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card">
+                <div class="card-body text-center text-muted py-5">
+                    <span class="oi oi-file" style="font-size: 3rem; opacity: 0.3;"></span>
+                    <p class="mt-3 mb-0">Предпросмотр недоступен для этого типа файла.</p>
+                    <p class="small">Нажмите «Скачать» для просмотра.</p>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter] public Guid FileId { get; set; }
+
+    private FileInfoDto? file;
+    private string? previewUrl;
+    private bool isLoading = true;
+    private bool isDeleting;
+    private string? error;
+
+    private bool IsImage => file?.ContentType?.StartsWith("image/", StringComparison.OrdinalIgnoreCase) == true;
+    private bool IsVideo => file?.ContentType?.StartsWith("video/", StringComparison.OrdinalIgnoreCase) == true;
+    private bool IsAudio => file?.ContentType?.StartsWith("audio/", StringComparison.OrdinalIgnoreCase) == true;
+    private bool IsPreviewable => IsImage || IsVideo || IsAudio;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadFile();
+    }
+
+    private async Task LoadFile()
+    {
+        isLoading = true;
+        error = null;
+        try
+        {
+            file = await FileApi.GetFileAsync(FileId);
+            if (file == null)
+            {
+                error = "Файл не найден.";
+                return;
+            }
+
+            if (IsPreviewable && !string.IsNullOrEmpty(file.Key))
+            {
+                previewUrl = await FileApi.GetDownloadUrlAsync(file.Key);
+            }
+        }
+        catch (Exception ex)
+        {
+            error = $"Ошибка загрузки: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task DownloadFile()
+    {
+        if (file == null || string.IsNullOrEmpty(file.Key)) return;
+        try
+        {
+            var url = await FileApi.GetDownloadUrlAsync(file.Key, forceDownload: true);
+            if (!string.IsNullOrEmpty(url))
+                await JsRuntime.InvokeVoidAsync("__triggerFileDownload", url);
+        }
+        catch (Exception ex)
+        {
+            error = $"Ошибка скачивания: {ex.Message}";
+        }
+    }
+
+    private async Task DeleteFile()
+    {
+        if (file == null) return;
+        if (!await JsRuntime.InvokeAsync<bool>("confirm", $"Удалить файл «{file.Name}»?"))
+            return;
+
+        isDeleting = true;
+        error = null;
+        try
+        {
+            await FileApi.DeleteFileAsync(Guid.Parse(file.Id));
+            Navigation.NavigateTo("/settings/files");
+        }
+        catch (Exception ex)
+        {
+            error = $"Ошибка удаления: {ex.Message}";
+        }
+        finally
+        {
+            isDeleting = false;
+        }
+    }
+
+    private static string FormatSize(long? bytes)
+    {
+        if (bytes is null) return "—";
+        var b = bytes.Value;
+        switch (b)
+        {
+            case < 1024:
+                return $"{b} Б";
+            case < 1024 * 1024:
+                return $"{b / 1024.0:F1} КБ";
+            case < 1024L * 1024 * 1024:
+                return $"{b / (1024.0 * 1024):F1} МБ";
+            default:
+                return $"{b / (1024.0 * 1024 * 1024):F2} ГБ";
+        }
+    }
+}

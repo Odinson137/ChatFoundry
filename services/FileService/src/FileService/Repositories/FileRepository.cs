@@ -39,4 +39,14 @@ public class FileRepository(FileDbContext context) : IFileRepository
         await context.SaveChangesAsync(ct);
         return entity;
     }
+
+    public async Task DeleteAsync(Guid id, CancellationToken ct = default)
+    {
+        var entity = await context.Files.FirstOrDefaultAsync(f => f.Id == id, ct);
+        if (entity != null)
+        {
+            context.Files.Remove(entity);
+            await context.SaveChangesAsync(ct);
+        }
+    }
 }

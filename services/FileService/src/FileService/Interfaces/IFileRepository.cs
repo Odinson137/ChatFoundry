@@ -9,4 +9,5 @@ public interface IFileRepository
     Task<IReadOnlyList<FileEntity>> ListAsync(Guid companyId, Guid? uploadedClientId, CancellationToken ct = default);
     Task<IReadOnlyList<FileEntity>> ListByUserAsync(Guid uploadedByUserId, Guid? uploadedClientId, CancellationToken ct = default);
     Task<FileEntity> AddAsync(FileEntity entity, CancellationToken ct = default);
+    Task DeleteAsync(Guid id, CancellationToken ct = default);
 }

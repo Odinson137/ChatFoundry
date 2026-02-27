@@ -53,6 +53,9 @@
                 if (input) input.click();
             }
         };
+        window.__triggerFileDownload = function(url) {
+            window.location.href = url;
+        };
         window.__downloadWorkflowJson = function(filename, jsonContent) {
             var blob = new Blob([jsonContent], { type: 'application/json' });
             var url = URL.createObjectURL(blob);

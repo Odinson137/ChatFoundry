@@ -22,7 +22,7 @@ public sealed class FileGrpcService(
         if (file == null)
             throw new RpcException(new Status(StatusCode.NotFound, "File not found"));
 
-        var url = await storage.GetSignedUrlAsync(file.Key, null, context.CancellationToken);
+        var url = await storage.GetSignedUrlAsync(file.Key, ct: context.CancellationToken);
         if (string.IsNullOrEmpty(url))
             throw new RpcException(new Status(StatusCode.Unavailable, "Signed URL could not be generated"));
 

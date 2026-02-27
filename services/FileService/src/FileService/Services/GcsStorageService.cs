@@ -9,8 +9,9 @@ namespace FileService.Services;
 public interface IStorageService
 {
     Task<(string Key, string Url)> UploadAsync(Stream content, string fileName, string? contentType, CancellationToken ct = default);
-    Task<string?> GetSignedUrlAsync(string key, TimeSpan? validity = null, CancellationToken ct = default);
+    Task<string?> GetSignedUrlAsync(string key, TimeSpan? validity = null, string? downloadFileName = null, CancellationToken ct = default);
     IAsyncEnumerable<FileEntry> ListAsync(string? prefix, CancellationToken ct = default);
+    Task DeleteAsync(string key, CancellationToken ct = default);
 }
 
 public record FileEntry(string Key, string? Name, string? Url);
@@ -68,18 +69,39 @@ public class GcsStorageService : IStorageService
             content,
             cancellationToken: ct);
 
-        var url = await GetSignedUrlAsync(key, null, ct) ?? key;
+        var url = await GetSignedUrlAsync(key, ct: ct) ?? key;
         return (key, url);
     }
 
-    public async Task<string?> GetSignedUrlAsync(string key, TimeSpan? validity = null, CancellationToken ct = default)
+    public async Task<string?> GetSignedUrlAsync(string key, TimeSpan? validity = null, string? downloadFileName = null, CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(key)) return null;
         if (_urlSigner == null) return null;
         var objectName = ToObjectName(key);
         var duration = validity ?? _signedUrlValidity;
-        var url = await _urlSigner.SignAsync(_bucketName, objectName, duration, HttpMethod.Get, cancellationToken: ct);
-        return url;
+
+        if (!string.IsNullOrEmpty(downloadFileName))
+        {
+            var template = UrlSigner.RequestTemplate
+                .FromBucket(_bucketName)
+                .WithObjectName(objectName)
+                .WithHttpMethod(HttpMethod.Get)
+                .WithQueryParameters(new Dictionary<string, IEnumerable<string>>
+                {
+                    ["response-content-disposition"] = [$"attachment; filename=\"{downloadFileName}\""]
+                });
+            var options = UrlSigner.Options.FromDuration(duration);
+            return await _urlSigner.SignAsync(template, options, ct);
+        }
+
+        return await _urlSigner.SignAsync(_bucketName, objectName, duration, HttpMethod.Get, cancellationToken: ct);
+    }
+
+    public async Task DeleteAsync(string key, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(key)) return;
+        var objectName = ToObjectName(key);
+        await _client.DeleteObjectAsync(_bucketName, objectName, cancellationToken: ct);
     }
 
     public async IAsyncEnumerable<FileEntry> ListAsync(string? prefix, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken ct = default)
@@ -89,7 +111,7 @@ public class GcsStorageService : IStorageService
         await foreach (var obj in list.WithCancellation(ct))
         {
             var shortKey = ToShortKey(obj.Name);
-            var url = await GetSignedUrlAsync(shortKey, null, ct);
+            var url = await GetSignedUrlAsync(shortKey, ct: ct);
             yield return new FileEntry(shortKey, Path.GetFileName(obj.Name), url);
         }
     }
