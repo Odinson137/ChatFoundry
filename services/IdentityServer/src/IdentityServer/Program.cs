@@ -2,11 +2,11 @@ using IdentityServer.Data;
 using IdentityServer.Entities;
 using IdentityServer.GraphQL;
 using IdentityServer.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 using OpenIddict.Server;
-using OpenIddict.Validation.AspNetCore;
 using Shared.Grpc.Company;
 using Shared.Infrastructure.DependencyInjection;
 
@@ -83,14 +83,26 @@ services.AddOpenIddict()
         });
     });
 
-services.AddOpenIddict()
-    .AddValidation(options =>
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        options.UseLocalServer();
-        options.UseAspNetCore();
+        options.Authority = "http://identity-service:8080";
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = "http://identity-service:8080/",
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true
+        };
     });
 
-services.AddAuthentication(options => { options.DefaultScheme = IdentityConstants.ApplicationScheme; });
+services.Configure<Microsoft.AspNetCore.Authentication.AuthenticationOptions>(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+});
 
 services.AddAuthorization();
 

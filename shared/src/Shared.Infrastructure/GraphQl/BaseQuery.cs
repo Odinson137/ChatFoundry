@@ -15,7 +15,6 @@ public abstract class BaseGraphQl
     {
         HttpContextAccessor = httpContextAccessor;
         var user = HttpContextAccessor.HttpContext?.User;
-        // OpenIddict выдаёт "sub", не ClaimTypes.NameIdentifier
         var userId = user?.FindFirstValue(ClaimTypes.NameIdentifier)
                      ?? user?.FindFirstValue("sub");
         UserId = Guid.TryParse(userId, out var guid) ? guid : Guid.Empty;
