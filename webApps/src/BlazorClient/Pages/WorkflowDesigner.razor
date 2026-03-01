@@ -507,6 +507,89 @@
                             <small class="form-text text-muted">Можно использовать переменные <code>{{variable_name}}</code>.</small>
                         </div>
                     }
+
+                    @if (node is WorkflowNodeModel { Data: SubWorkflowNodeData subData })
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">Вызываемый процесс</label>
+                            @if (subData.WorkflowId != Guid.Empty && (AvailableWorkflows?.FirstOrDefault(w => w.Id == subData.WorkflowId)) is { } selectedW)
+                            {
+                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                    <span class="text-muted">@GetWorkflowDisplayName(selectedW)</span>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" @onclick="() => OpenProcessPicker(subData)">
+                                        <span class="oi oi-pencil"></span> Изменить
+                                    </button>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                    @if (subData.WorkflowId != Guid.Empty)
+                                    {
+                                        <span class="text-muted">Процесс выбран</span>
+                                    }
+                                    <button type="button" class="btn btn-sm btn-outline-primary" @onclick="() => OpenProcessPicker(subData)">
+                                        <span class="oi @(subData.WorkflowId != Guid.Empty ? "oi-pencil" : "oi-plus")"></span> @(subData.WorkflowId != Guid.Empty ? "Изменить" : "Выбрать процесс")
+                                    </button>
+                                </div>
+                            }
+                        </div>
+
+                        @if (subData.WorkflowId != Guid.Empty)
+                        {
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Входные параметры</label>
+                                <small class="form-text text-muted d-block mb-2">
+                                    Привяжите параметры дочернего процесса к переменным или значениям текущего (можно <code>{{variable}}</code>).
+                                </small>
+                                @foreach (var mapping in subData.InputMappings.ToList())
+                                {
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text font-monospace" style="min-width:120px;">@mapping.Key</span>
+                                        <input type="text" class="form-control font-monospace"
+                                               value="@mapping.Value"
+                                               placeholder="{{variable}} или значение"
+                                               @oninput="e => { subData.InputMappings[mapping.Key] = e.Value?.ToString() ?? string.Empty; OnWorkflowChanged(); }" />
+                                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                @onclick="() => ShowVariablePicker(v => InsertVariableIntoMapping(subData.InputMappings, mapping.Key, v))">
+                                            <span class="oi oi-code"></span>
+                                        </button>
+                                    </div>
+                                }
+                                @if (!subData.InputMappings.Any())
+                                {
+                                    <p class="small text-muted">У выбранного процесса нет входных параметров. Задайте их во вкладке «Параметры» в настройках того процесса.</p>
+                                }
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Выходные параметры</label>
+                                <small class="form-text text-muted d-block mb-2">
+                                    Укажите, в какую переменную текущего процесса записать результат дочернего (слева — переменная, справа — параметр дочернего).
+                                </small>
+                                @foreach (var mapping in subData.OutputMappings.ToList())
+                                {
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text">$</span>
+                                        <input type="text" class="form-control font-monospace" style="max-width:40%;"
+                                               value="@mapping.Key"
+                                               placeholder="переменная"
+                                               @oninput="e => { var newKey = e.Value?.ToString() ?? string.Empty; if (!string.IsNullOrWhiteSpace(newKey) && newKey != mapping.Key) { var val = subData.OutputMappings[mapping.Key]; subData.OutputMappings.Remove(mapping.Key); subData.OutputMappings[newKey] = val; OnWorkflowChanged(); } }" />
+                                        <span class="input-group-text">&#8592;</span>
+                                        <input type="text" class="form-control font-monospace"
+                                               value="@mapping.Value"
+                                               placeholder="параметр дочернего"
+                                               readonly
+                                               tabindex="-1" />
+                                    </div>
+                                }
+                                @if (!subData.OutputMappings.Any())
+                                {
+                                    <p class="small text-muted">У выбранного процесса нет выходных параметров. Задайте их во вкладке «Параметры» в настройках того процесса.</p>
+                                }
+                            </div>
+                        }
+                    }
                 }
                 else if (SelectedModel is WorkflowLinkModel link)
                 {
@@ -680,7 +763,65 @@
             }
             else
             {
-                <p class="variables-modal-empty">Параметры (содержимое пока пусто).</p>
+                <p class="form-text text-muted mb-3">Параметры процесса задаются здесь. При вызове этого процесса из узла «Процесс» в другом workflow можно будет только связать эти параметры с переменными.</p>
+                <p class="form-text text-muted mb-3">В этом же процессе подставьте значение параметра в любом узле (Сообщение, Вопрос, Переменная, Условие и т.д.): нажмите кнопку выбора переменной рядом с полем или введите вручную <code>{{имя_параметра}}</code> (например, <code>{{user_query}}</code>).</p>
+                <div class="variables-modal-group mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="variables-modal-group-title">Входные параметры</div>
+                        <button type="button" class="btn btn-sm btn-outline-primary" @onclick="AddWorkflowInputParameter">
+                            <span class="oi oi-plus"></span> Добавить
+                        </button>
+                    </div>
+                    @if (!CurrentWorkflowInputParameters.Any())
+                    {
+                        <p class="variables-modal-empty small">Нет входных параметров. Добавьте параметры с названием и описанием.</p>
+                    }
+                    else
+                    {
+                        @foreach (var p in CurrentWorkflowInputParameters.ToList())
+                        {
+                            <div class="card card-body p-2 mb-2">
+                                <div class="row g-2">
+                                    <div class="col">
+                                        <input type="text" class="form-control form-control-sm" placeholder="Название (например, user_query)" @bind="p.Name" @oninput="OnWorkflowChanged" />
+                                    </div>
+                                    <div class="col">
+                                        <input type="text" class="form-control form-control-sm" placeholder="Значение по умолчанию" @bind="p.DefaultValue" @oninput="OnWorkflowChanged" />
+                                    </div>
+                                    <div class="col-auto">
+                                        <button type="button" class="btn btn-sm btn-outline-danger" @onclick="() => RemoveWorkflowInputParameter(p)"><span class="oi oi-trash"></span></button>
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control form-control-sm mt-1" placeholder="Описание" @bind="p.Description" @oninput="OnWorkflowChanged" />
+                            </div>
+                        }
+                    }
+                </div>
+                <div class="variables-modal-group">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="variables-modal-group-title">Выходные параметры</div>
+                        <button type="button" class="btn btn-sm btn-outline-primary" @onclick="AddWorkflowOutputParameter">
+                            <span class="oi oi-plus"></span> Добавить
+                        </button>
+                    </div>
+                    @if (!CurrentWorkflowOutputParameters.Any())
+                    {
+                        <p class="variables-modal-empty small">Нет выходных параметров. Добавьте параметры с названием и описанием.</p>
+                    }
+                    else
+                    {
+                        @foreach (var p in CurrentWorkflowOutputParameters.ToList())
+                        {
+                            <div class="card card-body p-2 mb-2">
+                                <div class="d-flex gap-2 align-items-center">
+                                    <input type="text" class="form-control form-control-sm" placeholder="Название (например, result)" @bind="p.Name" @oninput="OnWorkflowChanged" />
+                                    <input type="text" class="form-control form-control-sm" placeholder="Описание" @bind="p.Description" @oninput="OnWorkflowChanged" />
+                                    <button type="button" class="btn btn-sm btn-outline-danger" @onclick="() => RemoveWorkflowOutputParameter(p)"><span class="oi oi-trash"></span></button>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
             }
         </div>
     </div>
@@ -745,6 +886,68 @@
                 <span class="oi oi-info"></span>
                 Нажмите на переменную, чтобы вставить её в текущий узел.
             </p>
+        </div>
+    </div>
+}
+
+<!-- Модальное окно выбора процесса (поиск + пагинация) -->
+@if (IsProcessPickerOpen)
+{
+    <div class="variable-picker-backdrop" @onclick="CloseProcessPicker"></div>
+    <div class="variable-picker-modal" role="dialog" style="max-width: 420px;">
+        <div class="variable-picker-header">
+            <h2 class="variable-picker-title">Выбрать процесс</h2>
+            <button type="button" class="variable-picker-close" @onclick="CloseProcessPicker" aria-label="Закрыть">
+                <span class="oi oi-x"></span>
+            </button>
+        </div>
+        <div class="variable-picker-search-wrap">
+            <span class="variable-picker-search-icon oi oi-magnifying-glass"></span>
+            <input type="text"
+                   class="variable-picker-search"
+                   placeholder="Поиск по названию бота..."
+                   @bind="ProcessPickerSearch"
+                   @bind:event="oninput" />
+            <button type="button" class="btn btn-sm btn-outline-primary ms-2" @onclick="OnProcessPickerSearchSubmit">Искать</button>
+        </div>
+        <div class="variable-picker-list" style="min-height: 200px;">
+            @if (ProcessPickerLoading)
+            {
+                <div class="variable-picker-empty">
+                    <p>Загрузка...</p>
+                </div>
+            }
+            else if (!ProcessPickerItems.Any())
+            {
+                <div class="variable-picker-empty">
+                    <p>Нет процессов</p>
+                    <small>Добавьте процессы в настройках бота</small>
+                </div>
+            }
+            else
+            {
+                @foreach (var w in ProcessPickerItems)
+                {
+                    <button type="button"
+                            class="variable-picker-item variable-picker-item--custom"
+                            @onclick="() => SelectProcessFromPicker(w)">
+                        <span class="variable-picker-item-icon"><span class="oi oi-layers"></span></span>
+                        <div class="variable-picker-item-body">
+                            <span class="variable-picker-item-name">@GetWorkflowDisplayName(w)</span>
+                            <span class="variable-picker-item-code">v@w.Version</span>
+                        </div>
+                        <span class="variable-picker-item-add oi oi-plus"></span>
+                    </button>
+                }
+            }
+        </div>
+        <div class="d-flex justify-content-between align-items-center px-3 py-2 border-top">
+            <button type="button" class="btn btn-sm btn-outline-secondary" disabled="@(!ProcessPickerHasPrev)" @onclick="ProcessPickerPrevPage">
+                <span class="oi oi-chevron-left"></span> Назад
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" disabled="@(!ProcessPickerHasNext)" @onclick="ProcessPickerNextPage">
+                Вперёд <span class="oi oi-chevron-right"></span>
+            </button>
         </div>
     </div>
 }

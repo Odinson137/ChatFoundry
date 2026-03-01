@@ -1,11 +1,14 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
+using BlazorClient.Interfaces;
 
 namespace BlazorClient.Models;
 
 public record WorkflowSchema(
     List<NodeDefinition> Nodes,
     List<EdgeDefinition> Edges,
-    List<LayoutDefinition> Layout);
+    List<LayoutDefinition> Layout,
+    List<WorkflowParameterDto>? InputParameters = null,
+    List<WorkflowParameterDto>? OutputParameters = null);
 
 public record NodeDefinition(Guid Id, string Type, string Label, NodeData? Data);
 

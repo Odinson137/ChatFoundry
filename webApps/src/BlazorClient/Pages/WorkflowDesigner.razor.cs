@@ -111,6 +111,24 @@ public partial class WorkflowDesigner : IDisposable
     // Файловое хранилище — список для выбора в блоке Медиа
     private List<FileInfoDto>? StorageFiles { get; set; }
 
+    // Список workflow для выбора в блоке «Процесс»
+    private List<WorkflowListItem>? AvailableWorkflows { get; set; }
+
+    // Модальное окно выбора процесса (поиск + пагинация)
+    private bool IsProcessPickerOpen { get; set; }
+    private SubWorkflowNodeData? ProcessPickerTarget { get; set; }
+    private List<WorkflowListItem> ProcessPickerItems { get; set; } = [];
+    private string ProcessPickerSearch { get; set; } = "";
+    private bool ProcessPickerHasNext { get; set; }
+    private bool ProcessPickerHasPrev { get; set; }
+    private string? ProcessPickerEndCursor { get; set; }
+    private string? ProcessPickerStartCursor { get; set; }
+    private bool ProcessPickerLoading { get; set; }
+
+    /// <summary>Входные и выходные параметры текущего процесса (редактируются во вкладке «Параметры»).</summary>
+    private List<WorkflowParameterDto> CurrentWorkflowInputParameters { get; set; } = [];
+    private List<WorkflowParameterDto> CurrentWorkflowOutputParameters { get; set; } = [];
+
     protected override async Task OnInitializedAsync()
     {
         InitializeDiagram();
@@ -249,6 +267,8 @@ public partial class WorkflowDesigner : IDisposable
                 data.NodesDefinition,
                 data.EdgesDefinition,
                 data.LayoutDefinition);
+            CurrentWorkflowInputParameters = DeserializeParameters(data.InputParametersDefinition);
+            CurrentWorkflowOutputParameters = DeserializeParameters(data.OutputParametersDefinition);
             _isRestoring = true;
             try
             {
@@ -265,6 +285,22 @@ public partial class WorkflowDesigner : IDisposable
         catch (Exception ex)
         {
             _loadError = $"Не удалось загрузить схему: {ex.Message}";
+        }
+    }
+
+    private static List<WorkflowParameterDto> DeserializeParameters(string? json)
+    {
+        if (string.IsNullOrWhiteSpace(json) || json.Trim() == "[]" || json.Trim() == "{}")
+            return [];
+        try
+        {
+            var list = JsonSerializer.Deserialize<List<WorkflowParameterDto>>(json,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return list ?? [];
+        }
+        catch
+        {
+            return [];
         }
     }
 
@@ -385,7 +421,7 @@ public partial class WorkflowDesigner : IDisposable
         var schema = new WorkflowSchema(nodes, edges, layout);
         var (nStr, eStr, lStr) = SchemaService.Serialize(schema);
 
-        await ApiClient.UpdateWorkflowDefinitionsAsync(WorkflowId, nStr, eStr, lStr);
+        await ApiClient.UpdateWorkflowDefinitionsAsync(WorkflowId, nStr, eStr, lStr, CurrentWorkflowInputParameters, CurrentWorkflowOutputParameters);
         LastSavedAt = DateTime.UtcNow;
     }
 
@@ -415,7 +451,7 @@ public partial class WorkflowDesigner : IDisposable
             Guid.Parse(n.Id),
             n.Position.X,
             n.Position.Y)).ToList();
-        return new WorkflowSchema(nodes, edges, layout);
+        return new WorkflowSchema(nodes, edges, layout, CurrentWorkflowInputParameters, CurrentWorkflowOutputParameters);
     }
 
     private async Task CloseJsonMenuAndDownload()
@@ -448,6 +484,10 @@ public partial class WorkflowDesigner : IDisposable
             await using var stream = file.OpenReadStream(maxAllowedSize: 2 * 1024 * 1024); // 2 MB
             var schema = await JsonSerializer.DeserializeAsync<WorkflowSchema>(stream, WorkflowJsonOptions);
             if (schema == null) return;
+            if (schema.InputParameters != null)
+                CurrentWorkflowInputParameters = schema.InputParameters.Select(p => new WorkflowParameterDto { Name = p.Name ?? "", DefaultValue = p.DefaultValue, Description = p.Description }).ToList();
+            if (schema.OutputParameters != null)
+                CurrentWorkflowOutputParameters = schema.OutputParameters.Select(p => new WorkflowParameterDto { Name = p.Name ?? "", DefaultValue = p.DefaultValue, Description = p.Description }).ToList();
             _isRestoring = true;
             try
             {
@@ -495,6 +535,10 @@ public partial class WorkflowDesigner : IDisposable
         else if (data == null && type.ToLower() == "media")
         {
             data = new MediaNodeData { SourceType = MediaSourceType.Attachment };
+        }
+        else if (data == null && type.ToLower() == "subworkflow")
+        {
+            data = new SubWorkflowNodeData();
         }
         else if (data == null)
         {
@@ -546,6 +590,7 @@ public partial class WorkflowDesigner : IDisposable
             NodeType.AIFilter => "AI Фильтр",
             NodeType.AIGenerate => "AI Текст",
             NodeType.Media => "Медиа",
+            NodeType.SubWorkflow => "Процесс",
             _ => "Блок"
         };
 
@@ -558,6 +603,7 @@ public partial class WorkflowDesigner : IDisposable
             NodeType.HttpRequest => new HttpRequestNodeData { Method = "GET", Headers = new(), Url = "" },
             NodeType.AIGenerate => new AIGenerateNodeData { Prompt = "", Variable = ""},
             NodeType.Media => new MediaNodeData { SourceType = MediaSourceType.Attachment },
+            NodeType.SubWorkflow => new SubWorkflowNodeData(),
             _ => null
         };
 
@@ -603,6 +649,200 @@ public partial class WorkflowDesigner : IDisposable
     {
         if (askData?.Ui?.Buttons == null) return;
         askData.Ui.Buttons.Remove(button);
+        OnWorkflowChanged();
+        StateHasChanged();
+    }
+
+    private async Task LoadAvailableWorkflows()
+    {
+        try
+        {
+            AvailableWorkflows = (await ApiClient.GetWorkflowsListAsync())
+                .Where(w => w.Id != WorkflowId)
+                .ToList();
+        }
+        catch
+        {
+            AvailableWorkflows = [];
+        }
+
+        StateHasChanged();
+    }
+
+    private void OpenProcessPicker(SubWorkflowNodeData subData)
+    {
+        ProcessPickerTarget = subData;
+        ProcessPickerSearch = "";
+        ProcessPickerItems = [];
+        ProcessPickerEndCursor = null;
+        ProcessPickerStartCursor = null;
+        IsProcessPickerOpen = true;
+        _ = LoadProcessPickerPage();
+    }
+
+    private void CloseProcessPicker()
+    {
+        IsProcessPickerOpen = false;
+        ProcessPickerTarget = null;
+        ProcessPickerItems = [];
+        StateHasChanged();
+    }
+
+    private async Task LoadProcessPickerPage(string? after = null, string? before = null)
+    {
+        if (!IsProcessPickerOpen) return;
+        ProcessPickerLoading = true;
+        StateHasChanged();
+        try
+        {
+            WorkflowListPage page;
+            if (before != null)
+                page = await ApiClient.GetWorkflowsPageAsync(last: 10, before: before);
+            else
+                page = await ApiClient.GetWorkflowsPageAsync(first: 10, after: after);
+            var items = page.Items.Where(w => w.Id != WorkflowId).ToList();
+            if (!string.IsNullOrWhiteSpace(ProcessPickerSearch))
+            {
+                var q = ProcessPickerSearch.Trim();
+                items = items.Where(w => GetWorkflowDisplayName(w).Contains(q, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+            ProcessPickerItems = items;
+            ProcessPickerHasNext = page.HasNextPage;
+            ProcessPickerHasPrev = page.HasPreviousPage;
+            ProcessPickerEndCursor = page.EndCursor;
+            ProcessPickerStartCursor = page.StartCursor;
+        }
+        catch
+        {
+            ProcessPickerItems = [];
+            ProcessPickerHasNext = false;
+            ProcessPickerHasPrev = false;
+        }
+        finally
+        {
+            ProcessPickerLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ProcessPickerNextPage()
+    {
+        if (string.IsNullOrEmpty(ProcessPickerEndCursor)) return;
+        await LoadProcessPickerPage(after: ProcessPickerEndCursor);
+    }
+
+    private async Task ProcessPickerPrevPage()
+    {
+        if (string.IsNullOrEmpty(ProcessPickerStartCursor)) return;
+        await LoadProcessPickerPage(before: ProcessPickerStartCursor);
+    }
+
+    private void OnProcessPickerSearchSubmit() => _ = LoadProcessPickerPage();
+
+    private void SelectProcessFromPicker(WorkflowListItem w)
+    {
+        if (ProcessPickerTarget == null) return;
+        ProcessPickerTarget.WorkflowId = w.Id;
+        ProcessPickerTarget.InputMappings = w.InputParameters.ToDictionary(p => p.Name, p => p.DefaultValue ?? "");
+        var outDict = new Dictionary<string, string>();
+        foreach (var p in w.OutputParameters)
+            outDict[$"result_{outDict.Count + 1}"] = p.Name;
+        ProcessPickerTarget.OutputMappings = outDict;
+        AvailableWorkflows ??= [];
+        if (AvailableWorkflows.All(x => x.Id != w.Id))
+            AvailableWorkflows.Insert(0, w);
+        OnWorkflowChanged();
+        CloseProcessPicker();
+    }
+
+    private string GetWorkflowDisplayName(WorkflowListItem w) =>
+        w.Bot != null ? $"{w.Bot.Name} (v{w.Version})" : $"Workflow v{w.Version}";
+
+    private async Task OnSubWorkflowSelected(SubWorkflowNodeData subData, ChangeEventArgs e)
+    {
+        var idStr = e.Value?.ToString();
+        if (Guid.TryParse(idStr, out var id))
+        {
+            subData.WorkflowId = id;
+            var target = AvailableWorkflows?.FirstOrDefault(w => w.Id == id);
+            if (target != null)
+            {
+                subData.InputMappings = target.InputParameters
+                    .ToDictionary(p => p.Name, p => p.DefaultValue ?? "");
+                var outDict = new Dictionary<string, string>();
+                foreach (var p in target.OutputParameters)
+                    outDict[$"result_{outDict.Count + 1}"] = p.Name;
+                subData.OutputMappings = outDict;
+            }
+        }
+        else
+        {
+            subData.WorkflowId = Guid.Empty;
+            subData.InputMappings.Clear();
+            subData.OutputMappings.Clear();
+        }
+
+        OnWorkflowChanged();
+    }
+
+    private void InsertVariableIntoMapping(Dictionary<string, string> mappings, string key, string variableName)
+    {
+        var toInsert = "{{" + variableName.TrimStart('$') + "}}";
+        mappings[key] = (mappings.GetValueOrDefault(key) ?? "") + toInsert;
+        OnWorkflowChanged();
+        StateHasChanged();
+    }
+
+    private void AddSubWorkflowInputMapping(SubWorkflowNodeData subData)
+    {
+        var key = $"param_{subData.InputMappings.Count + 1}";
+        subData.InputMappings[key] = "";
+        OnWorkflowChanged();
+    }
+
+    private void RemoveSubWorkflowInputMapping(SubWorkflowNodeData subData, string key)
+    {
+        subData.InputMappings.Remove(key);
+        OnWorkflowChanged();
+    }
+
+    private void AddSubWorkflowOutputMapping(SubWorkflowNodeData subData)
+    {
+        var key = $"result_{subData.OutputMappings.Count + 1}";
+        subData.OutputMappings[key] = "";
+        OnWorkflowChanged();
+    }
+
+    private void RemoveSubWorkflowOutputMapping(SubWorkflowNodeData subData, string key)
+    {
+        subData.OutputMappings.Remove(key);
+        OnWorkflowChanged();
+    }
+
+    private void AddWorkflowInputParameter()
+    {
+        CurrentWorkflowInputParameters.Add(new WorkflowParameterDto { Name = "", DefaultValue = "", Description = "" });
+        OnWorkflowChanged();
+        StateHasChanged();
+    }
+
+    private void RemoveWorkflowInputParameter(WorkflowParameterDto item)
+    {
+        CurrentWorkflowInputParameters.Remove(item);
+        OnWorkflowChanged();
+        StateHasChanged();
+    }
+
+    private void AddWorkflowOutputParameter()
+    {
+        CurrentWorkflowOutputParameters.Add(new WorkflowParameterDto { Name = "", Description = "" });
+        OnWorkflowChanged();
+        StateHasChanged();
+    }
+
+    private void RemoveWorkflowOutputParameter(WorkflowParameterDto item)
+    {
+        CurrentWorkflowOutputParameters.Remove(item);
         OnWorkflowChanged();
         StateHasChanged();
     }
@@ -693,6 +933,21 @@ public partial class WorkflowDesigner : IDisposable
                     Name = name,
                     Type = VariableType.GlobalAttribute,
                     SourceNode = attr.DisplayName ?? attr.Key
+                };
+            }
+        }
+
+        // Входные параметры процесса — доступны как {{имя}} во всех узлах
+        foreach (var p in CurrentWorkflowInputParameters.Where(p => !string.IsNullOrWhiteSpace(p.Name)))
+        {
+            var name = NormalizeVariableName(p.Name);
+            if (!variables.ContainsKey(name))
+            {
+                variables[name] = new VariableInfo
+                {
+                    Name = name,
+                    Type = VariableType.Custom,
+                    SourceNode = string.IsNullOrWhiteSpace(p.Description) ? "Входной параметр процесса" : p.Description
                 };
             }
         }
@@ -1249,6 +1504,7 @@ if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].Usage
         new NodeToolItem("Логика", "Старт", NodeType.Start, "oi-media-play", "green"),
         new NodeToolItem("Логика", "Условие", NodeType.Condition, "oi-fork", "orange"),
         new NodeToolItem("Логика", "Ожидание", NodeType.Wait, "oi-timer", "blue"),
+        new NodeToolItem("Логика", "Процесс", NodeType.SubWorkflow, "oi-layers", "orange"),
         new NodeToolItem("Логика", "Конец", NodeType.End, "oi-media-stop", "red"),
         new NodeToolItem("Контент", "Сообщение", NodeType.Message, "oi-chat", "indigo"),
         new NodeToolItem("Контент", "Вопрос", NodeType.Ask, "oi-question-mark", "indigo"),

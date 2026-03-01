@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shared.Infrastructure.EntityTypeConfiguration;
 using WorkflowService.Entities;
@@ -22,6 +22,16 @@ public class WorkflowConfiguration : BaseEntityTypeConfiguration<BotWorkflow>
             .IsRequired();
 
         builder.Property(x => x.LayoutDefinition)
+            .HasColumnType("jsonb")
+            .HasDefaultValue("[]")
+            .IsRequired();
+
+        builder.Property(x => x.InputParametersDefinition)
+            .HasColumnType("jsonb")
+            .HasDefaultValue("[]")
+            .IsRequired();
+
+        builder.Property(x => x.OutputParametersDefinition)
             .HasColumnType("jsonb")
             .HasDefaultValue("[]")
             .IsRequired();

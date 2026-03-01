@@ -1,4 +1,4 @@
-﻿using HotChocolate;
+using HotChocolate;
 using HotChocolate.Types;
 using Shared.Infrastructure.GraphQl;
 using WorkflowService.Data;
@@ -20,7 +20,9 @@ public class BotWorkflowMutation
             EdgesDefinition = input.EdgesDefinition,
             LayoutDefinition = input.LayoutDefinition,
             Version = input.Version,
-            IsActiveBotWorkflow = input.IsActiveBotWorkflow
+            IsActiveBotWorkflow = input.IsActiveBotWorkflow,
+            InputParametersDefinition = input.InputParametersDefinition ?? "[]",
+            OutputParametersDefinition = input.OutputParametersDefinition ?? "[]"
         };
 
         context.Workflows.Add(workflow);
@@ -45,6 +47,11 @@ public class BotWorkflowMutation
         workflow.LayoutDefinition = input.LayoutDefinition ?? workflow.LayoutDefinition;
         workflow.Version = input.Version ?? workflow.Version;
         workflow.IsActiveBotWorkflow = input.IsActiveBotWorkflow ?? workflow.IsActiveBotWorkflow;
+
+        if (input.InputParametersDefinition != null)
+            workflow.InputParametersDefinition = input.InputParametersDefinition;
+        if (input.OutputParametersDefinition != null)
+            workflow.OutputParametersDefinition = input.OutputParametersDefinition;
 
         await context.SaveChangesAsync();
 
@@ -77,7 +84,9 @@ public record AddBotWorkflowInput(
     string EdgesDefinition, 
     string LayoutDefinition, 
     int Version = 1, 
-    bool IsActiveBotWorkflow = false);
+    bool IsActiveBotWorkflow = false,
+    string? InputParametersDefinition = null,
+    string? OutputParametersDefinition = null);
 
 public record AddBotWorkflowPayload(BotWorkflow BotWorkflow);
 
@@ -87,7 +96,9 @@ public record UpdateBotWorkflowInput(
     string? EdgesDefinition, 
     string? LayoutDefinition, 
     int? Version, 
-    bool? IsActiveBotWorkflow);
+    bool? IsActiveBotWorkflow,
+    string? InputParametersDefinition = null,
+    string? OutputParametersDefinition = null);
 
 public record UpdateBotWorkflowPayload(BotWorkflow? BotWorkflow);
 

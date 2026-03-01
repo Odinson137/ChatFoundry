@@ -60,6 +60,7 @@ services.AddScoped<IActionExecutor, SetAttributeActionExecutor>();
 services.AddScoped<IActionExecutor, HttpRequestActionExecutor>();
 services.AddScoped<IActionExecutor, AIGenerateActionExecutor>();
 services.AddScoped<IActionExecutor, SendMediaActionExecutor>();
+services.AddScoped<IActionExecutor, SubWorkflowActionExecutor>();
 
 services.AddScoped<IMessageSender, MessageSender>();
 services.AddScoped<IOpenAiService, OpenAiService>();
@@ -162,6 +163,7 @@ builder.Services
     .AddTypeExtension<ChannelMutation>()
     .AddTypeExtension<BotWorkflowMutation>()
     .AddType<MessengerChannelType>()
+    .AddType<WorkflowService.GraphQL.Types.BotWorkflowType>()
     .AddProjections() 
     .AddFiltering()
     .AddSorting();

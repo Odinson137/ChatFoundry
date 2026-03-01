@@ -26,8 +26,11 @@ public interface IWorkflowApiClient
 
     // ─── Workflows ───────────────────────────────────────────────────────────
     Task<WorkflowResponse?> GetWorkflowByIdAsync(Guid id);
+    Task<List<WorkflowListItem>> GetWorkflowsListAsync();
+    /// <summary>Постраничная загрузка процессов для модального выбора (first: 10, cursor-based).</summary>
+    Task<WorkflowListPage> GetWorkflowsPageAsync(int first = 10, string? after = null, int? last = null, string? before = null);
     Task<bool> AddBotWorkflowAsync(Guid botId, int version);
-    Task<bool> UpdateWorkflowDefinitionsAsync(Guid workflowId, string nodes, string edges, string layout);
+    Task<bool> UpdateWorkflowDefinitionsAsync(Guid workflowId, string nodes, string edges, string layout, List<WorkflowParameterDto>? inputParameters = null, List<WorkflowParameterDto>? outputParameters = null);
     Task<bool> UpdateBotWorkflowAsync(Guid workflowId, bool isActive);
     Task<bool> DeleteBotWorkflowAsync(Guid workflowId);
 }
@@ -38,4 +41,38 @@ public record WorkflowResponse(
     Guid Id,
     string NodesDefinition,
     string EdgesDefinition,
-    string LayoutDefinition);
+    string LayoutDefinition,
+    string? InputParametersDefinition = null,
+    string? OutputParametersDefinition = null);
+
+public class WorkflowParameterDto
+{
+    public string Name { get; set; } = "";
+    public string? DefaultValue { get; set; }
+    public string? Description { get; set; }
+}
+
+public class WorkflowListItem
+{
+    public Guid Id { get; set; }
+    public int Version { get; set; }
+    public WorkflowListItemBot? Bot { get; set; }
+    public List<WorkflowParameterDto> InputParameters { get; set; } = [];
+    public List<WorkflowParameterDto> OutputParameters { get; set; } = [];
+}
+
+public class WorkflowListItemBot
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = "";
+}
+
+/// <summary>Одна страница списка процессов (для модального выбора с пагинацией).</summary>
+public class WorkflowListPage
+{
+    public List<WorkflowListItem> Items { get; set; } = [];
+    public bool HasNextPage { get; set; }
+    public bool HasPreviousPage { get; set; }
+    public string? EndCursor { get; set; }
+    public string? StartCursor { get; set; }
+}

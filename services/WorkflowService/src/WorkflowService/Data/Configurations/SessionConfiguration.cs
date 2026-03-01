@@ -32,9 +32,13 @@ public class SessionConfiguration : BaseEntityTypeConfiguration<Session>
         builder.Property(x => x.ChannelId)
             .IsRequired();
 
+        builder.Property(x => x.Depth)
+            .HasDefaultValue(0);
+
         builder.HasIndex(x => x.WorkflowId);
         builder.HasIndex(x => new { x.ClientId, x.Channel });
         builder.HasIndex(x => new { x.ChannelId, x.ClientId, x.WorkflowId });
+        builder.HasIndex(x => x.ParentSessionId);
 
         builder.HasOne(x => x.Workflow)
             .WithMany()
@@ -45,5 +49,10 @@ public class SessionConfiguration : BaseEntityTypeConfiguration<Session>
             .WithMany()
             .HasForeignKey(x => x.ChannelId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(x => x.ParentSession)
+            .WithMany()
+            .HasForeignKey(x => x.ParentSessionId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

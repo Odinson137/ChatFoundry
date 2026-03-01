@@ -281,6 +281,8 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
                             layoutDefinition
                             version
                             isActiveBotWorkflow
+                            inputParametersDefinition
+                            outputParametersDefinition
                         }
                     }
                 }
@@ -289,6 +291,71 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
         var variables = new { id };
         var result = await ExecuteGraphQl<WorkflowsConnectionResponse>(query, variables);
         return result.Workflows.Nodes.FirstOrDefault();
+    }
+
+    public async Task<List<WorkflowListItem>> GetWorkflowsListAsync()
+    {
+        var page = await GetWorkflowsPageAsync(first: 10, after: null);
+        return page.Items;
+    }
+
+    public async Task<WorkflowListPage> GetWorkflowsPageAsync(int first = 10, string? after = null, int? last = null, string? before = null)
+    {
+        var query = """
+                query GetWorkflowsPage($first: Int, $after: String, $last: Int, $before: String) {
+                    workflows(first: $first, after: $after, last: $last, before: $before) {
+                        nodes {
+                            id
+                            version
+                            bot { id name }
+                            inputParametersDefinition
+                            outputParametersDefinition
+                        }
+                        pageInfo {
+                            hasNextPage
+                            hasPreviousPage
+                            endCursor
+                            startCursor
+                        }
+                    }
+                }
+                """;
+
+        var variables = new { first, after, last, before };
+        var result = await ExecuteGraphQl<WorkflowsPageResponse>(query, variables);
+        var conn = result.Workflows ?? new WorkflowListConnectionWithPageInfo();
+        var nodes = conn.Nodes ?? [];
+        return new WorkflowListPage
+        {
+            Items = nodes.Select(n => new WorkflowListItem
+            {
+                Id = n.Id,
+                Version = n.Version,
+                Bot = n.Bot,
+                InputParameters = DeserializeParameters(n.InputParametersDefinition),
+                OutputParameters = DeserializeParameters(n.OutputParametersDefinition)
+            }).ToList(),
+            HasNextPage = conn.PageInfo?.HasNextPage ?? false,
+            HasPreviousPage = conn.PageInfo?.HasPreviousPage ?? false,
+            EndCursor = conn.PageInfo?.EndCursor,
+            StartCursor = conn.PageInfo?.StartCursor
+        };
+    }
+
+    private static List<WorkflowParameterDto> DeserializeParameters(string? json)
+    {
+        if (string.IsNullOrWhiteSpace(json) || json.Trim() == "[]" || json.Trim() == "{}")
+            return [];
+        try
+        {
+            var list = JsonSerializer.Deserialize<List<WorkflowParameterDto>>(json,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return list ?? [];
+        }
+        catch
+        {
+            return [];
+        }
     }
 
     public async Task<bool> AddBotWorkflowAsync(Guid botId, int version)
@@ -318,7 +385,7 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
         catch { return false; }
     }
 
-    public async Task<bool> UpdateWorkflowDefinitionsAsync(Guid workflowId, string nodes, string edges, string layout)
+    public async Task<bool> UpdateWorkflowDefinitionsAsync(Guid workflowId, string nodes, string edges, string layout, List<WorkflowParameterDto>? inputParameters = null, List<WorkflowParameterDto>? outputParameters = null)
     {
         var query = """
                 mutation UpdateWorkflowDefs($input: UpdateBotWorkflowInput!) {
@@ -328,6 +395,9 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
                 }
                 """;
 
+        var inputParametersDefinition = SerializeParameters(inputParameters);
+        var outputParametersDefinition = SerializeParameters(outputParameters);
+
         var variables = new
         {
             input = new
@@ -335,7 +405,9 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
                 workflowId,
                 nodesDefinition = nodes,
                 edgesDefinition = edges,
-                layoutDefinition = layout
+                layoutDefinition = layout,
+                inputParametersDefinition,
+                outputParametersDefinition
             }
         };
 
@@ -345,6 +417,12 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
             Console.WriteLine($"Failed to update workflow definitions: {ex.Message}");
             return false;
         }
+    }
+
+    private static string SerializeParameters(List<WorkflowParameterDto>? list)
+    {
+        if (list == null || list.Count == 0) return "[]";
+        return JsonSerializer.Serialize(list, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
     }
 
     public async Task<bool> UpdateBotWorkflowAsync(Guid workflowId, bool isActive)
@@ -435,6 +513,49 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
     private class WorkflowConnection
     {
         public List<WorkflowResponse> Nodes { get; set; } = [];
+    }
+
+    private class WorkflowsListConnectionResponse
+    {
+        public WorkflowListConnection? Workflows { get; set; }
+    }
+
+    private class WorkflowsPageResponse
+    {
+        public WorkflowListConnectionWithPageInfo? Workflows { get; set; }
+    }
+
+    private class WorkflowListConnectionWithPageInfo
+    {
+        public List<WorkflowListNode> Nodes { get; set; } = [];
+        public WorkflowPageInfoDto? PageInfo { get; set; }
+    }
+
+    private class WorkflowPageInfoDto
+    {
+        public bool HasNextPage { get; set; }
+        public bool HasPreviousPage { get; set; }
+        public string? EndCursor { get; set; }
+        public string? StartCursor { get; set; }
+    }
+
+    private class WorkflowListConnection
+    {
+        public List<WorkflowListNode> Nodes { get; set; } = [];
+    }
+
+    private class WorkflowListNode
+    {
+        public Guid Id { get; set; }
+        public int Version { get; set; }
+        public WorkflowListItemBot? Bot { get; set; }
+        public string? InputParametersDefinition { get; set; }
+        public string? OutputParametersDefinition { get; set; }
+    }
+
+    private class WorkflowListItemsResponse
+    {
+        public List<WorkflowListItem> WorkflowListItems { get; set; } = [];
     }
 
     private class AddBotResponse

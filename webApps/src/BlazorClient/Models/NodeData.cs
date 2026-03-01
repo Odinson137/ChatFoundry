@@ -6,14 +6,15 @@ namespace BlazorClient.Models;
 // [JsonDerivedType] помогает System.Text.Json корректно сериализовать/десериализовать
 // полиморфные типы (когда NodeData может быть MessageNodeData, AskNodeData и т.д.).
 // 'typeDiscriminator' должен соответствовать тому, как сервер определяет тип данных.
-[JsonDerivedType(typeof(EmptyNodeData), "Empty")] // 'Empty' - если нет специфичных данных
-[JsonDerivedType(typeof(MessageNodeData), "Message")] // 'Message' - для узла сообщения
-[JsonDerivedType(typeof(SetVariableNodeData), "SetVariable")] // 'SetVariable' - для узла установки переменной
-[JsonDerivedType(typeof(SetAttributeNodeData), "SetAttribute")] // 'SetAttribute' - запись в атрибуты клиента
+[JsonDerivedType(typeof(EmptyNodeData), "Empty")]
+[JsonDerivedType(typeof(MessageNodeData), "Message")]
+[JsonDerivedType(typeof(SetVariableNodeData), "SetVariable")]
+[JsonDerivedType(typeof(SetAttributeNodeData), "SetAttribute")]
 [JsonDerivedType(typeof(AskNodeData), "Ask")]
 [JsonDerivedType(typeof(HttpRequestNodeData), "HttpRequest")]
 [JsonDerivedType(typeof(AIGenerateNodeData), "AIGenerate")]
 [JsonDerivedType(typeof(MediaNodeData), "Media")]
+[JsonDerivedType(typeof(SubWorkflowNodeData), "SubWorkflow")]
 
 public abstract class NodeData { }
 
@@ -154,4 +155,19 @@ public class MediaNodeData : NodeData
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Caption { get; set; }
+}
+
+public class SubWorkflowNodeData : NodeData
+{
+    public Guid WorkflowId { get; set; }
+
+    /// <summary>
+    /// Child parameter name -> expression with {{parentVar}} templates.
+    /// </summary>
+    public Dictionary<string, string> InputMappings { get; set; } = new();
+
+    /// <summary>
+    /// Parent variable name -> child variable name.
+    /// </summary>
+    public Dictionary<string, string> OutputMappings { get; set; } = new();
 }

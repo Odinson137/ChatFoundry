@@ -34,8 +34,12 @@ public class SessionResolver(
                 Status = SessionStatus.Active,
             };
 
+            PopulateDefaultInputParameters(session, workflow);
+
             await sessionRepository.AddAsync(session, ct);
         }
+
+        session = await DrillDownToActiveChildAsync(session, ct);
 
         variableService.PopulateFromEventParameters(session, message.Parameters);
         await variableService.LoadClientVariablesAsync(session, ct);
@@ -51,5 +55,27 @@ public class SessionResolver(
         
         session.Status = SessionStatus.Completed;
         await sessionRepository.SaveAsync(session, ct);
+    }
+
+    private async Task<Session> DrillDownToActiveChildAsync(Session session, CancellationToken ct)
+    {
+        while (session.Status == SessionStatus.WaitingForSubWorkflow)
+        {
+            var child = await sessionRepository.FindActiveChildAsync(session.Id, ct);
+            if (child == null)
+                break;
+            session = child;
+        }
+
+        return session;
+    }
+
+    private static void PopulateDefaultInputParameters(Session session, BotWorkflow workflow)
+    {
+        foreach (var param in workflow.InputParameters)
+        {
+            if (param.DefaultValue != null)
+                session.Variables[param.Name] = param.DefaultValue;
+        }
     }
 }

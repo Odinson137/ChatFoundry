@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Shared.Domain.Enums;
 using WorkflowService.Data;
 using WorkflowService.Entities;
@@ -13,7 +13,8 @@ public class ActionRepository(WorkflowDbContext db) : IActionRepository
         return await db.Actions
             .Include(c => c.Session)
             .ThenInclude(c => c.Workflow)
-            .Where(x => x.Session.Channel == channel && x.Session.ClientId == clientId)
+            .Where(x => x.Session.Channel == channel && x.Session.ClientId == clientId
+                && (x.Session.Status == SessionStatus.Active || x.Session.Status == SessionStatus.WaitingForSubWorkflow))
             .OrderByDescending(x => x.CreatedAt)
             .FirstOrDefaultAsync(ct);
     }

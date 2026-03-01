@@ -13,5 +13,6 @@ public enum NodeType
     HttpRequest,
     AIFilter,
     AIGenerate,
-    Media
+    Media,
+    SubWorkflow
 }

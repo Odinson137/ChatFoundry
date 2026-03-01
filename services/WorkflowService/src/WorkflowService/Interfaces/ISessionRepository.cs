@@ -6,6 +6,8 @@ public interface ISessionRepository
 {
     Task<Session?> FindActiveAsync(Guid channelId, string clientId, Guid botId, CancellationToken ct);
 
+    Task<Session?> FindActiveChildAsync(Guid parentSessionId, CancellationToken ct);
+
     Task<Session?> GetAsync(Guid sessionId, CancellationToken ct = default);
 
     Task AddAsync(Session session, CancellationToken ct = default);

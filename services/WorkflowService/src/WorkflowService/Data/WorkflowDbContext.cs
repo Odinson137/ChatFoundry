@@ -12,6 +12,28 @@ public class WorkflowDbContext : DbContext
     public WorkflowDbContext(DbContextOptions<WorkflowDbContext> options) : base(options)
     {
         Database.EnsureCreated();
+        EnsureWorkflowParameterColumns();
+    }
+
+    /// <summary>
+    /// Adds InputParametersDefinition and OutputParametersDefinition columns if missing (EnsureCreated does not alter existing tables).
+    /// </summary>
+    private void EnsureWorkflowParameterColumns()
+    {
+        var tableName = Model.FindEntityType(typeof(BotWorkflow))?.GetTableName();
+        if (string.IsNullOrEmpty(tableName)) return;
+
+        try
+        {
+#pragma warning disable EF1002 // tableName from model metadata, not user input
+            Database.ExecuteSqlRaw($"ALTER TABLE \"{tableName}\" ADD COLUMN IF NOT EXISTS \"InputParametersDefinition\" jsonb NOT NULL DEFAULT '[]'");
+            Database.ExecuteSqlRaw($"ALTER TABLE \"{tableName}\" ADD COLUMN IF NOT EXISTS \"OutputParametersDefinition\" jsonb NOT NULL DEFAULT '[]'");
+#pragma warning restore EF1002
+        }
+        catch
+        {
+            // Columns may already exist; ignore
+        }
     }
     
     public DbSet<Bot> Bots => Set<Bot>();
