@@ -35,6 +35,14 @@ public class SessionRepository(WorkflowDbContext db) : ISessionRepository
         return await db.Sessions.Include(c => c.Workflow).FirstOrDefaultAsync(c => c.Id == sessionId, ct);
     }
 
+    public async Task<IReadOnlyList<Session>> GetByParentSessionIdAsync(Guid parentSessionId, CancellationToken ct = default)
+    {
+        return await db.Sessions
+            .Include(s => s.Workflow)
+            .Where(s => s.ParentSessionId == parentSessionId)
+            .ToListAsync(ct);
+    }
+
     public async Task AddAsync(Session session, CancellationToken ct = default)
     {
         await db.Sessions.AddAsync(session, ct);

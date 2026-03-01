@@ -3,6 +3,7 @@ using Shared.Domain.Enums;
 using WorkflowService.Entities;
 using WorkflowService.Enums;
 using WorkflowService.Events;
+using WorkflowService.Exceptions;
 using WorkflowService.Interfaces;
 using WorkflowService.Models.Node;
 using WorkflowService.Utils;
@@ -36,8 +37,7 @@ public class SubWorkflowActionExecutor(
             throw new InvalidOperationException($"Node {node.Id} is not a SubWorkflow node");
 
         if (parentSession.Depth >= MaxDepth)
-            throw new InvalidOperationException(
-                $"SubWorkflow nesting depth exceeded (max {MaxDepth}). Possible infinite recursion.");
+            throw new SubWorkflowDepthExceededException(MaxDepth);
 
         var childWorkflow = await workflowRepository.GetByIdAsync(subData.WorkflowId)
                             ?? throw new InvalidOperationException($"SubWorkflow target {subData.WorkflowId} not found");

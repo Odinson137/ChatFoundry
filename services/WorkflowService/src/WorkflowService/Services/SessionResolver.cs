@@ -57,6 +57,45 @@ public class SessionResolver(
         await sessionRepository.SaveAsync(session, ct);
     }
 
+    public async Task CloseSessionAndHierarchyAsync(Guid sessionId, CancellationToken ct)
+    {
+        var session = await sessionRepository.GetAsync(sessionId, ct);
+        if (session == null)
+            return;
+
+        var toClose = new List<Session> { session };
+
+        await AddDescendantsAsync(sessionId, toClose, ct);
+
+        var current = session;
+        while (current.ParentSessionId is { } parentId)
+        {
+            var parent = await sessionRepository.GetAsync(parentId, ct);
+            if (parent == null)
+                break;
+            toClose.Add(parent);
+            current = parent;
+        }
+
+        foreach (var s in toClose)
+        {
+            if (s.Status == SessionStatus.Completed || s.Status == SessionStatus.Failed)
+                continue;
+            s.Status = SessionStatus.Failed;
+            await sessionRepository.SaveAsync(s, ct);
+        }
+    }
+
+    private async Task AddDescendantsAsync(Guid parentId, List<Session> list, CancellationToken ct)
+    {
+        var children = await sessionRepository.GetByParentSessionIdAsync(parentId, ct);
+        foreach (var child in children)
+        {
+            list.Add(child);
+            await AddDescendantsAsync(child.Id, list, ct);
+        }
+    }
+
     private async Task<Session> DrillDownToActiveChildAsync(Session session, CancellationToken ct)
     {
         while (session.Status == SessionStatus.WaitingForSubWorkflow)

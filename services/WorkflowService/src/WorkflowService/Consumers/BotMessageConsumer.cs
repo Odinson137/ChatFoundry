@@ -1,5 +1,6 @@
 using MassTransit;
 using Shared.Application.Events;
+using WorkflowService.Entities;
 using WorkflowService.Enums;
 using WorkflowService.Events;
 using WorkflowService.Interfaces;
@@ -26,22 +27,31 @@ public class BotMessageConsumer(
 
         foreach (var botId in botIds)
         {
-            var session = await sessionResolver.ResolveForBotAsync(msg, botId, ct);
+            Session? session = null;
+            try
+            {
+                session = await sessionResolver.ResolveForBotAsync(msg, botId, ct);
 
-            var graph = workflowGraphParser.Parse(session.Workflow.NodesDefinition, session.Workflow.EdgesDefinition);
-            var currentNode = session.CurrentNodeId == null
-                ? graph.GetStartNode()
-                : graph.GetNode(session.CurrentNodeId.Value);
+                var graph = workflowGraphParser.Parse(session.Workflow.NodesDefinition, session.Workflow.EdgesDefinition);
+                var currentNode = session.CurrentNodeId == null
+                    ? graph.GetStartNode()
+                    : graph.GetNode(session.CurrentNodeId.Value);
 
-            var action = await actionFactory.CreateAsync(
-                session,
-                currentNode,
-                currentNode.Type == WorkflowNodeType.Ask ? WorkflowNodeType.Input : currentNode.Type,
-                msg.Payload,
-                ct);
-            await actionRepository.AddAsync(action, ct);
+                var action = await actionFactory.CreateAsync(
+                    session,
+                    currentNode,
+                    currentNode.Type == WorkflowNodeType.Ask ? WorkflowNodeType.Input : currentNode.Type,
+                    msg.Payload,
+                    ct);
+                await actionRepository.AddAsync(action, ct);
 
-            await producer.Produce(new ExecuteActionCommand(action.Id, msg.ExternalUserId, msg.Channel), ct);
+                await producer.Produce(new ExecuteActionCommand(action.Id, msg.ExternalUserId, msg.Channel), ct);
+            }
+            catch
+            {
+                if (session != null)
+                    await sessionResolver.CloseSessionAndHierarchyAsync(session.Id, ct);
+            }
         }
     }
 }

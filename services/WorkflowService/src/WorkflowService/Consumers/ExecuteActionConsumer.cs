@@ -1,4 +1,4 @@
-﻿using MassTransit;
+using MassTransit;
 using WorkflowService.Actions.Factories;
 using WorkflowService.Events;
 using WorkflowService.Interfaces;
@@ -7,7 +7,8 @@ namespace WorkflowService.Consumers;
 
 public class ExecuteActionConsumer(
     IActionRepository actionRepository,
-    IActionExecutorFactory executorFactory)
+    IActionExecutorFactory executorFactory,
+    ISessionResolver sessionResolver)
     : IConsumer<ExecuteActionCommand>
 {
     public async Task Consume(ConsumeContext<ExecuteActionCommand> context)
@@ -29,11 +30,11 @@ public class ExecuteActionConsumer(
 
             await executor.ExecuteAsync(action, message, ct);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             action.MarkFailed();
             await actionRepository.SaveAsync(action, ct);
-            throw;
+            await sessionResolver.CloseSessionAndHierarchyAsync(action.SessionId, ct);
         }
     }
 }
