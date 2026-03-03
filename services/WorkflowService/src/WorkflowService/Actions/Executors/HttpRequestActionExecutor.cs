@@ -60,16 +60,9 @@ public class HttpRequestActionExecutor(
 
         // TODO доработать размер файла, потому что гигабайты я брать не хочу
         var responseContent = await responseMessage.Content.ReadAsStringAsync(ct);
-
-        if (!string.IsNullOrWhiteSpace(requestData.ResponseVariable))
-        {
-            variableService.SetVariable(session, requestData.ResponseVariable, responseContent);
-        }
-
-        if (!string.IsNullOrWhiteSpace(requestData.StatusCodeVariable))
-        {
-            variableService.SetVariable(session, requestData.StatusCodeVariable, (int)responseMessage.StatusCode);
-        }
+        
+        variableService.SetVariable(session, $"$node.{node.Id}.output", responseContent);
+        variableService.SetVariable(session, $"$node.{node.Id}.statusCode", (int)responseMessage.StatusCode);
 
         await variableService.SyncIfDirtyAsync(session, ct);
         await sessionRepository.SaveAsync(session, ct);

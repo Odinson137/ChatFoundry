@@ -39,12 +39,9 @@ public class AIGenerateActionExecutor(
 
         var result = await openAiService.GetCompletionAsync(resolvedPrompt, ct);
 
-        if (!string.IsNullOrWhiteSpace(aiData.Variable))
-        {
-            variableService.SetVariable(session, aiData.Variable, result);
-            await variableService.SyncIfDirtyAsync(session, ct);
-            await sessionRepository.SaveAsync(session, ct);
-        }
+        variableService.SetVariable(session, $"$node.{node.Id}.output", result);
+        await variableService.SyncIfDirtyAsync(session, ct);
+        await sessionRepository.SaveAsync(session, ct);
 
         await producer.Produce(new ActionCompletedEvent(message.Channel, message.ExternalUserId), ct);
     }

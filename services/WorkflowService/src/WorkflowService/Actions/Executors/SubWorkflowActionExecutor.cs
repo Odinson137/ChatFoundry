@@ -74,7 +74,7 @@ public class SubWorkflowActionExecutor(
         await actionRepository.AddAsync(childAction, ct);
 
         await producer.Produce(
-            new ExecuteActionCommand(childAction.Id, message.ExternalUserId, message.Channel), ct);
+            message with { ActionId = childAction.Id }, ct);
     }
 
     private static void PopulateDefaultInputs(Session childSession, BotWorkflow childWorkflow)

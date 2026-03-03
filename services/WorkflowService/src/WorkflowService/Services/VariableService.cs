@@ -102,19 +102,35 @@ public class VariableService(
         session.ClientProfileDirty = true;
     }
 
+    /// <summary>
+    /// Pattern: guid.output or guid.statusCode — stored in workflow without "node." prefix; resolved as $node.&lt;guid&gt;.&lt;key&gt;.
+    /// </summary>
+    private static readonly System.Text.RegularExpressions.Regex NodeOutputKeyRegex = new(
+        @"^[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}\.(output|statusCode)$",
+        System.Text.RegularExpressions.RegexOptions.Compiled);
+
     public string? GetVariable(Session session, string key)
     {
         if (string.IsNullOrWhiteSpace(key))
             throw new ArgumentException("Variable key cannot be empty", nameof(key));
 
-        // TODO разобраться потом с операндом: надо ли его ставить и хранить в бд или нет
-        var value = session.Variables.GetValueOrDefault(key);
-        if (value == null)
+        // Short form from DB: {{guid.output}} / {{guid.statusCode}} → resolve as $node.guid.output
+        if (NodeOutputKeyRegex.IsMatch(key))
         {
-            value = session.Variables.GetValueOrDefault($"${key}");
+            var nodeKey = "$node." + key;
+            var value = session.Variables.GetValueOrDefault(nodeKey);
+            if (value != null)
+                return value;
         }
 
-        return value;
+        // TODO разобраться потом с операндом: надо ли его ставить и хранить в бд или нет
+        var value2 = session.Variables.GetValueOrDefault(key);
+        if (value2 == null)
+        {
+            value2 = session.Variables.GetValueOrDefault($"${key}");
+        }
+
+        return value2;
     }
 
     public async Task SyncIfDirtyAsync(Session session, CancellationToken ct)

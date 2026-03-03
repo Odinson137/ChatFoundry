@@ -26,27 +26,12 @@ public class HttpRequestNodeData : NodeData
     public string Url { get; set; } = string.Empty;
     public string? Body { get; set; }
     public Dictionary<string, string> Headers { get; set; } = new();
-    
-    [JsonPropertyName("responseVariable")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? ResponseVariable { get; set; }
-    
-    [JsonPropertyName("statusCodeVariable")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? StatusCodeVariable { get; set; }
 }
 
 public class MessageNodeData : NodeData
 {
     // Теперь здесь set вместо init, и Blazor сможет привязаться к этому полю
     public string Text { get; set; } = string.Empty;
-    
-    /// <summary>
-    /// Имя переменной, в которую будет сохранен результат (например, ответ пользователя).
-    /// </summary>
-    [JsonPropertyName("variable")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? Variable { get; set; }
 }
 
 public class SetVariableNodeData : NodeData
@@ -100,9 +85,6 @@ public class AskUiData
 public class AskNodeData : NodeData
 {
     public string Text { get; set; } = string.Empty;
-    
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? Variable { get; set; }
 
     /// <summary>
     /// Кнопки под вопросом (если пусто — кнопки не отправляются).
@@ -114,9 +96,6 @@ public class AskNodeData : NodeData
 public class AIGenerateNodeData : NodeData
 {
     public string Prompt { get; set; } = string.Empty;
-    
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? Variable { get; set; }
 }
 
 /// <summary>

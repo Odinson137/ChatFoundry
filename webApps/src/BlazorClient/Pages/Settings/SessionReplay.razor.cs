@@ -154,7 +154,6 @@ public partial class SessionReplay : IDisposable, IReplayDataProvider
         {
             "message" => new MessageNodeData { Text = "" },
             "ask" => new AskNodeData { Text = "" },
-            "setvariable" => new SetVariableNodeData { Variable = "", Value = "" },
             "setattribute" => new SetAttributeNodeData { Attribute = "", Value = "" },
             "media" => new MediaNodeData { SourceType = MediaSourceType.Attachment },
             _ => new EmptyNodeData()

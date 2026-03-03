@@ -114,7 +114,6 @@ public sealed class WorkflowGraphParser
             WorkflowNodeType.Message => data.Deserialize<MessageNodeData>(JsonOptions) ?? NodeData.Empty,
             WorkflowNodeType.Ask => data.Deserialize<AskNodeData>(JsonOptions) ?? NodeData.Empty,
             WorkflowNodeType.SubWorkflow => data.Deserialize<SubWorkflowNodeData>(JsonOptions) ?? NodeData.Empty,
-            WorkflowNodeType.SetVariable => data.Deserialize<SetVariableNodeData>(JsonOptions) ?? NodeData.Empty,
             WorkflowNodeType.SetAttribute => data.Deserialize<SetAttributeNodeData>(JsonOptions) ?? NodeData.Empty,
             WorkflowNodeType.HttpRequest => data.Deserialize<HttpRequestNodeData>(JsonOptions) ?? NodeData.Empty,
             WorkflowNodeType.AIGenerate => data.Deserialize<AIGenerateNodeData>(JsonOptions) ?? NodeData.Empty,

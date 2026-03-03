@@ -23,14 +23,4 @@ public sealed class HttpRequestNodeData : NodeData
     /// Request Headers. Values can contain variables.
     /// </summary>
     public Dictionary<string, string> Headers { get; set; } = new();
-
-    /// <summary>
-    /// Variable name to save the response body.
-    /// </summary>
-    public string? ResponseVariable { get; set; }
-    
-    /// <summary>
-    /// Variable name to save the response status code.
-    /// </summary>
-    public string? StatusCodeVariable { get; set; }
 }

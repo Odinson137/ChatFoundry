@@ -96,8 +96,8 @@
                         <span class="oi oi-arrow-right"></span>
                     </button>
                 </div>
-                <button type="button" class="designer-btn-secondary" @onclick="OpenVariablesModal" title="Переменные">
-                    <span class="oi oi-code"></span> Переменные
+                <button type="button" class="designer-btn-secondary" @onclick="OpenVariablesModal" title="Атрибуты и параметры">
+                    <span class="oi oi-code"></span> Атрибуты и параметры
                 </button>
                 <div class="designer-json-dropdown">
                     <button type="button" class="designer-btn-secondary" @onclick="() => _jsonMenuOpen = !_jsonMenuOpen" title="Экспорт / импорт JSON">
@@ -194,25 +194,11 @@
                                 </button>
                             </label>
                             <textarea class="form-control font-monospace variable-input" 
-                                      value="@msgData.Text"
+                                      value="@ToDisplayText(msgData.Text)"
                                       @oninput="e => { UpdateFieldAndCheckAtMention(e, msgData, nameof(msgData.Text)); OnWorkflowChanged(); }"
                                       rows="4"></textarea>
                             <small class="form-text text-muted">
                                 Введите <kbd>@@</kbd> для выбора переменной. Или <code>{{variable_name}}</code>
-                            </small>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Сохранить результат в переменную</label>
-                            <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input type="text" 
-                                       class="form-control font-monospace" 
-                                       @bind="msgData.Variable" 
-                                       @oninput="OnWorkflowChanged"
-                                       placeholder="например, message_id"/>
-                            </div>
-                            <small class="form-text text-muted">
-                                Имя переменной для сохранения ID сообщения. Не обязательно.
                             </small>
                         </div>
                     }
@@ -228,7 +214,7 @@
                                 </button>
                             </label>
                             <textarea class="form-control font-monospace variable-input" 
-                                      value="@askData.Text"
+                                      value="@ToDisplayText(askData.Text)"
                                       @oninput="e => { UpdateFieldAndCheckAtMention(e, askData, nameof(askData.Text)); OnWorkflowChanged(); }"
                                       rows="4"></textarea>
                             <small class="form-text text-muted">
@@ -242,8 +228,16 @@
                                 @foreach (var btn in askData.Ui.Buttons.ToList())
                                 {
                                     <div class="input-group mb-2">
-                                        <input type="text" class="form-control" placeholder="Текст на кнопке" @bind="btn.Text" @oninput="OnWorkflowChanged"/>
-                                        <input type="text" class="form-control font-monospace" placeholder="Значение (в переменную)" @bind="btn.Value" @oninput="OnWorkflowChanged"/>
+                                        <input type="text"
+                                               class="form-control"
+                                               placeholder="Текст на кнопке"
+                                               value="@ToDisplayText(btn.Text)"
+                                               @oninput="e => { btn.Text = FromDisplayText(e.Value?.ToString() ?? string.Empty); OnWorkflowChanged(); }"/>
+                                        <input type="text"
+                                               class="form-control font-monospace"
+                                               placeholder="Значение (в переменную)"
+                                               value="@ToDisplayText(btn.Value)"
+                                               @oninput="e => { btn.Value = FromDisplayText(e.Value?.ToString() ?? string.Empty); OnWorkflowChanged(); }"/>
                                         <button type="button" class="btn btn-outline-danger" @onclick="() => RemoveAskButton(askData, btn)">
                                             <span class="oi oi-trash"></span>
                                         </button>
@@ -255,58 +249,6 @@
                             </button>
                             <small class="form-text text-muted d-block mt-1">
                                 При нажатии пользователем в переменную попадёт «Значение». Если кнопок нет — ожидается любой ввод.
-                            </small>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Сохранить результат в переменную</label>
-                            <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input type="text" 
-                                       class="form-control font-monospace" 
-                                       @bind="askData.Variable" 
-                                       @oninput="OnWorkflowChanged"
-                                       placeholder="например, user_response"/>
-                            </div>
-                            <small class="form-text text-muted">
-                                Имя переменной для сохранения ответа. Не обязательно.
-                            </small>
-                        </div>
-                    }
-                    
-                    @if (node is WorkflowNodeModel { Data: SetVariableNodeData varData })
-                    {
-                        <div class="mb-3">
-                            <label class="form-label d-flex justify-content-between align-items-center">
-                                <span>Имя переменной</span>
-                                <button type="button" class="btn btn-sm btn-outline-secondary" 
-                                        @onclick="() => ShowVariablePicker(v => varData.Variable = v)">
-                                    <span class="oi oi-code"></span> Выбрать
-                                </button>
-                            </label>
-                            <input type="text" 
-                                   class="form-control font-monospace" 
-                                   @bind="varData.Variable" 
-                                   @oninput="OnWorkflowChanged"
-                                   placeholder="$user_name (атрибуты: $global.* только в блоке «Атрибут»)"/>
-                            <small class="form-text text-muted">
-                                Имя переменной с $. Глобальные атрибуты ($global.*) задаются только блоком «Атрибут».
-                            </small>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label d-flex justify-content-between align-items-center">
-                                <span>Значение</span>
-                                <button type="button" class="btn btn-sm btn-outline-secondary" 
-                                        @onclick="() => ShowVariablePicker(v => InsertVariable(varData, nameof(varData.Value), v))">
-                                    <span class="oi oi-code"></span> {}
-                                </button>
-                            </label>
-                            <input type="text" 
-                                   class="form-control font-monospace" 
-                                   @bind="varData.Value" 
-                                   @oninput="OnWorkflowChanged"
-                                   placeholder="Значение или {{variable_name}}"/>
-                            <small class="form-text text-muted">
-                                Можно использовать переменные
                             </small>
                         </div>
                     }
@@ -338,8 +280,8 @@
                             </label>
                             <input type="text" 
                                    class="form-control font-monospace" 
-                                   @bind="attrData.Value" 
-                                   @oninput="OnWorkflowChanged"
+                                   value="@ToDisplayText(attrData.Value)"
+                                   @oninput="e => { attrData.Value = FromDisplayText(e.Value?.ToString() ?? string.Empty); OnWorkflowChanged(); }"
                                    placeholder="Текст или {{variable_name}}"/>
                             <small class="form-text text-muted">
                                 В шаблоне можно использовать переменные
@@ -367,7 +309,11 @@
                                     <span class="oi oi-code"></span> {}
                                 </button>
                             </label>
-                            <input type="text" class="form-control font-monospace" @bind="httpData.Url" placeholder="https://api.example.com/data"/>
+                            <input type="text"
+                                   class="form-control font-monospace"
+                                   value="@ToDisplayText(httpData.Url)"
+                                   @oninput="e => { httpData.Url = FromDisplayText(e.Value?.ToString() ?? string.Empty); OnWorkflowChanged(); }"
+                                   placeholder="https://api.example.com/data"/>
                         </div>
 
                         @if (httpData.Method == "POST" || httpData.Method == "PUT")
@@ -380,7 +326,11 @@
                                         <span class="oi oi-code"></span> {}
                                     </button>
                                 </label>
-                                <textarea class="form-control font-monospace" rows="5" @bind="httpData.Body" placeholder='{"key": "{{variable_name}}"}'></textarea>
+                                <textarea class="form-control font-monospace"
+                                          rows="5"
+                                          value="@ToDisplayText(httpData.Body)"
+                                          @oninput="e => { httpData.Body = FromDisplayText(e.Value?.ToString() ?? string.Empty); OnWorkflowChanged(); }"
+                                          placeholder='{"key": "{{variable_name}}"}'></textarea>
                             </div>
                         }
 
@@ -391,7 +341,11 @@
                                 <div class="input-group mb-2">
                                     <input type="text" class="form-control" placeholder="Header Name" value="@header.Key"
                                            @onchange="@(e => { var newKey = e.Value.ToString(); if (!string.IsNullOrWhiteSpace(newKey)) { httpData.Headers.Remove(header.Key); httpData.Headers[newKey] = header.Value; }})"/>
-                                    <input type="text" class="form-control" placeholder="Header Value" @bind="httpData.Headers[header.Key]" />
+                                    <input type="text"
+                                           class="form-control"
+                                           placeholder="Header Value"
+                                           value="@ToDisplayText(httpData.Headers[header.Key])"
+                                           @oninput="e => { httpData.Headers[header.Key] = FromDisplayText(e.Value?.ToString() ?? string.Empty); OnWorkflowChanged(); }" />
                                     <button class="btn btn-outline-danger" @onclick="() => httpData.Headers.Remove(header.Key)">
                                         <span class="oi oi-trash"></span>
                                     </button>
@@ -400,24 +354,6 @@
                             <button class="btn btn-sm btn-outline-primary" @onclick="() => AddHeader(httpData)">
                                 <span class="oi oi-plus"></span> Добавить заголовок
                             </button>
-                        </div>
-                        
-                        <hr/>
-
-                        <div class="mb-3">
-                            <label class="form-label">Сохранить тело ответа в переменную</label>
-                            <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input type="text" class="form-control font-monospace" @bind="httpData.ResponseVariable" placeholder="api_response"/>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Сохранить статус-код в переменную</label>
-                            <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input type="text" class="form-control font-monospace" @bind="httpData.StatusCodeVariable" placeholder="api_status_code"/>
-                            </div>
                         </div>
                     }
 
@@ -432,25 +368,11 @@
                                 </button>
                             </label>
                             <textarea class="form-control font-monospace" 
-                                      @bind="aiData.Prompt" 
-                                      @oninput="OnWorkflowChanged"
+                                      value="@ToDisplayText(aiData.Prompt)"
+                                      @oninput="e => { aiData.Prompt = FromDisplayText(e.Value?.ToString() ?? string.Empty); OnWorkflowChanged(); }"
                                       rows="6"></textarea>
                             <small class="form-text text-muted">
                                 Опишите, что должен сделать AI. Используйте переменные <code>{{variable_name}}</code>.
-                            </small>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Сохранить результат в переменную</label>
-                            <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input type="text" 
-                                       class="form-control font-monospace" 
-                                       @bind="aiData.Variable" 
-                                       @oninput="OnWorkflowChanged"
-                                       placeholder="например, ai_response"/>
-                            </div>
-                            <small class="form-text text-muted">
-                                Имя переменной для сохранения ответа от AI.
                             </small>
                         </div>
                     }
@@ -487,8 +409,8 @@
                                 </button>
                             </label>
                             <input type="text" class="form-control font-monospace"
-                                   @bind="mediaData.Value"
-                                   @oninput="OnWorkflowChanged"
+                                   value="@ToDisplayText(mediaData.Value)"
+                                   @oninput="e => { mediaData.Value = FromDisplayText(e.Value?.ToString() ?? string.Empty); OnWorkflowChanged(); }"
                                    placeholder="ID файла или {{variable_name}}"/>
                             <small class="form-text text-muted">Можно использовать переменные (например, <code>{{variable_name}}</code>).</small>
                         </div>
@@ -501,8 +423,8 @@
                                 </button>
                             </label>
                             <textarea class="form-control font-monospace" rows="2"
-                                      @bind="mediaData.Caption"
-                                      @oninput="OnWorkflowChanged"
+                                      value="@ToDisplayText(mediaData.Caption)"
+                                      @oninput="e => { mediaData.Caption = FromDisplayText(e.Value?.ToString() ?? string.Empty); OnWorkflowChanged(); }"
                                       placeholder="Необязательно"></textarea>
                             <small class="form-text text-muted">Можно использовать переменные <code>{{variable_name}}</code>.</small>
                         </div>
@@ -547,9 +469,9 @@
                                     <div class="input-group mb-2">
                                         <span class="input-group-text font-monospace" style="min-width:120px;">@mapping.Key</span>
                                         <input type="text" class="form-control font-monospace"
-                                               value="@mapping.Value"
+                                               value="@ToDisplayText(mapping.Value)"
                                                placeholder="{{variable}} или значение"
-                                               @oninput="e => { subData.InputMappings[mapping.Key] = e.Value?.ToString() ?? string.Empty; OnWorkflowChanged(); }" />
+                                               @oninput="e => { subData.InputMappings[mapping.Key] = FromDisplayText(e.Value?.ToString() ?? string.Empty); OnWorkflowChanged(); }" />
                                         <button type="button" class="btn btn-sm btn-outline-secondary"
                                                 @onclick="() => ShowVariablePicker(v => InsertVariableIntoMapping(subData.InputMappings, mapping.Key, v))">
                                             <span class="oi oi-code"></span>
@@ -683,62 +605,27 @@
     </main>
 </div>
 
-<!-- Модальное окно «Переменные / Атрибуты / Параметры» (просмотр, 3 вкладки) -->
+<!-- Модальное окно «Атрибуты и параметры» (2 вкладки) -->
 @if (IsVariablesModalOpen)
 {
     <div class="variables-modal-backdrop" @onclick="CloseVariablesModal"></div>
     <div class="variables-modal">
         <div class="variables-modal-header">
-            <h2 class="variables-modal-title">Переменные и атрибуты</h2>
+            <h2 class="variables-modal-title">Атрибуты и параметры</h2>
             <button type="button" class="variables-modal-close" @onclick="CloseVariablesModal" aria-label="Закрыть">
                 <span class="oi oi-x"></span>
             </button>
         </div>
         <div class="variables-modal-tabs">
             <button type="button" class="variables-modal-tab @(VariablesModalTab == 0 ? "active" : "")" @onclick="() => VariablesModalTab = 0">
-                Переменные
-            </button>
-            <button type="button" class="variables-modal-tab @(VariablesModalTab == 1 ? "active" : "")" @onclick="() => VariablesModalTab = 1">
                 Атрибуты
             </button>
-            <button type="button" class="variables-modal-tab @(VariablesModalTab == 2 ? "active" : "")" @onclick="() => VariablesModalTab = 2">
+            <button type="button" class="variables-modal-tab @(VariablesModalTab == 1 ? "active" : "")" @onclick="() => VariablesModalTab = 1">
                 Параметры
             </button>
         </div>
         <div class="variables-modal-body">
             @if (VariablesModalTab == 0)
-            {
-                <div class="variables-modal-search">
-                    <span class="oi oi-magnifying-glass"></span>
-                    <input type="text" placeholder="Поиск..." @bind="VariableSearchQuery" @bind:event="oninput" />
-                </div>
-                <div class="variables-modal-list">
-                    @{
-                        var varsOnly = GetGroupedVariablesOnlyVariables();
-                    }
-                    @if (!varsOnly.Any())
-                    {
-                        <p class="variables-modal-empty">Переменные появятся при использовании в узлах.</p>
-                    }
-                    else
-                    {
-                        @foreach (var group in varsOnly)
-                        {
-                            <div class="variables-modal-group">
-                                <div class="variables-modal-group-title">@group.Key</div>
-                                @foreach (var v in group.Value)
-                                {
-                                    <div class="variables-modal-item @GetVariableCssClass(v)">
-                                        <code>@v.Name</code>
-                                        @if (!string.IsNullOrEmpty(v.SourceNode)) { <span class="text-muted">— @v.SourceNode</span> }
-                                    </div>
-                                }
-                            </div>
-                        }
-                    }
-                </div>
-            }
-            else if (VariablesModalTab == 1)
             {
                 <div class="variables-modal-list">
                     @{
@@ -838,25 +725,47 @@
                 <span class="oi oi-x"></span>
             </button>
         </div>
-        <div class="variable-picker-search-wrap">
-            <span class="variable-picker-search-icon oi oi-magnifying-glass"></span>
-            <input type="text"
-                   class="variable-picker-search"
-                   placeholder="Поиск..."
-                   @bind="VariablePickerSearch"
-                   @bind:event="oninput" />
-        </div>
-        <div class="variable-picker-list">
-            @if (!GetFilteredVariablesForPicker().Any())
-            {
-                <div class="variable-picker-empty">
-                    <p>Нет доступных переменных</p>
-                    <small>Создайте переменные в узлах</small>
+        
+        @if (VariablePickerSelectedNode == null)
+        {
+            <div class="variable-picker-search-wrap">
+                <span class="variable-picker-search-icon oi oi-magnifying-glass"></span>
+                <input type="text"
+                       class="variable-picker-search"
+                       placeholder="Поиск по блокам и переменным..."
+                       @bind="VariablePickerSearch"
+                       @bind:event="oninput" />
+            </div>
+            <div class="variable-picker-list">
+                <div class="variable-picker-category">
+                    <div class="variable-picker-category-title">Блоки</div>
+                    <div class="variable-picker-items">
+                        @foreach (var node in GetFilteredNodesForVariablePicker())
+                        {
+                            <button type="button"
+                                    class="variable-picker-item variable-picker-item--custom"
+                                    @onclick="() => SelectNodeForVariablePicker(node)">
+                                <span class="variable-picker-item-icon">
+                                    <span class="oi @GetNodeIcon(node)"></span>
+                                </span>
+                                <div class="variable-picker-item-body">
+                                    <span class="variable-picker-item-name">@node.Title</span>
+                                    <span class="variable-picker-item-code">@node.NodeType</span>
+                                </div>
+                                <span class="variable-picker-item-add oi oi-chevron-right"></span>
+                            </button>
+                        }
+                        @if (!GetFilteredNodesForVariablePicker().Any())
+                        {
+                            <div class="variable-picker-empty">
+                                <p>Нет блоков</p>
+                                <small>Добавьте блоки на схему</small>
+                            </div>
+                        }
+                    </div>
                 </div>
-            }
-            else
-            {
-                @foreach (var group in GetGroupedVariablesForPicker())
+
+                @foreach (var group in GetGroupedStaticVariablesForPicker())
                 {
                     <div class="variable-picker-category">
                         <div class="variable-picker-category-title">@group.Key</div>
@@ -879,8 +788,58 @@
                         </div>
                     </div>
                 }
-            }
-        </div>
+            </div>
+        }
+        else
+        {
+            <div class="variable-picker-search-wrap">
+                <button type="button" class="btn btn-sm btn-outline-secondary me-2" @onclick="BackToVariablePickerNodes" title="Назад">
+                    <span class="oi oi-chevron-left"></span>
+                </button>
+                <span class="variable-picker-search-icon oi oi-magnifying-glass"></span>
+                <input type="text"
+                       class="variable-picker-search"
+                       placeholder="Поиск по переменным блока..."
+                       @bind="VariablePickerSearch"
+                       @bind:event="oninput" />
+            </div>
+            <div class="variable-picker-list">
+                @{
+                    var vars = GetVariablesForSelectedNode();
+                }
+                @if (!vars.Any())
+                {
+                    <div class="variable-picker-empty">
+                        <p>У этого блока нет переменных</p>
+                        <small>Выберите другой блок</small>
+                    </div>
+                }
+                else
+                {
+                    <div class="variable-picker-category">
+                        <div class="variable-picker-category-title">@VariablePickerSelectedNode.Title</div>
+                        <div class="variable-picker-items">
+                            @foreach (var v in vars)
+                            {
+                                <button type="button"
+                                        class="variable-picker-item variable-picker-item--custom"
+                                        @onclick="() => SelectVariableFromPicker(v.Key)">
+                                    <span class="variable-picker-item-icon">
+                                        <span class="oi oi-code"></span>
+                                    </span>
+                                    <div class="variable-picker-item-body">
+                                        <span class="variable-picker-item-name">@v.Display</span>
+                                        <span class="variable-picker-item-code">@GetVariableKeyShortDisplay(v.Key)</span>
+                                    </div>
+                                    <span class="variable-picker-item-add oi oi-plus"></span>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
         <div class="variable-picker-footer">
             <p class="variable-picker-footer-tip">
                 <span class="oi oi-info"></span>

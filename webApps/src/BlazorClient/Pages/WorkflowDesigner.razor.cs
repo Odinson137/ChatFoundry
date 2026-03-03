@@ -60,7 +60,7 @@ public partial class WorkflowDesigner : IDisposable
 
     // Модальное окно «Переменные / Атрибуты / Параметры» (просмотр)
     private bool IsVariablesModalOpen { get; set; }
-    private int VariablesModalTab { get; set; } // 0=Переменные, 1=Атрибуты, 2=Параметры
+    private int VariablesModalTab { get; set; } // 0=Атрибуты, 1=Параметры
 
     private List<VariableInfo> DiscoveredVariables { get; set; } = new();
     private string VariableSearchQuery { get; set; } = "";
@@ -103,6 +103,7 @@ public partial class WorkflowDesigner : IDisposable
     // Переменные - модальное окно выбора
     private bool IsVariablePickerOpen { get; set; }
     private string VariablePickerSearch { get; set; } = "";
+    private WorkflowNodeModel? VariablePickerSelectedNode { get; set; }
     private Action<string>? OnVariableSelected { get; set; }
 
     // JSON-меню (открыто/закрыто)
@@ -129,12 +130,19 @@ public partial class WorkflowDesigner : IDisposable
     private List<WorkflowParameterDto> CurrentWorkflowInputParameters { get; set; } = [];
     private List<WorkflowParameterDto> CurrentWorkflowOutputParameters { get; set; } = [];
 
+    // Pretty отображение автопеременных ($node.{guid}.*) в текстовых полях:
+    // в модели храним GUID-версию, в UI показываем «Название блока · переменная».
+    private readonly Dictionary<Guid, string> _nodeTitleById = new();
+    private readonly Dictionary<Guid, string> _nodePrefixById = new();
+    private readonly Dictionary<string, List<Guid>> _nodeIdsByTitle = new(StringComparer.OrdinalIgnoreCase);
+
     protected override async Task OnInitializedAsync()
     {
         InitializeDiagram();
         await LoadWorkflowData();
         await LoadCompanyAttributes();
         RefreshVariables();
+        RefreshNodeVariableCache();
     }
 
     private async Task LoadCompanyAttributes()
@@ -238,12 +246,14 @@ public partial class WorkflowDesigner : IDisposable
         if (_isRestoring) return;
         PushUndoState();
         RefreshVariables();
+        RefreshNodeVariableCache();
         StateHasChanged();
     }
 
     private void OnWorkflowChanged()
     {
         RefreshVariables();
+        RefreshNodeVariableCache();
         StateHasChanged();
     }
 
@@ -338,6 +348,8 @@ public partial class WorkflowDesigner : IDisposable
                 }
             }
         }
+        
+        RefreshNodeVariableCache();
     }
 
     private void PushUndoState()
@@ -524,10 +536,6 @@ public partial class WorkflowDesigner : IDisposable
         {
             data = new AskNodeData { Text = "" };
         }
-        else if (data == null && type.ToLower() == "setvariable")
-        {
-            data = new SetVariableNodeData { Variable = "", Value = "" };
-        }
         else if (data == null && type.ToLower() == "setattribute")
         {
             data = new SetAttributeNodeData { Attribute = "", Value = "" };
@@ -584,7 +592,6 @@ public partial class WorkflowDesigner : IDisposable
             NodeType.Ask => "Вопрос",
             NodeType.Condition => "Условие",
             NodeType.Wait => "Задержка",
-            NodeType.SetVariable => "Переменная",
             NodeType.SetAttribute => "Атрибут",
             NodeType.HttpRequest => "API запрос",
             NodeType.AIFilter => "AI Фильтр",
@@ -598,10 +605,9 @@ public partial class WorkflowDesigner : IDisposable
         {
             NodeType.Message => new MessageNodeData { Text = "" },
             NodeType.Ask => new AskNodeData { Text = "" },
-            NodeType.SetVariable => new SetVariableNodeData { Variable = "", Value = "" },
             NodeType.SetAttribute => new SetAttributeNodeData { Attribute = "", Value = "" },
             NodeType.HttpRequest => new HttpRequestNodeData { Method = "GET", Headers = new(), Url = "" },
-            NodeType.AIGenerate => new AIGenerateNodeData { Prompt = "", Variable = ""},
+            NodeType.AIGenerate => new AIGenerateNodeData { Prompt = "" },
             NodeType.Media => new MediaNodeData { SourceType = MediaSourceType.Attachment },
             NodeType.SubWorkflow => new SubWorkflowNodeData(),
             _ => null
@@ -787,7 +793,7 @@ public partial class WorkflowDesigner : IDisposable
 
     private void InsertVariableIntoMapping(Dictionary<string, string> mappings, string key, string variableName)
     {
-        var toInsert = "{{" + variableName.TrimStart('$') + "}}";
+        var toInsert = "{{" + VariableNameToStorageForm(variableName) + "}}";
         mappings[key] = (mappings.GetValueOrDefault(key) ?? "") + toInsert;
         OnWorkflowChanged();
         StateHasChanged();
@@ -912,8 +918,9 @@ public partial class WorkflowDesigner : IDisposable
 
     private void RefreshVariables()
     {
-        var variables = new Dictionary<string, VariableInfo>();
+        var variables = new Dictionary<string, VariableInfo>(StringComparer.OrdinalIgnoreCase);
 
+        // Атрибуты ($global.*)
         foreach (var (name, description) in GlobalAttributeVariables)
         {
             variables[name] = new VariableInfo
@@ -937,7 +944,7 @@ public partial class WorkflowDesigner : IDisposable
             }
         }
 
-        // Входные параметры процесса — доступны как {{имя}} во всех узлах
+        // Входные параметры процесса (хранятся в сессии без $, но в UI показываем как $param)
         foreach (var p in CurrentWorkflowInputParameters.Where(p => !string.IsNullOrWhiteSpace(p.Name)))
         {
             var name = NormalizeVariableName(p.Name);
@@ -952,253 +959,107 @@ public partial class WorkflowDesigner : IDisposable
             }
         }
 
+        // Автопеременные по GUID блока: $node.{guid}.output, $node.{guid}.statusCode, ...
         foreach (var node in Diagram.Nodes.Cast<WorkflowNodeModel>())
         {
             var nodeTitle = node.Title ?? "Unnamed";
-
-            if (node.Data is SetVariableNodeData varData && !string.IsNullOrWhiteSpace(varData.Variable))
+            foreach (var (key, display) in GetAutoVariablesForNode(node))
             {
-                var varName = NormalizeVariableName(varData.Variable);
-                if (!variables.ContainsKey(varName))
+                if (!variables.ContainsKey(key))
                 {
-                    variables[varName] = new VariableInfo
+                    variables[key] = new VariableInfo
                     {
-                        Name = varName,
-                        Type = GetVariableType(varName),
-                        SourceNode = nodeTitle
+                        Name = key,
+                        Type = VariableType.Custom,
+                        SourceNode = $"{nodeTitle} · {display}"
                     };
-                }
-
-                if (!string.IsNullOrWhiteSpace(varData.Value))
-                {
-                    var usedVars = ExtractVariables(varData.Value);
-                    foreach (var usedVar in usedVars)
-                    {
-                        EnsureVariableExists(variables, usedVar);
-                        variables[usedVar].UsageNodes.Add(nodeTitle);
-                    }
-                }
-            }
-
-            if (node.Data is SetAttributeNodeData attrData && !string.IsNullOrWhiteSpace(attrData.Attribute))
-            {
-                var attrKey = attrData.Attribute.Trim();
-                if (attrKey.StartsWith("$global.", StringComparison.OrdinalIgnoreCase))
-                    attrKey = attrKey["$global.".Length..];
-                var varName = "$global." + attrKey;
-                if (!variables.ContainsKey(varName))
-                {
-                    variables[varName] = new VariableInfo
-                    {
-                        Name = varName,
-                        Type = VariableType.GlobalAttribute,
-                        SourceNode = nodeTitle
-                    };
-                }
-                if (!string.IsNullOrWhiteSpace(attrData.Value))
-                {
-                    var usedVars = ExtractVariables(attrData.Value);
-                    foreach (var usedVar in usedVars)
-                    {
-                        EnsureVariableExists(variables, usedVar);
-                        variables[usedVar].UsageNodes.Add(nodeTitle);
-                    }
-                }
-            }
-
-            if (node.Data is MessageNodeData msgData)
-            {
-                if (!string.IsNullOrWhiteSpace(msgData.Variable))
-                {
-                    var varName = NormalizeVariableName(msgData.Variable);
-                    if (!variables.ContainsKey(varName))
-                    {
-                        variables[varName] = new VariableInfo
-                        {
-                            Name = varName,
-                            Type = GetVariableType(varName),
-                            SourceNode = nodeTitle
-                        };
-                    }
-                }
-    
-                if (!string.IsNullOrWhiteSpace(msgData.Text))
-                {
-                    var usedVars = ExtractVariables(msgData.Text);
-                    foreach (var varName in usedVars)
-                    {
-                        EnsureVariableExists(variables, varName);
-                        if (!variables[varName].UsageNodes.Contains(nodeTitle))
-                        {
-                            variables[varName].UsageNodes.Add(nodeTitle);
-                        }
-                    }
-                }
-            }
-            
-            if (node.Data is AskNodeData askData)
-            {
-                if (!string.IsNullOrWhiteSpace(askData.Variable))
-                {
-                    var varName = NormalizeVariableName(askData.Variable);
-                    if (!variables.ContainsKey(varName))
-                    {
-                        variables[varName] = new VariableInfo
-                        {
-                            Name = varName,
-                            Type = GetVariableType(varName),
-                            SourceNode = nodeTitle
-                        };
-                    }
-                }
-
-                if (!string.IsNullOrWhiteSpace(askData.Text))
-                {
-                    var usedVars = ExtractVariables(askData.Text);
-                    foreach (var varName in usedVars)
-                    {
-                        EnsureVariableExists(variables, varName);
-                        if (!variables[varName].UsageNodes.Contains(nodeTitle))
-                        {
-                            variables[varName].UsageNodes.Add(nodeTitle);
-                        }
-                    }
-                }
-            }
-            
-            if (node.Data is HttpRequestNodeData httpData)
-            {
-                // Definitions
-                if (!string.IsNullOrWhiteSpace(httpData.ResponseVariable))
-                {
-                    var varName = NormalizeVariableName(httpData.ResponseVariable);
-                    if (!variables.ContainsKey(varName))
-                    {
-                        variables[varName] = new VariableInfo { Name = varName, Type = GetVariableType(varName), SourceNode = nodeTitle };
-                    }
-                }
-                if (!string.IsNullOrWhiteSpace(httpData.StatusCodeVariable))
-                {
-                    var varName = NormalizeVariableName(httpData.StatusCodeVariable);
-                    if (!variables.ContainsKey(varName))
-                    {
-                        variables[varName] = new VariableInfo { Name = varName, Type = GetVariableType(varName), SourceNode = nodeTitle };
-                    }
-                }
-
-                // Usages
-                var urlVars = ExtractVariables(httpData.Url);
-                foreach (var varName in urlVars)
-                {
-                    EnsureVariableExists(variables, varName);
-                    if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].UsageNodes.Add(nodeTitle);
-                }
-
-                if (!string.IsNullOrWhiteSpace(httpData.Body))
-                {
-                    var bodyVars = ExtractVariables(httpData.Body);
-                    foreach (var varName in bodyVars)
-                    {
-                        EnsureVariableExists(variables, varName);
-if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].UsageNodes.Add(nodeTitle);
-                    }
-                }
-
-                foreach (var header in httpData.Headers)
-                {
-                    var headerVars = ExtractVariables(header.Value);
-                    foreach (var varName in headerVars)
-                    {
-                        EnsureVariableExists(variables, varName);
-                        if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].UsageNodes.Add(nodeTitle);
-                    }
-                }
-            }
-            
-            if (node.Data is AIGenerateNodeData aiData)
-            {
-                // Definition
-                if (!string.IsNullOrWhiteSpace(aiData.Variable))
-                {
-                    var varName = NormalizeVariableName(aiData.Variable);
-                    if (!variables.ContainsKey(varName))
-                    {
-                        variables[varName] = new VariableInfo { Name = varName, Type = GetVariableType(varName), SourceNode = nodeTitle };
-                    }
-                }
-
-                // Usage in Prompt
-                if (!string.IsNullOrWhiteSpace(aiData.Prompt))
-                {
-                    var promptVars = ExtractVariables(aiData.Prompt);
-                    foreach (var varName in promptVars)
-                    {
-                        EnsureVariableExists(variables, varName);
-                        if (!variables[varName].UsageNodes.Contains(nodeTitle))
-                        {
-                            variables[varName].UsageNodes.Add(nodeTitle);
-                        }
-                    }
-                }
-            }
-
-            if (node.Data is MediaNodeData mediaData)
-            {
-                if (!string.IsNullOrWhiteSpace(mediaData.Caption))
-                {
-                    var captionVars = ExtractVariables(mediaData.Caption);
-                    foreach (var varName in captionVars)
-                    {
-                        EnsureVariableExists(variables, varName);
-                        if (!variables[varName].UsageNodes.Contains(nodeTitle))
-                        {
-                            variables[varName].UsageNodes.Add(nodeTitle);
-                        }
-                    }
-                }
-                if (!string.IsNullOrWhiteSpace(mediaData.Value))
-                {
-                    var valueVars = ExtractVariables(mediaData.Value);
-                    foreach (var varName in valueVars)
-                    {
-                        EnsureVariableExists(variables, varName);
-                        if (!variables[varName].UsageNodes.Contains(nodeTitle))
-                        {
-                            variables[varName].UsageNodes.Add(nodeTitle);
-                        }
-                    }
                 }
             }
         }
 
+        // Использования переменных в текстовых полях нод
+        foreach (var node in Diagram.Nodes.Cast<WorkflowNodeModel>())
+        {
+            var nodeTitle = node.Title ?? "Unnamed";
+
+            if (node.Data is MessageNodeData msgData && !string.IsNullOrWhiteSpace(msgData.Text))
+                TrackUsage(variables, ExtractVariables(msgData.Text), nodeTitle);
+
+            if (node.Data is AskNodeData askData)
+            {
+                if (!string.IsNullOrWhiteSpace(askData.Text))
+                    TrackUsage(variables, ExtractVariables(askData.Text), nodeTitle);
+
+                if (askData.Ui?.Buttons != null)
+                {
+                    foreach (var b in askData.Ui.Buttons)
+                    {
+                        if (!string.IsNullOrWhiteSpace(b.Text))
+                            TrackUsage(variables, ExtractVariables(b.Text), nodeTitle);
+                        if (!string.IsNullOrWhiteSpace(b.Value))
+                            TrackUsage(variables, ExtractVariables(b.Value), nodeTitle);
+                    }
+                }
+            }
+
+            if (node.Data is SetAttributeNodeData attrData && !string.IsNullOrWhiteSpace(attrData.Value))
+                TrackUsage(variables, ExtractVariables(attrData.Value), nodeTitle);
+
+            if (node.Data is HttpRequestNodeData httpData)
+            {
+                if (!string.IsNullOrWhiteSpace(httpData.Url))
+                    TrackUsage(variables, ExtractVariables(httpData.Url), nodeTitle);
+                if (!string.IsNullOrWhiteSpace(httpData.Body))
+                    TrackUsage(variables, ExtractVariables(httpData.Body), nodeTitle);
+                foreach (var header in httpData.Headers)
+                {
+                    if (!string.IsNullOrWhiteSpace(header.Value))
+                        TrackUsage(variables, ExtractVariables(header.Value), nodeTitle);
+                }
+            }
+
+            if (node.Data is AIGenerateNodeData aiData && !string.IsNullOrWhiteSpace(aiData.Prompt))
+                TrackUsage(variables, ExtractVariables(aiData.Prompt), nodeTitle);
+
+            if (node.Data is MediaNodeData mediaData)
+            {
+                if (!string.IsNullOrWhiteSpace(mediaData.Value))
+                    TrackUsage(variables, ExtractVariables(mediaData.Value), nodeTitle);
+                if (!string.IsNullOrWhiteSpace(mediaData.Caption))
+                    TrackUsage(variables, ExtractVariables(mediaData.Caption), nodeTitle);
+            }
+
+            if (node.Data is SubWorkflowNodeData subData)
+            {
+                foreach (var mapping in subData.InputMappings)
+                {
+                    if (!string.IsNullOrWhiteSpace(mapping.Value))
+                        TrackUsage(variables, ExtractVariables(mapping.Value), nodeTitle);
+                }
+            }
+        }
+
+        // Использования в условиях на линках
         foreach (var link in Diagram.Links.Cast<WorkflowLinkModel>())
         {
+            const string usageNode = "Условие на линке";
+
             if (link.Condition?.Equals != null)
             {
                 var leftVar = NormalizeVariableName(link.Condition.Equals.Left);
                 EnsureVariableExists(variables, leftVar);
-                variables[leftVar].UsageNodes.Add("Условие на линке");
+                variables[leftVar].UsageNodes.Add(usageNode);
 
-                var rightVars = ExtractVariables(link.Condition.Equals.Right);
-                foreach (var rv in rightVars)
-                {
-                    EnsureVariableExists(variables, rv);
-                    variables[rv].UsageNodes.Add("Условие на линке");
-                }
+                TrackUsage(variables, ExtractVariables(link.Condition.Equals.Right), usageNode);
             }
 
             if (link.Condition?.Contains != null)
             {
                 var leftVar = NormalizeVariableName(link.Condition.Contains.Left);
                 EnsureVariableExists(variables, leftVar);
-                variables[leftVar].UsageNodes.Add("Условие на линке");
+                variables[leftVar].UsageNodes.Add(usageNode);
 
-                var rightVars = ExtractVariables(link.Condition.Contains.Right);
-                foreach (var rv in rightVars)
-                {
-                    EnsureVariableExists(variables, rv);
-                    variables[rv].UsageNodes.Add("Условие на линке");
-                }
+                TrackUsage(variables, ExtractVariables(link.Condition.Contains.Right), usageNode);
             }
         }
 
@@ -1208,7 +1069,214 @@ if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].Usage
             .ToList();
     }
 
-    private void EnsureVariableExists(Dictionary<string, VariableInfo> variables, string varName)
+    private static void TrackUsage(Dictionary<string, VariableInfo> variables, IEnumerable<string> usedVars, string usageNode)
+    {
+        foreach (var usedVar in usedVars)
+        {
+            EnsureVariableExists(variables, usedVar);
+            if (!variables[usedVar].UsageNodes.Contains(usageNode))
+                variables[usedVar].UsageNodes.Add(usageNode);
+        }
+    }
+
+    private static IReadOnlyList<(string Key, string Display)> GetAutoVariablesForNode(WorkflowNodeModel node)
+    {
+        if (!Guid.TryParse(node.Id, out var id))
+            return [];
+
+        return node.NodeType?.ToLowerInvariant() switch
+        {
+            "start" => [($"$node.{id}.output", "Payload (старт)")],
+            "ask" => [($"$node.{id}.output", "Ответ пользователя")],
+            "aigenerate" => [($"$node.{id}.output", "Результат AI")],
+            "httprequest" => [($"$node.{id}.output", "Тело ответа (response body)"),
+                              ($"$node.{id}.statusCode", "Статус-код (statusCode)")],
+            _ => []
+        };
+    }
+
+    /// <summary>Для пикера переменных: из полного ключа (например $node.guid.output) возвращает только имя переменной (output).</summary>
+    private static string GetVariableKeyShortDisplay(string fullKey)
+    {
+        if (string.IsNullOrEmpty(fullKey))
+            return fullKey ?? "";
+        var lastDot = fullKey.LastIndexOf('.');
+        return lastDot >= 0 ? fullKey[(lastDot + 1)..] : fullKey;
+    }
+
+    private void RefreshNodeVariableCache()
+    {
+        _nodeTitleById.Clear();
+        _nodePrefixById.Clear();
+        _nodeIdsByTitle.Clear();
+
+        if (Diagram == null)
+            return;
+
+        var ids = new List<(Guid Id, string N)>();
+        foreach (var node in Diagram.Nodes.Cast<WorkflowNodeModel>())
+        {
+            if (!Guid.TryParse(node.Id, out var id))
+                continue;
+
+            var title = node.Title ?? node.NodeType ?? "Блок";
+            _nodeTitleById[id] = title;
+            var normalizedTitle = SanitizeNodeTitleForToken(title);
+            if (!_nodeIdsByTitle.TryGetValue(normalizedTitle, out var list))
+            {
+                list = [];
+                _nodeIdsByTitle[normalizedTitle] = list;
+            }
+            list.Add(id);
+            ids.Add((id, id.ToString("N").ToLowerInvariant()));
+        }
+
+        if (ids.Count == 0)
+            return;
+
+        var assigned = new Dictionary<Guid, string>();
+        for (var len = 8; len <= 32; len++)
+        {
+            var counts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            foreach (var (_, n) in ids)
+            {
+                var p = n[..len];
+                counts[p] = counts.TryGetValue(p, out var c) ? c + 1 : 1;
+            }
+
+            foreach (var (id, n) in ids)
+            {
+                if (assigned.ContainsKey(id)) continue;
+                var p = n[..len];
+                if (counts[p] == 1)
+                    assigned[id] = p;
+            }
+
+            if (assigned.Count == ids.Count)
+                break;
+        }
+
+        foreach (var (id, n) in ids)
+            _nodePrefixById[id] = assigned.TryGetValue(id, out var p) ? p : n[..8];
+    }
+
+    // Match both short form {{guid.output}} and legacy {{node.guid.output}} / {{$node.guid.output}}
+    private static readonly Regex NodeInternalVarRegex =
+        new(@"\{\{(?:\$?node\.)?(?<guid>[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12})\.(?<key>[a-zA-Z0-9_]+)\}\}",
+            RegexOptions.Compiled);
+
+    // Новый формат без id: «{{Старт · output}}»
+    private static readonly Regex NodeDisplayVarRegexPretty =
+        new(@"\{\{(?<label>[^·]+)·(?<key>[a-zA-Z0-9_]+)\}\}", RegexOptions.Compiled);
+
+    // Старый формат (обратная совместимость): «{{Старт#ec11eb15.output}}»
+    private static readonly Regex NodeDisplayVarRegexLegacy =
+        new(@"\{\{(?<label>[^#\{\}]+)#(?<prefix>[0-9a-fA-F]{8,32})\.(?<key>[a-zA-Z0-9_]+)\}\}",
+            RegexOptions.Compiled);
+
+    private string ToDisplayText(string? internalText)
+    {
+        if (string.IsNullOrEmpty(internalText))
+            return internalText ?? "";
+
+        return NodeInternalVarRegex.Replace(internalText, m =>
+        {
+            if (!Guid.TryParse(m.Groups["guid"].Value, out var id))
+                return m.Value;
+
+            var key = m.Groups["key"].Value;
+            var title = _nodeTitleById.TryGetValue(id, out var t) ? t : id.ToString()[..8];
+            title = SanitizeNodeTitleForToken(title);
+
+            return "{{" + title + " · " + key + "}}";
+        });
+    }
+
+    private string FromDisplayText(string? displayText)
+    {
+        if (string.IsNullOrEmpty(displayText))
+            return displayText ?? "";
+
+        // Сначала новый формат «{{Старт · output}}»
+        var step1 = NodeDisplayVarRegexPretty.Replace(displayText, m =>
+        {
+            var label = m.Groups["label"].Value.Trim();
+            var key = m.Groups["key"].Value;
+            var id = ResolveGuidByTitle(label, key);
+            if (id == null)
+                return m.Value;
+            return "{{" + id.Value.ToString("D") + "." + key + "}}";
+        });
+
+        // Затем старый формат «{{Старт#ec11eb15.output}}» для обратной совместимости
+        return NodeDisplayVarRegexLegacy.Replace(step1, m =>
+        {
+            var prefix = m.Groups["prefix"].Value.ToLowerInvariant();
+            var key = m.Groups["key"].Value;
+            var id = ResolveGuidByPrefix(prefix);
+            if (id == null)
+                return m.Value;
+            return "{{" + id.Value.ToString("D") + "." + key + "}}";
+        });
+    }
+
+    private Guid? ResolveGuidByTitle(string label, string key)
+    {
+        if (string.IsNullOrWhiteSpace(label))
+            return null;
+
+        var normalized = SanitizeNodeTitleForToken(label);
+        if (!_nodeIdsByTitle.TryGetValue(normalized, out var ids) || ids.Count == 0)
+            return null;
+
+        if (ids.Count == 1)
+            return ids[0];
+
+        // Несколько нод с одним названием — берём первую, у которой есть такая переменная
+        foreach (var id in ids)
+        {
+            var node = Diagram?.Nodes.Cast<WorkflowNodeModel>().FirstOrDefault(n => n.Id == id.ToString());
+            if (node != null && GetAutoVariablesForNode(node).Any(v => v.Key.EndsWith("." + key, StringComparison.Ordinal)))
+                return id;
+        }
+        return ids[0];
+    }
+
+    private Guid? ResolveGuidByPrefix(string prefix)
+    {
+        if (string.IsNullOrWhiteSpace(prefix))
+            return null;
+
+        // 1) точное совпадение с вычисленным уникальным префиксом
+        foreach (var (id, p) in _nodePrefixById)
+        {
+            if (string.Equals(p, prefix, StringComparison.OrdinalIgnoreCase))
+                return id;
+        }
+
+        // 2) fallback: starts-with по полному guid N
+        foreach (var id in _nodeTitleById.Keys)
+        {
+            var n = id.ToString("N");
+            if (n.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                return id;
+        }
+
+        return null;
+    }
+
+    private static string SanitizeNodeTitleForToken(string title)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+            return "Блок";
+
+        var t = title.Trim();
+        t = t.Replace("{", " ").Replace("}", " ").Replace("#", " ").Replace("\r", " ").Replace("\n", " ");
+        t = Regex.Replace(t, @"\s+", " ").Trim();
+        return string.IsNullOrWhiteSpace(t) ? "Блок" : t;
+    }
+
+    private static void EnsureVariableExists(Dictionary<string, VariableInfo> variables, string varName)
     {
         if (!variables.ContainsKey(varName))
         {
@@ -1259,7 +1327,7 @@ if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].Usage
         return normalized;
     }
 
-    private VariableType GetVariableType(string varName)
+    private static VariableType GetVariableType(string varName)
     {
         var lower = varName.ToLower();
 
@@ -1373,6 +1441,7 @@ if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].Usage
     {
         OnVariableSelected = onSelected;
         VariablePickerSearch = "";
+        VariablePickerSelectedNode = null;
         IsVariablePickerOpen = true;
     }
 
@@ -1380,6 +1449,7 @@ if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].Usage
     {
         IsVariablePickerOpen = false;
         OnVariableSelected = null;
+        VariablePickerSelectedNode = null;
     }
 
     private void SelectVariableFromPicker(string variableName)
@@ -1388,6 +1458,7 @@ if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].Usage
         {
             var insert = "{{" + variableName.TrimStart('$') + "}}";
             var newVal = _atMentionFullValue.Substring(0, _atMentionIndex) + insert + _atMentionFullValue.Substring(_atMentionIndex + 1);
+            newVal = FromDisplayText(newVal);
             var prop = _atMentionTargetObj.GetType().GetProperty(_atMentionTargetProp);
             prop?.SetValue(_atMentionTargetObj, newVal);
             _atMentionTargetObj = null;
@@ -1405,40 +1476,110 @@ if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].Usage
     /// <summary>Обновляет поле из e.Value; при вводе @ (в любом месте) открывает выбор переменной, вставка на место @.</summary>
     private void UpdateFieldAndCheckAtMention(ChangeEventArgs e, object dataObject, string propertyName)
     {
-        var value = e.Value?.ToString() ?? "";
+        var displayValue = e.Value?.ToString() ?? "";
+        var value = FromDisplayText(displayValue);
         var prop = dataObject.GetType().GetProperty(propertyName);
         prop?.SetValue(dataObject, value);
-        if (value.Contains('@'))
+        if (displayValue.Contains('@'))
         {
-            _atMentionFullValue = value;
-            _atMentionIndex = value.LastIndexOf('@');
+            _atMentionFullValue = displayValue;
+            _atMentionIndex = displayValue.LastIndexOf('@');
             _atMentionTargetObj = dataObject;
             _atMentionTargetProp = propertyName;
             ShowVariablePicker(_ => { });
         }
     }
 
-    private List<VariableInfo> GetFilteredVariablesForPicker()
+    private IReadOnlyList<WorkflowNodeModel> GetFilteredNodesForVariablePicker()
     {
-        if (string.IsNullOrWhiteSpace(VariablePickerSearch))
-            return DiscoveredVariables;
+        if (Diagram == null)
+            return [];
 
-        return DiscoveredVariables
-            .Where(v => v.Name.Contains(VariablePickerSearch, StringComparison.OrdinalIgnoreCase))
+        var nodes = Diagram.Nodes.Cast<WorkflowNodeModel>().ToList();
+        if (string.IsNullOrWhiteSpace(VariablePickerSearch))
+            return nodes.OrderBy(n => n.Title).ToList();
+
+        var q = VariablePickerSearch.Trim();
+        return nodes
+            .Where(n =>
+                (n.Title ?? "").Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                (n.NodeType ?? "").Contains(q, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(n => n.Title)
             .ToList();
     }
 
-    private Dictionary<string, List<VariableInfo>> GetGroupedVariablesForPicker()
+    private void SelectNodeForVariablePicker(WorkflowNodeModel node)
     {
-        var filtered = GetFilteredVariablesForPicker();
+        VariablePickerSelectedNode = node;
+        VariablePickerSearch = "";
+    }
+
+    private void BackToVariablePickerNodes()
+    {
+        VariablePickerSelectedNode = null;
+        VariablePickerSearch = "";
+    }
+
+    private IReadOnlyList<(string Key, string Display)> GetVariablesForSelectedNode()
+    {
+        if (VariablePickerSelectedNode == null)
+            return [];
+
+        var vars = GetAutoVariablesForNode(VariablePickerSelectedNode);
+        if (string.IsNullOrWhiteSpace(VariablePickerSearch))
+            return vars;
+
+        var q = VariablePickerSearch.Trim();
+        return vars
+            .Where(v =>
+                v.Key.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                v.Display.Contains(q, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
+    /// <summary>Переменные выходов блоков ($node.guid.output или $guid.output) — показываются только при выборе блока, не в «Параметры и прочее».</summary>
+    private static bool IsNodeOutputVariable(string varName)
+    {
+        if (string.IsNullOrEmpty(varName))
+            return false;
+        if (varName.StartsWith("$node.", StringComparison.OrdinalIgnoreCase))
+            return true;
+        // Короткий формат из текста: $guid.output
+        if (varName.StartsWith("$") && varName.Length > 40)
+        {
+            var afterDollar = varName.AsSpan(1);
+            var dot = afterDollar.IndexOf('.');
+            if (dot > 0 && Guid.TryParse(afterDollar[..dot].ToString(), out _))
+                return true;
+        }
+        return false;
+    }
+
+    private Dictionary<string, List<VariableInfo>> GetGroupedStaticVariablesForPicker()
+    {
+        var inputParamNames = new HashSet<string>(CurrentWorkflowInputParameters.Select(p => p.Name ?? ""), StringComparer.OrdinalIgnoreCase);
+        var filtered = DiscoveredVariables
+            .Where(v => !IsNodeOutputVariable(v.Name))
+            .Where(v => v.Type != VariableType.Custom || inputParamNames.Contains(v.Name))
+            .ToList();
+
+        if (!string.IsNullOrWhiteSpace(VariablePickerSearch))
+        {
+            var q = VariablePickerSearch.Trim();
+            filtered = filtered.Where(v =>
+                    v.Name.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                    (v.SourceNode ?? "").Contains(q, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+
         return filtered.GroupBy(v => v.Type switch
         {
-            VariableType.GlobalAttribute => "Контактные данные и атрибуты",
+            VariableType.GlobalAttribute => "Атрибуты ($global.*)",
             VariableType.System => "Системные",
             VariableType.User => "Пользователь",
-            VariableType.Custom => "Пользовательские",
+            VariableType.Custom => "Параметры",
             _ => "Другие"
-        }).ToDictionary(g => g.Key, g => g.ToList());
+        }).ToDictionary(g => g.Key, g => g.OrderBy(x => x.Name).ToList());
     }
 
     private static string GetVariableTypeCss(VariableType type) => type switch
@@ -1462,18 +1603,42 @@ if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].Usage
         _ => "oi-tag"
     };
 
+    private static string GetNodeIcon(WorkflowNodeModel node)
+    {
+        return node.NodeType?.ToLowerInvariant() switch
+        {
+            "start" => "oi-media-play",
+            "ask" => "oi-question-mark",
+            "message" => "oi-chat",
+            "httprequest" => "oi-cloud-download",
+            "aigenerate" => "oi-bolt",
+            "media" => "oi-image",
+            "subworkflow" => "oi-layers",
+            "condition" => "oi-fork",
+            "wait" => "oi-timer",
+            _ => "oi-grid-three-up"
+        };
+    }
+
     private void InsertVariable(object dataObject, string propertyName, string variableName)
     {
         var property = dataObject.GetType().GetProperty(propertyName);
         if (property != null)
         {
             var currentValue = property.GetValue(dataObject)?.ToString() ?? "";
-            var toInsert = "{{" + variableName.TrimStart('$') + "}}";
-            
+            var toInsert = "{{" + VariableNameToStorageForm(variableName) + "}}";
             property.SetValue(dataObject, currentValue + toInsert);
-            
             OnWorkflowChanged();
         }
+    }
+
+    /// <summary>Strips $node. prefix so we store only {{guid.output}} in the DB.</summary>
+    private static string VariableNameToStorageForm(string variableName)
+    {
+        const string nodePrefix = "$node.";
+        if (variableName.StartsWith(nodePrefix, StringComparison.OrdinalIgnoreCase))
+            return variableName[nodePrefix.Length..];
+        return variableName.TrimStart('$');
     }
 
     #endregion
@@ -1510,7 +1675,6 @@ if (!variables[varName].UsageNodes.Contains(nodeTitle)) variables[varName].Usage
         new NodeToolItem("Контент", "Вопрос", NodeType.Ask, "oi-question-mark", "indigo"),
         new NodeToolItem("Контент", "Медиа", NodeType.Media, "oi-image", "indigo"),
         new NodeToolItem("AI и интеграции", "API Запрос", NodeType.HttpRequest, "oi-cloud-download", "violet"),
-        new NodeToolItem("AI и интеграции", "Переменная", NodeType.SetVariable, "oi-list", "violet"),
         new NodeToolItem("AI и интеграции", "Атрибут", NodeType.SetAttribute, "oi-person", "violet"),
         new NodeToolItem("AI и интеграции", "AI Фильтр", NodeType.AIFilter, "oi-eye", "violet"),
         new NodeToolItem("AI и интеграции", "AI Текст", NodeType.AIGenerate, "oi-bolt", "violet"),

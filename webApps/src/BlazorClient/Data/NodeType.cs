@@ -8,7 +8,6 @@ public enum NodeType
     Ask,
     Condition,
     Wait,
-    SetVariable,
     SetAttribute,
     HttpRequest,
     AIFilter,

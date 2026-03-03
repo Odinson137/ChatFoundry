@@ -24,7 +24,8 @@ public enum WorkflowNodeType
 
     Condition = 20,     // If-Else ветвление
     Wait = 21,          // Пауза/Задержка
-    SetVariable = 22,   // Присвоение значения (только обычные переменные)
+    [Obsolete("SetVariable node type was removed. Use $node.{guid}.output auto-variables instead.")]
+    SetVariable = 22,
     SetAttribute = 24,  // Запись в атрибуты клиента (глобальные, между сессиями)
     HttpRequest = 23,   // Внешний API запрос
     

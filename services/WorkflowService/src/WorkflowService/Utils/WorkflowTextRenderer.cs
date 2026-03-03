@@ -64,6 +64,6 @@ public partial class WorkflowTextRenderer(IVariableService variableService)
         });
     }
 
-    [GeneratedRegex(@"\{\{(?<name>[a-zA-Z0-9_.-]+)\}\}", RegexOptions.Compiled)]
+    [GeneratedRegex(@"\{\{(?<name>[\$a-zA-Z0-9_.-]+)\}\}", RegexOptions.Compiled)]
     private static partial Regex MyRegex();
 }

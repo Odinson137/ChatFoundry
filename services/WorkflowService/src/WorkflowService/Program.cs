@@ -55,7 +55,6 @@ services.AddScoped<IActionExecutor, SendMessageActionExecutor>();
 services.AddScoped<IActionExecutor, AskActionExecutor>();
 services.AddScoped<IActionExecutor, StartActionExecutor>();
 services.AddScoped<IActionExecutor, InputExecutor>();
-services.AddScoped<IActionExecutor, SetVariableActionExecutor>();
 services.AddScoped<IActionExecutor, SetAttributeActionExecutor>();
 services.AddScoped<IActionExecutor, HttpRequestActionExecutor>();
 services.AddScoped<IActionExecutor, AIGenerateActionExecutor>();

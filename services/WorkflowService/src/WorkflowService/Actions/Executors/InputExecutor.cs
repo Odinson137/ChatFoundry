@@ -28,13 +28,9 @@ public class InputExecutor(
         var graph = workflowGraphParser.Parse(session.Workflow.NodesDefinition, session.Workflow.EdgesDefinition);
         var node = graph.GetNode(session.CurrentNodeId!.Value);
 
-        var variable = (node.Data as AskNodeData)?.Variable;
-        if (!string.IsNullOrWhiteSpace(variable))
-        {
-            variableService.SetVariable(session, variable, action.Payload);
-            await variableService.SyncIfDirtyAsync(session, ct);
-            await sessionRepository.SaveAsync(session, ct);
-        }
+        variableService.SetVariable(session, $"$node.{node.Id}.output", action.Payload);
+        await variableService.SyncIfDirtyAsync(session, ct);
+        await sessionRepository.SaveAsync(session, ct);
 
         await producer.Produce(new ActionCompletedEvent(message.Channel, message.ExternalUserId), ct);
     }
