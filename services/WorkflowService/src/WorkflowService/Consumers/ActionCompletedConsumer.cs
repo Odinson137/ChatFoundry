@@ -36,7 +36,10 @@ public class ActionCompletedConsumer(
             session = lastUserAction.Session;
 
             if (lastUserAction.Status != ActionStatus.Failed)
+            {
                 lastUserAction.MarkCompleted();
+                await actionRepository.SaveAsync(lastUserAction, ct);
+            }
             session.CompletedAt = DateTime.UtcNow;
 
             var graph = workflowGraphParser.Parse(session.Workflow.NodesDefinition, session.Workflow.EdgesDefinition);

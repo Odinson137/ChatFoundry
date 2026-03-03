@@ -9,147 +9,166 @@
 
 <PageTitle>Управление ботами</PageTitle>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Управление ботами</h1>
-    <button class="btn btn-primary" @onclick="OnOpenCreateModal">
-        <span class="oi oi-plus"></span> Добавить бота
-    </button>
-</div>
-
-@if (isLoading)
-{
-    <div class="d-flex justify-content-center">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Загрузка...</span>
+<div class="bots-page">
+    <div class="bots-header">
+        <div class="bots-header-left">
+            <h1 class="bots-title">Управление ботами</h1>
+            @if (!isLoading && bots.Any())
+            {
+                <span class="bots-count">@bots.Count</span>
+            }
         </div>
+        <button class="bots-btn-primary" @onclick="OnOpenCreateModal">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Добавить бота
+        </button>
     </div>
-}
-else if (!string.IsNullOrEmpty(error))
-{
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @error
-        <button type="button" class="btn-close" @onclick="() => error = null"></button>
-    </div>
-}
-else
-{
-    @if (!bots.Any())
+
+    @if (isLoading)
     {
-        <div class="alert alert-info">Боты не найдены. Создайте первого бота!</div>
+        <div class="bots-loading">
+            <div class="bots-spinner"></div>
+            <p>Загрузка...</p>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(error))
+    {
+        <div class="bots-error">
+            <span>@error</span>
+            <button type="button" class="bots-error-close" @onclick="() => error = null">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+    }
+    else if (!bots.Any())
+    {
+        <div class="bots-empty">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2a4 4 0 0 0-4 4v2a4 4 0 0 0 8 0V6a4 4 0 0 0-4-4Z"/>
+                <path d="M4 10a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2"/>
+            </svg>
+            <p class="bots-empty-title">Боты не найдены</p>
+            <p class="bots-empty-desc">Создайте первого бота, чтобы подключить воркфлоу к каналам.</p>
+            <button class="bots-btn-primary" @onclick="OnOpenCreateModal">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Добавить бота
+            </button>
+        </div>
     }
     else
     {
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
-            <tr>
-                <th>Имя</th>
-                <th>Каналы</th>
-                <th>Активный Workflow</th>
-                <th>Создан</th>
-                <th class="text-end">Действия</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var bot in bots)
-            {
-                <tr>
-                    <td class="fw-bold">@bot.Name</td>
-                    <td>
-                        @{
-                            var channelNames = bot.BotChannels?
-                                .Where(bc => bc.Channel != null)
-                                .Select(bc => bc.Channel!.Name)
-                                .ToList() ?? new List<string>();
-                            if (channelNames.Count == 0)
-                            {
-                                <span class="text-muted">—</span>
-                            }
-                            else if (channelNames.Count <= 2)
-                            {
-                                @string.Join(", ", channelNames)
-                            }
-                            else
-                            {
-                                <span title="@string.Join(", ", channelNames)">@channelNames.Count каналов</span>
-                            }
-                        }
-                    </td>
-                    <td>
-                        @{
-                            var activeWorkflow = bot.Workflows?.FirstOrDefault(w => w.IsActiveBotWorkflow);
-                            if (activeWorkflow != null)
-                            {
-                                <span class="badge bg-success">v@(activeWorkflow.Version)</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">Нет</span>
-                            }
-                        }
-                    </td>
-                    <td>@bot.CreatedAt.ToLocalTime().ToString("g")</td>
-                    <td class="text-end">
-                        <a href="@($"bots/{bot.Id}")" class="btn btn-sm btn-primary me-2" title="Открыть воркфлоу">
-                            <span class="oi oi-eye"></span> Открыть
-                        </a>
-                        <button class="btn btn-sm btn-outline-primary me-2" @onclick="() => OnOpenEditModal(bot)">
-                            <span class="oi oi-pencil"></span>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteBot(bot)">
-                            <span class="oi oi-trash"></span>
-                        </button>
-                    </td>
-                </tr>
-            }
-            </tbody>
-        </table>
+        <div class="bots-table-wrap">
+            <table class="bots-table">
+                <thead>
+                    <tr>
+                        <th class="bots-th">Имя</th>
+                        <th class="bots-th">Каналы</th>
+                        <th class="bots-th">Активный Workflow</th>
+                        <th class="bots-th">Создан</th>
+                        <th class="bots-th bots-th-actions">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var bot in bots)
+                    {
+                        <tr class="bots-row">
+                            <td class="bots-td bots-td-name">@bot.Name</td>
+                            <td class="bots-td bots-td-muted">
+                                @{
+                                    var channelNames = bot.BotChannels?
+                                        .Where(bc => bc.Channel != null)
+                                        .Select(bc => bc.Channel!.Name)
+                                        .ToList() ?? new List<string>();
+                                    if (channelNames.Count == 0)
+                                    {
+                                        <span>—</span>
+                                    }
+                                    else if (channelNames.Count <= 2)
+                                    {
+                                        @string.Join(", ", channelNames)
+                                    }
+                                    else
+                                    {
+                                        <span title="@string.Join(", ", channelNames)">@channelNames.Count каналов</span>
+                                    }
+                                }
+                            </td>
+                            <td class="bots-td">
+                                @{
+                                    var activeWorkflow = bot.Workflows?.FirstOrDefault(w => w.IsActiveBotWorkflow);
+                                    if (activeWorkflow != null)
+                                    {
+                                        <span class="bots-badge bots-badge-success">v@(activeWorkflow.Version)</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="bots-badge bots-badge-neutral">Нет</span>
+                                    }
+                                }
+                            </td>
+                            <td class="bots-td bots-td-date">@bot.CreatedAt.ToLocalTime().ToString("g")</td>
+                            <td class="bots-td bots-td-actions">
+                                <a href="@($"bots/{bot.Id}")" class="bots-btn-link" title="Открыть воркфлоу">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    Открыть
+                                </a>
+                                <button class="bots-btn-icon" @onclick="() => OnOpenEditModal(bot)" title="Редактировать">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                </button>
+                                <button class="bots-btn-icon bots-btn-icon-danger" @onclick="() => DeleteBot(bot)" title="Удалить">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     }
-}
+</div>
 
-@* --- Модалька --- *@
+@* Modal *@
 @if (showModal)
 {
-    <div class="modal-backdrop fade show"></div>
-    <div class="modal fade show d-block" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">@(isEditMode ? "Редактировать бота" : "Новый бот")</h5>
-                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Имя бота</label>
-                        <input type="text" class="form-control" @bind="currentBotModel.Name" placeholder="My Super Bot" />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Каналы</label>
-                        @if (availableChannels.Count == 0)
-                        {
-                            <p class="text-muted small mb-0">Нет доступных каналов. Создайте каналы на странице <a href="/channels">Каналы</a>.</p>
-                        }
-                        else
-                        {
-                            <div class="border rounded p-2" style="max-height: 180px; overflow-y: auto;">
-                                @foreach (var ch in availableChannels)
-                                {
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="ch_@ch.Id" checked="@currentBotModel.SelectedChannelIds.Contains(ch.Id)" @onchange="() => ToggleChannel(ch.Id)" />
-                                        <label class="form-check-label" for="ch_@ch.Id">@ch.Name <span class="text-muted small">(@ch.ChannelType)</span></label>
-                                    </div>
-                                }
-                            </div>
-                        }
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="CloseModal">Отмена</button>
-                    <button type="button" class="btn btn-primary" @onclick="SaveBot" disabled="@(isSaving || string.IsNullOrWhiteSpace(currentBotModel.Name))">
-                        @if (isSaving) { <span class="spinner-border spinner-border-sm me-1"></span> }
-                        Сохранить
-                    </button>
-                </div>
+    <div class="bots-modal-backdrop" @onclick="CloseModal"></div>
+    <div class="bots-modal">
+        <div class="bots-modal-header">
+            <h3 class="bots-modal-title">@(isEditMode ? "Редактировать бота" : "Новый бот")</h3>
+            <button type="button" class="bots-modal-close" @onclick="CloseModal">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="bots-modal-body">
+            <div class="bots-field">
+                <label class="bots-label">Имя бота</label>
+                <input type="text" class="bots-input" @bind="currentBotModel.Name" placeholder="My Super Bot" />
             </div>
+            <div class="bots-field">
+                <label class="bots-label">Каналы</label>
+                @if (availableChannels.Count == 0)
+                {
+                    <p class="bots-hint">Нет доступных каналов. Создайте каналы на странице <a href="/channels">Каналы</a>.</p>
+                }
+                else
+                {
+                    <div class="bots-channels-box">
+                        @foreach (var ch in availableChannels)
+                        {
+                            <label class="bots-check-item">
+                                <input type="checkbox" checked="@currentBotModel.SelectedChannelIds.Contains(ch.Id)" @onchange="() => ToggleChannel(ch.Id)" />
+                                <span>@ch.Name <span class="bots-check-muted">(@ch.ChannelType)</span></span>
+                            </label>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="bots-modal-footer">
+            <button type="button" class="bots-btn-secondary" @onclick="CloseModal">Отмена</button>
+            <button type="button" class="bots-btn-save" @onclick="SaveBot" disabled="@(isSaving || string.IsNullOrWhiteSpace(currentBotModel.Name))">
+                @if (isSaving) { <div class="bots-spinner" style="width:18px;height:18px;border-width:2px;"></div> }
+                Сохранить
+            </button>
         </div>
     </div>
 }
