@@ -225,6 +225,65 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
         return result.Sessions.Nodes;
     }
 
+    public async Task<SessionsPageResult> GetSessionsPagedAsync(int first, string? after = null, string? statusFilter = null)
+    {
+        var where = statusFilter != null
+            ? $", where: {{ status: {{ eq: {statusFilter} }} }}"
+            : "";
+        var afterArg = after != null ? ", $after: String" : "";
+        var query = $$"""
+                query GetSessionsPaged($first: Int!{{afterArg}}) {
+                    sessions(first: $first{{(after != null ? ", after: $after" : "")}}, order: [{ createdAt: DESC }]{{where}}) {
+                        totalCount
+                        pageInfo {
+                            hasNextPage
+                            hasPreviousPage
+                            endCursor
+                            startCursor
+                        }
+                        nodes {
+                            id
+                            clientId
+                            channel
+                            channelId
+                            workflowId
+                            currentNodeId
+                            status
+                            createdAt
+                            completedAt
+                            workflow {
+                                id
+                                version
+                                bot { id name }
+                            }
+                            actions {
+                                id
+                                nodeId
+                                status
+                                workflowNodeType
+                                createdAt
+                            }
+                        }
+                    }
+                }
+                """;
+
+        var variables = new Dictionary<string, object?> { ["first"] = first };
+        if (after != null) variables["after"] = after;
+
+        var result = await ExecuteGraphQl<SessionsConnectionResponse>(query, variables);
+        var conn = result.Sessions;
+        return new SessionsPageResult
+        {
+            Items = conn.Nodes,
+            TotalCount = conn.TotalCount,
+            HasNextPage = conn.PageInfo?.HasNextPage ?? false,
+            HasPreviousPage = conn.PageInfo?.HasPreviousPage ?? false,
+            EndCursor = conn.PageInfo?.EndCursor,
+            StartCursor = conn.PageInfo?.StartCursor
+        };
+    }
+
     public async Task<SessionDto?> GetSessionByIdAsync(Guid sessionId)
     {
         var query = """
@@ -622,5 +681,15 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
     private class SessionConnection
     {
         public List<SessionDto> Nodes { get; set; } = [];
+        public int TotalCount { get; set; }
+        public SessionPageInfo? PageInfo { get; set; }
+    }
+
+    private class SessionPageInfo
+    {
+        public bool HasNextPage { get; set; }
+        public bool HasPreviousPage { get; set; }
+        public string? EndCursor { get; set; }
+        public string? StartCursor { get; set; }
     }
 }

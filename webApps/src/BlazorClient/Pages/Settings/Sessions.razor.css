@@ -48,3 +48,68 @@
     font-size: 0.75rem;
     color: #94a3b8;
 }
+
+/* ─── Pagination ───────────────────────────────────────────────────────── */
+
+.sess-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16px;
+    padding: 0 4px;
+}
+
+.sess-pagination-info {
+    font-size: 0.875rem;
+}
+
+.sess-pagination-muted {
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.sess-pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sess-page-size {
+    padding: 6px 28px 6px 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #0f172a;
+    background: #ffffff;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+}
+
+.sess-btn-page {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    color: #64748b;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.sess-btn-page:hover:not(:disabled) {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #0f172a;
+}
+
+.sess-btn-page:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
