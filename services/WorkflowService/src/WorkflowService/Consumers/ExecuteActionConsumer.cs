@@ -30,8 +30,12 @@ public class ExecuteActionConsumer(
 
             await executor.ExecuteAsync(action, message, ct);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            const int maxErrorLength = 2000;
+            action.ErrorMessage = ex.Message.Length <= maxErrorLength
+                ? ex.Message
+                : ex.Message[..maxErrorLength] + "...";
             action.MarkFailed();
             await actionRepository.SaveAsync(action, ct);
             await sessionResolver.CloseSessionAndHierarchyAsync(action.SessionId, ct);

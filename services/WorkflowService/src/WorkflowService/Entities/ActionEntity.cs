@@ -1,4 +1,4 @@
-﻿using Shared.Domain.Entities;
+using Shared.Domain.Entities;
 using Shared.Domain.Enums;
 using WorkflowService.Enums;
 
@@ -15,6 +15,11 @@ public class ActionEntity : EntityBase
     public WorkflowNodeType WorkflowNodeType { get; set; }
 
     public ActionStatus Status { get; set; } = ActionStatus.Pending;
+
+    /// <summary>
+    /// Error message when Status is Failed (e.g. exception message from executor).
+    /// </summary>
+    public string? ErrorMessage { get; set; }
 
     public void MarkInProgress()
     {

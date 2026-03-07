@@ -262,6 +262,7 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
                                 status
                                 workflowNodeType
                                 createdAt
+                                errorMessage
                             }
                         }
                     }
@@ -314,6 +315,7 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
                                 status
                                 workflowNodeType
                                 createdAt
+                                errorMessage
                             }
                         }
                     }

@@ -161,6 +161,25 @@
     gap: 4px;
 }
 
+.replay-step-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.replay-step-error {
+    font-size: 0.75rem;
+    color: #b91c1c;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    margin-left: 0.25rem;
+    margin-right: 0.25rem;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
 .replay-step {
     display: flex;
     align-items: flex-start;

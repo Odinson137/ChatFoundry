@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shared.Infrastructure.EntityTypeConfiguration;
 using WorkflowService.Entities;
@@ -21,6 +21,9 @@ public class ActionEntityConfiguration : BaseEntityTypeConfiguration<ActionEntit
         builder.Property(x => x.Status)
             .IsRequired()
             .HasConversion<int>();
+
+        builder.Property(x => x.ErrorMessage)
+            .HasMaxLength(2000);
 
         builder.HasIndex(x => x.SessionId);
 

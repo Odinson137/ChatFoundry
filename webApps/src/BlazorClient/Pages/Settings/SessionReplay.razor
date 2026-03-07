@@ -81,19 +81,26 @@
                                 var nodeLabel = GetNodeLabel(action.NodeId);
                                 var isSelected = _selectedStepIndex == index;
                                 var isCurrent = _session.CurrentNodeId.HasValue && action.NodeId == _session.CurrentNodeId.Value;
+                                var isFailed = string.Equals(action.Status, "FAILED", StringComparison.OrdinalIgnoreCase);
 
-                                <button class="replay-step @(isSelected ? "selected" : "") @(isCurrent ? "current" : "")"
-                                        @onclick="() => SelectStep(index)">
-                                    <div class="replay-step-number">@(index + 1)</div>
-                                    <div class="replay-step-body">
-                                        <div class="replay-step-title">@nodeLabel</div>
-                                        <div class="replay-step-meta">
-                                            <span class="replay-step-type">@action.WorkflowNodeType</span>
-                                            <span class="replay-step-status @ActionStatusClass(action.Status)">@ActionStatusLabel(action.Status)</span>
+                                <div class="replay-step-wrap">
+                                    <button class="replay-step @(isSelected ? "selected" : "") @(isCurrent ? "current" : "")"
+                                            @onclick="() => SelectStep(index)">
+                                        <div class="replay-step-number">@(index + 1)</div>
+                                        <div class="replay-step-body">
+                                            <div class="replay-step-title">@nodeLabel</div>
+                                            <div class="replay-step-meta">
+                                                <span class="replay-step-type">@action.WorkflowNodeType</span>
+                                                <span class="replay-step-status @ActionStatusClass(action.Status)">@ActionStatusLabel(action.Status)</span>
+                                            </div>
+                                            <div class="replay-step-time">@action.CreatedAt.ToLocalTime().ToString("HH:mm:ss")</div>
                                         </div>
-                                        <div class="replay-step-time">@action.CreatedAt.ToLocalTime().ToString("HH:mm:ss")</div>
-                                    </div>
-                                </button>
+                                    </button>
+                                    @if (isFailed)
+                                    {
+                                        <div class="replay-step-error">@(string.IsNullOrEmpty(action.ErrorMessage) ? "Ошибка без описания" : action.ErrorMessage)</div>
+                                    }
+                                </div>
                             }
                         }
                     </div>

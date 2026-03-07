@@ -48,4 +48,5 @@ public class SessionActionDto
     public string Status { get; set; } = string.Empty;
     public string WorkflowNodeType { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
+    public string? ErrorMessage { get; set; }
 }
