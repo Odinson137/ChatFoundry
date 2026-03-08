@@ -1,4 +1,4 @@
-﻿using WorkflowService.Entities;
+using WorkflowService.Entities;
 using WorkflowService.Enums;
 using WorkflowService.Interfaces;
 using WorkflowService.Utils;
@@ -34,12 +34,15 @@ public sealed class WorkflowGraph(
             if (outgoingEdge.Condition != null &&
                 WorkflowConditionEvaluator.Evaluate(outgoingEdge.Condition, session, variableService))
             {
-                return GetNode(outgoingEdge.To);
+                var node = GetNode(outgoingEdge.To);
+                return node.Type == WorkflowNodeType.End ? null : node;
             }
         }
 
         var nextNodeId = outgoingEdges.FirstOrDefault(c => c.Condition == null)?.To;
-        return nextNodeId == null ? null : GetNode(nextNodeId.Value);
+        if (nextNodeId == null) return null;
+        var next = GetNode(nextNodeId.Value);
+        return next.Type == WorkflowNodeType.End ? null : next;
     }
 
 }

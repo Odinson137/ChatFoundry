@@ -4,6 +4,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deployment", "deployment", 
 	ProjectSection(SolutionItems) = preProject
 		deployment\docker-compose.yml = deployment\docker-compose.yml
 		deployment\.env = deployment\.env
+		deployment\pg_hba.conf = deployment\pg_hba.conf
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "services", "services", "{70D6D50E-6783-4B33-B681-786214CDE729}"

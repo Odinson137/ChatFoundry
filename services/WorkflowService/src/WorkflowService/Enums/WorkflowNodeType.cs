@@ -4,6 +4,7 @@ public enum WorkflowNodeType
 {
     // ===== Control / flow =====
     Start = 0,
+    [Obsolete("End block was removed. Use no outgoing links to end the flow.")]
     End = 999,
     SubWorkflow = 100,
 

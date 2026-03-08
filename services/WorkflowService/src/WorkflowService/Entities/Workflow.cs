@@ -28,5 +28,4 @@ public class BotWorkflow : EntityBase
     public List<WorkflowParameter> OutputParameters => WorkflowParameterSerializer.Deserialize(OutputParametersDefinition);
 
     public ICollection<Session> Sessions { get; set; } = [];
-    public ICollection<WorkflowVersion> WorkflowVersions { get; set; } = [];
 }

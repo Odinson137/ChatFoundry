@@ -40,8 +40,10 @@ services:
       - "5010:8080" # Порт для GraphQL / REST
       - "5011:8081" # НОВЫЙ порт для gRPC
     depends_on:
-      - workflow-db
-      - redis
+      workflow-db:
+        condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - app_network
 
@@ -57,8 +59,16 @@ services:
       - "5433:5432"
     volumes:
       - workflow_pgdata:/var/lib/postgresql/data
+      - ./pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+    command: ["postgres", "-c", "hba_file=/etc/postgresql/pg_hba.conf"]
     networks:
       - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U foundry -d foundry_db"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
 
   identity-service:
     container_name: identity_service
@@ -78,8 +88,10 @@ services:
       - "5020:8080"
       - "5021:8081"
     depends_on:
-      - identity-db
-      - redis
+      identity-db:
+        condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - app_network
 
@@ -95,8 +107,16 @@ services:
       - "5434:5432"
     volumes:
       - identitydata:/var/lib/postgresql/data
+      - ./pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+    command: ["postgres", "-c", "hba_file=/etc/postgresql/pg_hba.conf"]
     networks:
       - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U foundry -d foundry_db"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
 
   client-service:
     container_name: client_service
@@ -114,8 +134,10 @@ services:
       - "5030:8080"
       - "5031:8081"
     depends_on:
-      - client-db
-      - redis
+      client-db:
+        condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - app_network
 
@@ -131,8 +153,16 @@ services:
       - "5435:5432"
     volumes:
       - client_pgdata:/var/lib/postgresql/data
+      - ./pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+    command: ["postgres", "-c", "hba_file=/etc/postgresql/pg_hba.conf"]
     networks:
       - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U foundry -d foundry_db"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
 
   company-service:
     container_name: company_service
@@ -150,8 +180,10 @@ services:
       - "5050:8080"
       - "5051:8081"
     depends_on:
-      - company-db
-      - redis
+      company-db:
+        condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - app_network
 
@@ -167,8 +199,16 @@ services:
       - "5437:5432"
     volumes:
       - company_pgdata:/var/lib/postgresql/data
+      - ./pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+    command: ["postgres", "-c", "hba_file=/etc/postgresql/pg_hba.conf"]
     networks:
       - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U foundry -d foundry_db"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
 
   telegram-service:
     container_name: telegram_service
@@ -183,9 +223,10 @@ services:
     ports:
       - "5040:8080"
     depends_on:
-      - telegram-db
-      - redis
-      - file-service
+      redis:
+        condition: service_started
+      file-service:
+        condition: service_started
     networks:
       - app_network
 
@@ -205,7 +246,8 @@ services:
       - "5070:8080"
       - "5071:8081"
     depends_on:
-      - file-db
+      file-db:
+        condition: service_healthy
     networks:
       - app_network
 
@@ -221,23 +263,16 @@ services:
       - "5438:5432"
     volumes:
       - file_pgdata:/var/lib/postgresql/data
+      - ./pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+    command: ["postgres", "-c", "hba_file=/etc/postgresql/pg_hba.conf"]
     networks:
       - app_network
-
-  telegram-db:
-    image: postgres:16
-    container_name: telegram_db
-    restart: always
-    environment:
-      POSTGRES_DB: foundry_db
-      POSTGRES_USER: foundry
-      POSTGRES_PASSWORD: foundry
-    ports:
-      - "5436:5432"
-    volumes:
-      - workflow_pgdata:/var/lib/postgresql/data
-    networks:
-      - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U foundry -d foundry_db"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
 
   redis:
     image: redis

@@ -109,8 +109,11 @@ public partial class WorkflowDesigner : IDisposable
     // JSON-меню (открыто/закрыто)
     private bool _jsonMenuOpen;
 
-    // Файловое хранилище — список для выбора в блоке Медиа
-    private List<FileInfoDto>? StorageFiles { get; set; }
+    // Модальное окно выбора файла из хранилища
+    private bool IsStoragePickerOpen { get; set; }
+    private MediaNodeData? StoragePickerTarget { get; set; }
+    private List<FileInfoDto> StoragePickerFiles { get; set; } = [];
+    private bool StoragePickerLoading { get; set; }
 
     // Список workflow для выбора в блоке «Процесс»
     private List<WorkflowListItem>? AvailableWorkflows { get; set; }
@@ -853,18 +856,44 @@ public partial class WorkflowDesigner : IDisposable
         StateHasChanged();
     }
 
-    private async Task LoadStorageFiles()
+    private async Task OpenStoragePicker(MediaNodeData mediaData)
     {
+        StoragePickerTarget = mediaData;
+        IsStoragePickerOpen = true;
+        StoragePickerLoading = true;
+        StoragePickerFiles = [];
+        StateHasChanged();
         try
         {
-            StorageFiles = await FileApiClient.ListFilesAsync(workflowId: WorkflowId);
-            StateHasChanged();
+            StoragePickerFiles = await FileApiClient.ListFilesAsync(workflowId: WorkflowId);
         }
         catch
         {
-            StorageFiles = new List<FileInfoDto>();
+            StoragePickerFiles = [];
+        }
+        finally
+        {
+            StoragePickerLoading = false;
             StateHasChanged();
         }
+    }
+
+    private void CloseStoragePicker()
+    {
+        IsStoragePickerOpen = false;
+        StoragePickerTarget = null;
+        StoragePickerFiles = [];
+        StateHasChanged();
+    }
+
+    private void SelectStorageFile(FileInfoDto file)
+    {
+        if (StoragePickerTarget != null)
+        {
+            StoragePickerTarget.Value = file.Id;
+            OnWorkflowChanged();
+        }
+        CloseStoragePicker();
     }
 
     private async Task OnMediaFileSelected(InputFileChangeEventArgs e, MediaNodeData mediaData)
@@ -1405,30 +1434,18 @@ public partial class WorkflowDesigner : IDisposable
         IsVariablesModalOpen = false;
     }
 
-    private async Task ZoomIn()
+    private void ZoomIn()
     {
         _zoomLevel = Math.Min(2.0, _zoomLevel + 0.1);
-        await ApplyZoom();
+        Diagram.SetZoom(_zoomLevel);
         StateHasChanged();
     }
 
-    private async Task ZoomOut()
+    private void ZoomOut()
     {
         _zoomLevel = Math.Max(0.25, _zoomLevel - 0.1);
-        await ApplyZoom();
+        Diagram.SetZoom(_zoomLevel);
         StateHasChanged();
-    }
-
-    private async Task ApplyZoom()
-    {
-        try
-        {
-            await JSRuntime.InvokeVoidAsync("window.__designerZoom", "designer-canvas-area", _zoomLevel);
-        }
-        catch
-        {
-            // Fallback: библиотека может не поддерживать вызов zoom извне
-        }
     }
 
     private async Task CopyVariableToClipboard(string variableName)
@@ -1670,7 +1687,6 @@ public partial class WorkflowDesigner : IDisposable
         new NodeToolItem("Логика", "Условие", NodeType.Condition, "oi-fork", "orange"),
         new NodeToolItem("Логика", "Ожидание", NodeType.Wait, "oi-timer", "blue"),
         new NodeToolItem("Логика", "Процесс", NodeType.SubWorkflow, "oi-layers", "orange"),
-        new NodeToolItem("Логика", "Конец", NodeType.End, "oi-media-stop", "red"),
         new NodeToolItem("Контент", "Сообщение", NodeType.Message, "oi-chat", "indigo"),
         new NodeToolItem("Контент", "Вопрос", NodeType.Ask, "oi-question-mark", "indigo"),
         new NodeToolItem("Контент", "Медиа", NodeType.Media, "oi-image", "indigo"),

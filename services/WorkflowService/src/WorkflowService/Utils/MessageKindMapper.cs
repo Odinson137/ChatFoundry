@@ -21,7 +21,6 @@ public static class MessageKindMapper
             WorkflowNodeType.Media => MessageKind.Media,
             WorkflowNodeType.Command => MessageKind.Command,
             WorkflowNodeType.Start => MessageKind.Unknown,
-            WorkflowNodeType.End => MessageKind.Unknown,
             WorkflowNodeType.SubWorkflow => MessageKind.Command,
             _ => MessageKind.Unknown
         };

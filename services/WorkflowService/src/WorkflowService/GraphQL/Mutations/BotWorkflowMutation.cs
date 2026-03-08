@@ -1,5 +1,6 @@
 using HotChocolate;
 using HotChocolate.Types;
+using Microsoft.EntityFrameworkCore;
 using Shared.Infrastructure.GraphQl;
 using WorkflowService.Data;
 using WorkflowService.Entities;
@@ -26,6 +27,8 @@ public class BotWorkflowMutation
         };
 
         context.Workflows.Add(workflow);
+        if (input.IsActiveBotWorkflow)
+            await context.Workflows.Where(w => w.BotId == input.BotId).ExecuteUpdateAsync(s => s.SetProperty(w => w.IsActiveBotWorkflow, false));
         await context.SaveChangesAsync();
 
         return new AddBotWorkflowPayload(workflow);
@@ -47,11 +50,15 @@ public class BotWorkflowMutation
         workflow.LayoutDefinition = input.LayoutDefinition ?? workflow.LayoutDefinition;
         workflow.Version = input.Version ?? workflow.Version;
         workflow.IsActiveBotWorkflow = input.IsActiveBotWorkflow ?? workflow.IsActiveBotWorkflow;
+        workflow.ModifiedAt = DateTime.UtcNow;
 
         if (input.InputParametersDefinition != null)
             workflow.InputParametersDefinition = input.InputParametersDefinition;
         if (input.OutputParametersDefinition != null)
             workflow.OutputParametersDefinition = input.OutputParametersDefinition;
+
+        if (workflow.IsActiveBotWorkflow)
+            await context.Workflows.Where(w => w.BotId == workflow.BotId && w.Id != workflow.Id).ExecuteUpdateAsync(s => s.SetProperty(w => w.IsActiveBotWorkflow, false));
 
         await context.SaveChangesAsync();
 
@@ -73,6 +80,40 @@ public class BotWorkflowMutation
         await context.SaveChangesAsync();
 
         return new DeleteBotWorkflowPayload(workflow);
+    }
+
+    public async Task<CopyBotWorkflowPayload> CopyBotWorkflowAsync(
+        CopyBotWorkflowInput input,
+        [Service] WorkflowDbContext context)
+    {
+        var source = await context.Workflows
+            .AsNoTracking()
+            .FirstOrDefaultAsync(w => w.Id == input.SourceWorkflowId);
+
+        if (source is null)
+            return new CopyBotWorkflowPayload(null);
+
+        var maxVersion = await context.Workflows
+            .Where(w => w.BotId == source.BotId)
+            .MaxAsync(w => (int?)w.Version);
+        var nextVersion = (maxVersion ?? 0) + 1;
+
+        var copy = new BotWorkflow
+        {
+            BotId = source.BotId,
+            NodesDefinition = source.NodesDefinition,
+            EdgesDefinition = source.EdgesDefinition,
+            LayoutDefinition = source.LayoutDefinition,
+            Version = nextVersion,
+            IsActiveBotWorkflow = false,
+            InputParametersDefinition = source.InputParametersDefinition,
+            OutputParametersDefinition = source.OutputParametersDefinition
+        };
+
+        context.Workflows.Add(copy);
+        await context.SaveChangesAsync();
+
+        return new CopyBotWorkflowPayload(copy);
     }
 }
 
@@ -105,5 +146,9 @@ public record UpdateBotWorkflowPayload(BotWorkflow? BotWorkflow);
 public record DeleteBotWorkflowInput(Guid WorkflowId);
 
 public record DeleteBotWorkflowPayload(BotWorkflow? BotWorkflow);
+
+public record CopyBotWorkflowInput(Guid SourceWorkflowId);
+
+public record CopyBotWorkflowPayload(BotWorkflow? BotWorkflow);
 
 #endregion

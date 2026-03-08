@@ -65,15 +65,6 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
     [UseProjection] 
     [UseFiltering]
     [UseSorting]
-    public DbSet<WorkflowVersion> GetWorkflowVersions([Service] WorkflowDbContext context)
-    {
-        return context.WorkflowVersions;
-    }
-    
-    [UsePaging(IncludeTotalCount = true)]
-    [UseProjection] 
-    [UseFiltering]
-    [UseSorting]
     public DbSet<ActionEntity> GetActionEntities([Service] WorkflowDbContext context)
     {
         return context.Actions;

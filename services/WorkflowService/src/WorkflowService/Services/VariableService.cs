@@ -6,7 +6,7 @@ using WorkflowService.Interfaces;
 namespace WorkflowService.Services;
 
 public class VariableService(
-    ClientAttributesService.ClientAttributesServiceClient grpcClient,
+    IClientAttributesGrpcClient grpcClient,
     ILogger<VariableService> logger) : IVariableService
 {
     private const string GlobalPrefix = "$global.";

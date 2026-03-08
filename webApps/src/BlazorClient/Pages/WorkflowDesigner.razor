@@ -149,22 +149,6 @@
                     <span class="oi oi-plus"></span>
                 </button>
             </div>
-
-            <!-- Мини-карта: справа снизу -->
-            <div class="designer-minimap">
-                <div class="designer-minimap-title">Карта</div>
-                <div class="designer-minimap-content">
-                    @if (Diagram != null)
-                    {
-                        @foreach (var node in Diagram.Nodes.Cast<WorkflowNodeModel>())
-                        {
-                            <div class="designer-minimap-node" 
-                                 style="left: @(node.Position.X / 25)px; top: @(node.Position.Y / 25)px;"
-                                 title="@node.Title"></div>
-                        }
-                    }
-                </div>
-            </div>
         </div>
 
         <!-- Панель настроек узла (справа, референс code.html) -->
@@ -385,20 +369,9 @@
                             <small class="form-text text-muted">Файл будет загружен в хранилище, к блоку привяжется ID файла.</small>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Или выбрать из хранилища</label>
-                            <button type="button" class="btn btn-sm btn-outline-primary" @onclick="() => LoadStorageFiles()">
-                                <span class="oi oi-list"></span> Обновить список
-                            </button>
-                            @if (StorageFiles != null)
-                            {
-                                <select class="form-select mt-2" @bind="mediaData.Value" @bind:event="onchange" @bind:after="OnWorkflowChanged">
-                                    <option value="">— Выберите файл —</option>
-                                    @foreach (var f in StorageFiles)
-                                    {
-                                        <option value="@f.Id">@(f.Name ?? f.Id)</option>
-                                    }
-                                </select>
-                            }
+                            <label class="form-label">
+                                Или выбрать из <a href="#" class="storage-picker-link" @onclick="() => OpenStoragePicker(mediaData)" @onclick:preventDefault>хранилища</a>
+                            </label>
                         </div>
                         <div class="mb-3">
                             <label class="form-label d-flex justify-content-between align-items-center">
@@ -845,6 +818,54 @@
                 <span class="oi oi-info"></span>
                 Нажмите на переменную, чтобы вставить её в текущий узел.
             </p>
+        </div>
+    </div>
+}
+
+<!-- Модальное окно выбора файла из хранилища -->
+@if (IsStoragePickerOpen)
+{
+    <div class="variable-picker-backdrop" @onclick="CloseStoragePicker"></div>
+    <div class="variable-picker-modal" role="dialog" style="max-width: 420px;">
+        <div class="variable-picker-header">
+            <h2 class="variable-picker-title">Выбрать файл из хранилища</h2>
+            <button type="button" class="variable-picker-close" @onclick="CloseStoragePicker" aria-label="Закрыть">
+                <span class="oi oi-x"></span>
+            </button>
+        </div>
+        <div class="variable-picker-list" style="min-height: 200px;">
+            @if (StoragePickerLoading)
+            {
+                <div class="variable-picker-empty">
+                    <p>Загрузка...</p>
+                </div>
+            }
+            else if (StoragePickerFiles == null || !StoragePickerFiles.Any())
+            {
+                <div class="variable-picker-empty">
+                    <p>Нет файлов в хранилище</p>
+                    <small>Загрузите файл через поле «Загрузить файл» выше</small>
+                </div>
+            }
+            else
+            {
+                @foreach (var f in StoragePickerFiles)
+                {
+                    <button type="button"
+                            class="variable-picker-item variable-picker-item--custom"
+                            @onclick="() => SelectStorageFile(f)">
+                        <span class="variable-picker-item-icon"><span class="oi oi-file"></span></span>
+                        <div class="variable-picker-item-body">
+                            <span class="variable-picker-item-name">@(f.Name ?? f.Id)</span>
+                            <span class="variable-picker-item-code">@f.Id</span>
+                        </div>
+                        <span class="variable-picker-item-add oi oi-plus"></span>
+                    </button>
+                }
+            }
+        </div>
+        <div class="d-flex justify-content-end px-3 py-2 border-top">
+            <button type="button" class="btn btn-sm btn-outline-secondary" @onclick="CloseStoragePicker">Отмена</button>
         </div>
     </div>
 }

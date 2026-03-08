@@ -1,4 +1,4 @@
-﻿namespace BlazorClient.Configuration;
+namespace BlazorClient.Configuration;
 
 public static class ApiEndpoints
 {

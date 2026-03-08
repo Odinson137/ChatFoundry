@@ -11,7 +11,10 @@ using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Shared.Application.Events;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
 using Shared.Infrastructure.DependencyInjection;
+using Shared.Infrastructure.Options;
 using Workflow.Grpc;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,7 +44,13 @@ builder.Services.AddScoped<IClientChannelRepository, ClientChannelRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IAttributeDefinitionRepository, AttributeDefinitionRepository>();
-builder.Services.AddScoped<IBotCompanyResolver, BotCompanyResolver>();
+builder.Services.AddScoped<BotCompanyResolver>();
+builder.Services.AddRedisCache(builder.Configuration, "CacheSettings");
+builder.Services.AddScoped<IBotCompanyResolver>(sp => new CachingBotCompanyResolver(
+    sp.GetRequiredService<BotCompanyResolver>(),
+    sp.GetRequiredService<IDistributedCache>(),
+    sp.GetRequiredService<IOptions<FoundryRedisCacheOptions>>(),
+    sp.GetRequiredService<ILogger<CachingBotCompanyResolver>>()));
 
 builder.Services.AddPostgreSql<ClientDbContext>(builder.Configuration);
 

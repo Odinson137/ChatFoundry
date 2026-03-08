@@ -1,6 +1,8 @@
 using Confluent.Kafka;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Shared.Application.Events;
 using Shared.Infrastructure.DependencyInjection;
@@ -15,6 +17,7 @@ using WorkflowService.GraphQL;
 using WorkflowService.GraphQL.Mutations;
 using WorkflowService.Grpc;
 using WorkflowService.Interfaces;
+using WorkflowService.Models;
 using WorkflowService.Repositories;
 using WorkflowService.Services;
 using WorkflowService.Utils;
@@ -150,6 +153,14 @@ services.AddGrpcClient<ClientAttributesService.ClientAttributesServiceClient>(o 
     o.Address = new Uri("http://client-service:8081");
 })
 .AddStandardResilienceHandler();
+
+services.AddRedisCache(builder.Configuration, "CacheSettings");
+services.AddScoped<ClientAttributesGrpcClient>();
+services.AddScoped<IClientAttributesGrpcClient>(sp => new CachingClientAttributesGrpcClient(
+    sp.GetRequiredService<ClientAttributesGrpcClient>(),
+    sp.GetRequiredService<IDistributedCache>(),
+    sp.GetRequiredService<IOptions<Shared.Infrastructure.Options.FoundryRedisCacheOptions>>(),
+    sp.GetRequiredService<ILogger<CachingClientAttributesGrpcClient>>()));
 
 services.AddScoped<Query>();
 services.AddScoped<BotMutation>();

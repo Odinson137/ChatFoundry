@@ -122,6 +122,7 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
                                 version
                                 isActiveBotWorkflow
                                 createdAt
+                                modifiedAt
                             }
                             botChannels {
                                 channelId
@@ -444,6 +445,29 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
 
         try { await ExecuteGraphQl<object>(query, variables); return true; }
         catch { return false; }
+    }
+
+    public async Task<bool> CopyBotWorkflowAsync(Guid sourceWorkflowId)
+    {
+        var query = """
+                mutation Copy($input: CopyBotWorkflowInput!) {
+                    copyBotWorkflow(input: $input) {
+                        botWorkflow { id }
+                    }
+                }
+                """;
+
+        var variables = new { input = new { sourceWorkflowId } };
+
+        try
+        {
+            await ExecuteGraphQl<object>(query, variables);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public async Task<bool> UpdateWorkflowDefinitionsAsync(Guid workflowId, string nodes, string edges, string layout, List<WorkflowParameterDto>? inputParameters = null, List<WorkflowParameterDto>? outputParameters = null)

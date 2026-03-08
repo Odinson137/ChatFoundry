@@ -1,9 +1,13 @@
 using Confluent.Kafka;
 using File.Grpc;
 using MassTransit;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Shared.Application.Events;
+using Shared.Infrastructure.DependencyInjection;
+using Shared.Infrastructure.Options;
 using TelegramService.Consumers;
 using TelegramService.Interfaces;
 using TelegramService.Services;
@@ -20,8 +24,19 @@ var services = builder.Services;
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 services.AddScoped<ITelegramClient, TelegramClient>();
-services.AddScoped<IBotTokenProvider, GrpcBotTokenProvider>();
-services.AddScoped<IFileSignedUrlProvider, FileSignedUrlProvider>();
+services.AddScoped<GrpcBotTokenProvider>();
+services.AddScoped<FileSignedUrlProvider>();
+services.AddRedisCache(builder.Configuration, "CacheSettings");
+services.AddScoped<IBotTokenProvider>(sp => new CachingBotTokenProvider(
+    sp.GetRequiredService<GrpcBotTokenProvider>(),
+    sp.GetRequiredService<IDistributedCache>(),
+    sp.GetRequiredService<IOptions<FoundryRedisCacheOptions>>(),
+    sp.GetRequiredService<ILogger<CachingBotTokenProvider>>()));
+services.AddScoped<IFileSignedUrlProvider>(sp => new CachingFileSignedUrlProvider(
+    sp.GetRequiredService<FileSignedUrlProvider>(),
+    sp.GetRequiredService<IDistributedCache>(),
+    sp.GetRequiredService<IOptions<FoundryRedisCacheOptions>>(),
+    sp.GetRequiredService<ILogger<CachingFileSignedUrlProvider>>()));
 
 services.AddLogging();
 

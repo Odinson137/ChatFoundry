@@ -32,6 +32,8 @@ public interface IWorkflowApiClient
     /// <summary>Постраничная загрузка процессов для модального выбора (first: 10, cursor-based).</summary>
     Task<WorkflowListPage> GetWorkflowsPageAsync(int first = 10, string? after = null, int? last = null, string? before = null);
     Task<bool> AddBotWorkflowAsync(Guid botId, int version);
+    /// <summary>Создаёт новую версию workflow как копию существующей (тот же бот, следующий номер версии).</summary>
+    Task<bool> CopyBotWorkflowAsync(Guid sourceWorkflowId);
     Task<bool> UpdateWorkflowDefinitionsAsync(Guid workflowId, string nodes, string edges, string layout, List<WorkflowParameterDto>? inputParameters = null, List<WorkflowParameterDto>? outputParameters = null);
     Task<bool> UpdateBotWorkflowAsync(Guid workflowId, bool isActive);
     Task<bool> DeleteBotWorkflowAsync(Guid workflowId);
