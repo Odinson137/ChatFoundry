@@ -492,70 +492,414 @@
 
                     <div class="mb-3">
                         <label class="form-label">Тип условия</label>
-                        <select class="form-select"
-                                @onchange="@(e => OnConditionTypeChanged(link, e.Value?.ToString()))">
-                            <option value="none" selected="@(link.Condition == null)">Без условия (Всегда)</option>
-                            <option value="equals" selected="@(link.Condition?.Equals != null)">Равно (==)</option>
-                            <option value="contains" selected="@(link.Condition?.Contains != null)">Содержит (*)</option>
-                        </select>
+                        <div class="designer-condition-type-dropdown @(_conditionTypeDropdownOpen ? "open" : "")">
+                            <button type="button"
+                                    id="condition-type-trigger"
+                                    class="designer-condition-type-trigger"
+                                    @onclick="() => _conditionTypeDropdownOpen = !_conditionTypeDropdownOpen"
+                                    aria-haspopup="listbox"
+                                    aria-expanded="@_conditionTypeDropdownOpen">
+                                <span class="designer-condition-type-trigger-text">@GetConditionTypeDisplayLabel(link)</span>
+                                <span class="oi oi-chevron-bottom designer-condition-type-chevron"></span>
+                            </button>
+                            @if (_conditionTypeDropdownOpen)
+                            {
+                                <div class="designer-condition-type-backdrop" @onclick="() => _conditionTypeDropdownOpen = false"></div>
+                                <ul id="condition-type-menu" class="designer-condition-type-menu designer-condition-type-menu--fixed" role="listbox">
+                                    @foreach (var opt in ConditionTypeOptions)
+                                    {
+                                        var value = opt.Value;
+                                        var label = opt.Label;
+                                        var isSelected = (value == "none" && link.Condition == null) ||
+                                                         (value == "and" && link.Condition?.And != null) ||
+                                                         (value == "or" && link.Condition?.Or != null) ||
+                                                         (value == "equals" && link.Condition?.Equals != null) ||
+                                                         (value == "notEquals" && link.Condition?.NotEquals != null) ||
+                                                         (value == "contains" && link.Condition?.Contains != null) ||
+                                                         (value == "startsWith" && link.Condition?.StartsWith != null) ||
+                                                         (value == "endsWith" && link.Condition?.EndsWith != null) ||
+                                                         (value == "greaterThan" && link.Condition?.GreaterThan != null) ||
+                                                         (value == "lessThan" && link.Condition?.LessThan != null) ||
+                                                         (value == "greaterOrEqual" && link.Condition?.GreaterOrEqual != null) ||
+                                                         (value == "lessOrEqual" && link.Condition?.LessOrEqual != null) ||
+                                                         (value == "inList" && link.Condition?.InList != null) ||
+                                                         (value == "regex" && link.Condition?.Regex != null) ||
+                                                         (value == "isEmpty" && link.Condition?.IsEmpty != null) ||
+                                                         (value == "isNotEmpty" && link.Condition?.IsNotEmpty != null);
+                                        <li role="option" aria-selected="@isSelected">
+                                            <button type="button"
+                                                    class="designer-condition-type-item @(isSelected ? "selected" : "")"
+                                                    @onclick="() => { OnConditionTypeChanged(link, value); }">
+                                                @label
+                                            </button>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                        </div>
                     </div>
 
-                    @if (link.Condition?.Equals != null)
+                    @if (link.Condition?.IsComposite == true)
+                    {
+                        <div class="mb-3">
+                            <p class="small text-muted mb-2">@(link.Condition.And != null ? "Все условия выполняются (И)" : "Хотя бы одно условие (ИЛИ)")</p>
+                            @for (var idx = 0; idx < link.Condition.SubConditions!.Count; idx++)
+                            {
+                                var index = idx;
+                                var sub = link.Condition.SubConditions[idx];
+                                var subBin = GetSubBinary(sub);
+                                var subUn = GetSubUnary(sub);
+                                <div class="card p-3 mb-2 border-secondary">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="small fw-bold">Условие @(idx + 1)</span>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" @onclick="() => RemoveSubCondition(link, index)">Удалить</button>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="small text-muted">Тип</label>
+                                        <select class="form-select form-select-sm" value="@GetSubConditionType(sub)" @onchange="e => OnConditionTypeChangedForSub(link, sub, e.Value?.ToString())">
+                                            @foreach (var opt in ConditionTypeOptions.Where(o => o.Value != "none" && o.Value != "and" && o.Value != "or"))
+                                            {
+                                                <option value="@opt.Value" selected="@(GetSubConditionType(sub) == opt.Value)">@opt.Label</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    @if (subBin != null)
+                                    {
+                                        <div class="mb-2">
+                                            <label class="small text-muted">Переменная</label>
+                                            <div class="input-group input-group-sm">
+                                                <input type="text" class="form-control font-monospace variable-input" value="@ToDisplayText(subBin.Left)" @oninput="e => { UpdateFieldAndCheckAtMention(e, subBin, nameof(BinaryConditionBase.Left)); OnWorkflowChanged(); }" placeholder="Left"/>
+                                                <button type="button" class="btn btn-outline-secondary" @onclick="() => ShowVariablePicker(v => InsertVariable(subBin, nameof(BinaryConditionBase.Left), v))">{}</button>
+                                            </div>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label class="small text-muted">Значение</label>
+                                            <div class="input-group input-group-sm">
+                                                <input type="text" class="form-control variable-input" value="@ToDisplayText(subBin.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, subBin, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }" placeholder="Right"/>
+                                                <button type="button" class="btn btn-outline-secondary" @onclick="() => ShowVariablePicker(v => InsertVariable(subBin, nameof(BinaryConditionBase.Right), v))">{}</button>
+                                            </div>
+                                        </div>
+                                        <div class="form-check form-check-sm">
+                                            <input type="checkbox" class="form-check-input" id="sub-ic-@idx" checked="@(subBin.IgnoreCase == true)" @onchange="e => { subBin.IgnoreCase = (bool)e.Value!; OnWorkflowChanged(); }"/>
+                                            <label class="form-check-label small text-muted" for="sub-ic-@idx">Не учитывать регистр</label>
+                                        </div>
+                                    }
+                                    else if (subUn != null)
+                                    {
+                                        <div class="mb-2">
+                                            <label class="small text-muted">Переменная</label>
+                                            <div class="input-group input-group-sm">
+                                                <input type="text" class="form-control font-monospace variable-input" value="@ToDisplayText(subUn.Left)" @oninput="e => { UpdateFieldAndCheckAtMention(e, subUn, nameof(UnaryConditionBase.Left)); OnWorkflowChanged(); }" placeholder="Left"/>
+                                                <button type="button" class="btn btn-outline-secondary" @onclick="() => ShowVariablePicker(v => InsertVariable(subUn, nameof(UnaryConditionBase.Left), v))">{}</button>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            <button type="button" class="btn btn-sm btn-outline-primary" @onclick="() => AddSubCondition(link)"><span class="oi oi-plus"></span> Добавить условие</button>
+                        </div>
+                    }
+                    else if (link.Condition?.Equals != null)
                     {
                         <div class="card p-3 border-primary mb-3 shadow-sm">
-                            <div class="mb-2">
+                            <div class="mb-2 designer-var-row">
                                 <label class="small text-muted d-flex justify-content-between align-items-center">
                                     <span>Переменная</span>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" 
-                                            @onclick="() => ShowVariablePicker(v => link.Condition.Equals.Left = v)">
-                                        <span class="oi oi-code"></span> Выбрать
-                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(link.Condition!.Equals!, nameof(BinaryConditionBase.Left), v))"><span class="oi oi-code"></span> {}</button>
                                 </label>
-                                <input type="text" 
-                                       class="form-control font-monospace" 
-                                       @bind="link.Condition.Equals.Left"
-                                       placeholder="$variable_name"/>
+                                <input type="text" class="form-control font-monospace variable-input" value="@ToDisplayText(link.Condition.Equals.Left)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.Equals!, nameof(BinaryConditionBase.Left)); OnWorkflowChanged(); }" placeholder="$variable_name"/>
+                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
                             </div>
                             <div class="text-center my-1"><span class="badge bg-primary">РАВНО</span></div>
-                            <div>
+                            <div class="designer-var-row">
                                 <label class="small text-muted d-flex justify-content-between align-items-center">
                                     <span>Значение</span>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" 
-                                            @onclick="() => ShowVariablePicker(v => InsertVariable(link.Condition.Equals, nameof(link.Condition.Equals.Right), v))">
-                                        <span class="oi oi-code"></span> {}
-                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(link.Condition!.Equals!, nameof(EqualsCondition.Right), v))"><span class="oi oi-code"></span> {}</button>
                                 </label>
-                                <input type="text" class="form-control" @bind="link.Condition.Equals.Right"/>
+                                <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.Equals.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.Equals!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
+                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                            </div>
+                            <div class="form-check mt-2">
+                                <input type="checkbox" class="form-check-input" id="eq-ignoreCase" checked="@(link.Condition.Equals.IgnoreCase == true)" @onchange="@(e => link.Condition!.Equals!.IgnoreCase = (bool)e.Value!)"/>
+                                <label class="form-check-label small text-muted" for="eq-ignoreCase">Не учитывать регистр</label>
+                            </div>
+                        </div>
+                    }
+                    else if (link.Condition?.NotEquals != null)
+                    {
+                        <div class="card p-3 border-secondary mb-3 shadow-sm">
+                            <div class="mb-2 designer-var-row">
+                                <label class="small text-muted d-flex justify-content-between align-items-center">
+                                    <span>Переменная</span>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(link.Condition!.NotEquals!, nameof(BinaryConditionBase.Left), v))"><span class="oi oi-code"></span> {}</button>
+                                </label>
+                                <input type="text" class="form-control font-monospace variable-input" value="@ToDisplayText(link.Condition.NotEquals.Left)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.NotEquals!, nameof(BinaryConditionBase.Left)); OnWorkflowChanged(); }" placeholder="$variable_name"/>
+                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                            </div>
+                            <div class="text-center my-1"><span class="badge bg-secondary">НЕ РАВНО</span></div>
+                            <div class="designer-var-row">
+                                <label class="small text-muted d-flex justify-content-between align-items-center">
+                                    <span>Значение</span>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(link.Condition!.NotEquals!, nameof(NotEqualsCondition.Right), v))"><span class="oi oi-code"></span> {}</button>
+                                </label>
+                                <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.NotEquals.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.NotEquals!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
+                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                            </div>
+                            <div class="form-check mt-2">
+                                <input type="checkbox" class="form-check-input" id="ne-ignoreCase" checked="@(link.Condition.NotEquals.IgnoreCase == true)" @onchange="@(e => link.Condition!.NotEquals!.IgnoreCase = (bool)e.Value!)"/>
+                                <label class="form-check-label small text-muted" for="ne-ignoreCase">Не учитывать регистр</label>
                             </div>
                         </div>
                     }
                     else if (link.Condition?.Contains != null)
                     {
                         <div class="card p-3 border-success mb-3 shadow-sm">
-                            <div class="mb-2">
+                            <div class="mb-2 designer-var-row">
                                 <label class="small text-muted d-flex justify-content-between align-items-center">
                                     <span>Переменная</span>
-                                     <button type="button" class="btn btn-sm btn-outline-secondary" 
-                                            @onclick="() => ShowVariablePicker(v => link.Condition.Contains.Left = v)">
-                                        <span class="oi oi-code"></span> Выбрать
-                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(link.Condition!.Contains!, nameof(BinaryConditionBase.Left), v))"><span class="oi oi-code"></span> {}</button>
                                 </label>
-                                <input type="text" 
-                                       class="form-control font-monospace" 
-                                       @bind="link.Condition.Contains.Left"
-                                       placeholder="$variable_name"/>
+                                <input type="text" class="form-control font-monospace variable-input" value="@ToDisplayText(link.Condition.Contains.Left)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.Contains!, nameof(BinaryConditionBase.Left)); OnWorkflowChanged(); }" placeholder="$variable_name"/>
+                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
                             </div>
                             <div class="text-center my-1"><span class="badge bg-success">СОДЕРЖИТ</span></div>
-                            <div>
+                            <div class="designer-var-row">
                                 <label class="small text-muted d-flex justify-content-between align-items-center">
                                     <span>Подстрока</span>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" 
-                                            @onclick="() => ShowVariablePicker(v => InsertVariable(link.Condition.Contains, nameof(link.Condition.Contains.Right), v))">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(link.Condition!.Contains!, nameof(ContainsCondition.Right), v))"><span class="oi oi-code"></span> {}</button>
+                                </label>
+                                <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.Contains.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.Contains!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
+                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                            </div>
+                            <div class="form-check mt-2">
+                                <input type="checkbox" class="form-check-input" id="ct-ignoreCase" checked="@(link.Condition.Contains.IgnoreCase ?? true)" @onchange="@(e => link.Condition!.Contains!.IgnoreCase = (bool)e.Value!)"/>
+                                <label class="form-check-label small text-muted" for="ct-ignoreCase">Не учитывать регистр</label>
+                            </div>
+                        </div>
+                    }
+                    else if (link.Condition?.StartsWith != null)
+                    {
+                        <div class="card p-3 border-info mb-3 shadow-sm">
+                            <div class="mb-2 designer-var-row">
+                                <label class="small text-muted d-flex justify-content-between align-items-center">
+                                    <span>Переменная</span>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(link.Condition!.StartsWith!, nameof(BinaryConditionBase.Left), v))"><span class="oi oi-code"></span> {}</button>
+                                </label>
+                                <input type="text" class="form-control font-monospace variable-input" value="@ToDisplayText(link.Condition.StartsWith.Left)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.StartsWith!, nameof(BinaryConditionBase.Left)); OnWorkflowChanged(); }" placeholder="$variable_name"/>
+                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                            </div>
+                            <div class="text-center my-1"><span class="badge bg-info">НАЧИНАЕТСЯ С</span></div>
+                            <div class="designer-var-row">
+                                <label class="small text-muted">Префикс</label>
+                                <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.StartsWith.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.StartsWith!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
+                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                            </div>
+                            <div class="form-check mt-2">
+                                <input type="checkbox" class="form-check-input" id="sw-ignoreCase" checked="@(link.Condition.StartsWith.IgnoreCase ?? true)" @onchange="@(e => link.Condition!.StartsWith!.IgnoreCase = (bool)e.Value!)"/>
+                                <label class="form-check-label small text-muted" for="sw-ignoreCase">Не учитывать регистр</label>
+                            </div>
+                        </div>
+                    }
+                    else if (link.Condition?.EndsWith != null)
+                    {
+                        <div class="card p-3 border-info mb-3 shadow-sm">
+                            <div class="mb-2 designer-var-row">
+                                <label class="small text-muted d-flex justify-content-between align-items-center">
+                                    <span>Переменная</span>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(link.Condition!.EndsWith!, nameof(BinaryConditionBase.Left), v))"><span class="oi oi-code"></span> {}</button>
+                                </label>
+                                <input type="text" class="form-control font-monospace variable-input" value="@ToDisplayText(link.Condition.EndsWith.Left)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.EndsWith!, nameof(BinaryConditionBase.Left)); OnWorkflowChanged(); }" placeholder="$variable_name"/>
+                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                            </div>
+                            <div class="text-center my-1"><span class="badge bg-info">ЗАКАНЧИВАЕТСЯ НА</span></div>
+                            <div class="designer-var-row">
+                                <label class="small text-muted">Суффикс</label>
+                                <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.EndsWith.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.EndsWith!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
+                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                            </div>
+                            <div class="form-check mt-2">
+                                <input type="checkbox" class="form-check-input" id="ew-ignoreCase" checked="@(link.Condition.EndsWith.IgnoreCase ?? true)" @onchange="@(e => link.Condition!.EndsWith!.IgnoreCase = (bool)e.Value!)"/>
+                                <label class="form-check-label small text-muted" for="ew-ignoreCase">Не учитывать регистр</label>
+                            </div>
+                        </div>
+                    }
+                    else if (link.Condition?.GreaterThan != null)
+                    {
+                        <div class="card p-3 border-warning mb-3 shadow-sm">
+                            <div class="mb-2 designer-var-row">
+                                <label class="small text-muted d-flex justify-content-between align-items-center">
+                                    <span>Переменная</span>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(link.Condition!.GreaterThan!, nameof(BinaryConditionBase.Left), v))"><span class="oi oi-code"></span> {}</button>
+                                </label>
+                                <input type="text" class="form-control font-monospace variable-input" value="@ToDisplayText(link.Condition.GreaterThan.Left)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.GreaterThan!, nameof(BinaryConditionBase.Left)); OnWorkflowChanged(); }" placeholder="$variable_name"/>
+                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                            </div>
+                            <div class="text-center my-1"><span class="badge bg-warning text-dark">БОЛЬШЕ (&gt;)</span></div>
+                            <div class="designer-var-row">
+                                <label class="small text-muted">Значение</label>
+                                <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.GreaterThan.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.GreaterThan!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
+                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                            </div>
+                            <div class="form-check mt-2">
+                                <input type="checkbox" class="form-check-input" id="gt-ignoreCase" checked="@(link.Condition.GreaterThan.IgnoreCase == true)" @onchange="@(e => link.Condition!.GreaterThan!.IgnoreCase = (bool)e.Value!)"/>
+                                <label class="form-check-label small text-muted" for="gt-ignoreCase">Не учитывать регистр</label>
+                            </div>
+                        </div>
+                    }
+                    else if (link.Condition?.LessThan != null)
+                    {
+                        <div class="card p-3 border-warning mb-3 shadow-sm">
+                            <div class="mb-2 designer-var-row">
+                                <label class="small text-muted d-flex justify-content-between align-items-center">
+                                    <span>Переменная</span>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(link.Condition!.LessThan!, nameof(BinaryConditionBase.Left), v))"><span class="oi oi-code"></span> {}</button>
+                                </label>
+                                <input type="text" class="form-control font-monospace variable-input" value="@ToDisplayText(link.Condition.LessThan.Left)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.LessThan!, nameof(BinaryConditionBase.Left)); OnWorkflowChanged(); }" placeholder="$variable_name"/>
+                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                            </div>
+                            <div class="text-center my-1"><span class="badge bg-warning text-dark">МЕНЬШЕ (&lt;)</span></div>
+                            <div class="designer-var-row">
+                                <label class="small text-muted">Значение</label>
+                                <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.LessThan.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.LessThan!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
+                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                            </div>
+                            <div class="form-check mt-2">
+                                <input type="checkbox" class="form-check-input" id="lt-ignoreCase" checked="@(link.Condition.LessThan.IgnoreCase == true)" @onchange="@(e => link.Condition!.LessThan!.IgnoreCase = (bool)e.Value!)"/>
+                                <label class="form-check-label small text-muted" for="lt-ignoreCase">Не учитывать регистр</label>
+                            </div>
+                        </div>
+                    }
+                    else if (link.Condition?.GreaterOrEqual != null)
+                    {
+                        <div class="card p-3 border-warning mb-3 shadow-sm">
+                            <div class="mb-2 designer-var-row">
+                                <label class="small text-muted d-flex justify-content-between align-items-center">
+                                    <span>Переменная</span>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(link.Condition!.GreaterOrEqual!, nameof(BinaryConditionBase.Left), v))"><span class="oi oi-code"></span> {}</button>
+                                </label>
+                                <input type="text" class="form-control font-monospace variable-input" value="@ToDisplayText(link.Condition.GreaterOrEqual.Left)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.GreaterOrEqual!, nameof(BinaryConditionBase.Left)); OnWorkflowChanged(); }" placeholder="$variable_name"/>
+                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                            </div>
+                            <div class="text-center my-1"><span class="badge bg-warning text-dark">≥</span></div>
+                            <div class="designer-var-row">
+                                <label class="small text-muted">Значение</label>
+                                <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.GreaterOrEqual.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.GreaterOrEqual!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
+                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                            </div>
+                            <div class="form-check mt-2">
+                                <input type="checkbox" class="form-check-input" id="ge-ignoreCase" checked="@(link.Condition.GreaterOrEqual.IgnoreCase == true)" @onchange="@(e => link.Condition!.GreaterOrEqual!.IgnoreCase = (bool)e.Value!)"/>
+                                <label class="form-check-label small text-muted" for="ge-ignoreCase">Не учитывать регистр</label>
+                            </div>
+                        </div>
+                    }
+                    else if (link.Condition?.LessOrEqual != null)
+                    {
+                        <div class="card p-3 border-warning mb-3 shadow-sm">
+                            <div class="mb-2 designer-var-row">
+                                <label class="small text-muted d-flex justify-content-between align-items-center">
+                                    <span>Переменная</span>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(link.Condition!.LessOrEqual!, nameof(BinaryConditionBase.Left), v))"><span class="oi oi-code"></span> {}</button>
+                                </label>
+                                <input type="text" class="form-control font-monospace variable-input" value="@ToDisplayText(link.Condition.LessOrEqual.Left)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.LessOrEqual!, nameof(BinaryConditionBase.Left)); OnWorkflowChanged(); }" placeholder="$variable_name"/>
+                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                            </div>
+                            <div class="text-center my-1"><span class="badge bg-warning text-dark">≤</span></div>
+                            <div class="designer-var-row">
+                                <label class="small text-muted">Значение</label>
+                                <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.LessOrEqual.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.LessOrEqual!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
+                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                            </div>
+                            <div class="form-check mt-2">
+                                <input type="checkbox" class="form-check-input" id="le-ignoreCase" checked="@(link.Condition.LessOrEqual.IgnoreCase == true)" @onchange="@(e => link.Condition!.LessOrEqual!.IgnoreCase = (bool)e.Value!)"/>
+                                <label class="form-check-label small text-muted" for="le-ignoreCase">Не учитывать регистр</label>
+                            </div>
+                        </div>
+                    }
+                    else if (link.Condition?.InList != null)
+                    {
+                        <div class="card p-3 border-dark mb-3 shadow-sm">
+                            <div class="mb-2 designer-var-row">
+                                <label class="small text-muted d-flex justify-content-between align-items-center">
+                                    <span>Переменная</span>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(link.Condition!.InList!, nameof(BinaryConditionBase.Left), v))"><span class="oi oi-code"></span> {}</button>
+                                </label>
+                                <input type="text" class="form-control font-monospace variable-input" value="@ToDisplayText(link.Condition.InList.Left)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.InList!, nameof(BinaryConditionBase.Left)); OnWorkflowChanged(); }" placeholder="$variable_name"/>
+                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                            </div>
+                            <div class="text-center my-1"><span class="badge bg-dark">В СПИСКЕ</span></div>
+                            <div class="designer-var-row">
+                                <label class="small text-muted">Значения через запятую</label>
+                                <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.InList.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.InList!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }" placeholder="a, b, c"/>
+                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                            </div>
+                            <div class="form-check mt-2">
+                                <input type="checkbox" class="form-check-input" id="il-ignoreCase" checked="@(link.Condition.InList.IgnoreCase ?? true)" @onchange="@(e => link.Condition!.InList!.IgnoreCase = (bool)e.Value!)"/>
+                                <label class="form-check-label small text-muted" for="il-ignoreCase">Не учитывать регистр</label>
+                            </div>
+                        </div>
+                    }
+                    else if (link.Condition?.Regex != null)
+                    {
+                        <div class="card p-3 border-dark mb-3 shadow-sm">
+                            <div class="mb-2 designer-var-row">
+                                <label class="small text-muted d-flex justify-content-between align-items-center">
+                                    <span>Переменная</span>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(link.Condition!.Regex!, nameof(BinaryConditionBase.Left), v))"><span class="oi oi-code"></span> {}</button>
+                                </label>
+                                <input type="text" class="form-control font-monospace variable-input" value="@ToDisplayText(link.Condition.Regex.Left)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.Regex!, nameof(BinaryConditionBase.Left)); OnWorkflowChanged(); }" placeholder="$variable_name"/>
+                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                            </div>
+                            <div class="text-center my-1"><span class="badge bg-dark">РЕГУЛЯРНОЕ ВЫРАЖЕНИЕ</span></div>
+                            <div class="designer-var-row">
+                                <label class="small text-muted">Шаблон (regex)</label>
+                                <input type="text" class="form-control font-monospace variable-input" value="@ToDisplayText(link.Condition.Regex.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.Regex!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }" placeholder="\d+"/>
+                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                            </div>
+                            <div class="form-check mt-2">
+                                <input type="checkbox" class="form-check-input" id="rx-ignoreCase" checked="@(link.Condition.Regex.IgnoreCase == true)" @onchange="@(e => link.Condition!.Regex!.IgnoreCase = (bool)e.Value!)"/>
+                                <label class="form-check-label small text-muted" for="rx-ignoreCase">Не учитывать регистр</label>
+                            </div>
+                        </div>
+                    }
+                    else if (link.Condition?.IsEmpty != null)
+                    {
+                        <div class="card p-3 border-secondary mb-3 shadow-sm">
+                            <div class="designer-var-row mb-2">
+                                <label class="small text-muted d-flex justify-content-between align-items-center">
+                                    <span>Переменная</span>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(link.Condition!.IsEmpty!, nameof(UnaryConditionBase.Left), v))">
                                         <span class="oi oi-code"></span> {}
                                     </button>
-                                </label>
-                                <input type="text" class="form-control" @bind="link.Condition.Contains.Right"/>
+                            </label>
+                            <input type="text" class="form-control font-monospace variable-input" value="@ToDisplayText(link.Condition.IsEmpty.Left)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.IsEmpty!, nameof(UnaryConditionBase.Left)); OnWorkflowChanged(); }" placeholder="$variable_name"/>
+                            <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
                             </div>
+                            <div class="text-center my-1"><span class="badge bg-secondary">ПУСТО</span></div>
+                        </div>
+                    }
+                    else if (link.Condition?.IsNotEmpty != null)
+                    {
+                        <div class="card p-3 border-secondary mb-3 shadow-sm">
+                            <div class="designer-var-row mb-2">
+                                <label class="small text-muted d-flex justify-content-between align-items-center">
+                                    <span>Переменная</span>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(link.Condition!.IsNotEmpty!, nameof(UnaryConditionBase.Left), v))">
+                                        <span class="oi oi-code"></span> {}
+                                    </button>
+                            </label>
+                            <input type="text" class="form-control font-monospace variable-input" value="@ToDisplayText(link.Condition.IsNotEmpty.Left)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.IsNotEmpty!, nameof(UnaryConditionBase.Left)); OnWorkflowChanged(); }" placeholder="$variable_name"/>
+                            <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                            </div>
+                            <div class="text-center my-1"><span class="badge bg-secondary">НЕ ПУСТО</span></div>
+                        </div>
+                    }
+
+                    @if (link.Condition != null && !link.Condition.IsComposite)
+                    {
+                        <div class="mb-3">
+                            <span class="small text-muted">Объединить условия:</span>
+                            <button type="button" class="btn btn-sm btn-outline-secondary ms-1" @onclick="() => ConvertToAnd(link)">И</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary ms-1" @onclick="() => ConvertToOr(link)">ИЛИ</button>
                         </div>
                     }
 

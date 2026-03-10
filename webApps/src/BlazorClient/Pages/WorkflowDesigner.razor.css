@@ -606,6 +606,30 @@
     border: 1px solid var(--designer-slate-200);
 }
 
+/* Выпадающие списки в панели — в стиле дизайнера */
+.designer-settings-panel .form-select {
+    padding: 0.5rem 2.25rem 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--designer-slate-800);
+    background-color: var(--designer-slate-50);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.6rem center;
+    background-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.designer-settings-panel .form-select:hover {
+    border-color: var(--designer-slate-300);
+}
+
+.designer-settings-panel .form-select:focus {
+    border-color: var(--designer-primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
 .designer-settings-panel textarea.form-control {
     border-radius: 12px;
     min-height: 100px;
@@ -1035,12 +1059,145 @@
     color: var(--designer-slate-500);
 }
 
+/* Выпадающий список «Тип условия» — в стиле дизайнера */
+.designer-condition-type-dropdown {
+    position: relative;
+}
+
+.designer-condition-type-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--designer-slate-800);
+    background: var(--designer-slate-50);
+    border: 1px solid var(--designer-slate-200);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    text-align: left;
+}
+
+.designer-condition-type-trigger:hover {
+    border-color: var(--designer-slate-300);
+}
+
+.designer-condition-type-trigger-text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.designer-condition-type-chevron {
+    flex-shrink: 0;
+    margin-left: 0.5rem;
+    font-size: 0.6rem;
+    color: var(--designer-slate-500);
+    transition: transform 0.2s;
+}
+
+.designer-condition-type-dropdown.open .designer-condition-type-chevron {
+    transform: rotate(180deg);
+}
+
+.designer-condition-type-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+}
+
+.designer-condition-type-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    margin: 0;
+    padding: 0.35rem;
+    list-style: none;
+    background: #fff;
+    border: 1px solid var(--designer-slate-200);
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+/* Позиционирование через JS — меню не обрезается панелью и не вызывает скролл */
+.designer-condition-type-menu--fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: auto;
+    width: 280px;
+}
+
+.designer-condition-type-menu li {
+    margin: 0;
+    padding: 0;
+}
+
+.designer-condition-type-item {
+    display: block;
+    width: 100%;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--designer-slate-700);
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    border-left: 3px solid transparent;
+    transition: background 0.2s ease, color 0.2s ease, border-left-color 0.2s ease;
+}
+
+.designer-condition-type-item:hover {
+    background: var(--designer-slate-100);
+    border-left-color: var(--designer-slate-300);
+}
+
+.designer-condition-type-item.selected {
+    background: var(--designer-indigo-50);
+    color: var(--designer-primary);
+}
+
+.designer-condition-type-item.selected:hover {
+    background: var(--designer-indigo-50);
+    border-left-color: var(--designer-primary);
+}
+
 .designer-settings-panel .btn-outline-danger {
     border-radius: 8px;
 }
 
 .designer-settings-panel .section-title {
     font-size: 0.875rem;
+}
+
+/* Кнопка выбора переменной — минималистичная, только иконка */
+.designer-var-picker-btn {
+    padding: 0.2rem 0.4rem !important;
+    min-width: 1.75rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+}
+.designer-var-picker-btn .oi {
+    font-size: 0.8rem;
+}
+
+/* Отступ между строкой с кнопкой «Выбрать» и полем ввода, чтобы focus ring не перекрывал кнопку */
+.designer-settings-panel .designer-var-row .form-control {
+    margin-top: 0.4rem;
+}
+.designer-settings-panel .designer-var-row .form-control:focus {
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+    outline: none;
 }
 
 .designer-settings-panel .badge {

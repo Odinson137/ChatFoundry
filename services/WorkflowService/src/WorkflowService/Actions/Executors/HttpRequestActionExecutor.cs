@@ -16,7 +16,8 @@ public class HttpRequestActionExecutor(
     IVariableService variableService,
     ITopicProducer<ActionCompletedEvent> producer,
     WorkflowGraphParser workflowGraphParser,
-    WorkflowTextRenderer workflowTextRenderer) : IActionExecutor
+    WorkflowTextRenderer workflowTextRenderer,
+    SsrfUrlValidator ssrfUrlValidator) : IActionExecutor
 {
     public WorkflowNodeType WorkflowNodeType => WorkflowNodeType.HttpRequest;
 
@@ -32,10 +33,17 @@ public class HttpRequestActionExecutor(
         if (node.Data is not HttpRequestNodeData requestData)
             return;
 
-        var client = httpClientFactory.CreateClient();
-
         // Render all text fields with session variables
         var renderedUrl = workflowTextRenderer.RenderText(requestData.Url, session);
+
+        // SSRF protection: block internal and private URLs — treat as error, do not complete successfully
+        if (!ssrfUrlValidator.IsUrlAllowed(renderedUrl, out var blockReason))
+        {
+            throw new InvalidOperationException(
+                $"Запрос к внутренним или запрещённым адресам не разрешён. {blockReason}");
+        }
+
+        var client = httpClientFactory.CreateClient();
         var renderedBody = requestData.Body != null ? workflowTextRenderer.RenderText(requestData.Body, session) : null;
         var renderedHeaders = requestData.Headers.ToDictionary(
             kvp => kvp.Key,
@@ -60,9 +68,11 @@ public class HttpRequestActionExecutor(
 
         // TODO доработать размер файла, потому что гигабайты я брать не хочу
         var responseContent = await responseMessage.Content.ReadAsStringAsync(ct);
-        
+
+        var isSuccess = responseMessage.IsSuccessStatusCode;
         variableService.SetVariable(session, $"$node.{node.Id}.output", responseContent);
         variableService.SetVariable(session, $"$node.{node.Id}.statusCode", (int)responseMessage.StatusCode);
+        variableService.SetVariable(session, $"$node.{node.Id}.success", isSuccess);
 
         await variableService.SyncIfDirtyAsync(session, ct);
         await sessionRepository.SaveAsync(session, ct);

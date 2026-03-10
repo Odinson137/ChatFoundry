@@ -109,6 +109,9 @@ public partial class WorkflowDesigner : IDisposable
     // JSON-меню (открыто/закрыто)
     private bool _jsonMenuOpen;
 
+    // Выпадающий список «Тип условия» на связи (открыт/закрыт)
+    private bool _conditionTypeDropdownOpen;
+
     // Модальное окно выбора файла из хранилища
     private bool IsStoragePickerOpen { get; set; }
     private MediaNodeData? StoragePickerTarget { get; set; }
@@ -146,6 +149,12 @@ public partial class WorkflowDesigner : IDisposable
         await LoadCompanyAttributes();
         RefreshVariables();
         RefreshNodeVariableCache();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_conditionTypeDropdownOpen)
+            await JSRuntime.InvokeVoidAsync("positionConditionTypeMenu", "condition-type-trigger", "condition-type-menu");
     }
 
     private async Task LoadCompanyAttributes()
@@ -361,8 +370,7 @@ public partial class WorkflowDesigner : IDisposable
             Guid.Parse(n.Id), n.NodeType, n.Title ?? "", n.Data is EmptyNodeData ? null : n.Data)).ToList();
         var edges = Diagram.Links.Cast<WorkflowLinkModel>().Select(l =>
         {
-            var fromId = GetNodeIdFromAnchor(l.Source);
-            var toId = GetNodeIdFromAnchor(l.Target);
+            var (fromId, toId) = GetEdgeFromTo(l);
             return (fromId.HasValue && toId.HasValue) ? new EdgeDefinition(fromId.Value, toId.Value, l.Label, l.Condition) : null;
         }).Where(e => e != null).Select(e => e!).ToList();
         var layout = Diagram.Nodes.Select(n => new LayoutDefinition(Guid.Parse(n.Id), n.Position.X, n.Position.Y)).ToList();
@@ -420,9 +428,7 @@ public partial class WorkflowDesigner : IDisposable
 
         var edges = Diagram.Links.Cast<WorkflowLinkModel>().Select(l =>
         {
-            var fromId = GetNodeIdFromAnchor(l.Source);
-            var toId = GetNodeIdFromAnchor(l.Target);
-
+            var (fromId, toId) = GetEdgeFromTo(l);
             return (fromId.HasValue && toId.HasValue)
                 ? new EdgeDefinition(fromId.Value, toId.Value, l.Label, l.Condition)
                 : null;
@@ -456,8 +462,7 @@ public partial class WorkflowDesigner : IDisposable
             n.Data is EmptyNodeData ? null : n.Data)).ToList();
         var edges = Diagram.Links.Cast<WorkflowLinkModel>().Select(l =>
         {
-            var fromId = GetNodeIdFromAnchor(l.Source);
-            var toId = GetNodeIdFromAnchor(l.Target);
+            var (fromId, toId) = GetEdgeFromTo(l);
             return (fromId.HasValue && toId.HasValue)
                 ? new EdgeDefinition(fromId.Value, toId.Value, l.Label, l.Condition)
                 : null;
@@ -1073,29 +1078,62 @@ public partial class WorkflowDesigner : IDisposable
         {
             const string usageNode = "Условие на линке";
 
-            if (link.Condition?.Equals != null)
-            {
-                var leftVar = NormalizeVariableName(link.Condition.Equals.Left);
-                EnsureVariableExists(variables, leftVar);
-                variables[leftVar].UsageNodes.Add(usageNode);
-
-                TrackUsage(variables, ExtractVariables(link.Condition.Equals.Right), usageNode);
-            }
-
-            if (link.Condition?.Contains != null)
-            {
-                var leftVar = NormalizeVariableName(link.Condition.Contains.Left);
-                EnsureVariableExists(variables, leftVar);
-                variables[leftVar].UsageNodes.Add(usageNode);
-
-                TrackUsage(variables, ExtractVariables(link.Condition.Contains.Right), usageNode);
-            }
+            TrackConditionVariables(link.Condition, variables, usageNode);
         }
 
         DiscoveredVariables = variables.Values
             .OrderBy(v => v.Type)
             .ThenBy(v => v.Name)
             .ToList();
+    }
+
+    private void TrackConditionVariables(ConditionDefinition? cond, Dictionary<string, VariableInfo> variables, string usageNode)
+    {
+        if (cond == null) return;
+
+        if (cond.And != null)
+        {
+            foreach (var sub in cond.And)
+                TrackConditionVariables(sub, variables, usageNode);
+            return;
+        }
+        if (cond.Or != null)
+        {
+            foreach (var sub in cond.Or)
+                TrackConditionVariables(sub, variables, usageNode);
+            return;
+        }
+
+        void TrackBinary(BinaryConditionBase? c)
+        {
+            if (c == null) return;
+            var leftVar = NormalizeVariableName(c.Left);
+            EnsureVariableExists(variables, leftVar);
+            variables[leftVar].UsageNodes.Add(usageNode);
+            TrackUsage(variables, ExtractVariables(c.Right), usageNode);
+        }
+
+        void TrackUnary(UnaryConditionBase? c)
+        {
+            if (c == null) return;
+            var leftVar = NormalizeVariableName(c.Left);
+            EnsureVariableExists(variables, leftVar);
+            variables[leftVar].UsageNodes.Add(usageNode);
+        }
+
+        TrackBinary(cond.Equals);
+        TrackBinary(cond.NotEquals);
+        TrackBinary(cond.Contains);
+        TrackBinary(cond.StartsWith);
+        TrackBinary(cond.EndsWith);
+        TrackBinary(cond.GreaterThan);
+        TrackBinary(cond.LessThan);
+        TrackBinary(cond.GreaterOrEqual);
+        TrackBinary(cond.LessOrEqual);
+        TrackBinary(cond.InList);
+        TrackBinary(cond.Regex);
+        TrackUnary(cond.IsEmpty);
+        TrackUnary(cond.IsNotEmpty);
     }
 
     private static void TrackUsage(Dictionary<string, VariableInfo> variables, IEnumerable<string> usedVars, string usageNode)
@@ -1119,7 +1157,8 @@ public partial class WorkflowDesigner : IDisposable
             "ask" => [($"$node.{id}.output", "Ответ пользователя")],
             "aigenerate" => [($"$node.{id}.output", "Результат AI")],
             "httprequest" => [($"$node.{id}.output", "Тело ответа (response body)"),
-                              ($"$node.{id}.statusCode", "Статус-код (statusCode)")],
+                              ($"$node.{id}.statusCode", "Статус-код (statusCode)"),
+                              ($"$node.{id}.success", "Успех запроса (true/false)")],
             _ => []
         };
     }
@@ -1473,7 +1512,7 @@ public partial class WorkflowDesigner : IDisposable
     {
         if (_atMentionTargetObj != null && !string.IsNullOrEmpty(_atMentionTargetProp))
         {
-            var insert = "{{" + variableName.TrimStart('$') + "}}";
+            var insert = "{{" + VariableNameToStorageForm(variableName) + "}}";
             var newVal = _atMentionFullValue.Substring(0, _atMentionIndex) + insert + _atMentionFullValue.Substring(_atMentionIndex + 1);
             newVal = FromDisplayText(newVal);
             var prop = _atMentionTargetObj.GetType().GetProperty(_atMentionTargetProp);
@@ -1673,9 +1712,32 @@ public partial class WorkflowDesigner : IDisposable
         return null;
     }
 
+    /// <summary>
+    /// Определяет направление ребра по типам портов: From = узел с выходом (Right), To = узел с входом (Left).
+    /// Так связь сохраняется одинаково независимо от того, от какого блока начали тянуть линию.
+    /// </summary>
+    private (Guid? fromId, Guid? toId) GetEdgeFromTo(WorkflowLinkModel l)
+    {
+        var sourcePort = l.Source?.Model as PortModel;
+        var targetPort = l.Target?.Model as PortModel;
+        if (sourcePort != null && targetPort != null)
+        {
+            var sourceNodeId = Guid.Parse(sourcePort.Parent.Id);
+            var targetNodeId = Guid.Parse(targetPort.Parent.Id);
+            if (sourcePort.Alignment == PortAlignment.Right && targetPort.Alignment == PortAlignment.Left)
+                return (sourceNodeId, targetNodeId);
+            if (sourcePort.Alignment == PortAlignment.Left && targetPort.Alignment == PortAlignment.Right)
+                return (targetNodeId, sourceNodeId);
+        }
+        var fromId = GetNodeIdFromAnchor(l.Source);
+        var toId = GetNodeIdFromAnchor(l.Target);
+        return (fromId, toId);
+    }
+
     private void OnSelectionChanged(SelectableModel model)
     {
         SelectedModel = model.Selected ? (Model)model : null;
+        _conditionTypeDropdownOpen = false;
         StateHasChanged();
     }
 
@@ -1710,29 +1772,249 @@ public partial class WorkflowDesigner : IDisposable
 
     private void OnConditionTypeChanged(WorkflowLinkModel link, string? type)
     {
-        switch (type)
+        if (type == "and")
         {
-            case "equals":
-                link.Condition = new ConditionDefinition
-                {
-                    Equals = new EqualsCondition("$var", "value")
-                };
-                link.Label = "Равно";
-                break;
-            case "contains":
-                link.Condition = new ConditionDefinition
-                {
-                    Contains = new ContainsCondition("$var", "text")
-                };
-                link.Label = "Содержит";
-                break;
-            default:
-                link.Condition = null;
-                link.Label = "";
-                break;
+            link.Condition = new ConditionDefinition { And = [NewEmptyCondition()] };
+            link.Label = "И";
+            _conditionTypeDropdownOpen = false;
+            StateHasChanged();
+            return;
         }
+        if (type == "or")
+        {
+            link.Condition = new ConditionDefinition { Or = [NewEmptyCondition()] };
+            link.Label = "ИЛИ";
+            _conditionTypeDropdownOpen = false;
+            StateHasChanged();
+            return;
+        }
+        link.Condition = type switch
+        {
+            "equals" => new ConditionDefinition { Equals = new EqualsCondition("", "value") },
+            "notEquals" => new ConditionDefinition { NotEquals = new NotEqualsCondition("", "value") },
+            "contains" => new ConditionDefinition { Contains = new ContainsCondition("", "text") },
+            "startsWith" => new ConditionDefinition { StartsWith = new StartsWithCondition("", "") },
+            "endsWith" => new ConditionDefinition { EndsWith = new EndsWithCondition("", "") },
+            "greaterThan" => new ConditionDefinition { GreaterThan = new GreaterThanCondition("", "0") },
+            "lessThan" => new ConditionDefinition { LessThan = new LessThanCondition("", "0") },
+            "greaterOrEqual" => new ConditionDefinition { GreaterOrEqual = new GreaterOrEqualCondition("", "0") },
+            "lessOrEqual" => new ConditionDefinition { LessOrEqual = new LessOrEqualCondition("", "0") },
+            "inList" => new ConditionDefinition { InList = new InListCondition("", "a, b, c") },
+            "regex" => new ConditionDefinition { Regex = new RegexMatchCondition("", ".*") },
+            "isEmpty" => new ConditionDefinition { IsEmpty = new IsEmptyCondition("") },
+            "isNotEmpty" => new ConditionDefinition { IsNotEmpty = new IsNotEmptyCondition("") },
+            _ => null
+        };
+        link.Label = type switch
+        {
+            "equals" => "Равно",
+            "notEquals" => "Не равно",
+            "contains" => "Содержит",
+            "startsWith" => "Начинается с",
+            "endsWith" => "Заканчивается на",
+            "greaterThan" => "Больше",
+            "lessThan" => "Меньше",
+            "greaterOrEqual" => "≥",
+            "lessOrEqual" => "≤",
+            "inList" => "В списке",
+            "regex" => "Regex",
+            "isEmpty" => "Пусто",
+            "isNotEmpty" => "Не пусто",
+            _ => ""
+        };
+        _conditionTypeDropdownOpen = false;
         StateHasChanged();
     }
+
+    private static void SetConditionTypeOn(ConditionDefinition cond, string? type)
+    {
+        cond.Equals = null;
+        cond.NotEquals = null;
+        cond.Contains = null;
+        cond.StartsWith = null;
+        cond.EndsWith = null;
+        cond.GreaterThan = null;
+        cond.LessThan = null;
+        cond.GreaterOrEqual = null;
+        cond.LessOrEqual = null;
+        cond.InList = null;
+        cond.Regex = null;
+        cond.IsEmpty = null;
+        cond.IsNotEmpty = null;
+        cond.And = null;
+        cond.Or = null;
+        switch (type)
+        {
+            case "equals": cond.Equals = new EqualsCondition("", "value"); break;
+            case "notEquals": cond.NotEquals = new NotEqualsCondition("", "value"); break;
+            case "contains": cond.Contains = new ContainsCondition("", "text"); break;
+            case "startsWith": cond.StartsWith = new StartsWithCondition("", ""); break;
+            case "endsWith": cond.EndsWith = new EndsWithCondition("", ""); break;
+            case "greaterThan": cond.GreaterThan = new GreaterThanCondition("", "0"); break;
+            case "lessThan": cond.LessThan = new LessThanCondition("", "0"); break;
+            case "greaterOrEqual": cond.GreaterOrEqual = new GreaterOrEqualCondition("", "0"); break;
+            case "lessOrEqual": cond.LessOrEqual = new LessOrEqualCondition("", "0"); break;
+            case "inList": cond.InList = new InListCondition("", "a, b, c"); break;
+            case "regex": cond.Regex = new RegexMatchCondition("", ".*"); break;
+            case "isEmpty": cond.IsEmpty = new IsEmptyCondition(""); break;
+            case "isNotEmpty": cond.IsNotEmpty = new IsNotEmptyCondition(""); break;
+        }
+    }
+
+    private void OnConditionTypeChangedForSub(WorkflowLinkModel link, ConditionDefinition sub, string? type)
+    {
+        SetConditionTypeOn(sub, type);
+        OnWorkflowChanged();
+        StateHasChanged();
+    }
+
+    private void ConvertToAnd(WorkflowLinkModel link)
+    {
+        if (link.Condition == null || link.Condition.IsComposite) return;
+        var current = CloneCondition(link.Condition);
+        link.Condition = new ConditionDefinition { And = [current, NewEmptyCondition()] };
+        link.Label = "И";
+        OnWorkflowChanged();
+        StateHasChanged();
+    }
+
+    private void ConvertToOr(WorkflowLinkModel link)
+    {
+        if (link.Condition == null || link.Condition.IsComposite) return;
+        var current = CloneCondition(link.Condition);
+        link.Condition = new ConditionDefinition { Or = [current, NewEmptyCondition()] };
+        link.Label = "ИЛИ";
+        OnWorkflowChanged();
+        StateHasChanged();
+    }
+
+    private void AddSubCondition(WorkflowLinkModel link)
+    {
+        if (link.Condition?.SubConditions == null) return;
+        link.Condition.SubConditions.Add(NewEmptyCondition());
+        OnWorkflowChanged();
+        StateHasChanged();
+    }
+
+    private void RemoveSubCondition(WorkflowLinkModel link, int index)
+    {
+        var list = link.Condition?.SubConditions;
+        if (list == null || index < 0 || index >= list.Count) return;
+        list.RemoveAt(index);
+        if (list.Count == 0)
+            link.Condition = null;
+        else if (list.Count == 1)
+            link.Condition = list[0];
+        OnWorkflowChanged();
+        StateHasChanged();
+    }
+
+    private static ConditionDefinition NewEmptyCondition() =>
+        new ConditionDefinition { Equals = new EqualsCondition("", "value") };
+
+    private static ConditionDefinition CloneCondition(ConditionDefinition c)
+    {
+        var clone = new ConditionDefinition();
+        if (c.Equals != null) clone.Equals = new EqualsCondition(c.Equals.Left, c.Equals.Right) { IgnoreCase = c.Equals.IgnoreCase };
+        if (c.NotEquals != null) clone.NotEquals = new NotEqualsCondition(c.NotEquals.Left, c.NotEquals.Right) { IgnoreCase = c.NotEquals.IgnoreCase };
+        if (c.Contains != null) clone.Contains = new ContainsCondition(c.Contains.Left, c.Contains.Right) { IgnoreCase = c.Contains.IgnoreCase };
+        if (c.StartsWith != null) clone.StartsWith = new StartsWithCondition(c.StartsWith.Left, c.StartsWith.Right) { IgnoreCase = c.StartsWith.IgnoreCase };
+        if (c.EndsWith != null) clone.EndsWith = new EndsWithCondition(c.EndsWith.Left, c.EndsWith.Right) { IgnoreCase = c.EndsWith.IgnoreCase };
+        if (c.GreaterThan != null) clone.GreaterThan = new GreaterThanCondition(c.GreaterThan.Left, c.GreaterThan.Right) { IgnoreCase = c.GreaterThan.IgnoreCase };
+        if (c.LessThan != null) clone.LessThan = new LessThanCondition(c.LessThan.Left, c.LessThan.Right) { IgnoreCase = c.LessThan.IgnoreCase };
+        if (c.GreaterOrEqual != null) clone.GreaterOrEqual = new GreaterOrEqualCondition(c.GreaterOrEqual.Left, c.GreaterOrEqual.Right) { IgnoreCase = c.GreaterOrEqual.IgnoreCase };
+        if (c.LessOrEqual != null) clone.LessOrEqual = new LessOrEqualCondition(c.LessOrEqual.Left, c.LessOrEqual.Right) { IgnoreCase = c.LessOrEqual.IgnoreCase };
+        if (c.InList != null) clone.InList = new InListCondition(c.InList.Left, c.InList.Right) { IgnoreCase = c.InList.IgnoreCase };
+        if (c.Regex != null) clone.Regex = new RegexMatchCondition(c.Regex.Left, c.Regex.Right) { IgnoreCase = c.Regex.IgnoreCase };
+        if (c.IsEmpty != null) clone.IsEmpty = new IsEmptyCondition(c.IsEmpty.Left);
+        if (c.IsNotEmpty != null) clone.IsNotEmpty = new IsNotEmptyCondition(c.IsNotEmpty.Left);
+        return clone;
+    }
+
+    private static BinaryConditionBase? GetSubBinary(ConditionDefinition sub)
+    {
+        if (sub.Equals != null) return sub.Equals;
+        if (sub.NotEquals != null) return sub.NotEquals;
+        if (sub.Contains != null) return sub.Contains;
+        if (sub.StartsWith != null) return sub.StartsWith;
+        if (sub.EndsWith != null) return sub.EndsWith;
+        if (sub.GreaterThan != null) return sub.GreaterThan;
+        if (sub.LessThan != null) return sub.LessThan;
+        if (sub.GreaterOrEqual != null) return sub.GreaterOrEqual;
+        if (sub.LessOrEqual != null) return sub.LessOrEqual;
+        if (sub.InList != null) return sub.InList;
+        if (sub.Regex != null) return sub.Regex;
+        return null;
+    }
+
+    private static UnaryConditionBase? GetSubUnary(ConditionDefinition sub)
+    {
+        if (sub.IsEmpty != null) return sub.IsEmpty;
+        if (sub.IsNotEmpty != null) return sub.IsNotEmpty;
+        return null;
+    }
+
+    private static string GetSubConditionType(ConditionDefinition sub)
+    {
+        if (sub.Equals != null) return "equals";
+        if (sub.NotEquals != null) return "notEquals";
+        if (sub.Contains != null) return "contains";
+        if (sub.StartsWith != null) return "startsWith";
+        if (sub.EndsWith != null) return "endsWith";
+        if (sub.GreaterThan != null) return "greaterThan";
+        if (sub.LessThan != null) return "lessThan";
+        if (sub.GreaterOrEqual != null) return "greaterOrEqual";
+        if (sub.LessOrEqual != null) return "lessOrEqual";
+        if (sub.InList != null) return "inList";
+        if (sub.Regex != null) return "regex";
+        if (sub.IsEmpty != null) return "isEmpty";
+        if (sub.IsNotEmpty != null) return "isNotEmpty";
+        return "equals";
+    }
+
+    /// <summary>Текущая подпись типа условия для отображения в кнопке выпадающего списка.</summary>
+    private static string GetConditionTypeDisplayLabel(WorkflowLinkModel link)
+    {
+        if (link.Condition == null) return "Без условия (Всегда)";
+        if (link.Condition.And != null && link.Condition.And.Count > 0)
+            return $"И ({link.Condition.And.Count} условий)";
+        if (link.Condition.Or != null && link.Condition.Or.Count > 0)
+            return $"ИЛИ ({link.Condition.Or.Count} условий)";
+        if (link.Condition.Equals != null) return "Равно (==)";
+        if (link.Condition.NotEquals != null) return "Не равно (!=)";
+        if (link.Condition.Contains != null) return "Содержит";
+        if (link.Condition.StartsWith != null) return "Начинается с";
+        if (link.Condition.EndsWith != null) return "Заканчивается на";
+        if (link.Condition.GreaterThan != null) return "Больше (>)";
+        if (link.Condition.LessThan != null) return "Меньше (<)";
+        if (link.Condition.GreaterOrEqual != null) return "Больше или равно (≥)";
+        if (link.Condition.LessOrEqual != null) return "Меньше или равно (≤)";
+        if (link.Condition.InList != null) return "В списке";
+        if (link.Condition.Regex != null) return "Регулярное выражение";
+        if (link.Condition.IsEmpty != null) return "Пусто";
+        if (link.Condition.IsNotEmpty != null) return "Не пусто";
+        return "Без условия (Всегда)";
+    }
+
+    private static readonly IReadOnlyList<(string Value, string Label)> ConditionTypeOptions = new List<(string, string)>
+    {
+        ("none", "Без условия (Всегда)"),
+        ("equals", "Равно (==)"),
+        ("notEquals", "Не равно (!=)"),
+        ("contains", "Содержит"),
+        ("startsWith", "Начинается с"),
+        ("endsWith", "Заканчивается на"),
+        ("greaterThan", "Больше (>)"),
+        ("lessThan", "Меньше (<)"),
+        ("greaterOrEqual", "Больше или равно (≥)"),
+        ("lessOrEqual", "Меньше или равно (≤)"),
+        ("inList", "В списке"),
+        ("regex", "Регулярное выражение"),
+        ("isEmpty", "Пусто"),
+        ("isNotEmpty", "Не пусто"),
+        ("and", "И (несколько условий)"),
+        ("or", "ИЛИ (несколько условий)")
+    };
 
     private void OnDragOver(DragEventArgs e)
     {

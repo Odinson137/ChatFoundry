@@ -123,7 +123,7 @@
                                 {
                                     <div class="replay-var-item var-global">
                                         <code class="replay-var-name">@kv.Key</code>
-                                        <span class="replay-var-value">@kv.Value</span>
+                                        <pre class="replay-var-value">@(string.IsNullOrEmpty(kv.Value) ? "(пусто)" : kv.Value)</pre>
                                     </div>
                                 }
                             }
@@ -134,8 +134,8 @@
                                 @foreach (var kv in GetSessionVariables())
                                 {
                                     <div class="replay-var-item var-session">
-                                        <code class="replay-var-name">@kv.Key</code>
-                                        <span class="replay-var-value">@(string.IsNullOrEmpty(kv.Value) ? "(пусто)" : kv.Value)</span>
+                                        <code class="replay-var-name">@GetVariableDisplayName(kv.Key)</code>
+                                        <pre class="replay-var-value">@(string.IsNullOrEmpty(kv.Value) ? "(пусто)" : kv.Value)</pre>
                                     </div>
                                 }
                             }

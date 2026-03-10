@@ -70,6 +70,7 @@ services.AddScoped<IOpenAiService, OpenAiService>();
 services.AddScoped<IActionExecutorFactory, ActionExecutorFactory>();
 services.AddScoped<WorkflowGraphParser>();
 services.AddScoped<WorkflowTextRenderer>();
+services.AddSingleton<SsrfUrlValidator>();
 services.AddScoped<IVariableService, VariableService>();
 
 

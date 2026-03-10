@@ -164,20 +164,20 @@ public partial class SessionReplay : IDisposable, IReplayDataProvider
         switch (type.ToLower())
         {
             case "start":
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right, new Point(1, 0.5)));
                 break;
             case "end":
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Left));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Left, new Point(0, 0.5)));
                 break;
             case "condition":
             case "aifilter":
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Left));
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right));
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Left, new Point(0, 0.5)));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right, new Point(1, 0.33)));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right, new Point(1, 0.67)));
                 break;
             default:
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Left));
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Left, new Point(0, 0.5)));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right, new Point(1, 0.5)));
                 break;
         }
 
@@ -271,6 +271,24 @@ public partial class SessionReplay : IDisposable, IReplayDataProvider
 
     private List<KeyValuePair<string, string>> GetSessionVariables()
         => GetFilteredVariables().Where(kv => !kv.Key.StartsWith("$global.")).ToList();
+
+    /// <summary>Для переменных $node.{guid}.suffix возвращает "Название блока · suffix", иначе ключ как есть.</summary>
+    private string GetVariableDisplayName(string key)
+    {
+        const string nodePrefix = "$node.";
+        if (string.IsNullOrEmpty(key) || !key.StartsWith(nodePrefix, StringComparison.OrdinalIgnoreCase))
+            return key;
+        var after = key.Substring(nodePrefix.Length);
+        var dot = after.IndexOf('.');
+        if (dot <= 0)
+            return key;
+        var guidStr = after.Substring(0, dot);
+        var suffix = after.Substring(dot + 1);
+        if (!Guid.TryParse(guidStr, out var nodeId))
+            return key;
+        var label = _nodeLabels.TryGetValue(nodeId, out var l) ? l : nodeId.ToString("N")[..8];
+        return $"{label} · {suffix}";
+    }
 
     private static string FormatChannel(string? channel) => channel?.ToUpperInvariant() switch
     {

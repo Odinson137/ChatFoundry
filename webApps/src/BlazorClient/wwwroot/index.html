@@ -67,6 +67,18 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
         };
+        window.__positionConditionTypeMenu = function(triggerId, menuId) {
+            var trigger = document.getElementById(triggerId);
+            var menu = document.getElementById(menuId);
+            if (!trigger || !menu) return;
+            var r = trigger.getBoundingClientRect();
+            menu.style.position = 'fixed';
+            menu.style.top = (r.bottom + 4) + 'px';
+            menu.style.left = r.left + 'px';
+            menu.style.width = Math.max(r.width, 280) + 'px';
+            menu.style.minWidth = Math.max(r.width, 280) + 'px';
+        };
+        window.positionConditionTypeMenu = window.__positionConditionTypeMenu;
     </script>
 </body>
 

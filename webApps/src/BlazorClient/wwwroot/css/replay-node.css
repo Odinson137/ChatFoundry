@@ -100,3 +100,31 @@
     background: #6366f1;
     font-size: 0.5rem;
 }
+
+/* Порты на краях блока: слева — вход, справа — выход (как в WorkflowDesigner) */
+.replay-node-ports {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    pointer-events: none;
+}
+
+.replay-node-ports-left {
+    left: 0;
+    align-items: flex-start;
+    transform: translateX(-50%);
+}
+
+.replay-node-ports-right {
+    right: 0;
+    align-items: flex-end;
+    transform: translateX(50%);
+}
+
+.replay-node-ports .replay-port {
+    pointer-events: auto;
+}

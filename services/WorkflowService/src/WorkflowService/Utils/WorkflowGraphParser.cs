@@ -124,18 +124,83 @@ public sealed class WorkflowGraphParser
 
     private static WorkflowCondition ParseCondition(JsonElement el)
     {
+        static void readBinary(JsonElement bin, out string left, out string right, out bool? ignoreCase)
+        {
+            left = bin.TryGetProperty("left", out var l) ? l.GetString() ?? "" : "";
+            right = bin.TryGetProperty("right", out var r) ? r.GetString() ?? "" : "";
+            ignoreCase = bin.TryGetProperty("ignoreCase", out var ic) ? (ic.ValueKind == JsonValueKind.True) : null;
+        }
+
         if (el.TryGetProperty("equals", out var eq))
         {
-            return new EqualsCondition
-            {
-                Left = eq.TryGetProperty("left", out var l) ? l.GetString() ?? "" : "",
-                Right = eq.TryGetProperty("right", out var r) ? r.GetString() ?? "" : ""
-            };
+            readBinary(eq, out var l, out var r, out var ic);
+            return new EqualsCondition { Left = l, Right = r, IgnoreCase = ic };
         }
+        if (el.TryGetProperty("notEquals", out var ne))
+        {
+            readBinary(ne, out var l, out var r, out var ic);
+            return new NotEqualsCondition { Left = l, Right = r, IgnoreCase = ic };
+        }
+        if (el.TryGetProperty("contains", out var c))
+        {
+            readBinary(c, out var l, out var r, out var ic);
+            return new ContainsCondition { Left = l, Right = r, IgnoreCase = ic };
+        }
+        if (el.TryGetProperty("greaterThan", out var gt))
+        {
+            readBinary(gt, out var l, out var r, out var ic);
+            return new GreaterThanCondition { Left = l, Right = r, IgnoreCase = ic };
+        }
+        if (el.TryGetProperty("lessThan", out var lt))
+        {
+            readBinary(lt, out var l, out var r, out var ic);
+            return new LessThanCondition { Left = l, Right = r, IgnoreCase = ic };
+        }
+        if (el.TryGetProperty("greaterOrEqual", out var ge))
+        {
+            readBinary(ge, out var l, out var r, out var ic);
+            return new GreaterOrEqualCondition { Left = l, Right = r, IgnoreCase = ic };
+        }
+        if (el.TryGetProperty("lessOrEqual", out var le))
+        {
+            readBinary(le, out var l, out var r, out var ic);
+            return new LessOrEqualCondition { Left = l, Right = r, IgnoreCase = ic };
+        }
+        if (el.TryGetProperty("startsWith", out var sw))
+        {
+            readBinary(sw, out var l, out var r, out var ic);
+            return new StartsWithCondition { Left = l, Right = r, IgnoreCase = ic };
+        }
+        if (el.TryGetProperty("endsWith", out var ew))
+        {
+            readBinary(ew, out var l, out var r, out var ic);
+            return new EndsWithCondition { Left = l, Right = r, IgnoreCase = ic };
+        }
+        if (el.TryGetProperty("regex", out var rx))
+        {
+            readBinary(rx, out var l, out var r, out var ic);
+            return new RegexMatchCondition { Left = l, Right = r, IgnoreCase = ic };
+        }
+        if (el.TryGetProperty("inList", out var il))
+        {
+            readBinary(il, out var l, out var r, out var ic);
+            return new InListCondition { Left = l, Right = r, IgnoreCase = ic };
+        }
+        if (el.TryGetProperty("isEmpty", out var ie))
+        {
+            var left = ie.TryGetProperty("left", out var l) ? l.GetString() ?? "" : "";
+            return new IsEmptyCondition { Left = left };
+        }
+        if (el.TryGetProperty("isNotEmpty", out var ine))
+        {
+            var left = ine.TryGetProperty("left", out var l) ? l.GetString() ?? "" : "";
+            return new IsNotEmptyCondition { Left = left };
+        }
+        if (el.TryGetProperty("not", out var notEl))
+            return new NotCondition { Condition = ParseCondition(notEl) };
 
         if (el.TryGetProperty("and", out var and))
             return new AndCondition { Conditions = and.EnumerateArray().Select(ParseCondition).ToList() };
-
         if (el.TryGetProperty("or", out var or))
             return new OrCondition { Conditions = or.EnumerateArray().Select(ParseCondition).ToList() };
 
@@ -168,9 +233,25 @@ public sealed class WorkflowGraphParser
 
     private static object SerializeCondition(WorkflowCondition condition)
     {
+        static object BinObj(string left, string right, bool? ignoreCase) =>
+            ignoreCase.HasValue ? new { left, right, ignoreCase = ignoreCase.Value } : new { left, right };
+
         return condition switch
         {
-            EqualsCondition eq => new { equals = new { left = eq.Left, right = eq.Right } },
+            EqualsCondition eq => new { equals = BinObj(eq.Left, eq.Right, eq.IgnoreCase) },
+            NotEqualsCondition ne => new { notEquals = BinObj(ne.Left, ne.Right, ne.IgnoreCase) },
+            ContainsCondition c => new { contains = BinObj(c.Left, c.Right, c.IgnoreCase) },
+            GreaterThanCondition gt => new { greaterThan = BinObj(gt.Left, gt.Right, gt.IgnoreCase) },
+            LessThanCondition lt => new { lessThan = BinObj(lt.Left, lt.Right, lt.IgnoreCase) },
+            GreaterOrEqualCondition ge => new { greaterOrEqual = BinObj(ge.Left, ge.Right, ge.IgnoreCase) },
+            LessOrEqualCondition le => new { lessOrEqual = BinObj(le.Left, le.Right, le.IgnoreCase) },
+            StartsWithCondition sw => new { startsWith = BinObj(sw.Left, sw.Right, sw.IgnoreCase) },
+            EndsWithCondition ew => new { endsWith = BinObj(ew.Left, ew.Right, ew.IgnoreCase) },
+            RegexMatchCondition rx => new { regex = BinObj(rx.Left, rx.Right, rx.IgnoreCase) },
+            InListCondition il => new { inList = BinObj(il.Left, il.Right, il.IgnoreCase) },
+            IsEmptyCondition ie => new { isEmpty = new { left = ie.Left } },
+            IsNotEmptyCondition ine => new { isNotEmpty = new { left = ine.Left } },
+            NotCondition n => new { not = SerializeCondition(n.Condition) },
             AndCondition and => new { and = and.Conditions.Select(SerializeCondition) },
             OrCondition or => new { or = or.Conditions.Select(SerializeCondition) },
             _ => new { }
