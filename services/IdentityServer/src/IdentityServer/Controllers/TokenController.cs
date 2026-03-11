@@ -30,8 +30,20 @@ public class TokenController(
             if (user == null ||
                 !await userManager.CheckPasswordAsync(user, request.Password))
             {
-                return Forbid(
-                    OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+                return BadRequest(new
+                {
+                    error = "invalid_grant",
+                    error_description = "Неверный email или пароль."
+                });
+            }
+
+            if (!user.EmailConfirmed)
+            {
+                return BadRequest(new
+                {
+                    error = "email_not_confirmed",
+                    error_description = "Подтвердите адрес электронной почты. Проверьте почту или запросите новое письмо."
+                });
             }
 
             var principal = await signInManager.CreateUserPrincipalAsync(user);

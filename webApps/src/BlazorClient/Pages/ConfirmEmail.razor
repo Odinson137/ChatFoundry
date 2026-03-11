@@ -1,0 +1,114 @@
+@page "/confirm-email"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<PageTitle>Подтверждение почты — ChatFoundry</PageTitle>
+
+<div class="confirm-email-page">
+    <div class="confirm-email-bg" aria-hidden="true"></div>
+    <div class="confirm-email-card">
+        @if (loading)
+        {
+            <div class="confirm-email-icon confirm-email-icon-loading">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="4" width="20" height="16" rx="2"/>
+                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                </svg>
+            </div>
+            <h1 class="confirm-email-title">Проверка ссылки...</h1>
+            <p class="confirm-email-subtitle">Подождите, мы проверяем вашу ссылку</p>
+            <div class="confirm-email-spinner"></div>
+        }
+        else if (success)
+        {
+            <div class="confirm-email-icon confirm-email-icon-success">
+                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="m9 12 2 2 4-4"/>
+                </svg>
+            </div>
+            <h1 class="confirm-email-title">Почта подтверждена</h1>
+            <p class="confirm-email-subtitle">Аккаунт готов к работе. Войдите, чтобы продолжить.</p>
+            <a href="/login?confirmed=1" class="confirm-email-btn">Войти в аккаунт</a>
+        }
+        else if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="confirm-email-icon confirm-email-icon-error">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+            </div>
+            <h1 class="confirm-email-title confirm-email-title-error">Ошибка подтверждения</h1>
+            <p class="confirm-email-subtitle">@errorMessage</p>
+            <a href="/login" class="confirm-email-btn confirm-email-btn-secondary">На страницу входа</a>
+        }
+        else
+        {
+            <div class="confirm-email-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="4" width="20" height="16" rx="2"/>
+                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                </svg>
+            </div>
+            <h1 class="confirm-email-title">Подтверждение почты</h1>
+            <p class="confirm-email-subtitle">Перейдите по ссылке из письма или вернитесь на страницу входа.</p>
+            <a href="/login" class="confirm-email-btn confirm-email-btn-secondary">На страницу входа</a>
+        }
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromQuery] public string? UserId { get; set; }
+    [SupplyParameterFromQuery] public string? Token { get; set; }
+    [SupplyParameterFromQuery(Name = "error")] public string? ErrorQuery { get; set; }
+
+    private bool loading = true;
+    private bool success;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(ErrorQuery))
+        {
+            errorMessage = "Ссылка недействительна или устарела.";
+            loading = false;
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(UserId) || string.IsNullOrWhiteSpace(Token))
+        {
+            errorMessage = "Не указаны параметры подтверждения.";
+            loading = false;
+            return;
+        }
+
+        try
+        {
+            var baseUrl = BlazorClient.Configuration.ApiEndpoints.Api;
+            var url = $"{baseUrl}/identity/auth/confirm-email?userId={Uri.EscapeDataString(UserId)}&token={Uri.EscapeDataString(Token)}";
+            var response = await Http.GetAsync(url);
+            var json = await response.Content.ReadFromJsonAsync<ConfirmEmailResponse>();
+            success = json?.Succeeded ?? false;
+            if (!success && !string.IsNullOrEmpty(json?.Message))
+                errorMessage = json.Message;
+            else if (!success)
+                errorMessage = "Ссылка недействительна или устарела.";
+        }
+        catch
+        {
+            errorMessage = "Не удалось проверить ссылку. Попробуйте позже.";
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private class ConfirmEmailResponse
+    {
+        public bool Succeeded { get; set; }
+        public string? Message { get; set; }
+    }
+}

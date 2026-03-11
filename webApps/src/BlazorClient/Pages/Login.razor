@@ -1,5 +1,6 @@
 @page "/login"
 @using BlazorClient.Auth
+@using BlazorClient.Configuration
 @using Blazored.LocalStorage
 @using Microsoft.AspNetCore.Components.Authorization
 
@@ -31,6 +32,13 @@
         <h1 class="login-title">Войти в ChatFoundry</h1>
         <p class="login-subtitle">Введите данные для входа в аккаунт</p>
 
+        @if (showConfirmedMessage)
+        {
+            <div class="login-error" style="background: #ecfdf5; border-color: #10b981; color: #065f46;">
+                <span>Почта подтверждена. Войдите в аккаунт.</span>
+            </div>
+        }
+
         <!-- Error -->
         @if (!string.IsNullOrEmpty(error))
         {
@@ -42,6 +50,14 @@
                 </svg>
                 <span>@error</span>
             </div>
+            @if (showResendButton)
+            {
+                <div class="login-resend-wrap">
+                    <button type="button" class="login-resend-link" @onclick="ResendConfirmation" disabled="@resendSent">
+                        @if (resendSent) { <span>Письмо отправлено</span> } else { <span>Отправить письмо снова</span> }
+                    </button>
+                </div>
+            }
         }
 
         <!-- Form -->
@@ -105,10 +121,31 @@
     private string password = "Pass123!";
     private string? error;
     private bool isLoading;
+    private bool showResendButton;
+    private bool resendSent;
+    private bool showConfirmedMessage;
+
+    protected override void OnInitialized()
+    {
+        var uri = Navigation.Uri;
+        showConfirmedMessage = uri.Contains("confirmed=1", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private async Task ResendConfirmation()
+    {
+        if (string.IsNullOrWhiteSpace(email)) return;
+        try
+        {
+            await Http.PostAsJsonAsync($"{ApiEndpoints.Api}/identity/auth/resend-confirmation", new { email = email.Trim() });
+            resendSent = true;
+        }
+        catch { /* ignore */ }
+    }
 
     private async Task HandleLogin()
     {
         error = null;
+        showResendButton = false;
         isLoading = true;
 
         var requestBody = new FormUrlEncodedContent(new[]
@@ -118,16 +155,18 @@
             new KeyValuePair<string, string>("password", password),
             new KeyValuePair<string, string>("client_id", "client"),
             new KeyValuePair<string, string>("client_secret", "secret"),
-            new KeyValuePair<string, string>("scope", "workflow client company identity file"),
+            new KeyValuePair<string, string>("scope", "workflow client company identity file offline_access"),
         });
 
         try
         {
-            var response = await Http.PostAsync("https://localhost:5000/identity/connect/token", requestBody);
+            var response = await Http.PostAsync($"{ApiEndpoints.Api}/identity/connect/token", requestBody);
             if (response.IsSuccessStatusCode)
             {
                 var tokenResponse = await response.Content.ReadFromJsonAsync<TokenResponse>();
                 await LocalStorage.SetItemAsync("authToken", tokenResponse!.AccessToken);
+                if (!string.IsNullOrEmpty(tokenResponse.RefreshToken))
+                    await LocalStorage.SetItemAsync("refreshToken", tokenResponse.RefreshToken);
                 var emailToStore = email.Trim();
                 await LocalStorage.SetItemAsync("userEmail", emailToStore);
                 ((ApiAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(tokenResponse.AccessToken, emailToStore);
@@ -136,9 +175,25 @@
             else
             {
                 var body = await response.Content.ReadAsStringAsync();
-                error = string.IsNullOrWhiteSpace(body)
-                    ? "Ошибка аутентификации. Проверьте логин и пароль."
-                    : $"Ошибка: {body}";
+                try
+                {
+                    var errJson = System.Text.Json.JsonSerializer.Deserialize<TokenErrorResponse>(body);
+                    if (errJson?.Error == "email_not_confirmed")
+                    {
+                        error = errJson.ErrorDescription ?? "Подтвердите адрес почты. Не пришло письмо?";
+                        showResendButton = true;
+                    }
+                    else
+                    {
+                        error = errJson?.ErrorDescription ?? (string.IsNullOrWhiteSpace(body) ? "Ошибка аутентификации. Проверьте логин и пароль." : body);
+                    }
+                }
+                catch
+                {
+                    error = string.IsNullOrWhiteSpace(body)
+                        ? "Ошибка аутентификации. Проверьте логин и пароль."
+                        : body;
+                }
             }
         }
         catch (Exception ex)
@@ -158,5 +213,13 @@
         {
             await HandleLogin();
         }
+    }
+
+    private class TokenErrorResponse
+    {
+        [System.Text.Json.Serialization.JsonPropertyName("error")]
+        public string? Error { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("error_description")]
+        public string? ErrorDescription { get; set; }
     }
 }

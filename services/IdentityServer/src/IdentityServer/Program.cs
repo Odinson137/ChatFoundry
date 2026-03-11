@@ -29,6 +29,12 @@ services.AddGrpcClient<CompanyRegistrationService.CompanyRegistrationServiceClie
 });
 services.AddScoped<ICompanyRegistrationClient, CompanyRegistrationClient>();
 
+services.AddDataProtection();
+
+services.Configure<IdentityServer.Options.SmtpOptions>(builder.Configuration.GetSection(IdentityServer.Options.SmtpOptions.SectionName));
+services.Configure<IdentityServer.Options.EmailConfirmationOptions>(builder.Configuration.GetSection(IdentityServer.Options.EmailConfirmationOptions.SectionName));
+services.AddSingleton<IEmailSender, SmtpEmailSender>();
+
 services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(opt =>
     {
         opt.Password.RequireNonAlphanumeric = false;
@@ -126,7 +132,7 @@ app.MapGet("/", () => "IdentityServer sample running");
 using (var scope = app.Services.CreateScope())
 {
     var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-    var user = new ApplicationUser { UserName = "bob", Email = "bob@example.com" };
+    var user = new ApplicationUser { UserName = "bob", Email = "bob@example.com", EmailConfirmed = true };
     var createResult = await userMgr.CreateAsync(user, "Pass123!");
     if (createResult.Succeeded)
     {

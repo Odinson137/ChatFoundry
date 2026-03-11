@@ -1,4 +1,5 @@
 @page "/register"
+@using BlazorClient.Configuration
 @inject HttpClient Http
 @inject NavigationManager Navigation
 
@@ -25,6 +26,17 @@
         <h1 class="register-title">Создать аккаунт</h1>
         <p class="register-subtitle">Зарегистрируйтесь и создайте своего первого AI-бота</p>
 
+        <!-- Success -->
+        @if (registrationSuccess)
+        {
+            <div class="register-error" style="background: #ecfdf5; border-color: #10b981; color: #065f46;">
+                <span>Проверьте почту — мы отправили ссылку для подтверждения. Перейдите по ссылке, затем войдите.</span>
+            </div>
+            <div class="register-footer" style="margin-top: 1rem;">
+                <a href="/login">Войти</a>
+            </div>
+        }
+
         <!-- Error -->
         @if (!string.IsNullOrEmpty(error))
         {
@@ -39,6 +51,8 @@
         }
 
         <!-- Form -->
+        @if (!registrationSuccess)
+        {
         <div class="register-form">
             <div class="register-field">
                 <label class="register-label" for="reg-email">Email</label>
@@ -116,11 +130,15 @@
                 }
             </button>
         </div>
+        }
 
+        @if (!registrationSuccess)
+        {
         <div class="register-footer">
             <span>Уже есть аккаунт?</span>
             <a href="/login">Войти</a>
         </div>
+        }
     </div>
 </div>
 
@@ -132,6 +150,7 @@
     private string? error;
     private bool isLoading;
     private bool hasInvite;
+    private bool registrationSuccess;
 
     protected override void OnInitialized()
     {
@@ -186,7 +205,7 @@
             ? (object)new { Email = email, Password = password, InviteToken = inviteToken }
             : new { Email = email, Password = password, CompanyName = companyName.Trim() };
 
-            var registerResponse = await Http.PostAsJsonAsync("https://localhost:5000/identity/auth/register", payload);
+            var registerResponse = await Http.PostAsJsonAsync($"{ApiEndpoints.Api}/identity/auth/register", payload);
 
             if (!registerResponse.IsSuccessStatusCode)
             {
@@ -197,7 +216,7 @@
                 return;
             }
 
-            Navigation.NavigateTo("/login");
+            registrationSuccess = true;
         }
         catch (Exception ex)
         {

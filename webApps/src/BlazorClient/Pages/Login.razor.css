@@ -64,6 +64,35 @@
     flex-shrink: 0;
 }
 
+/* Resend confirmation link (under email_not_confirmed error) */
+.login-resend-wrap {
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.login-resend-link {
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: #6366f1;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.15s;
+}
+
+.login-resend-link:hover:not(:disabled) {
+    color: #4f46e5;
+}
+
+.login-resend-link:disabled {
+    color: #94a3b8;
+    cursor: default;
+    text-decoration: none;
+}
+
 /* Form */
 .login-form {
     display: flex;

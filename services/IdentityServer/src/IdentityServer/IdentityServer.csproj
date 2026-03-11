@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <UserSecretsId>chatfoundry-identity-server</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
@@ -17,6 +18,7 @@
       <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="7.2.0" />
       <PackageReference Include="OpenIddict.Server.AspNetCore" Version="7.2.0" />
       <PackageReference Include="OpenIddict.Validation.AspNetCore" Version="7.2.0" />
+      <PackageReference Include="MailKit" Version="4.9.0" />
     </ItemGroup>
 
     <ItemGroup>

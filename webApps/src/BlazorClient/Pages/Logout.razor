@@ -15,6 +15,7 @@
     protected override async Task OnInitializedAsync()
     {
         await LocalStorage.RemoveItemAsync("authToken");
+        await LocalStorage.RemoveItemAsync("refreshToken");
         await LocalStorage.RemoveItemAsync("userEmail");
         ((ApiAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsLoggedOut();
         Navigation.NavigateTo("/");
