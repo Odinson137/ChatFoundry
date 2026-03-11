@@ -92,6 +92,9 @@
                            @bind="password"
                            @onkeydown="OnKeyDown" />
                 </div>
+                <div class="login-resend-wrap" style="margin-top: 6px;">
+                    <a href="/forgot-password" class="login-resend-link" style="text-decoration: underline;">Забыли пароль?</a>
+                </div>
             </div>
 
             <button class="login-btn" @onclick="HandleLogin" disabled="@isLoading">

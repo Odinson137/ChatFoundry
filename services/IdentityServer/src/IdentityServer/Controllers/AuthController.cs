@@ -154,4 +154,62 @@ public class AuthController(
 
         return Ok(new { message = "If an account exists and is not confirmed, a new email has been sent." });
     }
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest? request)
+    {
+        if (string.IsNullOrWhiteSpace(request?.Email))
+            return Ok(new { message = "If an account with this email exists, you will receive a password reset link." });
+
+        var user = await userManager.FindByEmailAsync(request.Email.Trim());
+        if (user == null)
+        {
+            return Ok(new { message = "If an account with this email exists, you will receive a password reset link." });
+        }
+
+        try
+        {
+            var token = await userManager.GeneratePasswordResetTokenAsync(user);
+            var baseUrl = emailConfirmationOptions.Value.AppBaseUrl.TrimEnd('/');
+            var resetUrl = $"{baseUrl}/reset-password?userId={user.Id}&token={Uri.EscapeDataString(token)}";
+            var subject = "Сброс пароля — ChatFoundry";
+            var htmlBody = $@"
+<!DOCTYPE html>
+<html>
+<head><meta charset=""utf-8""></head>
+<body>
+<p>Здравствуйте!</p>
+<p>Вы запросили сброс пароля. Перейдите по ссылке, чтобы задать новый пароль:</p>
+<p><a href=""{resetUrl}"">Сбросить пароль</a></p>
+<p>Ссылка действительна ограниченное время. Если вы не запрашивали сброс пароля, проигнорируйте это письмо.</p>
+</body>
+</html>";
+            await emailSender.SendEmailAsync(user.Email!, subject, htmlBody, HttpContext.RequestAborted);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to send password reset email to {Email}", user.Email);
+        }
+
+        return Ok(new { message = "If an account with this email exists, you will receive a password reset link." });
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest? request)
+    {
+        if (request == null || string.IsNullOrWhiteSpace(request.UserId) || string.IsNullOrWhiteSpace(request.Token) || string.IsNullOrWhiteSpace(request.NewPassword))
+            return BadRequest(new { succeeded = false, message = "Invalid or missing parameters." });
+
+        if (!Guid.TryParse(request.UserId, out _))
+            return BadRequest(new { succeeded = false, message = "Invalid user id." });
+
+        var user = await userManager.FindByIdAsync(request.UserId);
+        if (user == null)
+            return Ok(new { succeeded = false, message = "Invalid or expired reset link." });
+
+        var result = await userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
+        if (result.Succeeded)
+            return Ok(new { succeeded = true, message = "Password has been reset. You can sign in with your new password." });
+        return BadRequest(new { succeeded = false, message = "Invalid or expired reset link. Request a new one." });
+    }
 }

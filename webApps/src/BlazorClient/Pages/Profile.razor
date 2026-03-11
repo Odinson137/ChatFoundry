@@ -73,13 +73,13 @@
             </div>
 
             <div class="profile-actions">
-                <button type="button" class="profile-btn profile-btn-secondary" @onclick="OnChangePasswordClick">
+                <a href="@GetChangePasswordHref()" class="profile-btn profile-btn-secondary">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="11" width="18" height="11" rx="2"/>
                         <path d="M7 11V7a5 5 0 0110 0v4"/>
                     </svg>
                     <span>Сменить пароль</span>
-                </button>
+                </a>
             </div>
         </section>
     }
@@ -116,8 +116,11 @@
         }
     }
 
-    private void OnChangePasswordClick()
+    private string GetChangePasswordHref()
     {
-        // Заглушка: логика смены пароля на бэкенде пока не реализована
+        var email = me?.Email ?? "";
+        return string.IsNullOrEmpty(email)
+            ? "/forgot-password"
+            : $"/forgot-password?email={Uri.EscapeDataString(email)}";
     }
 }
