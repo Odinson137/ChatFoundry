@@ -97,6 +97,47 @@
             menu.style.minWidth = Math.max(r.width, 280) + 'px';
         };
         window.positionConditionTypeMenu = window.__positionConditionTypeMenu;
+        window.__cdChatGetScrollState = function(id) {
+            var el = document.getElementById(id);
+            if (!el) return null;
+            return { scrollHeight: el.scrollHeight, scrollTop: el.scrollTop };
+        };
+        window.__cdChatRestoreScroll = function(id, prevHeight, prevTop) {
+            setTimeout(function() {
+                var el = document.getElementById(id);
+                if (el && prevHeight !== undefined) el.scrollTop = prevTop + (el.scrollHeight - prevHeight);
+            }, 0);
+        };
+        window.__cdChatScrollToBottomInstant = function(id) {
+            var el = document.getElementById(id);
+            if (el) el.scrollTop = el.scrollHeight;
+        };
+        window.__cdChatSetupScrollLoadMore = function(id, dotNetRef) {
+            var el = document.getElementById(id);
+            if (!el || el._cdChatScrollAttached) return;
+            el._cdChatScrollAttached = true;
+            el._cdChatDotNetRef = dotNetRef;
+            var lastCall = 0;
+            var handler = function() {
+                if (el.scrollTop > 80) return;
+                var ref = el._cdChatDotNetRef;
+                if (!ref) return;
+                var now = Date.now();
+                if (now - lastCall < 800) return;
+                lastCall = now;
+                ref.invokeMethodAsync('OnScrollNearTopAsync');
+            };
+            el._cdChatScrollHandler = handler;
+            el.addEventListener('scroll', handler, { passive: true });
+        };
+        window.__cdChatTeardownScrollLoadMore = function(id) {
+            var el = document.getElementById(id);
+            if (!el || !el._cdChatScrollAttached) return;
+            el.removeEventListener('scroll', el._cdChatScrollHandler);
+            el._cdChatScrollHandler = null;
+            el._cdChatDotNetRef = null;
+            el._cdChatScrollAttached = false;
+        };
     </script>
 </body>
 

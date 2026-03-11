@@ -31,6 +31,49 @@
     font-weight: 500;
 }
 
+/* ─── Two-column layout (Variant C) ────────────────────────────────────── */
+
+.cd-two-columns {
+    display: block;
+}
+
+.cd-column-left {
+    margin-bottom: 1.5rem;
+}
+
+.cd-column-right {
+    min-width: 0;
+}
+
+@media (min-width: 992px) {
+    .cd-two-columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        align-items: start;
+    }
+
+    .cd-column-left {
+        margin-bottom: 0;
+    }
+}
+
+.cd-section-chat {
+    margin-bottom: 0;
+}
+
+.cd-section-chat .cd-chat {
+    height: 560px;
+    max-height: 560px;
+}
+
+@media (max-width: 991px) {
+    .cd-section-chat .cd-chat {
+        height: 450px;
+        max-height: 450px;
+    }
+}
+
 /* ─── Info Card ───────────────────────────────────────────────────────── */
 
 .cd-info-card {
@@ -306,7 +349,9 @@
 
 .cd-msg {
     display: flex;
-    margin-bottom: 2px;
+    align-items: flex-end;
+    gap: 8px;
+    margin-bottom: 6px;
 }
 
 .cd-msg-incoming {
@@ -315,6 +360,25 @@
 
 .cd-msg-outgoing {
     justify-content: flex-end;
+}
+
+.cd-msg-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #818cf8);
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cd-msg-avatar-bot {
+    background: #94a3b8;
+    font-size: 0.75rem;
 }
 
 .cd-msg-bubble {

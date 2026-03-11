@@ -2,8 +2,11 @@
 @using Microsoft.AspNetCore.Authorization
 @using BlazorClient.Interfaces
 @using BlazorClient.Models.DTO
+@using BlazorClient.Components
 @using Microsoft.JSInterop
+@using System.Text.Json
 @attribute [Authorize]
+@implements IDisposable
 @inject IClientApiClient ClientApi
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
@@ -34,6 +37,9 @@
             <span class="cd-breadcrumb-current">@GetDisplayName(client)</span>
         </nav>
 
+        <div class="cd-two-columns">
+            <!-- Left column: Client info + Channels -->
+            <div class="cd-column-left">
         <!-- Client Info Card -->
         <div class="cd-info-card">
             <div class="cd-info-header">
@@ -129,9 +135,12 @@
                 }
             </div>
         </div>
+            </div>
 
+            <!-- Right column: Messages -->
+            <div class="cd-column-right">
         <!-- Chat Section -->
-        <div class="cd-section">
+        <div class="cd-section cd-section-chat">
             <h2 class="cd-section-title">Сообщения</h2>
 
             @if (client.ClientChannels.Count > 1)
@@ -173,21 +182,22 @@
             }
             else if (selectedChannelId != Guid.Empty)
             {
-                <div class="cd-chat" @ref="chatContainer">
-                    @if (hasMoreMessages)
+                <div id="cd-chat-scroll" class="cd-chat" @ref="chatContainer">
+                    @if (hasMoreMessages || isLoadingMoreMessages)
                     {
-                        <div class="cd-chat-load-more">
-                            <button class="cd-btn cd-btn-ghost" @onclick="LoadMoreMessages" disabled="@isLoadingMoreMessages">
-                                @if (isLoadingMoreMessages)
-                                {
-                                    <div class="cd-spinner cd-spinner-sm"></div>
-                                }
-                                else
-                                {
-                                    <span>Загрузить старые сообщения</span>
-                                }
-                            </button>
-                            <span class="cd-muted cd-text-sm">@messageTotalCount сообщений всего</span>
+                        <div class="cd-chat-load-more" data-cd-chat-sentinel>
+                            @if (isLoadingMoreMessages)
+                            {
+                                <div class="cd-spinner cd-spinner-sm"></div>
+                                <span class="cd-muted cd-text-sm">Загрузка...</span>
+                            }
+                            else
+                            {
+                                <button type="button" class="cd-btn cd-btn-ghost" @onclick="LoadMoreMessages">
+                                    Загрузить старые сообщения
+                                </button>
+                                <span class="cd-muted cd-text-sm">@messageTotalCount сообщений · или прокрутите вверх</span>
+                            }
                         </div>
                     }
 
@@ -205,15 +215,18 @@
 
                         var isOutgoing = msg.Direction.Equals("OUTGOING", StringComparison.OrdinalIgnoreCase);
                         <div class="cd-msg @(isOutgoing ? "cd-msg-outgoing" : "cd-msg-incoming")">
+                            @if (!isOutgoing)
+                            {
+                                <div class="cd-msg-avatar">@GetInitials(client!)</div>
+                            }
                             <div class="cd-msg-bubble @(isOutgoing ? "cd-msg-bubble-out" : "cd-msg-bubble-in")">
-                                @if (!msg.MessageKind.Equals("TEXT", StringComparison.OrdinalIgnoreCase) &&
-                                     !msg.MessageKind.Equals("UNKNOWN", StringComparison.OrdinalIgnoreCase))
-                                {
-                                    <span class="cd-msg-kind">@GetKindIcon(msg.MessageKind) @msg.MessageKind</span>
-                                }
-                                <div class="cd-msg-text">@(msg.Payload ?? "")</div>
+                                <ClientMessageContent MessageKind="@msg.MessageKind" Payload="@msg.Payload" />
                                 <span class="cd-msg-time">@msg.CreatedAt.ToString("HH:mm")</span>
                             </div>
+                            @if (isOutgoing)
+                            {
+                                <div class="cd-msg-avatar cd-msg-avatar-bot" title="Бот">B</div>
+                            }
                         </div>
                     }
                     <div @ref="chatBottom"></div>
@@ -225,6 +238,8 @@
                     <p>Выберите канал для просмотра сообщений</p>
                 </div>
             }
+        </div>
+            </div>
         </div>
     }
 </div>
@@ -246,12 +261,62 @@
     
     private ElementReference chatContainer;
     private ElementReference chatBottom;
+    private DotNetObjectReference<ClientDetails>? _dotNetRef;
+    private bool _scrollListenerAttached;
+    private bool _justLoadedMessages;
 
-    private const int MessagesPageSize = 50;
+    private const int InitialPageSize = 10;
+    private const int LoadMorePageSize = 20;
+    private const string ChatScrollId = "cd-chat-scroll";
 
     protected override async Task OnInitializedAsync()
     {
         await LoadClient();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (messages.Count > 0 && selectedChannelId != Guid.Empty)
+        {
+            if (_justLoadedMessages)
+            {
+                try
+                {
+                    await JS.InvokeVoidAsync("__cdChatScrollToBottomInstant", ChatScrollId);
+                }
+                catch { /* ignore */ }
+                _justLoadedMessages = false;
+            }
+            if (hasMoreMessages && !_scrollListenerAttached)
+            {
+                try
+                {
+                    _dotNetRef ??= DotNetObjectReference.Create(this);
+                    await Task.Delay(400);
+                    await JS.InvokeVoidAsync("__cdChatSetupScrollLoadMore", ChatScrollId, _dotNetRef);
+                    _scrollListenerAttached = true;
+                }
+                catch
+                {
+                    _dotNetRef?.Dispose();
+                    _dotNetRef = null;
+                }
+            }
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnScrollNearTopAsync()
+    {
+        if (!hasMoreMessages || isLoadingMoreMessages) return;
+        await InvokeAsync(LoadMoreMessages);
+    }
+
+    public void Dispose()
+    {
+        try { JS.InvokeVoidAsync("__cdChatTeardownScrollLoadMore", ChatScrollId); } catch { }
+        _dotNetRef?.Dispose();
+        _dotNetRef = null;
     }
 
     private async Task LoadClient()
@@ -286,6 +351,8 @@
     private async Task SelectChannel(Guid channelId)
     {
         if (selectedChannelId == channelId) return;
+        try { await JS.InvokeVoidAsync("__cdChatTeardownScrollLoadMore", ChatScrollId); } catch { }
+        _scrollListenerAttached = false;
         selectedChannelId = channelId;
         messages.Clear();
         messagesCursor = null;
@@ -301,7 +368,7 @@
 
         try
         {
-            var result = await ClientApi.GetMessagesAsync(selectedChannelId, MessagesPageSize);
+            var result = await ClientApi.GetMessagesAsync(selectedChannelId, InitialPageSize);
             // Реверсируем список, чтобы новые сообщения были внизу
             result.Items.Reverse();
             messages = result.Items;
@@ -316,9 +383,8 @@
         finally
         {
             isLoadingMessages = false;
+            _justLoadedMessages = true;
             StateHasChanged();
-            // Прокручиваем вниз после загрузки
-            await ScrollToBottom();
         }
     }
 
@@ -328,12 +394,23 @@
         isLoadingMoreMessages = true;
         StateHasChanged();
 
+        double prevScrollHeight = 0;
+        double prevScrollTop = 0;
         try
         {
-            var result = await ClientApi.GetMessagesAsync(selectedChannelId, MessagesPageSize, messagesCursor);
-            // Реверсируем новую порцию
+            var state = await JS.InvokeAsync<JsonElement?>("__cdChatGetScrollState", ChatScrollId);
+            if (state.HasValue && state.Value.ValueKind == JsonValueKind.Object)
+            {
+                if (state.Value.TryGetProperty("scrollHeight", out var sh)) prevScrollHeight = sh.GetDouble();
+                if (state.Value.TryGetProperty("scrollTop", out var st)) prevScrollTop = st.GetDouble();
+            }
+        }
+        catch { /* ignore */ }
+
+        try
+        {
+            var result = await ClientApi.GetMessagesAsync(selectedChannelId, LoadMorePageSize, messagesCursor);
             result.Items.Reverse();
-            // Добавляем старые сообщения В НАЧАЛО списка
             messages.InsertRange(0, result.Items);
             hasMoreMessages = result.HasNextPage;
             messagesCursor = result.EndCursor;
@@ -346,6 +423,11 @@
         {
             isLoadingMoreMessages = false;
             StateHasChanged();
+            try
+            {
+                await JS.InvokeVoidAsync("__cdChatRestoreScroll", ChatScrollId, prevScrollHeight, prevScrollTop);
+            }
+            catch { /* ignore */ }
         }
     }
 
@@ -411,23 +493,4 @@
         "CALLBACK_QUERY" => "\u21a9",
         _ => "\U0001f4e6"
     };
-
-    private async Task ScrollToBottom()
-    {
-        try
-        {
-            await JS.InvokeVoidAsync("eval", @"
-                setTimeout(() => {
-                    const chatBottom = document.querySelector('.cd-chat > div:last-child');
-                    if (chatBottom) {
-                        chatBottom.scrollIntoView({ behavior: 'smooth', block: 'end' });
-                    }
-                }, 100);
-            ");
-        }
-        catch
-        {
-            // Игнорируем ошибки прокрутки
-        }
-    }
 }

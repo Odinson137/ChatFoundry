@@ -1,0 +1,213 @@
+@using BlazorClient.Models.DTO
+@using BlazorClient.Interfaces
+@inject IFileApiClient FileApi
+@using System.Text.Json
+
+<div class="cd-msg-content">
+    @if (_kind == "TEXT" || _kind == "LINK")
+    {
+        <div class="cd-msg-text">@_displayText</div>
+    }
+    else if (_kind == "BUTTONS")
+    {
+        if (!string.IsNullOrWhiteSpace(_buttonsText))
+        {
+            <div class="cd-msg-text">@_buttonsText</div>
+        }
+        if (_buttonsList != null && _buttonsList.Count > 0)
+        {
+            <div class="cd-msg-buttons">
+                @foreach (var btn in _buttonsList)
+                {
+                    <span class="cd-msg-btn-chip">@(btn.Text ?? "")</span>
+                }
+            </div>
+        }
+        @if (_buttonsList == null && !string.IsNullOrWhiteSpace(Payload))
+        {
+            <div class="cd-msg-text">@Payload</div>
+        }
+    }
+    else if (_kind == "MEDIA")
+    {
+        if (!_mediaResolved)
+        {
+            <div class="cd-msg-media-loading">Загрузка...</div>
+        }
+        else if (!string.IsNullOrEmpty(_mediaUrl) && _mediaIsImage)
+        {
+            <div class="cd-msg-media">
+                <img src="@_mediaUrl" alt="@_mediaFileName" class="cd-msg-media-img" loading="lazy" />
+                @if (!string.IsNullOrWhiteSpace(_mediaCaption))
+                {
+                    <div class="cd-msg-media-caption">@_mediaCaption</div>
+                }
+            </div>
+        }
+        else if (!string.IsNullOrEmpty(_mediaUrl))
+        {
+            <div class="cd-msg-media">
+                <a href="@_mediaUrl" target="_blank" rel="noopener" class="cd-msg-media-link">Скачать файл@(_mediaFileName != null ? $" — {_mediaFileName}" : "")</a>
+                @if (!string.IsNullOrWhiteSpace(_mediaCaption))
+                {
+                    <div class="cd-msg-media-caption">@_mediaCaption</div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="cd-msg-media-placeholder">
+                <span class="cd-msg-kind">&#x1f5bc; Медиа</span>
+                @if (!string.IsNullOrWhiteSpace(_mediaCaption))
+                {
+                    <div class="cd-msg-text">@_mediaCaption</div>
+                }
+                else if (!string.IsNullOrWhiteSpace(Payload) && !Payload.TrimStart().StartsWith("{"))
+                {
+                    <div class="cd-msg-text cd-msg-text-muted">(превью недоступно)</div>
+                }
+            </div>
+        }
+    }
+    else
+    {
+        <span class="cd-msg-kind">@GetKindIcon(MessageKind) @MessageKind</span>
+        if (!string.IsNullOrWhiteSpace(_displayText))
+        {
+            <div class="cd-msg-text">@_displayText</div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter] public string MessageKind { get; set; } = "";
+    [Parameter] public string? Payload { get; set; }
+
+    private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
+
+    private string _kind = "";
+    private string _displayText = "";
+    private string? _buttonsText;
+    private List<InlineButtonDto>? _buttonsList;
+
+    private string? _mediaUrl;
+    private string? _mediaCaption;
+    private string? _mediaFileName;
+    private bool _mediaResolved;
+    private bool _mediaIsImage;
+
+    protected override void OnParametersSet()
+    {
+        _kind = (MessageKind ?? "").Trim().ToUpperInvariant();
+        _displayText = GetDisplayText(Payload);
+        _buttonsText = null;
+        _buttonsList = null;
+        _mediaUrl = null;
+        _mediaCaption = null;
+        _mediaFileName = null;
+        _mediaResolved = false;
+        _mediaIsImage = false;
+
+        if (_kind == "BUTTONS" && !string.IsNullOrWhiteSpace(Payload) && Payload.TrimStart().StartsWith("{"))
+        {
+            try
+            {
+                var dto = JsonSerializer.Deserialize<AskMessagePayloadDto>(Payload, JsonOptions);
+                _buttonsText = dto?.Text;
+                _buttonsList = dto?.Buttons;
+            }
+            catch { /* ignore */ }
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_kind != "MEDIA")
+            return;
+
+        var p = Payload ?? "";
+        if (string.IsNullOrWhiteSpace(p))
+        {
+            _mediaResolved = true;
+            return;
+        }
+
+        if (!p.TrimStart().StartsWith("{"))
+        {
+            try
+            {
+                var dto = JsonSerializer.Deserialize<MessagePayloadDto>(p, JsonOptions);
+                _mediaCaption = dto?.Caption;
+            }
+            catch { /* ignore */ }
+            _mediaResolved = true;
+            return;
+        }
+
+        try
+        {
+            var dto = JsonSerializer.Deserialize<MessagePayloadDto>(p, JsonOptions);
+            var text = dto?.Text?.Trim();
+            _mediaCaption = dto?.Caption;
+            if (string.IsNullOrWhiteSpace(text) || !Guid.TryParse(text, out var fileId))
+            {
+                _mediaResolved = true;
+                return;
+            }
+
+            var file = await FileApi.GetFileAsync(fileId);
+            if (file == null || string.IsNullOrWhiteSpace(file.Key))
+            {
+                _mediaResolved = true;
+                return;
+            }
+
+            _mediaUrl = await FileApi.GetDownloadUrlAsync(file.Key, forceDownload: false);
+            _mediaFileName = file.Name;
+            var contentType = file.ContentType?.ToLowerInvariant() ?? "";
+            _mediaIsImage = contentType.StartsWith("image/");
+        }
+        catch
+        {
+            /* ignore */
+        }
+        finally
+        {
+            _mediaResolved = true;
+        }
+    }
+
+    private static string GetDisplayText(string? payload)
+    {
+        var p = payload ?? "";
+        if (string.IsNullOrWhiteSpace(p)) return "";
+        if (p.TrimStart().StartsWith("{"))
+        {
+            try
+            {
+                var dto = JsonSerializer.Deserialize<MessagePayloadDto>(p, JsonOptions);
+                return dto?.Text ?? p;
+            }
+            catch
+            {
+                return p;
+            }
+        }
+        return p;
+    }
+
+    private static string GetKindIcon(string kind) => (kind ?? "").ToUpperInvariant() switch
+    {
+        "IMAGE" => "\u0001f5bc",
+        "AUDIO" => "\u0001f3b5",
+        "VIDEO" => "\u0001f3ac",
+        "VOICE" => "\u0001f3a4",
+        "FILE" => "\u0001f4ce",
+        "STICKER" => "\u0001f600",
+        "LINK" => "\u0001f517",
+        "COMMAND" => "/",
+        "BUTTONS" => "\u2328",
+        "CALLBACK_QUERY" => "\u21a9",
+        _ => "\u0001f4e6"
+    };
+}

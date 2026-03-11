@@ -1,0 +1,88 @@
+.cd-msg-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.cd-msg-content .cd-msg-text {
+    white-space: pre-wrap;
+}
+
+.cd-msg-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.cd-msg-btn-chip {
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.cd-msg-bubble-in .cd-msg-btn-chip {
+    border-color: #e2e8f0;
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+.cd-msg-media {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.cd-msg-media-img {
+    max-width: 100%;
+    max-height: 280px;
+    width: auto;
+    height: auto;
+    border-radius: 8px;
+    object-fit: contain;
+}
+
+.cd-msg-media-caption {
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+.cd-msg-media-link {
+    color: inherit;
+    text-decoration: underline;
+}
+
+.cd-msg-media-link:hover {
+    opacity: 0.9;
+}
+
+.cd-msg-media-placeholder {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cd-msg-media-loading {
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+.cd-msg-text-muted {
+    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+.cd-msg-content .cd-msg-kind {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 2px;
+    opacity: 0.7;
+}
