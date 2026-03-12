@@ -226,15 +226,11 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
         return result.Sessions.Nodes;
     }
 
-    public async Task<SessionsPageResult> GetSessionsPagedAsync(int first, string? after = null, string? statusFilter = null)
+    public async Task<SessionsPageResult> GetSessionsPagedAsync(int first, string? after = null, SessionListFilter? filter = null)
     {
-        var where = statusFilter != null
-            ? $", where: {{ status: {{ eq: {statusFilter} }} }}"
-            : "";
-        var afterArg = after != null ? ", $after: String" : "";
-        var query = $$"""
-                query GetSessionsPaged($first: Int!{{afterArg}}) {
-                    sessions(first: $first{{(after != null ? ", after: $after" : "")}}, order: [{ createdAt: DESC }]{{where}}) {
+        var query = """
+                query GetSessionsPaged($first: Int!, $after: String, $where: SessionFilterInput) {
+                    sessions(first: $first, after: $after, where: $where, order: [{ createdAt: DESC }]) {
                         totalCount
                         pageInfo {
                             hasNextPage
@@ -270,8 +266,12 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
                 }
                 """;
 
-        var variables = new Dictionary<string, object?> { ["first"] = first };
-        if (after != null) variables["after"] = after;
+        var variables = new Dictionary<string, object?>
+        {
+            ["first"] = first,
+            ["after"] = after,
+            ["where"] = BuildSessionsWhere(filter)
+        };
 
         var result = await ExecuteGraphQl<SessionsConnectionResponse>(query, variables);
         var conn = result.Sessions;
@@ -284,6 +284,42 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
             EndCursor = conn.PageInfo?.EndCursor,
             StartCursor = conn.PageInfo?.StartCursor
         };
+    }
+
+    private static object? BuildSessionsWhere(SessionListFilter? filter)
+    {
+        if (filter == null) return null;
+
+        var conditions = new List<object>();
+
+        if (!string.IsNullOrWhiteSpace(filter.Status))
+            conditions.Add(new { status = new { eq = filter.Status.Trim().ToUpperInvariant() } });
+
+        if (!string.IsNullOrWhiteSpace(filter.Search))
+            conditions.Add(new { clientId = new { contains = filter.Search.Trim() } });
+
+        if (filter.BotId.HasValue)
+            conditions.Add(new { workflow = new { botId = new { eq = filter.BotId.Value } } });
+
+        if (filter.CreatedFrom.HasValue || filter.CreatedTo.HasValue)
+        {
+            var createdAt = new Dictionary<string, object?>();
+            if (filter.CreatedFrom.HasValue) createdAt["gte"] = filter.CreatedFrom.Value;
+            if (filter.CreatedTo.HasValue) createdAt["lte"] = filter.CreatedTo.Value;
+            conditions.Add(new Dictionary<string, object> { ["createdAt"] = createdAt });
+        }
+
+        if (filter.CompletedFrom.HasValue || filter.CompletedTo.HasValue)
+        {
+            var completedAt = new Dictionary<string, object?>();
+            if (filter.CompletedFrom.HasValue) completedAt["gte"] = filter.CompletedFrom.Value;
+            if (filter.CompletedTo.HasValue) completedAt["lte"] = filter.CompletedTo.Value;
+            conditions.Add(new Dictionary<string, object> { ["completedAt"] = completedAt });
+        }
+
+        if (conditions.Count == 0) return null;
+        if (conditions.Count == 1) return conditions[0];
+        return new { and = conditions };
     }
 
     public async Task<SessionDto?> GetSessionByIdAsync(Guid sessionId)

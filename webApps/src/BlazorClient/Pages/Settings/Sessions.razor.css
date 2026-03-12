@@ -1,7 +1,120 @@
+/* ─── Sessions page: no card border ─────────────────────────────────────── */
+
+.sess-card {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent;
+}
+
+.sess-card:hover {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* ─── Filters row: одна строка, одинаковый размер контролов ─────────────── */
+
 .sess-filters {
+    padding: 0 0 16px;
+    margin-bottom: 0;
+}
+
+.sess-filters-row {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 8px;
+    gap: 10px 16px;
+}
+
+.sess-filters-row:not(.sess-filters-row-dates) {
+    margin-bottom: 12px;
+}
+
+.sess-filters-row-dates {
+    margin-bottom: 0;
+}
+
+/* Одинаковая высота: поле, селекты, кнопка обновить */
+.sess-filters-row .sess-input,
+.sess-filters-row .sess-select,
+.sess-filters-row .sess-btn-refresh {
+    height: 38px;
+    box-sizing: border-box;
+    margin: 0;
+}
+
+.sess-input {
+    padding: 0 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: #0f172a;
+    outline: none;
+}
+
+.sess-input-search {
+    min-width: 200px;
+    width: 260px;
+}
+
+.sess-input::placeholder {
+    color: #94a3b8;
+}
+
+.sess-input:focus {
+    border-color: #6366f1;
+}
+
+.sess-input-date {
+    width: auto;
+    min-width: 130px;
+}
+
+.sess-filters-row .sess-btn-refresh {
+    flex-shrink: 0;
+    width: 38px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sess-filters-row .sess-select {
+    min-width: 140px;
+    width: 140px;
+    padding: 0 32px 0 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: #0f172a;
+    background: #fff;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+}
+
+.sess-filters-row .sess-select:last-of-type {
+    min-width: 160px;
+    width: 160px;
+}
+
+.sess-filter-label {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.sess-filters-row-dates .sess-filter-label:first-of-type {
+    margin-right: 0;
+}
+
+.sess-filters-row-dates .sess-filter-label:not(:first-of-type) {
+    margin-left: 8px;
+}
+
+.sess-filter-sep {
+    color: #94a3b8;
+    font-size: 0.875rem;
 }
 
 .sess-client-id {

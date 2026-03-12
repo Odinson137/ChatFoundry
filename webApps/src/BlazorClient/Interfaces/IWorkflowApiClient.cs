@@ -23,7 +23,7 @@ public interface IWorkflowApiClient
     // ─── Sessions ────────────────────────────────────────────────────────────
     Task<List<SessionDto>> GetSessionsAsync(string? statusFilter = null);
     /// <summary>Постраничная загрузка сессий (cursor-based).</summary>
-    Task<SessionsPageResult> GetSessionsPagedAsync(int first, string? after = null, string? statusFilter = null);
+    Task<SessionsPageResult> GetSessionsPagedAsync(int first, string? after = null, SessionListFilter? filter = null);
     Task<SessionDto?> GetSessionByIdAsync(Guid sessionId);
 
     // ─── Workflows ───────────────────────────────────────────────────────────
@@ -79,6 +79,18 @@ public class WorkflowListPage
     public bool HasPreviousPage { get; set; }
     public string? EndCursor { get; set; }
     public string? StartCursor { get; set; }
+}
+
+/// <summary>Фильтр списка сессий: поиск по clientId, бот, статус, период создания/завершения.</summary>
+public class SessionListFilter
+{
+    public string? Search { get; set; }
+    public Guid? BotId { get; set; }
+    public string? Status { get; set; }
+    public DateTime? CreatedFrom { get; set; }
+    public DateTime? CreatedTo { get; set; }
+    public DateTime? CompletedFrom { get; set; }
+    public DateTime? CompletedTo { get; set; }
 }
 
 /// <summary>Одна страница списка сессий (cursor-based пагинация).</summary>

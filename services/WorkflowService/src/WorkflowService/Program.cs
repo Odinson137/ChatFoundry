@@ -168,6 +168,11 @@ services.AddScoped<BotMutation>();
 
 builder.Services
     .AddGraphQLServer()
+    .ModifyCostOptions(o =>
+    {
+        o.MaxFieldCost = 10_000;
+        o.MaxTypeCost = 10_000;
+    })
     .AddQueryType<Query>()
     .AddMutationType<Mutation>()
     .AddTypeExtension<BotMutation>()

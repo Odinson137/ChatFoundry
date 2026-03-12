@@ -1,8 +1,10 @@
 @page "/settings/sessions"
 @layout SettingsLayout
+@using BlazorClient.Interfaces
 @using BlazorClient.Models.DTO
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
+@implements IDisposable
 
 @inject BlazorClient.Interfaces.IWorkflowApiClient ApiClient
 @inject NavigationManager Navigation
@@ -13,18 +15,6 @@
     <div>
         <h1 class="settings-page-title">Сессии</h1>
         <p class="settings-page-subtitle">Просмотр взаимодействий пользователей с ботами</p>
-    </div>
-    <div class="sess-filters">
-        <select class="settings-select" style="width: auto; min-width: 160px;" @bind="StatusFilter" @bind:after="OnFilterChanged">
-            <option value="">Все статусы</option>
-            <option value="ACTIVE">Активные</option>
-            <option value="COMPLETED">Завершённые</option>
-            <option value="FAILED">Ошибка</option>
-            <option value="CANCELLED">Отменённые</option>
-        </select>
-        <button class="settings-icon-btn" @onclick="OnRefreshClick" title="Обновить">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
-        </button>
     </div>
 </div>
 
@@ -56,7 +46,39 @@ else if (!_sessions.Any())
 }
 else
 {
-    <div class="settings-card">
+    <div class="settings-card sess-card">
+        <div class="sess-filters">
+            <div class="sess-filters-row">
+                <input type="text" class="sess-input sess-input-search" placeholder="ID клиента" @bind="_searchText" @bind:event="oninput" @bind:after="OnSearchInput" />
+                <select class="settings-select sess-select" @bind="StatusFilter" @bind:after="OnFilterChanged">
+                    <option value="">Все статусы</option>
+                    <option value="ACTIVE">Активные</option>
+                    <option value="COMPLETED">Завершённые</option>
+                    <option value="FAILED">Ошибка</option>
+                    <option value="CANCELLED">Отменённые</option>
+                </select>
+                <select class="settings-select sess-select" @bind="_botIdFilter" @bind:after="OnFilterChanged">
+                    <option value="">Все боты</option>
+                    @foreach (var bot in _bots)
+                    {
+                        <option value="@bot.Id">@bot.Name</option>
+                    }
+                </select>
+                <button type="button" class="settings-icon-btn sess-btn-refresh" @onclick="OnRefreshClick" title="Обновить">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+                </button>
+            </div>
+            <div class="sess-filters-row sess-filters-row-dates">
+                <span class="sess-filter-label">Создана</span>
+                <input type="date" class="sess-input sess-input-date" @bind="_createdFrom" @bind:format="yyyy-MM-dd" @bind:after="OnFilterChanged" />
+                <span class="sess-filter-sep">—</span>
+                <input type="date" class="sess-input sess-input-date" @bind="_createdTo" @bind:format="yyyy-MM-dd" @bind:after="OnFilterChanged" />
+                <span class="sess-filter-label">Завершена</span>
+                <input type="date" class="sess-input sess-input-date" @bind="_completedFrom" @bind:format="yyyy-MM-dd" @bind:after="OnFilterChanged" />
+                <span class="sess-filter-sep">—</span>
+                <input type="date" class="sess-input sess-input-date" @bind="_completedTo" @bind:format="yyyy-MM-dd" @bind:after="OnFilterChanged" />
+            </div>
+        </div>
         <table class="settings-table">
             <thead>
             <tr>
@@ -138,9 +160,16 @@ else
 
 @code {
     private List<SessionDto> _sessions = [];
+    private List<BotDto> _bots = [];
     private bool _isLoading = true;
     private string? _error;
     private string StatusFilter { get; set; } = "";
+    private string _searchText = "";
+    private string _botIdFilter = "";
+    private DateTime? _createdFrom;
+    private DateTime? _createdTo;
+    private DateTime? _completedFrom;
+    private DateTime? _completedTo;
 
     private int _pageSize = 25;
     private string? _endCursor;
@@ -148,10 +177,38 @@ else
     private bool _hasNextPage;
     private bool _hasPreviousPage;
     private int _totalCount;
+    private Timer? _searchDebounceTimer;
 
     protected override async Task OnInitializedAsync()
     {
+        try { _bots = await ApiClient.GetBotsAsync(); } catch { /* боты опциональны для фильтра */ }
         await LoadSessions();
+    }
+
+    private SessionListFilter? BuildFilter()
+    {
+        var status = string.IsNullOrWhiteSpace(StatusFilter) ? null : StatusFilter.Trim().ToUpperInvariant();
+        var search = string.IsNullOrWhiteSpace(_searchText) ? null : _searchText.Trim();
+        Guid? botId = null;
+        if (!string.IsNullOrWhiteSpace(_botIdFilter) && Guid.TryParse(_botIdFilter, out var bid))
+            botId = bid;
+
+        var createdToEnd = _createdTo.HasValue ? _createdTo.Value.Date.AddDays(1).AddTicks(-1) : (DateTime?)null;
+        var completedToEnd = _completedTo.HasValue ? _completedTo.Value.Date.AddDays(1).AddTicks(-1) : (DateTime?)null;
+
+        if (status == null && search == null && !botId.HasValue && !_createdFrom.HasValue && !_createdTo.HasValue && !_completedFrom.HasValue && !_completedTo.HasValue)
+            return null;
+
+        return new SessionListFilter
+        {
+            Status = status,
+            Search = search,
+            BotId = botId,
+            CreatedFrom = _createdFrom.HasValue ? DateTime.SpecifyKind(_createdFrom.Value, DateTimeKind.Utc) : null,
+            CreatedTo = createdToEnd.HasValue ? DateTime.SpecifyKind(createdToEnd.Value, DateTimeKind.Utc) : null,
+            CompletedFrom = _completedFrom.HasValue ? DateTime.SpecifyKind(_completedFrom.Value, DateTimeKind.Utc) : null,
+            CompletedTo = completedToEnd.HasValue ? DateTime.SpecifyKind(completedToEnd.Value, DateTimeKind.Utc) : null
+        };
     }
 
     private async Task LoadSessions()
@@ -162,7 +219,7 @@ else
 
         try
         {
-            var filter = string.IsNullOrEmpty(StatusFilter) ? null : StatusFilter;
+            var filter = BuildFilter();
             var result = await ApiClient.GetSessionsPagedAsync(_pageSize, _endCursor, filter);
             _sessions = result.Items;
             _totalCount = result.TotalCount;
@@ -184,6 +241,21 @@ else
     {
         ResetPagination();
         await LoadSessions();
+    }
+
+    private async Task OnSearchInput()
+    {
+        _searchDebounceTimer?.Dispose();
+        _searchDebounceTimer = new Timer(_ =>
+        {
+            InvokeAsync(async () =>
+            {
+                _searchDebounceTimer?.Dispose();
+                _searchDebounceTimer = null;
+                ResetPagination();
+                await LoadSessions();
+            });
+        }, null, 400, Timeout.Infinite);
     }
 
     private async Task OnRefreshClick()
@@ -222,6 +294,11 @@ else
     private void OpenReplay(Guid sessionId)
     {
         Navigation.NavigateTo($"/settings/sessions/{sessionId}");
+    }
+
+    public void Dispose()
+    {
+        _searchDebounceTimer?.Dispose();
     }
 
     private static string TruncateClientId(string clientId)
