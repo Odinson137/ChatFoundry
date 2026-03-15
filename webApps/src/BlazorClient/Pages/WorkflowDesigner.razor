@@ -359,6 +359,15 @@
                                 Опишите, что должен сделать AI. Используйте переменные <code>{{variable_name}}</code>.
                             </small>
                         </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="ai-include-context-@node.Id"
+                                       checked="@aiData.IncludeChatContext"
+                                       @onchange="e => { aiData.IncludeChatContext = GetCheckboxChecked(e); OnWorkflowChanged(); }"/>
+                                <label class="form-check-label" for="ai-include-context-@node.Id">Учитывать контекст чата</label>
+                            </div>
+                            <small class="form-text text-muted">AI получит историю сообщений текущего диалога.</small>
+                        </div>
                     }
 
                     @if (node is WorkflowNodeModel { Data: MediaNodeData mediaData })

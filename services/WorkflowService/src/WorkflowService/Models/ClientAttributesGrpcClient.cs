@@ -10,4 +10,5 @@ public sealed class ClientAttributesGrpcClient(ClientAttributesService.ClientAtt
 
     public Task<SetClientAttributesResponse> SetClientAttributesAsync(SetClientAttributesRequest request, CancellationToken cancellationToken = default)
         => inner.SetClientAttributesAsync(request, cancellationToken: cancellationToken).ResponseAsync;
+
 }

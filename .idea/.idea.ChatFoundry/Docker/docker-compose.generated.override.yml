@@ -6,17 +6,35 @@ services:
       context: "C:\\Users\\buryy\\RiderProjects\\ChatFoundry"
       dockerfile: "services/WorkflowService/src/WorkflowService/Dockerfile"
       target: "base"
+      args:
+        BUILD_CONFIGURATION: "Debug"
     command: []
     entrypoint:
-    - "dotnet"
-    - "/app/bin/Debug/net10.0/WorkflowService.dll"
+    - "/opt/JetBrains/RiderDebuggerTools/linux-x64/JetBrains.Debugger.Worker"
+    - "--runtimeconfig"
+    - "/opt/JetBrains/RiderDebuggerTools/JetBrains.Debugger.Worker.runtimeconfig.json"
+    - "--mode=server"
+    - "--frontend-port=57000"
+    - "--backend-port=57200"
+    - "--roslyn-worker-port=57402"
+    - "--timeout=60"
     environment:
       DOTNET_USE_POLLING_FILE_WATCHER: "true"
+      RIDER_DEBUGGER_LOG_DIR: "/var/opt/JetBrains/RiderDebuggerTools"
+      RESHARPER_LOG_CONF: "/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
     image: "workflowservice:dev"
-    ports: []
+    ports:
+    - "127.0.0.1:57002:57000"
+    - "127.0.0.1:57202:57200"
+    - "127.0.0.1:57402:57402"
     volumes:
     - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry\\services\\WorkflowService\\src\\\
       WorkflowService:/app:rw"
     - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry:/src:rw"
     - "C:\\Users\\buryy\\.nuget\\packages:/home/app/.nuget/packages"
+    - "C:\\Users\\buryy\\AppData\\Local\\JetBrains\\RiderRemoteDebugger\\2025.1.8\\\
+      Linux64:/opt/JetBrains/RiderDebuggerTools"
+    - "C:\\Program Files\\JetBrains\\JetBrains Rider 2025.1.4\\bin\\backend-log.xml:/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
+    - "C:\\Users\\buryy\\AppData\\Local\\JetBrains\\Rider2025.1\\log\\DebuggerWorker\\\
+      JetBrains.Debugger.Worker.2026_3_15_14_19_58:/var/opt/JetBrains/RiderDebuggerTools:rw"
     working_dir: "/app"

@@ -27,6 +27,14 @@ public class ActionRepository(WorkflowDbContext db) : IActionRepository
             .FirstOrDefaultAsync(x => x.Id == actionId, ct);
     }
 
+    public async Task<List<ActionEntity>> GetBySessionIdAsync(Guid sessionId, CancellationToken ct = default)
+    {
+        return await db.Actions
+            .Where(a => a.SessionId == sessionId)
+            .OrderBy(a => a.CreatedAt)
+            .ToListAsync(ct);
+    }
+
     public async Task AddAsync(
         ActionEntity action,
         CancellationToken ct = default)

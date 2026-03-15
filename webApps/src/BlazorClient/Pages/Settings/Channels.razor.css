@@ -116,6 +116,15 @@
     opacity: 1;
 }
 
+.settings-readonly-value {
+    padding: 9px 12px;
+    font-size: 0.875rem;
+    color: #64748b;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
 @media (max-width: 640px) {
     .ch-grid {
         grid-template-columns: 1fr;

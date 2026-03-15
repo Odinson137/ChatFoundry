@@ -1260,6 +1260,13 @@ public partial class WorkflowDesigner : IDisposable
         });
     }
 
+    private static bool GetCheckboxChecked(ChangeEventArgs e)
+    {
+        if (e.Value is bool b) return b;
+        var s = e.Value?.ToString();
+        return string.Equals(s, "on", StringComparison.OrdinalIgnoreCase) || string.Equals(s, "true", StringComparison.OrdinalIgnoreCase);
+    }
+
     private string FromDisplayText(string? displayText)
     {
         if (string.IsNullOrEmpty(displayText))

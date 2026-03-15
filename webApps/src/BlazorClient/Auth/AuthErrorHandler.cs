@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using Blazored.LocalStorage;
 using BlazorClient.Models;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace BlazorClient.Auth;
 
@@ -13,11 +14,16 @@ public class AuthErrorHandler : DelegatingHandler
 {
     private readonly ILocalStorageService _localStorage;
     private readonly NavigationManager _navigation;
+    private readonly IServiceProvider _serviceProvider;
 
-    public AuthErrorHandler(ILocalStorageService localStorage, NavigationManager navigation)
+    public AuthErrorHandler(
+        ILocalStorageService localStorage,
+        NavigationManager navigation,
+        IServiceProvider serviceProvider)
     {
         _localStorage = localStorage;
         _navigation = navigation;
+        _serviceProvider = serviceProvider;
     }
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -76,6 +82,9 @@ public class AuthErrorHandler : DelegatingHandler
         await _localStorage.SetItemAsync("authToken", tokenResponse.AccessToken);
         if (!string.IsNullOrEmpty(tokenResponse.RefreshToken))
             await _localStorage.SetItemAsync("refreshToken", tokenResponse.RefreshToken);
+
+        var authStateProvider = (ApiAuthenticationStateProvider)_serviceProvider.GetRequiredService<AuthenticationStateProvider>();
+        authStateProvider.MarkUserAsAuthenticated(tokenResponse.AccessToken);
 
         var retryRequest = new HttpRequestMessage(request.Method, request.RequestUri);
         foreach (var h in request.Headers)

@@ -9,6 +9,8 @@ namespace WorkflowService.Services;
 
 public class OpenAiService : IOpenAiService
 {
+    private const int MaxContextChars = 12_000;
+
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly OpenAiOptions _options;
 
@@ -18,7 +20,10 @@ public class OpenAiService : IOpenAiService
         _options = options.Value;
     }
 
-    public async Task<string> GetCompletionAsync(string prompt, CancellationToken cancellationToken = default)
+    public async Task<string> GetCompletionAsync(
+        string prompt,
+        IReadOnlyList<(string Role, string Content)>? chatHistory = null,
+        CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(_options.ApiKey) || _options.ApiKey == "YOUR_API_KEY")
         {
@@ -26,10 +31,12 @@ public class OpenAiService : IOpenAiService
             return string.Empty;
         }
 
+        var apiMessages = BuildMessages(prompt, chatHistory);
+
         var client = _httpClientFactory.CreateClient("OpenAI");
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _options.ApiKey);
 
-        var requestBody = new ChatCompletionRequest(_options.Model, [new ChatMessage("user", prompt)]);
+        var requestBody = new ChatCompletionRequest(_options.Model, apiMessages);
         var jsonBody = JsonSerializer.Serialize(requestBody);
         var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
 
@@ -53,6 +60,48 @@ public class OpenAiService : IOpenAiService
             // TODO: Log the exception
             return $"Error: Could not parse the response from OpenAI. {e.Message}";
         }
+    }
+
+    private static List<ChatMessage> BuildMessages(string prompt, IReadOnlyList<(string Role, string Content)>? chatHistory)
+    {
+        if (chatHistory is null || chatHistory.Count == 0)
+            return [new ChatMessage("user", prompt)];
+
+        (string Role, string Content)? systemMsg = null;
+        IReadOnlyList<(string Role, string Content)> rest = chatHistory;
+        if (chatHistory.Count > 0 && string.Equals(chatHistory[0].Role, "system", StringComparison.OrdinalIgnoreCase))
+        {
+            systemMsg = chatHistory[0];
+            rest = chatHistory.Skip(1).ToList();
+        }
+
+        var truncated = TruncateHistory(rest, MaxContextChars);
+        var list = truncated
+            .Select(m => new ChatMessage(m.Role, m.Content))
+            .ToList();
+        if (systemMsg is { } sm)
+            list.Insert(0, new ChatMessage(sm.Role, sm.Content));
+        list.Add(new ChatMessage("user", prompt));
+        return list;
+    }
+
+    /// <summary>
+    /// Drops oldest messages from the start until total content length is at most maxChars.
+    /// </summary>
+    private static IReadOnlyList<(string Role, string Content)> TruncateHistory(
+        IReadOnlyList<(string Role, string Content)> history,
+        int maxChars)
+    {
+        var total = 0;
+        for (var i = history.Count - 1; i >= 0; i--)
+        {
+            total += history[i].Content?.Length ?? 0;
+            if (total > maxChars)
+            {
+                return history.Skip(i + 1).ToList();
+            }
+        }
+        return history;
     }
 
     private record ChatCompletionRequest(
