@@ -46,14 +46,21 @@ public class AuthErrorHandler : DelegatingHandler
         if (response.StatusCode != System.Net.HttpStatusCode.Unauthorized)
             return response;
 
+        Console.WriteLine($"[AuthErrorHandler] 401 received for {request.RequestUri}");
+
         var refreshToken = await _localStorage.GetItemAsync<string>("refreshToken");
         if (string.IsNullOrWhiteSpace(refreshToken))
         {
+            Console.WriteLine("[AuthErrorHandler] No refresh token in localStorage, redirecting to login");
             await ClearAuthAndRedirect();
             return response;
         }
 
+        Console.WriteLine($"[AuthErrorHandler] Attempting token refresh...");
+
         var tokenEndpoint = GetTokenEndpoint(request);
+        Console.WriteLine($"[AuthErrorHandler] Token endpoint: {tokenEndpoint}");
+
         var refreshRequest = new HttpRequestMessage(HttpMethod.Post, tokenEndpoint)
         {
             Content = new FormUrlEncodedContent(new[]
@@ -68,6 +75,8 @@ public class AuthErrorHandler : DelegatingHandler
         var refreshResponse = await base.SendAsync(refreshRequest, cancellationToken);
         if (!refreshResponse.IsSuccessStatusCode)
         {
+            var errorBody = await refreshResponse.Content.ReadAsStringAsync(cancellationToken);
+            Console.WriteLine($"[AuthErrorHandler] Refresh failed: {refreshResponse.StatusCode} — {errorBody}");
             await ClearAuthAndRedirect();
             return response;
         }
@@ -75,9 +84,12 @@ public class AuthErrorHandler : DelegatingHandler
         var tokenResponse = await refreshResponse.Content.ReadFromJsonAsync<TokenResponse>(cancellationToken);
         if (tokenResponse == null || string.IsNullOrEmpty(tokenResponse.AccessToken))
         {
+            Console.WriteLine("[AuthErrorHandler] Refresh response has no access token");
             await ClearAuthAndRedirect();
             return response;
         }
+
+        Console.WriteLine($"[AuthErrorHandler] Refresh successful, got new access token. Has new refresh token: {!string.IsNullOrEmpty(tokenResponse.RefreshToken)}");
 
         await _localStorage.SetItemAsync("authToken", tokenResponse.AccessToken);
         if (!string.IsNullOrEmpty(tokenResponse.RefreshToken))

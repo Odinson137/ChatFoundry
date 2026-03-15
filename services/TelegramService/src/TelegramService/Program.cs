@@ -113,6 +113,13 @@ builder.Services.AddGrpcClient<File.Grpc.FileService.FileServiceClient>(o =>
     o.Address = new Uri(address);
 });
 
+services.AddHttpClient("FileServiceRest", client =>
+{
+    var restUrl = builder.Configuration["Services:FileServiceRestUrl"] ?? "http://file-service:8080";
+    client.BaseAddress = new Uri(restUrl.TrimEnd('/') + "/");
+});
+services.AddScoped<IMediaUploader, MediaUploader>();
+
 
 var app = builder.Build();
 

@@ -1,3 +1,4 @@
+using System.Text.Json;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -13,7 +14,7 @@ namespace TelegramService.Controllers;
 public class TelegramHookController(
     ITopicProducer<BotIncomingMessage> producer,
     ILogger<TelegramHookController> logger,
-    ITelegramClient telegramClient)
+    IMediaUploader mediaUploader)
     : ControllerBase
 {
     [HttpPost("{ChannelId:guid}")]
@@ -26,7 +27,7 @@ public class TelegramHookController(
             return Ok();
         }
 
-        var messageEvent = ProcessUpdate(channelId, body);
+        var messageEvent = await ProcessUpdateAsync(channelId, body, token);
         if (messageEvent != null)
         {
             await producer.Produce(messageEvent, token);
@@ -35,7 +36,7 @@ public class TelegramHookController(
         return Ok();
     }
 
-    private BotIncomingMessage? ProcessUpdate(Guid channelId, TelegramUpdateDto update)
+    private async Task<BotIncomingMessage?> ProcessUpdateAsync(Guid channelId, TelegramUpdateDto update, CancellationToken ct)
     {
         if (update.CallbackQuery != null)
         {
@@ -60,17 +61,52 @@ public class TelegramHookController(
         var chatId = message.Chat.Id.ToString();
         var messageId = message.MessageId.ToString();
 
-        return message.Text != null
-            ? CreateTextMessage(channelId, message, chatId, messageId)
-            : message switch
+        if (message.Text != null)
+            return CreateTextMessage(channelId, message, chatId, messageId);
+
+        var (fileId, fileName, mimeType) = message switch
+        {
+            { Photo.Count: > 0 } => (message.Photo!.OrderBy(c => c.FileSize).Last().FileId, (string?)null, "image/jpeg"),
+            { Sticker: not null } => (message.Sticker!.FileId, (string?)null, "image/webp"),
+            { Document: not null } => (message.Document!.FileId, message.Document.FileName, message.Document.MimeType),
+            { Voice: not null } => (message.Voice!.FileId, (string?)null, message.Voice.MimeType ?? "audio/ogg"),
+            { Video: not null } => (message.Video!.FileId, message.Video.FileName, message.Video.MimeType ?? "video/mp4"),
+            { Audio: not null } => (message.Audio!.FileId, message.Audio.FileName, message.Audio.MimeType ?? "audio/mpeg"),
+            _ => (null, null, null)
+        };
+
+        if (fileId == null)
+            return null;
+
+        var payload = await UploadAndBuildPayloadAsync(channelId, fileId, fileName, mimeType, message.Caption, ct);
+
+        return new BotIncomingMessage(
+            channelId, chatId, DefaultChannel.Telegram, payload, messageId,
+            new Dictionary<MessageParameter, string>
             {
-                { Photo.Count: > 0 } => CreatePhotoMessage(channelId, message, chatId, messageId),
-                { Sticker: not null } => CreateStickerMessage(channelId, message, chatId, messageId),
-                { Document: not null } => CreateDocumentMessage(channelId, message, chatId, messageId),
-                { Voice: not null } => CreateVoiceMessage(channelId, message, chatId, messageId),
-                _ => null
-            };
+                [MessageParameter.FirstName] = message.From?.FirstName ?? "",
+                [MessageParameter.UserName] = message.From?.Username ?? ""
+            },
+            MessageKind.Media
+        );
     }
+
+    private async Task<string> UploadAndBuildPayloadAsync(
+        Guid channelId, string fileId, string? fileName, string? mimeType, string? caption, CancellationToken ct)
+    {
+        var result = await mediaUploader.DownloadAndUploadAsync(channelId, fileId, fileName, mimeType, ct);
+
+        return result switch
+        {
+            MediaUploadSuccess success => JsonSerialize(new { text = success.FileId.ToString(), caption }),
+            MediaUploadSizeExceeded => JsonSerialize(new { error = "size_exceeded", telegram_file_id = fileId, caption }),
+            MediaUploadFailed => JsonSerialize(new { error = "upload_failed", telegram_file_id = fileId, caption }),
+            _ => JsonSerialize(new { error = "upload_failed", telegram_file_id = fileId, caption })
+        };
+    }
+
+    private static string JsonSerialize(object value) =>
+        System.Text.Json.JsonSerializer.Serialize(value, new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull });
 
     private static BotIncomingMessage CreateTextMessage(Guid channelId, TelegramMessageDto message, string chatId,
         string messageId)
@@ -82,63 +118,6 @@ public class TelegramHookController(
                 [MessageParameter.FirstName] = message.From?.FirstName ?? "",
                 [MessageParameter.UserName] = message.From?.Username ?? ""
             }
-        );
-    }
-
-    private static BotIncomingMessage CreatePhotoMessage(Guid channelId, TelegramMessageDto message, string chatId,
-        string messageId)
-    {
-        var largePhoto = message.Photo!.OrderBy(c => c.FileSize).Last();
-        return new BotIncomingMessage(
-            channelId, chatId, DefaultChannel.Telegram, largePhoto.FileId, messageId,
-            new Dictionary<MessageParameter, string>
-            {
-                [MessageParameter.FirstName] = message.From?.FirstName ?? "",
-                [MessageParameter.UserName] = message.From?.Username ?? ""
-            },
-            MessageKind.Media
-        );
-    }
-
-    private static BotIncomingMessage CreateStickerMessage(Guid channelId, TelegramMessageDto message, string chatId,
-        string messageId)
-    {
-        return new BotIncomingMessage(
-            channelId, chatId, DefaultChannel.Telegram, message.Sticker!.FileId, messageId,
-            new Dictionary<MessageParameter, string>
-            {
-                [MessageParameter.FirstName] = message.From?.FirstName ?? "",
-                [MessageParameter.UserName] = message.From?.Username ?? ""
-            },
-            MessageKind.Media
-        );
-    }
-
-    private static BotIncomingMessage CreateDocumentMessage(Guid channelId, TelegramMessageDto message, string chatId,
-        string messageId)
-    {
-        return new BotIncomingMessage(
-            channelId, chatId, DefaultChannel.Telegram, message.Document!.FileId, messageId,
-            new Dictionary<MessageParameter, string>
-            {
-                [MessageParameter.FirstName] = message.From?.FirstName ?? "",
-                [MessageParameter.UserName] = message.From?.Username ?? ""
-            },
-            MessageKind.Media
-        );
-    }
-
-    private static BotIncomingMessage CreateVoiceMessage(Guid channelId, TelegramMessageDto message, string chatId,
-        string messageId)
-    {
-        return new BotIncomingMessage(
-            channelId, chatId, DefaultChannel.Telegram, message.Voice!.FileId, messageId,
-            new Dictionary<MessageParameter, string>
-            {
-                [MessageParameter.FirstName] = message.From?.FirstName ?? "",
-                [MessageParameter.UserName] = message.From?.Username ?? ""
-            },
-            MessageKind.Media
         );
     }
 }

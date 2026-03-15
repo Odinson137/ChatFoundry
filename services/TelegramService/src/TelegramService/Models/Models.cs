@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace TelegramService.Models;
 
@@ -39,10 +39,14 @@ public sealed class TelegramMessageDto
 
     [JsonProperty("entities")] public IReadOnlyList<TelegramMessageEntityDto>? Entities { get; init; }
 
+    [JsonProperty("caption")] public string? Caption { get; init; }
+
     [JsonProperty("photo")] public IReadOnlyList<TelegramPhotoSizeDto>? Photo { get; init; }
     [JsonProperty("sticker")] public TelegramStickerDto? Sticker { get; init; }
     [JsonProperty("document")] public TelegramDocumentDto? Document { get; init; }
     [JsonProperty("voice")] public TelegramVoiceDto? Voice { get; init; }
+    [JsonProperty("video")] public TelegramVideoDto? Video { get; init; }
+    [JsonProperty("audio")] public TelegramAudioDto? Audio { get; init; }
 }
 
 public sealed class TelegramUserDto
@@ -111,6 +115,30 @@ public sealed class TelegramVoiceDto
     [JsonProperty("file_id")] public string FileId { get; init; } = null!;
     [JsonProperty("file_unique_id")] public string FileUniqueId { get; init; } = null!;
     [JsonProperty("duration")] public int Duration { get; init; }
+    [JsonProperty("mime_type")] public string? MimeType { get; init; }
+    [JsonProperty("file_size")] public long? FileSize { get; init; }
+}
+
+public sealed class TelegramVideoDto
+{
+    [JsonProperty("file_id")] public string FileId { get; init; } = null!;
+    [JsonProperty("file_unique_id")] public string FileUniqueId { get; init; } = null!;
+    [JsonProperty("width")] public int Width { get; init; }
+    [JsonProperty("height")] public int Height { get; init; }
+    [JsonProperty("duration")] public int Duration { get; init; }
+    [JsonProperty("file_name")] public string? FileName { get; init; }
+    [JsonProperty("mime_type")] public string? MimeType { get; init; }
+    [JsonProperty("file_size")] public long? FileSize { get; init; }
+}
+
+public sealed class TelegramAudioDto
+{
+    [JsonProperty("file_id")] public string FileId { get; init; } = null!;
+    [JsonProperty("file_unique_id")] public string FileUniqueId { get; init; } = null!;
+    [JsonProperty("duration")] public int Duration { get; init; }
+    [JsonProperty("performer")] public string? Performer { get; init; }
+    [JsonProperty("title")] public string? Title { get; init; }
+    [JsonProperty("file_name")] public string? FileName { get; init; }
     [JsonProperty("mime_type")] public string? MimeType { get; init; }
     [JsonProperty("file_size")] public long? FileSize { get; init; }
 }

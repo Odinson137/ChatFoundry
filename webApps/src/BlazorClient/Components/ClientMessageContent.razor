@@ -58,7 +58,15 @@
         {
             <div class="cd-msg-media-placeholder">
                 <span class="cd-msg-kind">&#x1f5bc; Медиа</span>
-                @if (!string.IsNullOrWhiteSpace(_mediaCaption))
+                @if (_mediaError == "size_exceeded")
+                {
+                    <div class="cd-msg-text cd-msg-text-muted">Файл превышает 20 МБ. Превью недоступно.</div>
+                }
+                else if (_mediaError == "upload_failed")
+                {
+                    <div class="cd-msg-text cd-msg-text-muted">Превью недоступно (ошибка загрузки).</div>
+                }
+                else if (!string.IsNullOrWhiteSpace(_mediaCaption))
                 {
                     <div class="cd-msg-text">@_mediaCaption</div>
                 }
@@ -95,6 +103,7 @@
     private string? _mediaFileName;
     private bool _mediaResolved;
     private bool _mediaIsImage;
+    private string? _mediaError;
 
     protected override void OnParametersSet()
     {
@@ -107,6 +116,7 @@
         _mediaFileName = null;
         _mediaResolved = false;
         _mediaIsImage = false;
+        _mediaError = null;
 
         if (_kind == "BUTTONS" && !string.IsNullOrWhiteSpace(Payload) && Payload.TrimStart().StartsWith("{"))
         {
@@ -147,8 +157,16 @@
         try
         {
             var dto = JsonSerializer.Deserialize<MessagePayloadDto>(p, JsonOptions);
-            var text = dto?.Text?.Trim();
             _mediaCaption = dto?.Caption;
+
+            if (!string.IsNullOrEmpty(dto?.Error))
+            {
+                _mediaError = dto.Error;
+                _mediaResolved = true;
+                return;
+            }
+
+            var text = dto?.Text?.Trim();
             if (string.IsNullOrWhiteSpace(text) || !Guid.TryParse(text, out var fileId))
             {
                 _mediaResolved = true;

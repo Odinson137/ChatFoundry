@@ -12,6 +12,12 @@ public class MessagePayloadDto
 
     [JsonPropertyName("caption")]
     public string? Caption { get; set; }
+
+    [JsonPropertyName("error")]
+    public string? Error { get; set; }
+
+    [JsonPropertyName("telegram_file_id")]
+    public string? TelegramFileId { get; set; }
 }
 
 /// <summary>

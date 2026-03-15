@@ -9,7 +9,7 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
 {
     public async Task<IReadOnlyList<FileEntity>> GetFiles([Service] IFileRepository fileRepository, CancellationToken ct = default)
     {
-        return await fileRepository.ListByUserAsync(UserId, null, ct);
+        return await fileRepository.ListAsync(CompanyId ?? Guid.Empty, null, ct);
     }
 
     public async Task<FileEntity?> GetFile(Guid id, [Service] IFileRepository fileRepository, CancellationToken ct = default)

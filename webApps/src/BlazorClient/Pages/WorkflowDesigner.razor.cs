@@ -1695,6 +1695,18 @@ public partial class WorkflowDesigner : IDisposable
         }
     }
 
+    /// <summary>Устанавливает значение поля только выбранной переменной (предыдущее содержимое удаляется).</summary>
+    private void InsertVariableReplacing(object dataObject, string propertyName, string variableName)
+    {
+        var property = dataObject.GetType().GetProperty(propertyName);
+        if (property != null)
+        {
+            var toSet = "{{" + VariableNameToStorageForm(variableName) + "}}";
+            property.SetValue(dataObject, toSet);
+            OnWorkflowChanged();
+        }
+    }
+
     /// <summary>Strips $node. prefix so we store only {{guid.output}} in the DB.</summary>
     private static string VariableNameToStorageForm(string variableName)
     {
