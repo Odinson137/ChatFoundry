@@ -45,7 +45,7 @@
                     @foreach (var item in GetFilteredNodeTools().Where(x => x.Section == "Логика"))
                     {
                         <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, item.Type)">
-                            <span class="node-tool-icon node-tool-icon--@item.IconClass"><span class="oi @item.Icon"></span></span>
+                            <span class="node-tool-icon node-tool-icon--@item.IconClass">@((MarkupString)item.IconSvg)</span>
                             <span class="node-tool-label">@item.Label</span>
                         </div>
                     }
@@ -57,7 +57,7 @@
                     @foreach (var item in GetFilteredNodeTools().Where(x => x.Section == "Контент"))
                     {
                         <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, item.Type)">
-                            <span class="node-tool-icon node-tool-icon--@item.IconClass"><span class="oi @item.Icon"></span></span>
+                            <span class="node-tool-icon node-tool-icon--@item.IconClass">@((MarkupString)item.IconSvg)</span>
                             <span class="node-tool-label">@item.Label</span>
                         </div>
                     }
@@ -69,7 +69,7 @@
                     @foreach (var item in GetFilteredNodeTools().Where(x => x.Section == "AI и интеграции"))
                     {
                         <div class="node-tool" draggable="true" @ondragstart="e => OnDragStart(e, item.Type)">
-                            <span class="node-tool-icon node-tool-icon--@item.IconClass"><span class="oi @item.Icon"></span></span>
+                            <span class="node-tool-icon node-tool-icon--@item.IconClass">@((MarkupString)item.IconSvg)</span>
                             <span class="node-tool-label">@item.Label</span>
                         </div>
                     }
@@ -626,7 +626,7 @@
                                 <input type="text" class="form-control font-monospace variable-input" value="@ToDisplayText(link.Condition.Equals.Left)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.Equals!, nameof(BinaryConditionBase.Left)); OnWorkflowChanged(); }" placeholder="$variable_name"/>
                                 <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
                             </div>
-                            <div class="text-center my-1"><span class="badge bg-primary">РАВНО</span></div>
+                            <div class="text-center my-1"><span class="badge designer-cond-badge designer-cond-badge--equals">РАВНО</span></div>
                             <div class="designer-var-row">
                                 <label class="small text-muted d-flex justify-content-between align-items-center">
                                     <span>Значение</span>

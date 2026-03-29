@@ -1,4 +1,4 @@
-﻿using Blazor.Diagrams.Core.Anchors;
+using Blazor.Diagrams.Core.Anchors;
 using Blazor.Diagrams.Core.Geometry;
 using Blazor.Diagrams.Core.Models;
 
@@ -65,5 +65,8 @@ public class WorkflowLinkModel : LinkModel
     public WorkflowLinkModel(Anchor source, Anchor? target = null, Guid? id = null)
         : base(id?.ToString() ?? Guid.NewGuid().ToString(), source, target)
     {
+        Color = "#94a3b8";
+        SelectedColor = "#6366f1";
+        Width = 1;
     }
 }

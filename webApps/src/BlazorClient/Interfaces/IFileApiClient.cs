@@ -10,14 +10,11 @@ public record FileInfoDto(
     DateTime? CreatedAt = null,
     string? Key = null,
     Guid? UploadedByUserId = null,
-    Guid? UploadedClientId = null,
-    string? UploadedByUserName = null)
+    Guid? UploadedClientId = null)
 {
-    /// <summary>«Клиент» при загрузке от клиента; иначе имя пользователя или «Пользователь».</summary>
+    /// <summary>«Клиент» при загрузке от клиента; иначе «Администратор» (загрузка из панели / сервиса).</summary>
     public string UploadSourceDisplay =>
-        UploadedClientId.HasValue ? "Клиент"
-        : !string.IsNullOrWhiteSpace(UploadedByUserName) ? UploadedByUserName!
-        : "Пользователь";
+        UploadedClientId.HasValue ? "Клиент" : "Администратор";
 }
 
 public interface IFileApiClient

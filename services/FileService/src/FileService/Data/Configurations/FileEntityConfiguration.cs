@@ -22,9 +22,6 @@ public class FileEntityConfiguration : IEntityTypeConfiguration<FileEntity>
         builder.Property(f => f.ContentType)
             .HasMaxLength(128);
 
-        builder.Property(f => f.UploadedByUserName)
-            .HasMaxLength(256);
-
         builder.HasIndex(f => f.CompanyId);
         builder.HasIndex(f => f.UploadedClientId);
         builder.HasIndex(f => f.UploadedByUserId);

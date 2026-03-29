@@ -30,11 +30,9 @@ public class FilesController(
         await using var stream = file.OpenReadStream();
         var (key, url) = await storage.UploadAsync(stream, file.FileName, file.ContentType, ct);
 
-        var user = httpContextAccessor.HttpContext?.User;
         var entity = new FileEntity
         {
             UploadedByUserId = userId != Guid.Empty ? userId : null,
-            UploadedByUserName = UploaderDisplayNameHelper.FromPrincipal(user),
             CompanyId = companyId ?? companyIdFromClaim ?? Guid.Empty,
             UploadedClientId = uploadedClientId,
             Key = key,

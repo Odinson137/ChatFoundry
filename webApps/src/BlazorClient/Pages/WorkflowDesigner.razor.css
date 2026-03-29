@@ -26,6 +26,43 @@
     --designer-violet-600: #7c3aed;
 }
 
+/* Bootstrap «primary» на странице дизайнера — в палитру ChatFoundry (indigo), не дефолтный синий */
+.designer-page-container .btn-outline-primary {
+    color: var(--designer-primary);
+    border-color: #a5b4fc;
+    background: #fff;
+}
+
+.designer-page-container .btn-outline-primary:hover {
+    color: #4f46e5;
+    border-color: var(--designer-primary);
+    background: var(--designer-indigo-50);
+}
+
+.designer-page-container .border-primary {
+    border-color: rgba(99, 102, 241, 0.45) !important;
+}
+
+.designer-page-container .badge.bg-primary {
+    background: linear-gradient(135deg, var(--designer-primary) 0%, var(--designer-primary-end) 100%) !important;
+    color: #fff !important;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+/* Явный бейдж условия «РАВНО» — фиолетовый, всегда читаемый на белой карточке */
+.designer-settings-panel .designer-cond-badge--equals,
+.designer-page-container .designer-cond-badge--equals {
+    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%) !important;
+    background-color: #7c3aed !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    border: 0;
+    box-shadow: 0 1px 2px rgba(124, 58, 237, 0.35);
+}
+
 /* Основной контейнер — на весь экран, без скроллов */
 .designer-page-container {
     display: flex;
@@ -198,6 +235,13 @@
     font-size: 1rem;
 }
 
+.node-tool-icon svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
 .node-tool-icon--green {
     background: var(--designer-emerald-50);
     color: var(--designer-emerald-600);
@@ -209,8 +253,8 @@
 }
 
 .node-tool-icon--blue {
-    background: #eff6ff;
-    color: #2563eb;
+    background: var(--designer-indigo-50);
+    color: var(--designer-indigo-600);
 }
 
 .node-tool-icon--red {
@@ -292,11 +336,7 @@
 }
 
 .designer-undo-redo {
-    display: flex;
-    align-items: center;
-    background: var(--designer-slate-100);
-    padding: 0.15rem;
-    border-radius: 8px;
+    display: none;
 }
 
 .designer-undo-btn,
@@ -1541,6 +1581,30 @@
 .canvas-area ::deep [class*="port"]:hover {
     transform: scale(1.2);
     background: var(--designer-indigo-600) !important;
+}
+
+/* Подпись на связи (foreignObject) — нейтральный сланцевый текст, не голубой от темы диаграммы */
+.canvas-area ::deep foreignObject.diagram-link-label {
+    overflow: visible;
+}
+
+.canvas-area ::deep foreignObject.diagram-link-label,
+.canvas-area ::deep foreignObject.diagram-link-label * {
+    color: var(--designer-slate-600);
+}
+
+.canvas-area ::deep foreignObject.diagram-link-label > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.25rem;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid var(--designer-slate-200);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 
 /* Убираем глобальные скроллы */

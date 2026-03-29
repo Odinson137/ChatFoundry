@@ -55,7 +55,9 @@ public partial class SessionReplay : IDisposable, IReplayDataProvider
             Links =
             {
                 DefaultRouter = new NormalRouter(),
-                DefaultPathGenerator = new SmoothPathGenerator()
+                DefaultPathGenerator = new SmoothPathGenerator(),
+                DefaultColor = "#94a3b8",
+                DefaultSelectedColor = "#6366f1"
             }
         };
 

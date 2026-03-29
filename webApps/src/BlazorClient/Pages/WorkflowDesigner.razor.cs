@@ -242,13 +242,15 @@ public partial class WorkflowDesigner : IDisposable
             {
                 DefaultRouter = new NormalRouter(),
                 DefaultPathGenerator = new SmoothPathGenerator(),
+                DefaultColor = "#94a3b8",
+                DefaultSelectedColor = "#6366f1",
                 Factory = (diagram, source, targetAnchor) =>
                 {
                     Anchor sourceAnchor = source is PortModel port
                         ? new SinglePortAnchor(port)
                         : new ShapeIntersectionAnchor((NodeModel)source);
 
-                    return new WorkflowLinkModel(sourceAnchor, targetAnchor) { Color = "gray", Width = 1 };
+                    return new WorkflowLinkModel(sourceAnchor, targetAnchor);
                 }
             }
         };
@@ -1922,15 +1924,15 @@ public partial class WorkflowDesigner : IDisposable
 
     private static readonly List<NodeToolItem> AllNodeTools =
     [
-        new NodeToolItem("Логика", "Старт", NodeType.Start, "oi-media-play", "green"),
-        new NodeToolItem("Логика", "Ожидание", NodeType.Wait, "oi-timer", "blue"),
-        new NodeToolItem("Логика", "Процесс", NodeType.SubWorkflow, "oi-layers", "orange"),
-        new NodeToolItem("Контент", "Сообщение", NodeType.Message, "oi-chat", "indigo"),
-        new NodeToolItem("Контент", "Вопрос", NodeType.Ask, "oi-question-mark", "indigo"),
-        new NodeToolItem("Контент", "Медиа", NodeType.Media, "oi-image", "indigo"),
-        new NodeToolItem("AI и интеграции", "API Запрос", NodeType.HttpRequest, "oi-cloud-download", "violet"),
-        new NodeToolItem("AI и интеграции", "Атрибут", NodeType.SetAttribute, "oi-person", "violet"),
-        new NodeToolItem("AI и интеграции", "AI Текст", NodeType.AIGenerate, "oi-bolt", "violet"),
+        new NodeToolItem("Логика", "Старт", NodeType.Start, NodeToolPaletteSvg.Start, "green"),
+        new NodeToolItem("Логика", "Ожидание", NodeType.Wait, NodeToolPaletteSvg.Wait, "blue"),
+        new NodeToolItem("Логика", "Процесс", NodeType.SubWorkflow, NodeToolPaletteSvg.SubWorkflow, "orange"),
+        new NodeToolItem("Контент", "Сообщение", NodeType.Message, NodeToolPaletteSvg.Message, "indigo"),
+        new NodeToolItem("Контент", "Вопрос", NodeType.Ask, NodeToolPaletteSvg.Ask, "indigo"),
+        new NodeToolItem("Контент", "Медиа", NodeType.Media, NodeToolPaletteSvg.Media, "indigo"),
+        new NodeToolItem("AI и интеграции", "API Запрос", NodeType.HttpRequest, NodeToolPaletteSvg.HttpRequest, "violet"),
+        new NodeToolItem("AI и интеграции", "Атрибут", NodeType.SetAttribute, NodeToolPaletteSvg.SetAttribute, "violet"),
+        new NodeToolItem("AI и интеграции", "AI Текст", NodeType.AIGenerate, NodeToolPaletteSvg.AiGenerate, "violet"),
     ];
 
     private IEnumerable<NodeToolItem> GetFilteredNodeTools()
@@ -1943,7 +1945,7 @@ public partial class WorkflowDesigner : IDisposable
             t.Section.Contains(q, StringComparison.OrdinalIgnoreCase));
     }
 
-    private sealed record NodeToolItem(string Section, string Label, NodeType Type, string Icon, string IconClass);
+    private sealed record NodeToolItem(string Section, string Label, NodeType Type, string IconSvg, string IconClass);
 
     private void OnConditionTypeChanged(WorkflowLinkModel link, string? type)
     {
