@@ -22,6 +22,10 @@ public class ActionEntityConfiguration : BaseEntityTypeConfiguration<ActionEntit
             .IsRequired()
             .HasConversion<int>();
 
+        builder.Property(x => x.MessageKind)
+            .IsRequired()
+            .HasConversion<int>();
+
         builder.Property(x => x.ErrorMessage)
             .HasMaxLength(2000);
 

@@ -36,7 +36,14 @@ public class MessageSender(
 
         if (node.Type == WorkflowNodeType.Media && node.Data is MediaNodeData mediaData)
         {
-            messageKind = MessageKind.Media;
+            messageKind = mediaData.MediaKind switch
+            {
+                MediaKind.Image => MessageKind.Photo,
+                MediaKind.Video => MessageKind.Video,
+                MediaKind.Audio => MessageKind.Audio,
+                MediaKind.File => MessageKind.Document,
+                _ => MessageKind.Photo
+            };
             var fileId = string.IsNullOrEmpty(mediaData.Value)
                 ? throw new NoNullAllowedException("File Id not presented")
                 : workflowTextRenderer.RenderText(mediaData.Value, action.Session);

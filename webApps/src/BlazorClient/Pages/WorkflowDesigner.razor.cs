@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using BlazorClient.Models.Diagram;
 
@@ -115,7 +116,11 @@ public partial class WorkflowDesigner : IDisposable
     // Модальное окно выбора файла из хранилища
     private bool IsStoragePickerOpen { get; set; }
     private MediaNodeData? StoragePickerTarget { get; set; }
-    private List<FileInfoDto> StoragePickerFiles { get; set; } = [];
+    private List<FileInfoDto> StoragePickerAllFiles { get; set; } = [];
+    private string StoragePickerSearch { get; set; } = "";
+    private int StoragePickerPageIndex { get; set; }
+    private const int StoragePickerPageSize = 10;
+    private Timer? _storagePickerSearchTimer;
     private bool StoragePickerLoading { get; set; }
 
     // Список workflow для выбора в блоке «Процесс»
@@ -360,8 +365,25 @@ public partial class WorkflowDesigner : IDisposable
                 }
             }
         }
-        
+
+        foreach (var node in Diagram.Nodes.Cast<WorkflowNodeModel>())
+        {
+            if (node.Data is AskNodeData ask)
+                NormalizeAskButtons(ask);
+        }
+
         RefreshNodeVariableCache();
+    }
+
+    private static void NormalizeAskButtons(AskNodeData ask)
+    {
+        if (ask.Ui?.Buttons == null) return;
+        foreach (var b in ask.Ui.Buttons)
+        {
+            if (string.IsNullOrWhiteSpace(b.Text) && !string.IsNullOrWhiteSpace(b.Value))
+                b.Text = b.Value!;
+            b.Value = null;
+        }
     }
 
     private void PushUndoState()
@@ -598,11 +620,9 @@ public partial class WorkflowDesigner : IDisposable
             NodeType.End => "Конец",
             NodeType.Message => "Сообщение",
             NodeType.Ask => "Вопрос",
-            NodeType.Condition => "Условие",
             NodeType.Wait => "Задержка",
             NodeType.SetAttribute => "Атрибут",
             NodeType.HttpRequest => "API запрос",
-            NodeType.AIFilter => "AI Фильтр",
             NodeType.AIGenerate => "AI Текст",
             NodeType.Media => "Медиа",
             NodeType.SubWorkflow => "Процесс",
@@ -654,7 +674,7 @@ public partial class WorkflowDesigner : IDisposable
     {
         if (askData == null) return;
         askData.Ui ??= new AskUiData();
-        askData.Ui.Buttons.Add(new AskButtonData { Text = "", Value = "" });
+        askData.Ui.Buttons.Add(new AskButtonData { Text = "" });
         OnWorkflowChanged();
         StateHasChanged();
     }
@@ -866,15 +886,17 @@ public partial class WorkflowDesigner : IDisposable
         StoragePickerTarget = mediaData;
         IsStoragePickerOpen = true;
         StoragePickerLoading = true;
-        StoragePickerFiles = [];
+        StoragePickerAllFiles = [];
+        StoragePickerSearch = "";
+        StoragePickerPageIndex = 0;
         StateHasChanged();
         try
         {
-            StoragePickerFiles = await FileApiClient.ListFilesAsync(workflowId: WorkflowId);
+            StoragePickerAllFiles = await FileApiClient.ListFilesAsync(workflowId: WorkflowId);
         }
         catch
         {
-            StoragePickerFiles = [];
+            StoragePickerAllFiles = [];
         }
         finally
         {
@@ -885,9 +907,86 @@ public partial class WorkflowDesigner : IDisposable
 
     private void CloseStoragePicker()
     {
+        _storagePickerSearchTimer?.Dispose();
+        _storagePickerSearchTimer = null;
         IsStoragePickerOpen = false;
         StoragePickerTarget = null;
-        StoragePickerFiles = [];
+        StoragePickerAllFiles = [];
+        StoragePickerSearch = "";
+        StoragePickerPageIndex = 0;
+        StateHasChanged();
+    }
+
+    private List<FileInfoDto> ComputeStoragePickerFiltered()
+    {
+        IEnumerable<FileInfoDto> q = StoragePickerAllFiles;
+        var search = StoragePickerSearch.Trim();
+        if (!string.IsNullOrEmpty(search))
+        {
+            q = q.Where(f =>
+                (f.Name?.Contains(search, StringComparison.OrdinalIgnoreCase) == true) ||
+                f.Id.Contains(search, StringComparison.OrdinalIgnoreCase));
+        }
+
+        return q.OrderByDescending(f => f.CreatedAt).ToList();
+    }
+
+    private (List<FileInfoDto> page, int total) GetStoragePickerPage()
+    {
+        var filtered = ComputeStoragePickerFiltered();
+        var total = filtered.Count;
+        if (total == 0)
+            return (new List<FileInfoDto>(), 0);
+        var maxPageIndex = (total - 1) / StoragePickerPageSize;
+        if (StoragePickerPageIndex > maxPageIndex)
+            StoragePickerPageIndex = maxPageIndex;
+        var page = filtered.Skip(StoragePickerPageIndex * StoragePickerPageSize).Take(StoragePickerPageSize).ToList();
+        return (page, total);
+    }
+
+    private bool StoragePickerHasPrev => StoragePickerPageIndex > 0;
+
+    private bool StoragePickerHasNext
+    {
+        get
+        {
+            var total = ComputeStoragePickerFiltered().Count;
+            return (StoragePickerPageIndex + 1) * StoragePickerPageSize < total;
+        }
+    }
+
+    private void OnStoragePickerSearchInput()
+    {
+        _storagePickerSearchTimer?.Dispose();
+        _storagePickerSearchTimer = new Timer(_ =>
+        {
+            InvokeAsync(async () =>
+            {
+                _storagePickerSearchTimer?.Dispose();
+                _storagePickerSearchTimer = null;
+                StoragePickerPageIndex = 0;
+                await InvokeAsync(StateHasChanged);
+            });
+        }, null, 400, Timeout.Infinite);
+    }
+
+    private void OnStoragePickerSearchSubmit()
+    {
+        StoragePickerPageIndex = 0;
+        StateHasChanged();
+    }
+
+    private void StoragePickerNextPage()
+    {
+        if (StoragePickerHasNext)
+            StoragePickerPageIndex++;
+        StateHasChanged();
+    }
+
+    private void StoragePickerPrevPage()
+    {
+        if (StoragePickerHasPrev)
+            StoragePickerPageIndex--;
         StateHasChanged();
     }
 
@@ -1030,8 +1129,6 @@ public partial class WorkflowDesigner : IDisposable
                     {
                         if (!string.IsNullOrWhiteSpace(b.Text))
                             TrackUsage(variables, ExtractVariables(b.Text), nodeTitle);
-                        if (!string.IsNullOrWhiteSpace(b.Value))
-                            TrackUsage(variables, ExtractVariables(b.Value), nodeTitle);
                     }
                 }
             }
@@ -1153,8 +1250,16 @@ public partial class WorkflowDesigner : IDisposable
 
         return node.NodeType?.ToLowerInvariant() switch
         {
-            "start" => [($"$node.{id}.output", "Payload (старт)")],
-            "ask" => [($"$node.{id}.output", "Ответ пользователя")],
+            "start" =>
+            [
+                ($"$node.{id}.output", "Payload (старт)"),
+                ($"$node.{id}.messageKind", "Тип сообщения")
+            ],
+            "ask" =>
+            [
+                ($"$node.{id}.output", "Ответ пользователя"),
+                ($"$node.{id}.messageKind", "Тип сообщения")
+            ],
             "aigenerate" => [($"$node.{id}.output", "Результат AI")],
             "httprequest" => [($"$node.{id}.output", "Тело ответа (response body)"),
                               ($"$node.{id}.statusCode", "Статус-код (statusCode)"),
@@ -1757,7 +1862,60 @@ public partial class WorkflowDesigner : IDisposable
     {
         SelectedModel = model.Selected ? (Model)model : null;
         _conditionTypeDropdownOpen = false;
+        ApplyNodeDragLocks();
         StateHasChanged();
+        if (model.Selected)
+        {
+            _ = InvokeAsync(async () =>
+            {
+                try
+                {
+                    await JSRuntime.InvokeVoidAsync("__releaseDiagramPointerDragDeferred");
+                }
+                catch (JSDisconnectedException)
+                {
+                    // Navigated away
+                }
+            });
+        }
+    }
+
+    /// <summary>
+    /// While the settings panel is open, only the selected node can be dragged; other nodes are locked.
+    /// When a link is selected, all nodes are locked.
+    /// </summary>
+    private void ApplyNodeDragLocks()
+    {
+        if (SelectedModel is NodeModel activeNode)
+        {
+            foreach (var node in Diagram.Nodes)
+                node.Locked = !ReferenceEquals(node, activeNode);
+        }
+        else if (SelectedModel != null)
+        {
+            foreach (var node in Diagram.Nodes)
+                node.Locked = true;
+        }
+        else
+        {
+            foreach (var node in Diagram.Nodes)
+                node.Locked = false;
+        }
+    }
+
+    /// <summary>Сбрасывает «липкий» drag диаграммы, как только курсор попадает на боковую панель.</summary>
+    private void OnSettingsPanelPointerEnter()
+    {
+        _ = InvokeAsync(async () =>
+        {
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("__releaseDiagramPointerDragCore");
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        });
     }
 
     private void OnDragStart(DragEventArgs e, NodeType type) => _draggedType = type;
@@ -1765,7 +1923,6 @@ public partial class WorkflowDesigner : IDisposable
     private static readonly List<NodeToolItem> AllNodeTools =
     [
         new NodeToolItem("Логика", "Старт", NodeType.Start, "oi-media-play", "green"),
-        new NodeToolItem("Логика", "Условие", NodeType.Condition, "oi-fork", "orange"),
         new NodeToolItem("Логика", "Ожидание", NodeType.Wait, "oi-timer", "blue"),
         new NodeToolItem("Логика", "Процесс", NodeType.SubWorkflow, "oi-layers", "orange"),
         new NodeToolItem("Контент", "Сообщение", NodeType.Message, "oi-chat", "indigo"),
@@ -1773,7 +1930,6 @@ public partial class WorkflowDesigner : IDisposable
         new NodeToolItem("Контент", "Медиа", NodeType.Media, "oi-image", "indigo"),
         new NodeToolItem("AI и интеграции", "API Запрос", NodeType.HttpRequest, "oi-cloud-download", "violet"),
         new NodeToolItem("AI и интеграции", "Атрибут", NodeType.SetAttribute, "oi-person", "violet"),
-        new NodeToolItem("AI и интеграции", "AI Фильтр", NodeType.AIFilter, "oi-eye", "violet"),
         new NodeToolItem("AI и интеграции", "AI Текст", NodeType.AIGenerate, "oi-bolt", "violet"),
     ];
 
@@ -2015,6 +2171,39 @@ public partial class WorkflowDesigner : IDisposable
         return "Без условия (Всегда)";
     }
 
+    /// <summary>Значения для условий по полю messageKind (совпадают с Shared.Domain.Enums.MessageKind.ToString()).</summary>
+    public static readonly IReadOnlyList<(string Value, string Label)> IncomingMessageKindSelectOptions =
+    [
+        ("Text", "Текст"),
+        ("Photo", "Фото"),
+        ("Video", "Видео"),
+        ("Audio", "Аудио"),
+        ("Voice", "Голосовое"),
+        ("Document", "Документ"),
+        ("Sticker", "Стикер"),
+        ("Unknown", "Неизвестно"),
+    ];
+
+    /// <summary>True, если левая часть условия ссылается на тип входящего сообщения ($node.*.messageKind или $message.kind).</summary>
+    private bool IsMessageKindLeftOperand(string? left)
+    {
+        if (string.IsNullOrWhiteSpace(left)) return false;
+        var t = left.Trim();
+        if (string.Equals(t, "$message.kind", StringComparison.OrdinalIgnoreCase)) return true;
+        if (t.EndsWith(".messageKind", StringComparison.OrdinalIgnoreCase)) return true;
+        var normalized = FromDisplayText(t);
+        if (NodeInternalVarRegex.IsMatch(normalized))
+        {
+            var m = NodeInternalVarRegex.Match(normalized);
+            if (m.Success && m.Length == normalized.Length &&
+                string.Equals(m.Groups["key"].Value, "messageKind", StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+        var pm = NodeDisplayVarRegexPretty.Match(t);
+        return pm.Success && pm.Length == t.Length &&
+               string.Equals(pm.Groups["key"].Value, "messageKind", StringComparison.OrdinalIgnoreCase);
+    }
+
     private static readonly IReadOnlyList<(string Value, string Label)> ConditionTypeOptions = new List<(string, string)>
     {
         ("none", "Без условия (Всегда)"),
@@ -2041,6 +2230,7 @@ public partial class WorkflowDesigner : IDisposable
 
     public void Dispose()
     {
+        _storagePickerSearchTimer?.Dispose();
         if (Diagram != null)
         {
             Diagram.SelectionChanged -= OnSelectionChanged;

@@ -1049,6 +1049,50 @@
     flex-shrink: 0;
 }
 
+.storage-picker-modal .variable-picker-list.storage-picker-list {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.storage-picker-table {
+    font-size: 0.8125rem;
+}
+
+.storage-picker-table thead th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--designer-slate-500);
+    border-bottom: 1px solid var(--designer-slate-100);
+}
+
+.storage-picker-table td {
+    vertical-align: middle;
+}
+
+.storage-picker-row {
+    cursor: pointer;
+}
+
+.storage-picker-row:hover {
+    background: var(--designer-slate-50, #f8fafc);
+}
+
+.storage-picker-cell-name {
+    font-weight: 500;
+    color: var(--designer-slate-800, #1e293b);
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.storage-picker-id {
+    font-size: 0.7rem;
+    color: var(--designer-slate-500);
+    word-break: break-all;
+}
+
 /* Панель настроек — совместимость с существующими form-control внутри */
 .designer-settings-panel .mb-3 {
     margin-bottom: 1rem;
@@ -1202,6 +1246,74 @@
 
 .designer-settings-panel .badge {
     font-size: 0.7rem;
+}
+
+/* Строки кнопок Ask: поле + компактное удаление */
+.designer-ask-button-row {
+    display: flex;
+    align-items: stretch;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.designer-ask-button-input {
+    flex: 1;
+    min-width: 0;
+    border-radius: 8px;
+}
+
+.designer-ask-remove {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--designer-slate-200);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--designer-slate-500);
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.designer-ask-remove:hover {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #b91c1c;
+}
+
+.designer-ask-remove .oi {
+    font-size: 0.95rem;
+}
+
+.designer-ask-add {
+    width: 100%;
+    margin-top: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--designer-slate-700);
+    background: #fff;
+    border: 1px solid var(--designer-slate-200);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.designer-ask-add:hover {
+    background: var(--designer-indigo-50);
+    border-color: var(--designer-primary);
+    color: var(--designer-primary);
+}
+
+.designer-ask-add .oi {
+    font-size: 0.85rem;
 }
 
 /* ========== Модальное окно «Переменные / Атрибуты / Параметры» ========== */
@@ -1395,6 +1507,15 @@
     padding: 0.5rem 0.75rem;
     color: var(--designer-slate-800);
     font-size: 0.8125rem;
+}
+
+/* Выбранный узел: кольцо через box-shadow (без position/outline — иначе ломается absolute-раскладка узла и ширина) */
+.canvas-area ::deep .diagram-node.selected {
+    box-shadow: 0 0 0 2px var(--designer-primary), 0 4px 20px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+.canvas-area ::deep .bd-node.selected {
+    box-shadow: 0 0 0 2px var(--designer-primary), 0 4px 20px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
 
 /* Порты: видимые, удобный размер для перетаскивания линии связи */

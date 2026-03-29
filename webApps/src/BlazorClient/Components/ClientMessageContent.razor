@@ -28,7 +28,7 @@
             <div class="cd-msg-text">@Payload</div>
         }
     }
-    else if (_kind == "MEDIA")
+    else if (IsMediaPresentationKind(_kind))
     {
         if (!_mediaResolved)
         {
@@ -132,7 +132,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        if (_kind != "MEDIA")
+        if (!IsMediaPresentationKind(_kind))
             return;
 
         var p = Payload ?? "";
@@ -214,18 +214,21 @@
         return p;
     }
 
+    private static bool IsMediaPresentationKind(string k) => (k ?? "").ToUpperInvariant() is
+        "MEDIA" or "PHOTO" or "VIDEO" or "AUDIO" or "VOICE" or "DOCUMENT" or "STICKER";
+
     private static string GetKindIcon(string kind) => (kind ?? "").ToUpperInvariant() switch
     {
-        "IMAGE" => "\u0001f5bc",
-        "AUDIO" => "\u0001f3b5",
-        "VIDEO" => "\u0001f3ac",
-        "VOICE" => "\u0001f3a4",
-        "FILE" => "\u0001f4ce",
-        "STICKER" => "\u0001f600",
-        "LINK" => "\u0001f517",
+        "PHOTO" or "IMAGE" or "MEDIA" => "\U0001F5BC",
+        "AUDIO" => "\U0001F3B5",
+        "VIDEO" => "\U0001F3AC",
+        "VOICE" => "\U0001F3A4",
+        "DOCUMENT" or "FILE" => "\U0001F4CE",
+        "STICKER" => "\U0001F600",
+        "LINK" => "\U0001F517",
         "COMMAND" => "/",
         "BUTTONS" => "\u2328",
         "CALLBACK_QUERY" => "\u21a9",
-        _ => "\u0001f4e6"
+        _ => "\U0001F4E6"
     };
 }

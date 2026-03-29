@@ -2,7 +2,9 @@
 @layout SettingsLayout
 @using BlazorClient.Interfaces
 @using Microsoft.AspNetCore.Authorization
+@using System.Threading
 @attribute [Authorize]
+@implements IDisposable
 
 @inject IFileApiClient FileApi
 @inject ICompanyApiClient CompanyApi
@@ -39,7 +41,7 @@
         <div class="settings-spinner"></div>
     </div>
 }
-else if (!files.Any())
+else if (!_allFiles.Any())
 {
     <div class="settings-empty-state">
         <div class="settings-empty-icon">
@@ -55,7 +57,38 @@ else if (!files.Any())
 }
 else
 {
-    <div class="settings-card">
+    var (pageItems, totalFiltered) = GetPage();
+    <div class="settings-card files-card">
+        <div class="files-filters">
+            <div class="files-filters-row">
+                <input type="text" class="files-input files-input-search" placeholder="Имя или ID файла" @bind="_searchText" @bind:event="oninput" @bind:after="OnSearchInput" />
+                <select class="settings-select files-select" @bind="_typeFilter" @bind:after="OnFilterChanged">
+                    <option value="">Все типы</option>
+                    <option value="image">Изображения</option>
+                    <option value="video">Видео</option>
+                    <option value="audio">Аудио</option>
+                    <option value="other">Прочее</option>
+                </select>
+                <button type="button" class="settings-icon-btn files-btn-refresh" @onclick="OnRefreshClick" title="Обновить">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+                </button>
+            </div>
+            <div class="files-filters-row files-filters-row-dates">
+                <span class="files-filter-label">Загружен</span>
+                <input type="date" class="files-input files-input-date" @bind="_createdFrom" @bind:format="yyyy-MM-dd" @bind:after="OnFilterChanged" />
+                <span class="files-filter-sep">—</span>
+                <input type="date" class="files-input files-input-date" @bind="_createdTo" @bind:format="yyyy-MM-dd" @bind:after="OnFilterChanged" />
+            </div>
+        </div>
+        @if (totalFiltered == 0)
+        {
+            <div class="files-filter-empty">
+                <p>Ничего не найдено</p>
+                <small>Измените фильтры или поисковый запрос</small>
+            </div>
+        }
+        else
+        {
         <table class="settings-table">
             <thead>
             <tr>
@@ -63,11 +96,12 @@ else
                 <th>Тип</th>
                 <th>Размер</th>
                 <th>Дата</th>
+                <th>Кто загрузил</th>
                 <th style="text-align: right;">Действия</th>
             </tr>
             </thead>
             <tbody>
-            @foreach (var file in files)
+            @foreach (var file in pageItems)
             {
                 <tr style="cursor: pointer;" @onclick="() => OpenFile(file)">
                     <td>
@@ -96,6 +130,7 @@ else
                     <td><code class="file-type">@(file.ContentType ?? "—")</code></td>
                     <td class="file-size">@FormatSize(file.Size)</td>
                     <td class="file-date">@(file.CreatedAt?.ToString("dd.MM.yyyy") ?? "—")</td>
+                    <td class="file-source">@file.UploadSourceDisplay</td>
                     <td style="text-align: right;" @onclick:stopPropagation="true">
                         <div class="file-actions">
                             <button class="settings-icon-btn" @onclick="() => OpenFile(file)" title="Подробнее">
@@ -113,7 +148,31 @@ else
             }
             </tbody>
         </table>
+        }
     </div>
+
+    @if (totalFiltered > 0)
+    {
+        <div class="files-pagination">
+            <div class="files-pagination-info">
+                <span class="files-pagination-muted">Показано @(pageItems.Count) из @totalFiltered</span>
+            </div>
+            <div class="files-pagination-controls">
+                <label class="files-pagination-muted">На странице:</label>
+                <select class="files-page-size" @bind="_pageSize" @bind:after="OnPageSizeChanged">
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                </select>
+                <button class="files-btn-page" disabled="@(!HasPrevPage)" @onclick="GoToPreviousPage" title="Назад">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <button class="files-btn-page" disabled="@(!HasNextPage)" @onclick="GoToNextPage" title="Вперёд">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+            </div>
+        </div>
+    }
 }
 
 @if (showUploadModal)
@@ -156,9 +215,17 @@ else
 }
 
 @code {
-    private List<FileInfoDto> files = new();
+    private List<FileInfoDto> _allFiles = new();
     private bool isLoading = true;
     private string? error;
+
+    private string _searchText = "";
+    private DateTime? _createdFrom;
+    private DateTime? _createdTo;
+    private string _typeFilter = "";
+    private int _pageSize = 25;
+    private int _pageIndex;
+    private Timer? _searchDebounceTimer;
 
     private bool showUploadModal;
     private bool isUploading;
@@ -167,9 +234,114 @@ else
 
     private const long MaxFileSize = 20 * 1024 * 1024;
 
+    private bool HasPrevPage => _pageIndex > 0;
+
+    private bool HasNextPage
+    {
+        get
+        {
+            var total = ComputeFiltered().Count;
+            return (_pageIndex + 1) * _pageSize < total;
+        }
+    }
+
     protected override async Task OnInitializedAsync()
     {
         await LoadFiles();
+    }
+
+    private List<FileInfoDto> ComputeFiltered()
+    {
+        IEnumerable<FileInfoDto> q = _allFiles;
+
+        var search = _searchText.Trim();
+        if (!string.IsNullOrEmpty(search))
+        {
+            q = q.Where(f =>
+                (f.Name?.Contains(search, StringComparison.OrdinalIgnoreCase) == true) ||
+                f.Id.Contains(search, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (!string.IsNullOrEmpty(_typeFilter))
+        {
+            q = q.Where(f => _typeFilter switch
+            {
+                "image" => IsImage(f.ContentType),
+                "video" => IsVideo(f.ContentType),
+                "audio" => IsAudio(f.ContentType),
+                "other" => !IsImage(f.ContentType) && !IsVideo(f.ContentType) && !IsAudio(f.ContentType),
+                _ => true
+            });
+        }
+
+        if (_createdFrom.HasValue)
+        {
+            var from = _createdFrom.Value.Date;
+            q = q.Where(f => f.CreatedAt.HasValue && f.CreatedAt.Value.ToLocalTime().Date >= from);
+        }
+
+        if (_createdTo.HasValue)
+        {
+            var to = _createdTo.Value.Date;
+            q = q.Where(f => f.CreatedAt.HasValue && f.CreatedAt.Value.ToLocalTime().Date <= to);
+        }
+
+        return q.OrderByDescending(f => f.CreatedAt).ToList();
+    }
+
+    private (List<FileInfoDto> page, int total) GetPage()
+    {
+        var filtered = ComputeFiltered();
+        var total = filtered.Count;
+        if (_pageIndex > 0 && _pageIndex * _pageSize >= total)
+            _pageIndex = Math.Max(0, (total - 1) / Math.Max(_pageSize, 1));
+        var page = filtered.Skip(_pageIndex * _pageSize).Take(_pageSize).ToList();
+        return (page, total);
+    }
+
+    private void OnFilterChanged()
+    {
+        _pageIndex = 0;
+    }
+
+    private async Task OnSearchInput()
+    {
+        _searchDebounceTimer?.Dispose();
+        _searchDebounceTimer = new Timer(_ =>
+        {
+            InvokeAsync(async () =>
+            {
+                _searchDebounceTimer?.Dispose();
+                _searchDebounceTimer = null;
+                _pageIndex = 0;
+                await InvokeAsync(StateHasChanged);
+            });
+        }, null, 400, Timeout.Infinite);
+    }
+
+    private async Task OnRefreshClick()
+    {
+        _pageIndex = 0;
+        await LoadFiles();
+    }
+
+    private void OnPageSizeChanged()
+    {
+        _pageIndex = 0;
+    }
+
+    private Task GoToNextPage()
+    {
+        if (HasNextPage)
+            _pageIndex++;
+        return InvokeAsync(StateHasChanged);
+    }
+
+    private Task GoToPreviousPage()
+    {
+        if (HasPrevPage)
+            _pageIndex--;
+        return InvokeAsync(StateHasChanged);
     }
 
     private async Task LoadFiles()
@@ -178,7 +350,8 @@ else
         error = null;
         try
         {
-            files = await FileApi.ListFilesAsync();
+            _allFiles = await FileApi.ListFilesAsync();
+            _pageIndex = 0;
         }
         catch (Exception ex)
         {
@@ -188,6 +361,11 @@ else
         {
             isLoading = false;
         }
+    }
+
+    public void Dispose()
+    {
+        _searchDebounceTimer?.Dispose();
     }
 
     private void OpenFile(FileInfoDto file)

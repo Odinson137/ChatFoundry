@@ -26,9 +26,11 @@ public class FileMutation(
         var (key, _) = await storage.UploadAsync(stream, fileName, contentType, ct);
 
         var size = file.Length;
+        var principal = HttpContextAccessor.HttpContext?.User;
         var entity = new FileEntity
         {
-            UploadedByUserId = UserId,
+            UploadedByUserId = UserId != Guid.Empty ? UserId : null,
+            UploadedByUserName = UploaderDisplayNameHelper.FromPrincipal(principal),
             CompanyId = companyId,
             UploadedClientId = uploadedClientId,
             Key = key,

@@ -51,7 +51,7 @@ public class TelegramHookController(
                     [MessageParameter.FirstName] = update.CallbackQuery.From.FirstName,
                     [MessageParameter.UserName] = update.CallbackQuery.From.Username ?? ""
                 },
-                MessageKind.CallbackQuery
+                MessageKind.Text
             );
         }
 
@@ -64,15 +64,15 @@ public class TelegramHookController(
         if (message.Text != null)
             return CreateTextMessage(channelId, message, chatId, messageId);
 
-        var (fileId, fileName, mimeType) = message switch
+        var (fileId, fileName, mimeType, mediaKind) = message switch
         {
-            { Photo.Count: > 0 } => (message.Photo!.OrderBy(c => c.FileSize).Last().FileId, (string?)null, "image/jpeg"),
-            { Sticker: not null } => (message.Sticker!.FileId, (string?)null, "image/webp"),
-            { Document: not null } => (message.Document!.FileId, message.Document.FileName, message.Document.MimeType),
-            { Voice: not null } => (message.Voice!.FileId, (string?)null, message.Voice.MimeType ?? "audio/ogg"),
-            { Video: not null } => (message.Video!.FileId, message.Video.FileName, message.Video.MimeType ?? "video/mp4"),
-            { Audio: not null } => (message.Audio!.FileId, message.Audio.FileName, message.Audio.MimeType ?? "audio/mpeg"),
-            _ => (null, null, null)
+            { Photo.Count: > 0 } => (message.Photo!.OrderBy(c => c.FileSize).Last().FileId, (string?)null, "image/jpeg", MessageKind.Photo),
+            { Sticker: not null } => (message.Sticker!.FileId, (string?)null, "image/webp", MessageKind.Sticker),
+            { Document: not null } => (message.Document!.FileId, message.Document.FileName, message.Document.MimeType, MessageKind.Document),
+            { Voice: not null } => (message.Voice!.FileId, (string?)null, message.Voice.MimeType ?? "audio/ogg", MessageKind.Voice),
+            { Video: not null } => (message.Video!.FileId, message.Video.FileName, message.Video.MimeType ?? "video/mp4", MessageKind.Video),
+            { Audio: not null } => (message.Audio!.FileId, message.Audio.FileName, message.Audio.MimeType ?? "audio/mpeg", MessageKind.Audio),
+            _ => ((string?)null, (string?)null, (string?)null, MessageKind.Unknown)
         };
 
         if (fileId == null)
@@ -87,7 +87,7 @@ public class TelegramHookController(
                 [MessageParameter.FirstName] = message.From?.FirstName ?? "",
                 [MessageParameter.UserName] = message.From?.Username ?? ""
             },
-            MessageKind.Media
+            mediaKind
         );
     }
 

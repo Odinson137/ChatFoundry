@@ -8,7 +8,17 @@ public record FileInfoDto(
     string? ContentType = null,
     long? Size = null,
     DateTime? CreatedAt = null,
-    string? Key = null);
+    string? Key = null,
+    Guid? UploadedByUserId = null,
+    Guid? UploadedClientId = null,
+    string? UploadedByUserName = null)
+{
+    /// <summary>«Клиент» при загрузке от клиента; иначе имя пользователя или «Пользователь».</summary>
+    public string UploadSourceDisplay =>
+        UploadedClientId.HasValue ? "Клиент"
+        : !string.IsNullOrWhiteSpace(UploadedByUserName) ? UploadedByUserName!
+        : "Пользователь";
+}
 
 public interface IFileApiClient
 {

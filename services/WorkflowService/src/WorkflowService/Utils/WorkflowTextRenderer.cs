@@ -20,7 +20,10 @@ public partial class WorkflowTextRenderer(IVariableService variableService)
     {
         BotMessagePayload messagePayload = messageKind switch
         {
-            MessageKind.Text or MessageKind.Link or MessageKind.Media => RenderMessagePayload(node, session),
+            MessageKind.Text or MessageKind.Link
+                or MessageKind.Photo or MessageKind.Video or MessageKind.Audio
+                or MessageKind.Voice or MessageKind.Document or MessageKind.Sticker
+                => RenderMessagePayload(node, session),
             MessageKind.Buttons => RenderButtonsPayload(node, session),
             _ => throw new InvalidOperationException($"MessageKind '{messageKind}' is not supported by text renderer")
         };
@@ -43,10 +46,22 @@ public partial class WorkflowTextRenderer(IVariableService variableService)
             throw new InvalidOperationException($"Node {node.Id} does not contain ask data");
 
         var text = RenderText(ask.Text, session);
-        var buttons = ask.Ui?.Buttons.Select(b => new InlineButton(
-            RenderText(b.Text, session),
-            RenderText(b.Value, session)
-        )).ToList() ?? [];
+        var buttons = new List<InlineButton>();
+        if (ask.Ui?.Buttons != null)
+        {
+            foreach (var b in ask.Ui.Buttons)
+            {
+                var renderedText = RenderText(b.Text ?? "", session);
+                var renderedValue = RenderText(b.Value ?? "", session);
+                var display = !string.IsNullOrWhiteSpace(renderedText)
+                    ? renderedText.Trim()
+                    : (renderedValue ?? "").Trim();
+                if (string.IsNullOrEmpty(display))
+                    continue;
+                var callback = string.IsNullOrWhiteSpace(renderedValue) ? display : renderedValue.Trim();
+                buttons.Add(new InlineButton(display, callback));
+            }
+        }
 
         return new AskMessagePayload(text, buttons);
     }

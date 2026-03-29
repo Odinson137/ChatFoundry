@@ -97,6 +97,68 @@
             menu.style.minWidth = Math.max(r.width, 280) + 'px';
         };
         window.positionConditionTypeMenu = window.__positionConditionTypeMenu;
+        (function() {
+            if (window.__diagramPointerTrackerInstalled) return;
+            window.__diagramPointerTrackerInstalled = true;
+            window.__diagramPointerButtons = 0;
+            var sync = function(e) { window.__diagramPointerButtons = e.buttons; };
+            document.addEventListener('pointerdown', sync, true);
+            document.addEventListener('pointermove', sync, true);
+            document.addEventListener('pointerup', sync, true);
+            document.addEventListener('pointercancel', sync, true);
+        })();
+        /** Direct synthetic pointerup on diagram canvas (DragMovablesBehavior). */
+        window.__releaseDiagramPointerDragCore = function() {
+            var root = document.getElementById('designer-canvas-area');
+            var target = root ? root.querySelector('.designer-canvas') : null;
+            if (!target) target = root;
+            if (!target) return;
+            var rect = target.getBoundingClientRect();
+            var cx = rect.left + rect.width / 2;
+            var cy = rect.top + rect.height / 2;
+            var opts = {
+                bubbles: true,
+                cancelable: true,
+                clientX: cx,
+                clientY: cy,
+                button: 0,
+                buttons: 0,
+                pointerId: 1,
+                pointerType: 'mouse',
+                view: window
+            };
+            try {
+                target.dispatchEvent(new PointerEvent('pointercancel', opts));
+                target.dispatchEvent(new PointerEvent('pointerup', opts));
+            } catch (e) {
+                target.dispatchEvent(new MouseEvent('mouseup', {
+                    bubbles: true,
+                    cancelable: true,
+                    clientX: cx,
+                    clientY: cy,
+                    button: 0,
+                    buttons: 0,
+                    view: window
+                }));
+            }
+        };
+        /**
+         * Defers release so an intentional drag (primary button still down) is not cancelled.
+         * Only injects when pointer buttons indicate the primary button is up (stuck drag after overlay).
+         */
+        window.__releaseDiagramPointerDragDeferred = function() {
+            requestAnimationFrame(function() {
+                requestAnimationFrame(function() {
+                    setTimeout(function() {
+                        var b = window.__diagramPointerButtons;
+                        if (typeof b === 'number' && (b & 1) !== 0)
+                            return;
+                        window.__releaseDiagramPointerDragCore();
+                    }, 0);
+                });
+            });
+        };
+        window.__releaseDiagramPointerDrag = window.__releaseDiagramPointerDragDeferred;
         window.__cdChatGetScrollState = function(id) {
             var el = document.getElementById(id);
             if (!el) return null;

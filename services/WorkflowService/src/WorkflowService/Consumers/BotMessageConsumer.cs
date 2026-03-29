@@ -42,6 +42,7 @@ public class BotMessageConsumer(
                     currentNode,
                     currentNode.Type == WorkflowNodeType.Ask ? WorkflowNodeType.Input : currentNode.Type,
                     msg.Payload,
+                    msg.MessageKind,
                     ct);
                 await actionRepository.AddAsync(action, ct);
 

@@ -42,7 +42,12 @@ public sealed class SendTelegramMessageConsumer(
                 await telegramClient.SendInlineKeyboardAsync(channelId, chatId, buttonsPayload.Text, buttonsPayload.Buttons, ct);
                 break;
 
-            case MessageKind.Media:
+            case MessageKind.Photo:
+            case MessageKind.Video:
+            case MessageKind.Audio:
+            case MessageKind.Voice:
+            case MessageKind.Document:
+            case MessageKind.Sticker:
                 var mediaPayload = JsonConvert.DeserializeObject<MessagePayload>(messageJson)!;
                 await telegramClient.SendMediaAsync(channelId, chatId, mediaPayload.Text, mediaPayload.Caption, ct);
                 break;

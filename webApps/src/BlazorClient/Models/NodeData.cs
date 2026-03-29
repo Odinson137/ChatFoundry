@@ -68,10 +68,12 @@ public class SetAttributeNodeData : NodeData
 /// </summary>
 public class AskButtonData
 {
-    /// <summary>Текст на кнопке (отображается пользователю).</summary>
+    /// <summary>Текст на кнопке и значение, попадающее в переменную при нажатии (Telegram callback).</summary>
     public string Text { get; set; } = string.Empty;
-    /// <summary>Значение, которое попадёт в переменную при нажатии.</summary>
-    public string Value { get; set; } = string.Empty;
+
+    /// <summary>Только для старых сохранений с отдельным value; не сериализуется, если null.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Value { get; set; }
 }
 
 /// <summary>

@@ -29,6 +29,7 @@ public class StartActionExecutor(
         var node = graph.GetNode(session.CurrentNodeId!.Value);
 
         variableService.SetVariable(session, $"$node.{node.Id}.output", action.Payload);
+        variableService.SetVariable(session, $"$node.{node.Id}.messageKind", action.MessageKind.ToString());
         await variableService.SyncIfDirtyAsync(session, ct);
         await sessionRepository.SaveAsync(session, ct);
 

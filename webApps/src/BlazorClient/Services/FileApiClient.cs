@@ -46,6 +46,9 @@ public class FileApiClient(HttpClient http) : IFileApiClient
                     size
                     createdAt
                     key
+                    uploadedByUserId
+                    uploadedClientId
+                    uploadedByUserName
                   }
                 }
                 """;
@@ -85,6 +88,9 @@ public class FileApiClient(HttpClient http) : IFileApiClient
                     size
                     createdAt
                     key
+                    uploadedByUserId
+                    uploadedClientId
+                    uploadedByUserName
                   }
                 }
                 """;
@@ -134,6 +140,9 @@ public class FileApiClient(HttpClient http) : IFileApiClient
             ? DateTime.TryParse(ca.GetString(), out var dt) ? dt : null
             : null;
         var key = f.TryGetProperty("key", out var k) ? k.GetString() : null;
-        return new FileInfoDto(id, name, contentType, size, createdAt, key);
+        Guid? uploadedByUserId = f.TryGetProperty("uploadedByUserId", out var ubu) && ubu.ValueKind == JsonValueKind.String && Guid.TryParse(ubu.GetString(), out var ubuGuid) ? ubuGuid : null;
+        Guid? uploadedClientId = f.TryGetProperty("uploadedClientId", out var uci) && uci.ValueKind == JsonValueKind.String && Guid.TryParse(uci.GetString(), out var uciGuid) ? uciGuid : null;
+        var uploadedByUserName = f.TryGetProperty("uploadedByUserName", out var ubn) && ubn.ValueKind == JsonValueKind.String ? ubn.GetString() : null;
+        return new FileInfoDto(id, name, contentType, size, createdAt, key, uploadedByUserId, uploadedClientId, uploadedByUserName);
     }
 }

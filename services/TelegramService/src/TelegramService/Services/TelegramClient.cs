@@ -48,14 +48,35 @@ public sealed class TelegramClient(
     {
         var client = await GetClientAsync(channelId, ct);
 
-        var rows = buttons
+        var valid = buttons
             .Select(b =>
             {
-                return new[] { InlineKeyboardButton.WithCallbackData(b.Text, string.IsNullOrWhiteSpace(b.CallbackData) ? b.Text :  b.CallbackData)
-                };
+                var label = (b.Text ?? "").Trim();
+                if (string.IsNullOrEmpty(label))
+                    return (InlineKeyboardButton?)null;
+                var data = string.IsNullOrWhiteSpace(b.CallbackData)
+                    ? label
+                    : b.CallbackData.Trim();
+                if (string.IsNullOrEmpty(data))
+                    data = label;
+                return InlineKeyboardButton.WithCallbackData(label, data);
             })
+            .Where(x => x != null)
+            .Select(x => x!)
             .ToArray();
 
+        if (valid.Length == 0)
+        {
+            await client.SendMessage(
+                chatId: chatId,
+                text: text,
+                parseMode: ParseMode.Html,
+                cancellationToken: ct);
+            logger.LogInformation("Telegram message sent without keyboard (no valid buttons) to {ChatId}", chatId);
+            return;
+        }
+
+        var rows = valid.Select(b => new[] { b }).ToArray();
         var markup = new InlineKeyboardMarkup(rows);
 
         await client.SendMessage(

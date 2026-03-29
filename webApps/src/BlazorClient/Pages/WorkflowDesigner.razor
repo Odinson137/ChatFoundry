@@ -154,7 +154,7 @@
         <!-- Панель настроек узла (справа, референс code.html) -->
         @if (SelectedModel != null)
         {
-            <div class="designer-settings-panel">
+            <div class="designer-settings-panel" @onpointerenter="OnSettingsPanelPointerEnter">
             <div class="panel-header">
                 <h6>Настройки</h6>
                 <button type="button" class="btn-close" @onclick="() => SelectedModel = null"></button>
@@ -211,28 +211,23 @@
                             {
                                 @foreach (var btn in askData.Ui.Buttons.ToList())
                                 {
-                                    <div class="input-group mb-2">
+                                    <div class="designer-ask-button-row">
                                         <input type="text"
-                                               class="form-control"
-                                               placeholder="Текст на кнопке"
+                                               class="form-control designer-ask-button-input"
+                                               placeholder="Текст кнопки"
                                                value="@ToDisplayText(btn.Text)"
                                                @oninput="e => { btn.Text = FromDisplayText(e.Value?.ToString() ?? string.Empty); OnWorkflowChanged(); }"/>
-                                        <input type="text"
-                                               class="form-control font-monospace"
-                                               placeholder="Значение (в переменную)"
-                                               value="@ToDisplayText(btn.Value)"
-                                               @oninput="e => { btn.Value = FromDisplayText(e.Value?.ToString() ?? string.Empty); OnWorkflowChanged(); }"/>
-                                        <button type="button" class="btn btn-outline-danger" @onclick="() => RemoveAskButton(askData, btn)">
+                                        <button type="button" class="designer-ask-remove" title="Удалить" @onclick="() => RemoveAskButton(askData, btn)">
                                             <span class="oi oi-trash"></span>
                                         </button>
                                     </div>
                                 }
                             }
-                            <button type="button" class="btn btn-sm btn-outline-primary" @onclick="() => AddAskButton(askData)">
+                            <button type="button" class="designer-ask-add" @onclick="() => AddAskButton(askData)">
                                 <span class="oi oi-plus"></span> Добавить кнопку
                             </button>
                             <small class="form-text text-muted d-block mt-1">
-                                При нажатии пользователем в переменную попадёт «Значение». Если кнопок нет — ожидается любой ввод.
+                                При нажатии в переменную попадёт этот текст. Если кнопок нет — ожидается любой ввод.
                             </small>
                         </div>
                     }
@@ -583,10 +578,22 @@
                                         </div>
                                         <div class="mb-2">
                                             <label class="small text-muted">Значение</label>
-                                            <div class="input-group input-group-sm">
-                                                <input type="text" class="form-control variable-input" value="@ToDisplayText(subBin.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, subBin, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }" placeholder="Right"/>
-                                                <button type="button" class="btn btn-outline-secondary" @onclick="() => ShowVariablePicker(v => InsertVariable(subBin, nameof(BinaryConditionBase.Right), v))">{}</button>
-                                            </div>
+                                            @if (IsMessageKindLeftOperand(subBin.Left))
+                                            {
+                                                <select class="form-select form-select-sm variable-input" value="@subBin.Right" @onchange="@(e => { subBin.Right = e.Value?.ToString() ?? ""; OnWorkflowChanged(); })">
+                                                    @foreach (var opt in IncomingMessageKindSelectOptions)
+                                                    {
+                                                        <option value="@opt.Value">@opt.Label</option>
+                                                    }
+                                                </select>
+                                            }
+                                            else
+                                            {
+                                                <div class="input-group input-group-sm">
+                                                    <input type="text" class="form-control variable-input" value="@ToDisplayText(subBin.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, subBin, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }" placeholder="Right"/>
+                                                    <button type="button" class="btn btn-outline-secondary" @onclick="() => ShowVariablePicker(v => InsertVariable(subBin, nameof(BinaryConditionBase.Right), v))">{}</button>
+                                                </div>
+                                            }
                                         </div>
                                         <div class="form-check form-check-sm">
                                             <input type="checkbox" class="form-check-input" id="sub-ic-@idx" checked="@(subBin.IgnoreCase == true)" @onchange="e => { subBin.IgnoreCase = (bool)e.Value!; OnWorkflowChanged(); }"/>
@@ -623,10 +630,26 @@
                             <div class="designer-var-row">
                                 <label class="small text-muted d-flex justify-content-between align-items-center">
                                     <span>Значение</span>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(link.Condition!.Equals!, nameof(EqualsCondition.Right), v))"><span class="oi oi-code"></span> {}</button>
+                                    @if (!IsMessageKindLeftOperand(link.Condition.Equals.Left))
+                                    {
+                                        <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(link.Condition!.Equals!, nameof(EqualsCondition.Right), v))"><span class="oi oi-code"></span> {}</button>
+                                    }
                                 </label>
-                                <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.Equals.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.Equals!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
-                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                                @if (IsMessageKindLeftOperand(link.Condition.Equals.Left))
+                                {
+                                    <select class="form-select form-select-sm variable-input" value="@link.Condition.Equals.Right" @onchange="@(e => { link.Condition!.Equals!.Right = e.Value?.ToString() ?? ""; OnWorkflowChanged(); })">
+                                        @foreach (var opt in IncomingMessageKindSelectOptions)
+                                        {
+                                            <option value="@opt.Value">@opt.Label</option>
+                                        }
+                                    </select>
+                                    <small class="form-text text-muted">Тип входящего сообщения</small>
+                                }
+                                else
+                                {
+                                    <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.Equals.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.Equals!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
+                                    <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                                }
                             </div>
                             <div class="form-check mt-2">
                                 <input type="checkbox" class="form-check-input" id="eq-ignoreCase" checked="@(link.Condition.Equals.IgnoreCase == true)" @onchange="@(e => link.Condition!.Equals!.IgnoreCase = (bool)e.Value!)"/>
@@ -649,10 +672,26 @@
                             <div class="designer-var-row">
                                 <label class="small text-muted d-flex justify-content-between align-items-center">
                                     <span>Значение</span>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(link.Condition!.NotEquals!, nameof(NotEqualsCondition.Right), v))"><span class="oi oi-code"></span> {}</button>
+                                    @if (!IsMessageKindLeftOperand(link.Condition.NotEquals.Left))
+                                    {
+                                        <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(link.Condition!.NotEquals!, nameof(NotEqualsCondition.Right), v))"><span class="oi oi-code"></span> {}</button>
+                                    }
                                 </label>
-                                <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.NotEquals.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.NotEquals!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
-                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                                @if (IsMessageKindLeftOperand(link.Condition.NotEquals.Left))
+                                {
+                                    <select class="form-select form-select-sm variable-input" value="@link.Condition.NotEquals.Right" @onchange="@(e => { link.Condition!.NotEquals!.Right = e.Value?.ToString() ?? ""; OnWorkflowChanged(); })">
+                                        @foreach (var opt in IncomingMessageKindSelectOptions)
+                                        {
+                                            <option value="@opt.Value">@opt.Label</option>
+                                        }
+                                    </select>
+                                    <small class="form-text text-muted">Тип входящего сообщения</small>
+                                }
+                                else
+                                {
+                                    <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.NotEquals.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.NotEquals!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
+                                    <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                                }
                             </div>
                             <div class="form-check mt-2">
                                 <input type="checkbox" class="form-check-input" id="ne-ignoreCase" checked="@(link.Condition.NotEquals.IgnoreCase == true)" @onchange="@(e => link.Condition!.NotEquals!.IgnoreCase = (bool)e.Value!)"/>
@@ -675,10 +714,26 @@
                             <div class="designer-var-row">
                                 <label class="small text-muted d-flex justify-content-between align-items-center">
                                     <span>Подстрока</span>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(link.Condition!.Contains!, nameof(ContainsCondition.Right), v))"><span class="oi oi-code"></span> {}</button>
+                                    @if (!IsMessageKindLeftOperand(link.Condition.Contains.Left))
+                                    {
+                                        <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(link.Condition!.Contains!, nameof(ContainsCondition.Right), v))"><span class="oi oi-code"></span> {}</button>
+                                    }
                                 </label>
-                                <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.Contains.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.Contains!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
-                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                                @if (IsMessageKindLeftOperand(link.Condition.Contains.Left))
+                                {
+                                    <select class="form-select form-select-sm variable-input" value="@link.Condition.Contains.Right" @onchange="@(e => { link.Condition!.Contains!.Right = e.Value?.ToString() ?? ""; OnWorkflowChanged(); })">
+                                        @foreach (var opt in IncomingMessageKindSelectOptions)
+                                        {
+                                            <option value="@opt.Value">@opt.Label</option>
+                                        }
+                                    </select>
+                                    <small class="form-text text-muted">Тип входящего сообщения</small>
+                                }
+                                else
+                                {
+                                    <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.Contains.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.Contains!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
+                                    <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                                }
                             </div>
                             <div class="form-check mt-2">
                                 <input type="checkbox" class="form-check-input" id="ct-ignoreCase" checked="@(link.Condition.Contains.IgnoreCase ?? true)" @onchange="@(e => link.Condition!.Contains!.IgnoreCase = (bool)e.Value!)"/>
@@ -700,8 +755,21 @@
                             <div class="text-center my-1"><span class="badge bg-info">НАЧИНАЕТСЯ С</span></div>
                             <div class="designer-var-row">
                                 <label class="small text-muted">Префикс</label>
-                                <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.StartsWith.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.StartsWith!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
-                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                                @if (IsMessageKindLeftOperand(link.Condition.StartsWith.Left))
+                                {
+                                    <select class="form-select form-select-sm variable-input" value="@link.Condition.StartsWith.Right" @onchange="@(e => { link.Condition!.StartsWith!.Right = e.Value?.ToString() ?? ""; OnWorkflowChanged(); })">
+                                        @foreach (var opt in IncomingMessageKindSelectOptions)
+                                        {
+                                            <option value="@opt.Value">@opt.Label</option>
+                                        }
+                                    </select>
+                                    <small class="form-text text-muted">Тип входящего сообщения</small>
+                                }
+                                else
+                                {
+                                    <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.StartsWith.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.StartsWith!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
+                                    <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                                }
                             </div>
                             <div class="form-check mt-2">
                                 <input type="checkbox" class="form-check-input" id="sw-ignoreCase" checked="@(link.Condition.StartsWith.IgnoreCase ?? true)" @onchange="@(e => link.Condition!.StartsWith!.IgnoreCase = (bool)e.Value!)"/>
@@ -723,8 +791,21 @@
                             <div class="text-center my-1"><span class="badge bg-info">ЗАКАНЧИВАЕТСЯ НА</span></div>
                             <div class="designer-var-row">
                                 <label class="small text-muted">Суффикс</label>
-                                <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.EndsWith.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.EndsWith!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
-                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                                @if (IsMessageKindLeftOperand(link.Condition.EndsWith.Left))
+                                {
+                                    <select class="form-select form-select-sm variable-input" value="@link.Condition.EndsWith.Right" @onchange="@(e => { link.Condition!.EndsWith!.Right = e.Value?.ToString() ?? ""; OnWorkflowChanged(); })">
+                                        @foreach (var opt in IncomingMessageKindSelectOptions)
+                                        {
+                                            <option value="@opt.Value">@opt.Label</option>
+                                        }
+                                    </select>
+                                    <small class="form-text text-muted">Тип входящего сообщения</small>
+                                }
+                                else
+                                {
+                                    <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.EndsWith.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.EndsWith!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
+                                    <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                                }
                             </div>
                             <div class="form-check mt-2">
                                 <input type="checkbox" class="form-check-input" id="ew-ignoreCase" checked="@(link.Condition.EndsWith.IgnoreCase ?? true)" @onchange="@(e => link.Condition!.EndsWith!.IgnoreCase = (bool)e.Value!)"/>
@@ -746,8 +827,21 @@
                             <div class="text-center my-1"><span class="badge bg-warning text-dark">БОЛЬШЕ (&gt;)</span></div>
                             <div class="designer-var-row">
                                 <label class="small text-muted">Значение</label>
-                                <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.GreaterThan.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.GreaterThan!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
-                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                                @if (IsMessageKindLeftOperand(link.Condition.GreaterThan.Left))
+                                {
+                                    <select class="form-select form-select-sm variable-input" value="@link.Condition.GreaterThan.Right" @onchange="@(e => { link.Condition!.GreaterThan!.Right = e.Value?.ToString() ?? ""; OnWorkflowChanged(); })">
+                                        @foreach (var opt in IncomingMessageKindSelectOptions)
+                                        {
+                                            <option value="@opt.Value">@opt.Label</option>
+                                        }
+                                    </select>
+                                    <small class="form-text text-muted">Тип входящего сообщения</small>
+                                }
+                                else
+                                {
+                                    <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.GreaterThan.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.GreaterThan!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
+                                    <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                                }
                             </div>
                             <div class="form-check mt-2">
                                 <input type="checkbox" class="form-check-input" id="gt-ignoreCase" checked="@(link.Condition.GreaterThan.IgnoreCase == true)" @onchange="@(e => link.Condition!.GreaterThan!.IgnoreCase = (bool)e.Value!)"/>
@@ -769,8 +863,21 @@
                             <div class="text-center my-1"><span class="badge bg-warning text-dark">МЕНЬШЕ (&lt;)</span></div>
                             <div class="designer-var-row">
                                 <label class="small text-muted">Значение</label>
-                                <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.LessThan.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.LessThan!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
-                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                                @if (IsMessageKindLeftOperand(link.Condition.LessThan.Left))
+                                {
+                                    <select class="form-select form-select-sm variable-input" value="@link.Condition.LessThan.Right" @onchange="@(e => { link.Condition!.LessThan!.Right = e.Value?.ToString() ?? ""; OnWorkflowChanged(); })">
+                                        @foreach (var opt in IncomingMessageKindSelectOptions)
+                                        {
+                                            <option value="@opt.Value">@opt.Label</option>
+                                        }
+                                    </select>
+                                    <small class="form-text text-muted">Тип входящего сообщения</small>
+                                }
+                                else
+                                {
+                                    <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.LessThan.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.LessThan!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
+                                    <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                                }
                             </div>
                             <div class="form-check mt-2">
                                 <input type="checkbox" class="form-check-input" id="lt-ignoreCase" checked="@(link.Condition.LessThan.IgnoreCase == true)" @onchange="@(e => link.Condition!.LessThan!.IgnoreCase = (bool)e.Value!)"/>
@@ -792,8 +899,21 @@
                             <div class="text-center my-1"><span class="badge bg-warning text-dark">≥</span></div>
                             <div class="designer-var-row">
                                 <label class="small text-muted">Значение</label>
-                                <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.GreaterOrEqual.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.GreaterOrEqual!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
-                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                                @if (IsMessageKindLeftOperand(link.Condition.GreaterOrEqual.Left))
+                                {
+                                    <select class="form-select form-select-sm variable-input" value="@link.Condition.GreaterOrEqual.Right" @onchange="@(e => { link.Condition!.GreaterOrEqual!.Right = e.Value?.ToString() ?? ""; OnWorkflowChanged(); })">
+                                        @foreach (var opt in IncomingMessageKindSelectOptions)
+                                        {
+                                            <option value="@opt.Value">@opt.Label</option>
+                                        }
+                                    </select>
+                                    <small class="form-text text-muted">Тип входящего сообщения</small>
+                                }
+                                else
+                                {
+                                    <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.GreaterOrEqual.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.GreaterOrEqual!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
+                                    <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                                }
                             </div>
                             <div class="form-check mt-2">
                                 <input type="checkbox" class="form-check-input" id="ge-ignoreCase" checked="@(link.Condition.GreaterOrEqual.IgnoreCase == true)" @onchange="@(e => link.Condition!.GreaterOrEqual!.IgnoreCase = (bool)e.Value!)"/>
@@ -815,8 +935,21 @@
                             <div class="text-center my-1"><span class="badge bg-warning text-dark">≤</span></div>
                             <div class="designer-var-row">
                                 <label class="small text-muted">Значение</label>
-                                <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.LessOrEqual.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.LessOrEqual!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
-                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                                @if (IsMessageKindLeftOperand(link.Condition.LessOrEqual.Left))
+                                {
+                                    <select class="form-select form-select-sm variable-input" value="@link.Condition.LessOrEqual.Right" @onchange="@(e => { link.Condition!.LessOrEqual!.Right = e.Value?.ToString() ?? ""; OnWorkflowChanged(); })">
+                                        @foreach (var opt in IncomingMessageKindSelectOptions)
+                                        {
+                                            <option value="@opt.Value">@opt.Label</option>
+                                        }
+                                    </select>
+                                    <small class="form-text text-muted">Тип входящего сообщения</small>
+                                }
+                                else
+                                {
+                                    <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.LessOrEqual.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.LessOrEqual!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }"/>
+                                    <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                                }
                             </div>
                             <div class="form-check mt-2">
                                 <input type="checkbox" class="form-check-input" id="le-ignoreCase" checked="@(link.Condition.LessOrEqual.IgnoreCase == true)" @onchange="@(e => link.Condition!.LessOrEqual!.IgnoreCase = (bool)e.Value!)"/>
@@ -838,8 +971,21 @@
                             <div class="text-center my-1"><span class="badge bg-dark">В СПИСКЕ</span></div>
                             <div class="designer-var-row">
                                 <label class="small text-muted">Значения через запятую</label>
-                                <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.InList.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.InList!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }" placeholder="a, b, c"/>
-                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                                @if (IsMessageKindLeftOperand(link.Condition.InList.Left))
+                                {
+                                    <select class="form-select form-select-sm variable-input" value="@link.Condition.InList.Right" @onchange="@(e => { link.Condition!.InList!.Right = e.Value?.ToString() ?? ""; OnWorkflowChanged(); })">
+                                        @foreach (var opt in IncomingMessageKindSelectOptions)
+                                        {
+                                            <option value="@opt.Value">@opt.Label</option>
+                                        }
+                                    </select>
+                                    <small class="form-text text-muted">Тип входящего сообщения</small>
+                                }
+                                else
+                                {
+                                    <input type="text" class="form-control variable-input" value="@ToDisplayText(link.Condition.InList.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.InList!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }" placeholder="a, b, c"/>
+                                    <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                                }
                             </div>
                             <div class="form-check mt-2">
                                 <input type="checkbox" class="form-check-input" id="il-ignoreCase" checked="@(link.Condition.InList.IgnoreCase ?? true)" @onchange="@(e => link.Condition!.InList!.IgnoreCase = (bool)e.Value!)"/>
@@ -861,8 +1007,21 @@
                             <div class="text-center my-1"><span class="badge bg-dark">РЕГУЛЯРНОЕ ВЫРАЖЕНИЕ</span></div>
                             <div class="designer-var-row">
                                 <label class="small text-muted">Шаблон (regex)</label>
-                                <input type="text" class="form-control font-monospace variable-input" value="@ToDisplayText(link.Condition.Regex.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.Regex!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }" placeholder="\d+"/>
-                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                                @if (IsMessageKindLeftOperand(link.Condition.Regex.Left))
+                                {
+                                    <select class="form-select form-select-sm variable-input" value="@link.Condition.Regex.Right" @onchange="@(e => { link.Condition!.Regex!.Right = e.Value?.ToString() ?? ""; OnWorkflowChanged(); })">
+                                        @foreach (var opt in IncomingMessageKindSelectOptions)
+                                        {
+                                            <option value="@opt.Value">@opt.Label</option>
+                                        }
+                                    </select>
+                                    <small class="form-text text-muted">Тип входящего сообщения</small>
+                                }
+                                else
+                                {
+                                    <input type="text" class="form-control font-monospace variable-input" value="@ToDisplayText(link.Condition.Regex.Right)" @oninput="e => { UpdateFieldAndCheckAtMention(e, link.Condition!.Regex!, nameof(BinaryConditionBase.Right)); OnWorkflowChanged(); }" placeholder="\d+"/>
+                                    <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                                }
                             </div>
                             <div class="form-check mt-2">
                                 <input type="checkbox" class="form-check-input" id="rx-ignoreCase" checked="@(link.Condition.Regex.IgnoreCase == true)" @onchange="@(e => link.Condition!.Regex!.IgnoreCase = (bool)e.Value!)"/>
@@ -1178,45 +1337,92 @@
 <!-- Модальное окно выбора файла из хранилища -->
 @if (IsStoragePickerOpen)
 {
+    var (storagePageItems, storageTotalFiltered) = GetStoragePickerPage();
     <div class="variable-picker-backdrop" @onclick="CloseStoragePicker"></div>
-    <div class="variable-picker-modal" role="dialog" style="max-width: 420px;">
+    <div class="variable-picker-modal storage-picker-modal" role="dialog" style="max-width: 640px;">
         <div class="variable-picker-header">
             <h2 class="variable-picker-title">Выбрать файл из хранилища</h2>
             <button type="button" class="variable-picker-close" @onclick="CloseStoragePicker" aria-label="Закрыть">
                 <span class="oi oi-x"></span>
             </button>
         </div>
-        <div class="variable-picker-list" style="min-height: 200px;">
+        @if (!StoragePickerLoading && StoragePickerAllFiles.Any())
+        {
+            <div class="variable-picker-search-wrap">
+                <span class="variable-picker-search-icon oi oi-magnifying-glass"></span>
+                <input type="text"
+                       class="variable-picker-search"
+                       placeholder="Поиск по имени или ID..."
+                       @bind="StoragePickerSearch"
+                       @bind:event="oninput"
+                       @bind:after="OnStoragePickerSearchInput" />
+                <button type="button" class="btn btn-sm btn-outline-primary ms-2" @onclick="OnStoragePickerSearchSubmit">Искать</button>
+            </div>
+        }
+        <div class="variable-picker-list storage-picker-list" style="min-height: 200px;">
             @if (StoragePickerLoading)
             {
                 <div class="variable-picker-empty">
                     <p>Загрузка...</p>
                 </div>
             }
-            else if (StoragePickerFiles == null || !StoragePickerFiles.Any())
+            else if (!StoragePickerAllFiles.Any())
             {
                 <div class="variable-picker-empty">
                     <p>Нет файлов в хранилище</p>
                     <small>Загрузите файл через поле «Загрузить файл» выше</small>
                 </div>
             }
+            else if (storageTotalFiltered == 0)
+            {
+                <div class="variable-picker-empty">
+                    <p>Ничего не найдено</p>
+                    <small>Измените поисковый запрос</small>
+                </div>
+            }
             else
             {
-                @foreach (var f in StoragePickerFiles)
-                {
-                    <button type="button"
-                            class="variable-picker-item variable-picker-item--custom"
-                            @onclick="() => SelectStorageFile(f)">
-                        <span class="variable-picker-item-icon"><span class="oi oi-file"></span></span>
-                        <div class="variable-picker-item-body">
-                            <span class="variable-picker-item-name">@(f.Name ?? f.Id)</span>
-                            <span class="variable-picker-item-code">@f.Id</span>
-                        </div>
-                        <span class="variable-picker-item-add oi oi-plus"></span>
-                    </button>
-                }
+                <div class="table-responsive px-2">
+                    <table class="table table-sm table-hover mb-0 storage-picker-table">
+                        <thead>
+                        <tr>
+                            <th>Имя</th>
+                            <th>Id</th>
+                            <th>Создан</th>
+                            <th style="width: 90px;"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var f in storagePageItems)
+                        {
+                            <tr class="storage-picker-row" @onclick="() => SelectStorageFile(f)">
+                                <td class="storage-picker-cell-name">@(f.Name ?? "—")</td>
+                                <td><code class="storage-picker-id">@f.Id</code></td>
+                                <td class="text-muted small">@(f.CreatedAt?.ToLocalTime().ToString("dd.MM.yyyy HH:mm") ?? "—")</td>
+                                <td @onclick:stopPropagation="true">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" @onclick="() => SelectStorageFile(f)">Выбрать</button>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
             }
         </div>
+        @if (!StoragePickerLoading && StoragePickerAllFiles.Any() && storageTotalFiltered > 0)
+        {
+            <div class="d-flex justify-content-between align-items-center px-3 py-2 border-top flex-wrap gap-2">
+                <span class="text-muted small">Показано @storagePageItems.Count из @storageTotalFiltered</span>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" disabled="@(!StoragePickerHasPrev)" @onclick="StoragePickerPrevPage">
+                        <span class="oi oi-chevron-left"></span> Назад
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" disabled="@(!StoragePickerHasNext)" @onclick="StoragePickerNextPage">
+                        Вперёд <span class="oi oi-chevron-right"></span>
+                    </button>
+                </div>
+            </div>
+        }
         <div class="d-flex justify-content-end px-3 py-2 border-top">
             <button type="button" class="btn btn-sm btn-outline-secondary" @onclick="CloseStoragePicker">Отмена</button>
         </div>

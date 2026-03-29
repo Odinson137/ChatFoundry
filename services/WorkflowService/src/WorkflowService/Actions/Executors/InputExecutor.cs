@@ -33,6 +33,7 @@ public class InputExecutor(
 
         variableService.SetVariable(session, $"$node.{node.Id}.output", output);
         variableService.SetVariable(session, $"$node.{node.Id}.error", error);
+        variableService.SetVariable(session, $"$node.{node.Id}.messageKind", action.MessageKind.ToString());
         await variableService.SyncIfDirtyAsync(session, ct);
         await sessionRepository.SaveAsync(session, ct);
 

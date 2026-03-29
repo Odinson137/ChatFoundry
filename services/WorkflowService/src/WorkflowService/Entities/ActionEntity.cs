@@ -12,6 +12,9 @@ public class ActionEntity : EntityBase
     public Guid NodeId { get; set; }
     public string? Payload { get; set; }
 
+    /// <summary>Тип входящего сообщения пользователя для этого действия (Start/Input).</summary>
+    public MessageKind MessageKind { get; set; } = MessageKind.Unknown;
+
     public WorkflowNodeType WorkflowNodeType { get; set; }
 
     public ActionStatus Status { get; set; } = ActionStatus.Pending;
