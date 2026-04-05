@@ -74,23 +74,19 @@ else
         </div>
     </div>
 
-    <div class="settings-card">
-        <div class="settings-card-body">
-            <div class="overview-info-grid">
-                <div class="overview-info-item">
-                    <div class="overview-info-label">Название компании</div>
-                    <div class="overview-info-value">@company.Name</div>
-                </div>
-                @if (!string.IsNullOrWhiteSpace(company.Description))
-                {
+    @if (!string.IsNullOrWhiteSpace(company.Description))
+    {
+        <div class="settings-card">
+            <div class="settings-card-body">
+                <div class="overview-info-grid">
                     <div class="overview-info-item overview-info-full">
                         <div class="overview-info-label">Описание</div>
                         <div class="overview-info-value">@company.Description</div>
                     </div>
-                }
+                </div>
             </div>
         </div>
-    </div>
+    }
 }
 
 @code {

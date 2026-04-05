@@ -1,0 +1,97 @@
+@using Blazor.Diagrams.Components.Renderers
+@using Blazor.Diagrams.Core.Models
+@using BlazorClient.Models
+@using BlazorClient.Models.Diagram
+@using BlazorClient.Pages
+@using Microsoft.AspNetCore.Components
+
+<div class="bd-node workflow-designer-node @NodeToolPaletteSvg.GetCanvasVariantClass(Node.NodeType)">
+    <div class="bd-node-header workflow-designer-node-header">
+        <span class="workflow-designer-node-icon" aria-hidden="true">@((MarkupString)NodeToolPaletteSvg.GetCanvasIconSvg(Node.NodeType))</span>
+        <span class="workflow-designer-node-title">@(Node.Title ?? Node.NodeType)</span>
+    </div>
+    @if (!string.IsNullOrEmpty(PreviewLine))
+    {
+        <div class="bd-node-content workflow-designer-node-preview">@PreviewLine</div>
+    }
+    <div class="workflow-designer-node-ports workflow-designer-node-ports-left">
+        @foreach (var port in Node.Ports.Where(p => p.Alignment == PortAlignment.Left))
+        {
+            <PortRenderer @key="port.Id" Port="port" />
+        }
+    </div>
+    <div class="workflow-designer-node-ports workflow-designer-node-ports-right">
+        @foreach (var port in Node.Ports.Where(p => p.Alignment == PortAlignment.Right))
+        {
+            <PortRenderer @key="port.Id" Port="port" />
+        }
+    </div>
+</div>
+
+@code {
+    private const int MaxPreviewChars = 56;
+
+    [Parameter] public WorkflowNodeModel Node { get; set; } = null!;
+
+    [CascadingParameter(Name = "WorkflowNodePreviewFormatter")]
+    public Func<string?, string>? PreviewFormatter { get; set; }
+
+    private string? PreviewLine => BuildPreview();
+
+    private string? BuildPreview()
+    {
+        if (Node.Data == null) return null;
+        var fmt = PreviewFormatter;
+
+        string? raw = Node.Data switch
+        {
+            MessageNodeData m => string.IsNullOrWhiteSpace(m.Text) ? null : m.Text,
+            AskNodeData a => string.IsNullOrWhiteSpace(a.Text) ? null : a.Text,
+            HttpRequestNodeData h => string.IsNullOrWhiteSpace(h.Url)
+                ? $"{h.Method} …"
+                : $"{h.Method} {h.Url}",
+            AIGenerateNodeData g => string.IsNullOrWhiteSpace(g.Prompt) ? null : g.Prompt,
+            SetAttributeNodeData s =>
+                string.IsNullOrWhiteSpace(s.Attribute) && string.IsNullOrWhiteSpace(s.Value)
+                    ? null
+                    : $"{s.Attribute}: {s.Value}",
+            SetVariableNodeData v =>
+                string.IsNullOrWhiteSpace(v.Variable) && string.IsNullOrWhiteSpace(v.Value)
+                    ? null
+                    : $"{v.Variable} ← {v.Value}",
+            MediaNodeData md => MediaPreviewRaw(md),
+            SubWorkflowNodeData sw => sw.WorkflowId == Guid.Empty
+                ? "Процесс не выбран"
+                : $"Процесс · {sw.WorkflowId}",
+            _ => null
+        };
+
+        if (raw == null) return null;
+
+        raw = FirstLineOnly(raw);
+        var display = fmt != null ? fmt(raw) : raw;
+        return TruncateByLength(display, MaxPreviewChars);
+    }
+
+    private static string FirstLineOnly(string s)
+    {
+        var line = s.Replace("\r\n", "\n").Replace('\r', '\n');
+        var i = line.IndexOf('\n');
+        return i >= 0 ? line[..i].Trim() : line.Trim();
+    }
+
+    private static string MediaPreviewRaw(MediaNodeData md)
+    {
+        var bits = $"{md.MediaKind} · {md.SourceType}";
+        if (!string.IsNullOrWhiteSpace(md.Caption)) return bits + " · " + md.Caption;
+        if (!string.IsNullOrWhiteSpace(md.Value)) return bits + " · " + md.Value;
+        return bits;
+    }
+
+    private static string TruncateByLength(string s, int max)
+    {
+        var t = s.Trim();
+        if (t.Length <= max) return t;
+        return t[..(max - 1)] + "…";
+    }
+}

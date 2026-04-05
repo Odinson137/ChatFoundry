@@ -20,11 +20,11 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using BlazorClient.Components;
 using BlazorClient.Models.Diagram;
 
 namespace BlazorClient.Pages;
 
-// Модели переменных
 public class VariableInfo
 {
     public string Name { get; set; } = "";
@@ -56,27 +56,23 @@ public partial class WorkflowDesigner : IDisposable
     private NodeType? _draggedType;
     private Model? SelectedModel { get; set; }
 
-    // Атрибуты компании (для правой панели)
     private List<AttributeDefinitionDto> CompanyAttributeDefinitions { get; set; } = new();
 
-    // Модальное окно «Переменные / Атрибуты / Параметры» (просмотр)
     private bool IsVariablesModalOpen { get; set; }
-    private int VariablesModalTab { get; set; } // 0=Атрибуты, 1=Параметры
+    private int VariablesModalTab { get; set; }
 
     private List<VariableInfo> DiscoveredVariables { get; set; } = new();
     private string VariableSearchQuery { get; set; } = "";
 
-    // Поиск узлов в левой панели
     private string NodeSearchQuery { get; set; } = "";
 
-    // Зум канваса
     private double _zoomLevel = 1.0;
     private int ZoomPercent => (int)Math.Round(_zoomLevel * 100);
 
-    // Время последнего сохранения (для подписи «Сохранено N мин назад»)
     private DateTime? LastSavedAt { get; set; }
 
-    /// <summary>Текст «Сохранено N мин назад» или «Не сохранено».</summary>
+    private Func<string?, string> FormatPreviewForNodeWidget => s => ToDisplayText(s ?? "");
+
     private string LastSavedText
     {
         get
@@ -89,31 +85,25 @@ public partial class WorkflowDesigner : IDisposable
         }
     }
 
-    // Undo/Redo
     private readonly List<(string N, string E, string L)> _undoStack = new();
     private int _undoIndex = -1;
     private bool _isRestoring;
     private const int MaxUndoSteps = 30;
 
-    // Ввод @ для выбора переменной (вставка на место @, в т.ч. в середине текста)
     private object? _atMentionTargetObj;
     private string? _atMentionTargetProp;
     private string _atMentionFullValue = "";
     private int _atMentionIndex;
 
-    // Переменные - модальное окно выбора
     private bool IsVariablePickerOpen { get; set; }
     private string VariablePickerSearch { get; set; } = "";
     private WorkflowNodeModel? VariablePickerSelectedNode { get; set; }
     private Action<string>? OnVariableSelected { get; set; }
 
-    // JSON-меню (открыто/закрыто)
     private bool _jsonMenuOpen;
 
-    // Выпадающий список «Тип условия» на связи (открыт/закрыт)
     private bool _conditionTypeDropdownOpen;
 
-    // Модальное окно выбора файла из хранилища
     private bool IsStoragePickerOpen { get; set; }
     private MediaNodeData? StoragePickerTarget { get; set; }
     private List<FileInfoDto> StoragePickerAllFiles { get; set; } = [];
@@ -123,10 +113,8 @@ public partial class WorkflowDesigner : IDisposable
     private Timer? _storagePickerSearchTimer;
     private bool StoragePickerLoading { get; set; }
 
-    // Список workflow для выбора в блоке «Процесс»
     private List<WorkflowListItem>? AvailableWorkflows { get; set; }
 
-    // Модальное окно выбора процесса (поиск + пагинация)
     private bool IsProcessPickerOpen { get; set; }
     private SubWorkflowNodeData? ProcessPickerTarget { get; set; }
     private List<WorkflowListItem> ProcessPickerItems { get; set; } = [];
@@ -137,12 +125,9 @@ public partial class WorkflowDesigner : IDisposable
     private string? ProcessPickerStartCursor { get; set; }
     private bool ProcessPickerLoading { get; set; }
 
-    /// <summary>Входные и выходные параметры текущего процесса (редактируются во вкладке «Параметры»).</summary>
     private List<WorkflowParameterDto> CurrentWorkflowInputParameters { get; set; } = [];
     private List<WorkflowParameterDto> CurrentWorkflowOutputParameters { get; set; } = [];
 
-    // Pretty отображение автопеременных ($node.{guid}.*) в текстовых полях:
-    // в модели храним GUID-версию, в UI показываем «Название блока · переменная».
     private readonly Dictionary<Guid, string> _nodeTitleById = new();
     private readonly Dictionary<Guid, string> _nodePrefixById = new();
     private readonly Dictionary<string, List<Guid>> _nodeIdsByTitle = new(StringComparer.OrdinalIgnoreCase);
@@ -174,10 +159,6 @@ public partial class WorkflowDesigner : IDisposable
         }
     }
 
-    /// <summary>
-    /// Ключи атрибутов для выпадающего списка в блоке «Атрибут»: базовые + из компании, без дубликатов.
-    /// </summary>
-    /// <summary>Ключи для вкладки Атрибуты в модалке: базовые + из компании, без дубликатов.</summary>
     private IEnumerable<string> GetAttributeKeysForModal()
     {
         var baseKeys = new[] { "name", "username", "phone", "email" };
@@ -256,6 +237,7 @@ public partial class WorkflowDesigner : IDisposable
         };
 
         Diagram = new BlazorDiagram(options);
+        Diagram.RegisterComponent<WorkflowNodeModel, WorkflowDesignerNodeWidget>();
         Diagram.SelectionChanged += OnSelectionChanged;
         Diagram.Changed += OnDiagramChanged;
     }
@@ -587,20 +569,19 @@ public partial class WorkflowDesigner : IDisposable
 
         var node = new WorkflowNodeModel(position, type, label, id, data);
 
-        // Направление схемы: слева направо (вход Left, выход Right)
         switch (type.ToLower())
         {
             case "start":
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right)); // только выход вправо
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right));
                 break;
             case "end":
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Left)); // только вход слева
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Left));
                 break;
             case "condition":
             case "aifilter":
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Left));  // вход
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right)); // выход 1
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right)); // выход 2
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Left));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right));
                 break;
             default:
                 node.AddPort(new WorkflowPortModel(node, PortAlignment.Left));
@@ -1009,7 +990,7 @@ public partial class WorkflowDesigner : IDisposable
 
         try
         {
-            await using var stream = file.OpenReadStream(maxAllowedSize: 20 * 1024 * 1024); // 20 MB
+            await using var stream = file.OpenReadStream(maxAllowedSize: 20 * 1024 * 1024);
             var contentType = file.ContentType;
             var result = await FileApiClient.UploadFileAsync(stream, file.Name, contentType, workflowId: WorkflowId);
             if (result != null)
@@ -1055,7 +1036,6 @@ public partial class WorkflowDesigner : IDisposable
     {
         var variables = new Dictionary<string, VariableInfo>(StringComparer.OrdinalIgnoreCase);
 
-        // Атрибуты ($global.*)
         foreach (var (name, description) in GlobalAttributeVariables)
         {
             variables[name] = new VariableInfo
@@ -1079,7 +1059,6 @@ public partial class WorkflowDesigner : IDisposable
             }
         }
 
-        // Входные параметры процесса (хранятся в сессии без $, но в UI показываем как $param)
         foreach (var p in CurrentWorkflowInputParameters.Where(p => !string.IsNullOrWhiteSpace(p.Name)))
         {
             var name = NormalizeVariableName(p.Name);
@@ -1094,7 +1073,6 @@ public partial class WorkflowDesigner : IDisposable
             }
         }
 
-        // Автопеременные по GUID блока: $node.{guid}.output, $node.{guid}.statusCode, ...
         foreach (var node in Diagram.Nodes.Cast<WorkflowNodeModel>())
         {
             var nodeTitle = node.Title ?? "Unnamed";
@@ -1112,7 +1090,6 @@ public partial class WorkflowDesigner : IDisposable
             }
         }
 
-        // Использования переменных в текстовых полях нод
         foreach (var node in Diagram.Nodes.Cast<WorkflowNodeModel>())
         {
             var nodeTitle = node.Title ?? "Unnamed";
@@ -1172,7 +1149,6 @@ public partial class WorkflowDesigner : IDisposable
             }
         }
 
-        // Использования в условиях на линках
         foreach (var link in Diagram.Links.Cast<WorkflowLinkModel>())
         {
             const string usageNode = "Условие на линке";
@@ -1270,7 +1246,6 @@ public partial class WorkflowDesigner : IDisposable
         };
     }
 
-    /// <summary>Для пикера переменных: из полного ключа (например $node.guid.output) возвращает только имя переменной (output).</summary>
     private static string GetVariableKeyShortDisplay(string fullKey)
     {
         if (string.IsNullOrEmpty(fullKey))
@@ -1335,16 +1310,13 @@ public partial class WorkflowDesigner : IDisposable
             _nodePrefixById[id] = assigned.TryGetValue(id, out var p) ? p : n[..8];
     }
 
-    // Match both short form {{guid.output}} and legacy {{node.guid.output}} / {{$node.guid.output}}
     private static readonly Regex NodeInternalVarRegex =
         new(@"\{\{(?:\$?node\.)?(?<guid>[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12})\.(?<key>[a-zA-Z0-9_]+)\}\}",
             RegexOptions.Compiled);
 
-    // Новый формат без id: «{{Старт · output}}»
     private static readonly Regex NodeDisplayVarRegexPretty =
-        new(@"\{\{(?<label>[^·]+)·(?<key>[a-zA-Z0-9_]+)\}\}", RegexOptions.Compiled);
+        new(@"\{\{(?<label>[^·]+)·(?<key>[a-zA-Z0-9_]+)\}\}",             RegexOptions.Compiled);
 
-    // Старый формат (обратная совместимость): «{{Старт#ec11eb15.output}}»
     private static readonly Regex NodeDisplayVarRegexLegacy =
         new(@"\{\{(?<label>[^#\{\}]+)#(?<prefix>[0-9a-fA-F]{8,32})\.(?<key>[a-zA-Z0-9_]+)\}\}",
             RegexOptions.Compiled);
@@ -1379,7 +1351,6 @@ public partial class WorkflowDesigner : IDisposable
         if (string.IsNullOrEmpty(displayText))
             return displayText ?? "";
 
-        // Сначала новый формат «{{Старт · output}}»
         var step1 = NodeDisplayVarRegexPretty.Replace(displayText, m =>
         {
             var label = m.Groups["label"].Value.Trim();
@@ -1390,7 +1361,6 @@ public partial class WorkflowDesigner : IDisposable
             return "{{" + id.Value.ToString("D") + "." + key + "}}";
         });
 
-        // Затем старый формат «{{Старт#ec11eb15.output}}» для обратной совместимости
         return NodeDisplayVarRegexLegacy.Replace(step1, m =>
         {
             var prefix = m.Groups["prefix"].Value.ToLowerInvariant();
@@ -1414,7 +1384,6 @@ public partial class WorkflowDesigner : IDisposable
         if (ids.Count == 1)
             return ids[0];
 
-        // Несколько нод с одним названием — берём первую, у которой есть такая переменная
         foreach (var id in ids)
         {
             var node = Diagram?.Nodes.Cast<WorkflowNodeModel>().FirstOrDefault(n => n.Id == id.ToString());
@@ -1429,14 +1398,12 @@ public partial class WorkflowDesigner : IDisposable
         if (string.IsNullOrWhiteSpace(prefix))
             return null;
 
-        // 1) точное совпадение с вычисленным уникальным префиксом
         foreach (var (id, p) in _nodePrefixById)
         {
             if (string.Equals(p, prefix, StringComparison.OrdinalIgnoreCase))
                 return id;
         }
 
-        // 2) fallback: starts-with по полному guid N
         foreach (var id in _nodeTitleById.Keys)
         {
             var n = id.ToString("N");
@@ -1554,7 +1521,6 @@ public partial class WorkflowDesigner : IDisposable
         }).ToDictionary(g => g.Key, g => g.ToList());
     }
 
-    /// <summary>Только переменные (без атрибутов $global.*) для вкладки «Переменные».</summary>
     private Dictionary<string, List<VariableInfo>> GetGroupedVariablesOnlyVariables()
     {
         var onlyVars = DiscoveredVariables.Where(v => v.Type != VariableType.GlobalAttribute).ToList();
@@ -1643,7 +1609,6 @@ public partial class WorkflowDesigner : IDisposable
         StateHasChanged();
     }
 
-    /// <summary>Обновляет поле из e.Value; при вводе @ (в любом месте) открывает выбор переменной, вставка на место @.</summary>
     private void UpdateFieldAndCheckAtMention(ChangeEventArgs e, object dataObject, string propertyName)
     {
         var displayValue = e.Value?.ToString() ?? "";
@@ -1707,14 +1672,12 @@ public partial class WorkflowDesigner : IDisposable
             .ToList();
     }
 
-    /// <summary>Переменные выходов блоков ($node.guid.output или $guid.output) — показываются только при выборе блока, не в «Параметры и прочее».</summary>
     private static bool IsNodeOutputVariable(string varName)
     {
         if (string.IsNullOrEmpty(varName))
             return false;
         if (varName.StartsWith("$node.", StringComparison.OrdinalIgnoreCase))
             return true;
-        // Короткий формат из текста: $guid.output
         if (varName.StartsWith("$") && varName.Length > 40)
         {
             var afterDollar = varName.AsSpan(1);
@@ -1802,7 +1765,6 @@ public partial class WorkflowDesigner : IDisposable
         }
     }
 
-    /// <summary>Устанавливает значение поля только выбранной переменной (предыдущее содержимое удаляется).</summary>
     private void InsertVariableReplacing(object dataObject, string propertyName, string variableName)
     {
         var property = dataObject.GetType().GetProperty(propertyName);
@@ -1814,7 +1776,6 @@ public partial class WorkflowDesigner : IDisposable
         }
     }
 
-    /// <summary>Strips $node. prefix so we store only {{guid.output}} in the DB.</summary>
     private static string VariableNameToStorageForm(string variableName)
     {
         const string nodePrefix = "$node.";
@@ -1876,16 +1837,11 @@ public partial class WorkflowDesigner : IDisposable
                 }
                 catch (JSDisconnectedException)
                 {
-                    // Navigated away
                 }
             });
         }
     }
 
-    /// <summary>
-    /// While the settings panel is open, only the selected node can be dragged; other nodes are locked.
-    /// When a link is selected, all nodes are locked.
-    /// </summary>
     private void ApplyNodeDragLocks()
     {
         if (SelectedModel is NodeModel activeNode)
@@ -1905,7 +1861,6 @@ public partial class WorkflowDesigner : IDisposable
         }
     }
 
-    /// <summary>Сбрасывает «липкий» drag диаграммы, как только курсор попадает на боковую панель.</summary>
     private void OnSettingsPanelPointerEnter()
     {
         _ = InvokeAsync(async () =>
@@ -2149,7 +2104,6 @@ public partial class WorkflowDesigner : IDisposable
         return "equals";
     }
 
-    /// <summary>Текущая подпись типа условия для отображения в кнопке выпадающего списка.</summary>
     private static string GetConditionTypeDisplayLabel(WorkflowLinkModel link)
     {
         if (link.Condition == null) return "Без условия (Всегда)";
@@ -2173,7 +2127,6 @@ public partial class WorkflowDesigner : IDisposable
         return "Без условия (Всегда)";
     }
 
-    /// <summary>Значения для условий по полю messageKind (совпадают с Shared.Domain.Enums.MessageKind.ToString()).</summary>
     public static readonly IReadOnlyList<(string Value, string Label)> IncomingMessageKindSelectOptions =
     [
         ("Text", "Текст"),
@@ -2186,7 +2139,6 @@ public partial class WorkflowDesigner : IDisposable
         ("Unknown", "Неизвестно"),
     ];
 
-    /// <summary>True, если левая часть условия ссылается на тип входящего сообщения ($node.*.messageKind или $message.kind).</summary>
     private bool IsMessageKindLeftOperand(string? left)
     {
         if (string.IsNullOrWhiteSpace(left)) return false;

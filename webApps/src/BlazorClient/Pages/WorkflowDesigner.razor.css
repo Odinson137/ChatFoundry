@@ -1,8 +1,3 @@
-/* ============================================
-   Workflow Designer — полноэкранно, без скроллов
-   Референс: code.html (страница), code1.html (модалка переменных)
-   ============================================ */
-
 :root {
     --designer-primary: #6366f1;
     --designer-primary-end: #8b5cf6;
@@ -26,7 +21,6 @@
     --designer-violet-600: #7c3aed;
 }
 
-/* Bootstrap «primary» на странице дизайнера — в палитру ChatFoundry (indigo), не дефолтный синий */
 .designer-page-container .btn-outline-primary {
     color: var(--designer-primary);
     border-color: #a5b4fc;
@@ -50,7 +44,6 @@
     letter-spacing: 0.04em;
 }
 
-/* Явный бейдж условия «РАВНО» — фиолетовый, всегда читаемый на белой карточке */
 .designer-settings-panel .designer-cond-badge--equals,
 .designer-page-container .designer-cond-badge--equals {
     background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%) !important;
@@ -63,7 +56,6 @@
     box-shadow: 0 1px 2px rgba(124, 58, 237, 0.35);
 }
 
-/* Основной контейнер — на весь экран, без скроллов */
 .designer-page-container {
     display: flex;
     width: 100%;
@@ -73,7 +65,6 @@
     background: #fff;
 }
 
-/* ========== Левая панель (референс code.html) ========== */
 .designer-sidebar {
     width: 280px;
     min-width: 280px;
@@ -278,7 +269,6 @@
     color: var(--designer-slate-700);
 }
 
-/* ========== Основная область ========== */
 .designer-main {
     flex: 1;
     display: flex;
@@ -374,7 +364,6 @@
     gap: 0.75rem;
 }
 
-/* JSON dropdown (Blazor-controlled, без Bootstrap JS) */
 .designer-json-dropdown {
     position: relative;
 }
@@ -458,7 +447,6 @@
     color: #fff !important;
 }
 
-/* Кнопка «Сохранить» в шапке: явный контраст (белый текст на фиолетовом), переопределяет глобальные стили */
 .designer-header .designer-btn-primary.designer-header-save,
 .designer-header .designer-header-save.designer-btn-primary {
     background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
@@ -471,7 +459,6 @@
     -webkit-text-fill-color: #ffffff;
 }
 
-/* Канвас с точечной сеткой (референс code.html dot-grid) */
 .canvas-area {
     flex: 1;
     position: relative;
@@ -486,7 +473,6 @@
     inset: 0;
 }
 
-/* Зум: слева снизу */
 .designer-zoom-controls {
     position: absolute;
     bottom: 1.5rem;
@@ -533,7 +519,6 @@
     border-right: 1px solid var(--designer-slate-100);
 }
 
-/* Подсказка про @ */
 .designer-tip {
     font-size: 0.75rem;
     color: var(--designer-slate-500);
@@ -559,7 +544,6 @@
     border-radius: 4px;
 }
 
-/* ========== Панель настроек узла (референс code.html) ========== */
 .designer-settings-panel {
     position: absolute;
     right: 2rem;
@@ -627,7 +611,6 @@
     color: var(--designer-slate-500);
 }
 
-/* Ссылка «хранилища» в блоке Медиа — открывает окно выбора файла */
 .storage-picker-link {
     color: var(--designer-primary);
     text-decoration: none;
@@ -646,7 +629,6 @@
     border: 1px solid var(--designer-slate-200);
 }
 
-/* Выпадающие списки в панели — в стиле дизайнера */
 .designer-settings-panel .form-select {
     padding: 0.5rem 2.25rem 0.5rem 0.75rem;
     font-size: 0.875rem;
@@ -680,7 +662,6 @@
     font-size: 0.875rem;
 }
 
-/* ========== Панель переменных (правый край — полоска как data_object в code.html) ========== */
 .variables-panel {
     position: absolute;
     right: 0;
@@ -703,7 +684,6 @@
     transform: translateX(0);
 }
 
-/* Полоска «Переменные» на правом краю — всегда видна (референс code.html) */
 .variables-tab {
     position: absolute;
     right: 0;
@@ -855,7 +835,6 @@
     flex-shrink: 0;
 }
 
-/* ========== Модальное окно выбора переменной (референс code1.html) ========== */
 .variable-picker-backdrop {
     position: fixed;
     inset: 0;
@@ -1089,51 +1068,372 @@
     flex-shrink: 0;
 }
 
-.storage-picker-modal .variable-picker-list.storage-picker-list {
-    padding-left: 0;
-    padding-right: 0;
+
+.storage-picker-modal {
+    max-width: 42rem;
+    width: calc(100% - 2rem);
 }
 
-.storage-picker-table {
+.storage-picker-header {
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.storage-picker-header-text {
+    min-width: 0;
+}
+
+.storage-picker-subtitle {
+    margin: 0.25rem 0 0;
     font-size: 0.8125rem;
-}
-
-.storage-picker-table thead th {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
+    font-weight: 500;
     color: var(--designer-slate-500);
-    border-bottom: 1px solid var(--designer-slate-100);
+    line-height: 1.35;
 }
 
-.storage-picker-table td {
-    vertical-align: middle;
+.storage-picker-toolbar {
+    display: flex;
+    align-items: stretch;
+    gap: 0.625rem;
+    padding: 0 1.5rem 1rem;
+    flex-shrink: 0;
+}
+
+.storage-picker-search-field {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 0.875rem;
+    background: var(--designer-slate-50);
+    border: 1px solid var(--designer-slate-200);
+    border-radius: 10px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.storage-picker-search-field:focus-within {
+    background: #fff;
+    border-color: var(--designer-primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+}
+
+.storage-picker-search-icon {
+    flex-shrink: 0;
+    color: var(--designer-slate-400);
+    font-size: 0.95rem;
+}
+
+.storage-picker-search-input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.65rem 0;
+    border: none;
+    background: transparent;
+    font-size: 0.875rem;
+    font-family: inherit;
+    line-height: 1.4;
+    color: var(--designer-slate-800);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.storage-picker-search-input::placeholder {
+    color: var(--designer-slate-400);
+}
+
+.storage-picker-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0.55rem 1rem;
+    font-family: inherit;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    line-height: 1.35;
+    transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.15s;
+    white-space: nowrap;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.storage-picker-btn:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.storage-picker-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* Явный градиент без var(): в scoped CSS переменная --designer-primary-gradient на фоне кнопки может не примениться — тогда белый текст на белом фоне не виден */
+.storage-picker-btn--accent {
+    padding-left: 1.125rem;
+    padding-right: 1.125rem;
+    min-width: 4.5rem;
+    font-size: 0.875rem;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+}
+
+.storage-picker-btn--accent:hover:not(:disabled) {
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.45);
+    background: linear-gradient(135deg, #575bec 0%, #7c3aed 100%);
+}
+
+.storage-picker-btn--primary {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--designer-indigo-600);
+    background: #fff;
+    border-color: #c7d2fe;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+.storage-picker-row:hover .storage-picker-btn--primary:not(:disabled) {
+    border-color: var(--designer-primary);
+    color: #4338ca;
+    background: var(--designer-indigo-50);
+}
+
+.storage-picker-btn--primary:hover:not(:disabled) {
+    border-color: var(--designer-primary);
+    background: var(--designer-indigo-50);
+}
+
+.storage-picker-btn--ghost {
+    color: var(--designer-slate-600);
+    background: var(--designer-slate-50);
+    border-color: var(--designer-slate-200);
+}
+
+.storage-picker-btn--ghost:hover:not(:disabled) {
+    background: var(--designer-slate-100);
+    border-color: var(--designer-slate-300);
+    color: var(--designer-slate-800);
+}
+
+.storage-picker-modal .variable-picker-list.storage-picker-list {
+    padding: 0 1rem 0.5rem;
+    min-height: 12rem;
+}
+
+.storage-picker-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 2.5rem 1rem !important;
+}
+
+.storage-picker-spinner {
+    width: 2rem;
+    height: 2rem;
+    border: 3px solid var(--designer-slate-200);
+    border-top-color: var(--designer-primary);
+    border-radius: 50%;
+    animation: storage-picker-spin 0.7s linear infinite;
+}
+
+@keyframes storage-picker-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.storage-picker-empty-msg .storage-picker-empty-icon {
+    width: 3rem;
+    height: 3rem;
+    margin: 0 auto 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: var(--designer-violet-50);
+    color: var(--designer-violet-600);
+    font-size: 1.35rem;
+}
+
+.storage-picker-empty-icon--muted {
+    background: var(--designer-slate-100);
+    color: var(--designer-slate-400);
+}
+
+.storage-picker-scroll {
+    border: 1px solid var(--designer-slate-200);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.storage-picker-grid {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.storage-picker-grid-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.3fr) auto 5.5rem;
+    gap: 0.5rem 0.75rem;
+    align-items: center;
+    padding: 0.5rem 0.875rem;
+    font-size: 0.6875rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--designer-slate-400);
+    background: linear-gradient(180deg, var(--designer-slate-50) 0%, #f1f5f9 100%);
+    border-bottom: 1px solid var(--designer-slate-200);
 }
 
 .storage-picker-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.3fr) auto 5.5rem;
+    gap: 0.5rem 0.75rem;
+    align-items: center;
+    padding: 0.55rem 0.875rem;
+    border-top: 1px solid var(--designer-slate-100);
     cursor: pointer;
+    transition: background 0.15s;
+}
+
+.storage-picker-row:first-of-type {
+    border-top: none;
 }
 
 .storage-picker-row:hover {
-    background: var(--designer-slate-50, #f8fafc);
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.06) 0%, rgba(139, 92, 246, 0.04) 100%);
 }
 
-.storage-picker-cell-name {
-    font-weight: 500;
-    color: var(--designer-slate-800, #1e293b);
-    max-width: 200px;
+.storage-picker-col {
+    min-width: 0;
+    font-size: 0.8125rem;
+}
+
+.storage-picker-col--name {
+    font-weight: 600;
+    color: var(--designer-slate-800);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
+.storage-picker-col--date {
+    font-size: 0.78rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--designer-slate-500);
+    white-space: nowrap;
+}
+
+.storage-picker-col--action {
+    display: flex;
+    justify-content: flex-end;
+}
+
 .storage-picker-id {
-    font-size: 0.7rem;
+    display: block;
+    font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+    font-size: 0.68rem;
+    line-height: 1.35;
     color: var(--designer-slate-500);
     word-break: break-all;
 }
 
-/* Панель настроек — совместимость с существующими form-control внутри */
+.storage-picker-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 0.75rem 1.5rem;
+    border-top: 1px solid var(--designer-slate-100);
+    background: var(--designer-slate-50);
+}
+
+.storage-picker-count {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--designer-slate-500);
+}
+
+.storage-picker-count strong {
+    color: var(--designer-slate-700);
+    font-weight: 700;
+}
+
+.storage-picker-pagination-btns {
+    display: flex;
+    gap: 0.35rem;
+}
+
+.storage-picker-nav-btn {
+    width: 2.25rem;
+    height: 2.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--designer-slate-200);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--designer-slate-600);
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.storage-picker-nav-btn:hover:not(:disabled) {
+    border-color: var(--designer-primary);
+    color: var(--designer-indigo-600);
+    background: var(--designer-indigo-50);
+}
+
+.storage-picker-nav-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.storage-picker-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.875rem 1.5rem 1.25rem;
+    border-top: 1px solid var(--designer-slate-100);
+    background: #fff;
+}
+
+@media (max-width: 540px) {
+    .storage-picker-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .storage-picker-grid {
+        min-width: 26rem;
+    }
+
+    .storage-picker-toolbar {
+        flex-wrap: wrap;
+    }
+
+    .storage-picker-btn--accent {
+        flex: 1;
+        min-width: 5rem;
+    }
+}
+
 .designer-settings-panel .mb-3 {
     margin-bottom: 1rem;
 }
@@ -1143,7 +1443,6 @@
     color: var(--designer-slate-500);
 }
 
-/* Выпадающий список «Тип условия» — в стиле дизайнера */
 .designer-condition-type-dropdown {
     position: relative;
 }
@@ -1211,7 +1510,6 @@
     overflow-y: auto;
 }
 
-/* Позиционирование через JS — меню не обрезается панелью и не вызывает скролл */
 .designer-condition-type-menu--fixed {
     position: fixed;
     top: 0;
@@ -1264,7 +1562,6 @@
     font-size: 0.875rem;
 }
 
-/* Кнопка выбора переменной — минималистичная, только иконка */
 .designer-var-picker-btn {
     padding: 0.2rem 0.4rem !important;
     min-width: 1.75rem;
@@ -1275,7 +1572,6 @@
     font-size: 0.8rem;
 }
 
-/* Отступ между строкой с кнопкой «Выбрать» и полем ввода, чтобы focus ring не перекрывал кнопку */
 .designer-settings-panel .designer-var-row .form-control {
     margin-top: 0.4rem;
 }
@@ -1288,7 +1584,6 @@
     font-size: 0.7rem;
 }
 
-/* Строки кнопок Ask: поле + компактное удаление */
 .designer-ask-button-row {
     display: flex;
     align-items: stretch;
@@ -1356,7 +1651,6 @@
     font-size: 0.85rem;
 }
 
-/* ========== Модальное окно «Переменные / Атрибуты / Параметры» ========== */
 .variables-modal-backdrop {
     position: fixed;
     inset: 0;
@@ -1515,18 +1809,10 @@
     margin: 1rem 0 0;
 }
 
-/* Узлы диаграммы — карточки с левой акцентной полосой (border), тень, скругления */
-.canvas-area ::deep .diagram-node,
-.canvas-area ::deep .bd-node,
-.canvas-area ::deep .default-node,
-.canvas-area ::deep [class*="node"] {
-    border-radius: 12px !important;
-    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
-    border: 1px solid var(--designer-slate-200) !important;
-    border-left: 4px solid var(--designer-primary) !important;
-    overflow: visible !important;
-    min-width: 140px;
-    background: #ffffff !important;
+.canvas-area ::deep .diagram-node:has(.workflow-designer-node) {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
 }
 
 .canvas-area ::deep .bd-node .bd-node-header,
@@ -1549,41 +1835,11 @@
     font-size: 0.8125rem;
 }
 
-/* Выбранный узел: кольцо через box-shadow (без position/outline — иначе ломается absolute-раскладка узла и ширина) */
-.canvas-area ::deep .diagram-node.selected {
-    box-shadow: 0 0 0 2px var(--designer-primary), 0 4px 20px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+.canvas-area ::deep .diagram-node.selected:has(.workflow-designer-node) {
+    box-shadow: none !important;
 }
 
-.canvas-area ::deep .bd-node.selected {
-    box-shadow: 0 0 0 2px var(--designer-primary), 0 4px 20px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
-}
 
-/* Порты: видимые, удобный размер для перетаскивания линии связи */
-.canvas-area ::deep .diagram-port,
-.canvas-area ::deep .bd-port,
-.canvas-area ::deep [class*="port"] {
-    width: 14px !important;
-    height: 14px !important;
-    min-width: 14px !important;
-    min-height: 14px !important;
-    border-radius: 50% !important;
-    background: var(--designer-primary) !important;
-    border: 2px solid #fff !important;
-    box-shadow: 0 0 0 1px var(--designer-slate-200);
-    cursor: crosshair !important;
-    pointer-events: auto !important;
-    opacity: 1 !important;
-    z-index: 10;
-}
-
-.canvas-area ::deep .diagram-port:hover,
-.canvas-area ::deep .bd-port:hover,
-.canvas-area ::deep [class*="port"]:hover {
-    transform: scale(1.2);
-    background: var(--designer-indigo-600) !important;
-}
-
-/* Подпись на связи (foreignObject) — нейтральный сланцевый текст, не голубой от темы диаграммы */
 .canvas-area ::deep foreignObject.diagram-link-label {
     overflow: visible;
 }
@@ -1607,7 +1863,6 @@
     box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 
-/* Убираем глобальные скроллы */
 .designer-page-container * {
     box-sizing: border-box;
 }

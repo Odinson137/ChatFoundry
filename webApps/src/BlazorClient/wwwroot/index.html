@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css" />
     <link rel="stylesheet" href="css/app.css" />
     <link rel="stylesheet" href="css/replay-node.css" />
+    <link rel="stylesheet" href="css/workflow-designer-node.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <link href="BlazorClient.styles.css" rel="stylesheet" />
     <script type="importmap"></script>
@@ -107,7 +108,6 @@
             document.addEventListener('pointerup', sync, true);
             document.addEventListener('pointercancel', sync, true);
         })();
-        /** Direct synthetic pointerup on diagram canvas (DragMovablesBehavior). */
         window.__releaseDiagramPointerDragCore = function() {
             var root = document.getElementById('designer-canvas-area');
             var target = root ? root.querySelector('.designer-canvas') : null;
@@ -142,10 +142,6 @@
                 }));
             }
         };
-        /**
-         * Defers release so an intentional drag (primary button still down) is not cancelled.
-         * Only injects when pointer buttons indicate the primary button is up (stuck drag after overlay).
-         */
         window.__releaseDiagramPointerDragDeferred = function() {
             requestAnimationFrame(function() {
                 requestAnimationFrame(function() {

@@ -1,0 +1,245 @@
+.designer-canvas .diagram-node:has(.workflow-designer-node) {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    z-index: 2;
+}
+
+.designer-canvas .diagram-node:hover:has(.workflow-designer-node),
+.designer-canvas .diagram-node.selected:has(.workflow-designer-node) {
+    z-index: 20;
+}
+
+.designer-canvas .diagram-node.selected:has(.workflow-designer-node) {
+    box-shadow: none !important;
+}
+
+.designer-canvas .diagram-node.selected:has(.workflow-designer-node) .workflow-designer-node {
+    box-shadow:
+        0 0 0 2px #6366f1,
+        0 4px 20px rgba(15, 23, 42, 0.1),
+        0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+.workflow-designer-node {
+    position: relative;
+    z-index: 0;
+    min-width: 148px;
+    max-width: 260px;
+    border-radius: 12px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-left-width: 4px;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+    overflow: visible;
+    cursor: move;
+}
+
+.workflow-designer-node-header {
+    position: relative;
+    z-index: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.65rem;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #334155;
+    border-radius: 10px 10px 0 0;
+}
+
+.workflow-designer-node-icon {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+}
+
+.workflow-designer-node-icon svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+}
+
+.workflow-designer-node-title {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.workflow-designer-node-preview {
+    position: relative;
+    z-index: 0;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    color: #475569;
+    line-height: 1.35;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    word-break: break-all;
+}
+
+.workflow-designer-node--start {
+    border-left-color: #059669;
+}
+.workflow-designer-node--start .workflow-designer-node-header {
+    background: #ecfdf5;
+}
+
+.workflow-designer-node--end {
+    border-left-color: #dc2626;
+}
+.workflow-designer-node--end .workflow-designer-node-header {
+    background: #fef2f2;
+}
+
+.workflow-designer-node--wait {
+    border-left-color: #4f46e5;
+}
+.workflow-designer-node--wait .workflow-designer-node-header {
+    background: #eef2ff;
+}
+
+.workflow-designer-node--message {
+    border-left-color: #4f46e5;
+}
+.workflow-designer-node--message .workflow-designer-node-header {
+    background: #eef2ff;
+}
+
+.workflow-designer-node--ask {
+    border-left-color: #7c3aed;
+}
+.workflow-designer-node--ask .workflow-designer-node-header {
+    background: #f5f3ff;
+}
+
+.workflow-designer-node--media {
+    border-left-color: #6366f1;
+}
+.workflow-designer-node--media .workflow-designer-node-header {
+    background: #eef2ff;
+}
+
+.workflow-designer-node--subworkflow {
+    border-left-color: #ea580c;
+}
+.workflow-designer-node--subworkflow .workflow-designer-node-header {
+    background: #fff7ed;
+}
+
+.workflow-designer-node--http {
+    border-left-color: #7c3aed;
+}
+.workflow-designer-node--http .workflow-designer-node-header {
+    background: #f5f3ff;
+}
+
+.workflow-designer-node--attribute {
+    border-left-color: #9333ea;
+}
+.workflow-designer-node--attribute .workflow-designer-node-header {
+    background: #faf5ff;
+}
+
+.workflow-designer-node--ai {
+    border-left-color: #d97706;
+}
+.workflow-designer-node--ai .workflow-designer-node-header {
+    background: #fffbeb;
+}
+
+.workflow-designer-node--condition {
+    border-left-color: #ea580c;
+}
+.workflow-designer-node--condition .workflow-designer-node-header {
+    background: #fff7ed;
+}
+
+.workflow-designer-node--aifilter {
+    border-left-color: #f59e0b;
+}
+.workflow-designer-node--aifilter .workflow-designer-node-header {
+    background: #fffbeb;
+}
+
+.workflow-designer-node--default {
+    border-left-color: #94a3b8;
+}
+.workflow-designer-node--default .workflow-designer-node-header {
+    background: #f8fafc;
+}
+
+/*
+ * Порты: в default.styles позиция задана только для .default-node — без неё div пустой и без круга.
+ * Явно задаём размеры и фон (как у .default-node .diagram-port).
+ */
+.workflow-designer-node-ports {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    pointer-events: none;
+    overflow: visible;
+}
+
+.workflow-designer-node-ports-left {
+    left: 0;
+    align-items: center;
+    transform: translateX(-50%);
+}
+
+.workflow-designer-node-ports-right {
+    right: 0;
+    align-items: center;
+    transform: translateX(50%);
+}
+
+.workflow-designer-node-ports .diagram-port {
+    pointer-events: auto;
+    position: relative;
+    flex: 0 0 auto;
+    display: block !important;
+    box-sizing: border-box !important;
+    width: 16px !important;
+    height: 16px !important;
+    min-width: 16px !important;
+    min-height: 16px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    background: #6366f1 !important;
+    border: 2px solid #fff !important;
+    box-shadow: 0 0 0 1px #e2e8f0 !important;
+    opacity: 1 !important;
+    cursor: crosshair !important;
+    overflow: visible !important;
+}
+
+.workflow-designer-node-ports .diagram-port:hover {
+    transform: scale(1.15);
+    background: #4f46e5 !important;
+}
+
+.designer-canvas .diagram-node:has(.workflow-designer-node) .diagram-port {
+    width: 16px !important;
+    height: 16px !important;
+    min-width: 16px !important;
+    min-height: 16px !important;
+}

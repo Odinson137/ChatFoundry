@@ -131,12 +131,14 @@
              @ondragover="OnDragOver" 
              @ondragover:preventDefault="true">
             <CascadingValue Value="Diagram">
+                <CascadingValue Name="WorkflowNodePreviewFormatter" Value="@FormatPreviewForNodeWidget" IsFixed="true">
                 <DiagramCanvas class="designer-canvas">
                     <Widgets>
                         <GridWidget Size="24" Mode="GridMode.Point" BackgroundColor="#ffffff"/>
                         <SelectionBoxWidget/>
                     </Widgets>
                 </DiagramCanvas>
+                </CascadingValue>
             </CascadingValue>
 
             <!-- Зум: слева снизу -->
@@ -1339,92 +1341,103 @@
 {
     var (storagePageItems, storageTotalFiltered) = GetStoragePickerPage();
     <div class="variable-picker-backdrop" @onclick="CloseStoragePicker"></div>
-    <div class="variable-picker-modal storage-picker-modal" role="dialog" style="max-width: 640px;">
-        <div class="variable-picker-header">
-            <h2 class="variable-picker-title">Выбрать файл из хранилища</h2>
+    <div class="variable-picker-modal storage-picker-modal" role="dialog" aria-modal="true" aria-labelledby="storage-picker-title">
+        <div class="variable-picker-header storage-picker-header">
+            <div class="storage-picker-header-text">
+                <h2 id="storage-picker-title" class="variable-picker-title">Файлы хранилища</h2>
+                <p class="storage-picker-subtitle">Выберите файл для блока или найдите по имени и ID</p>
+            </div>
             <button type="button" class="variable-picker-close" @onclick="CloseStoragePicker" aria-label="Закрыть">
                 <span class="oi oi-x"></span>
             </button>
         </div>
         @if (!StoragePickerLoading && StoragePickerAllFiles.Any())
         {
-            <div class="variable-picker-search-wrap">
-                <span class="variable-picker-search-icon oi oi-magnifying-glass"></span>
-                <input type="text"
-                       class="variable-picker-search"
-                       placeholder="Поиск по имени или ID..."
-                       @bind="StoragePickerSearch"
-                       @bind:event="oninput"
-                       @bind:after="OnStoragePickerSearchInput" />
-                <button type="button" class="btn btn-sm btn-outline-primary ms-2" @onclick="OnStoragePickerSearchSubmit">Искать</button>
+            <div class="storage-picker-toolbar">
+                <label class="storage-picker-search-field">
+                    <span class="storage-picker-search-icon oi oi-magnifying-glass" aria-hidden="true"></span>
+                    <input type="search"
+                           class="storage-picker-search-input"
+                           placeholder="Поиск по имени или ID…"
+                           autocomplete="off"
+                           @bind="StoragePickerSearch"
+                           @bind:event="oninput"
+                           @bind:after="OnStoragePickerSearchInput" />
+                </label>
+                <button type="button" class="storage-picker-btn storage-picker-btn--accent" @onclick="OnStoragePickerSearchSubmit">Найти</button>
             </div>
         }
-        <div class="variable-picker-list storage-picker-list" style="min-height: 200px;">
+        <div class="variable-picker-list storage-picker-list">
             @if (StoragePickerLoading)
             {
-                <div class="variable-picker-empty">
-                    <p>Загрузка...</p>
+                <div class="variable-picker-empty storage-picker-loading">
+                    <div class="storage-picker-spinner" aria-hidden="true"></div>
+                    <p>Загрузка списка…</p>
                 </div>
             }
             else if (!StoragePickerAllFiles.Any())
             {
-                <div class="variable-picker-empty">
+                <div class="variable-picker-empty storage-picker-empty-msg">
+                    <div class="storage-picker-empty-icon" aria-hidden="true">
+                        <span class="oi oi-folder"></span>
+                    </div>
                     <p>Нет файлов в хранилище</p>
-                    <small>Загрузите файл через поле «Загрузить файл» выше</small>
+                    <small>Загрузите файл через поле «Загрузить файл» в настройках блока</small>
                 </div>
             }
             else if (storageTotalFiltered == 0)
             {
-                <div class="variable-picker-empty">
+                <div class="variable-picker-empty storage-picker-empty-msg">
+                    <div class="storage-picker-empty-icon storage-picker-empty-icon--muted" aria-hidden="true">
+                        <span class="oi oi-magnifying-glass"></span>
+                    </div>
                     <p>Ничего не найдено</p>
-                    <small>Измените поисковый запрос</small>
+                    <small>Измените запрос или сбросьте фильтр</small>
                 </div>
             }
             else
             {
-                <div class="table-responsive px-2">
-                    <table class="table table-sm table-hover mb-0 storage-picker-table">
-                        <thead>
-                        <tr>
-                            <th>Имя</th>
-                            <th>Id</th>
-                            <th>Создан</th>
-                            <th style="width: 90px;"></th>
-                        </tr>
-                        </thead>
-                        <tbody>
+                <div class="storage-picker-scroll">
+                    <div class="storage-picker-grid" role="list">
+                        <div class="storage-picker-grid-head" role="presentation">
+                            <span class="storage-picker-col storage-picker-col--name">Имя</span>
+                            <span class="storage-picker-col storage-picker-col--id">ID</span>
+                            <span class="storage-picker-col storage-picker-col--date">Создан</span>
+                            <span class="storage-picker-col storage-picker-col--action" aria-hidden="true"></span>
+                        </div>
                         @foreach (var f in storagePageItems)
                         {
-                            <tr class="storage-picker-row" @onclick="() => SelectStorageFile(f)">
-                                <td class="storage-picker-cell-name">@(f.Name ?? "—")</td>
-                                <td><code class="storage-picker-id">@f.Id</code></td>
-                                <td class="text-muted small">@(f.CreatedAt?.ToLocalTime().ToString("dd.MM.yyyy HH:mm") ?? "—")</td>
-                                <td @onclick:stopPropagation="true">
-                                    <button type="button" class="btn btn-sm btn-outline-primary" @onclick="() => SelectStorageFile(f)">Выбрать</button>
-                                </td>
-                            </tr>
+                            <div class="storage-picker-row" role="listitem" @onclick="() => SelectStorageFile(f)">
+                                <span class="storage-picker-col storage-picker-col--name" title="@(f.Name ?? "")">@(f.Name ?? "—")</span>
+                                <code class="storage-picker-col storage-picker-col--id storage-picker-id" title="@f.Id">@f.Id</code>
+                                <span class="storage-picker-col storage-picker-col--date">@(f.CreatedAt?.ToLocalTime().ToString("dd.MM.yyyy HH:mm") ?? "—")</span>
+                                <div class="storage-picker-col storage-picker-col--action" @onclick:stopPropagation="true">
+                                    <button type="button" class="storage-picker-btn storage-picker-btn--primary" @onclick="() => SelectStorageFile(f)">
+                                        Выбрать
+                                    </button>
+                                </div>
+                            </div>
                         }
-                        </tbody>
-                    </table>
+                    </div>
                 </div>
             }
         </div>
         @if (!StoragePickerLoading && StoragePickerAllFiles.Any() && storageTotalFiltered > 0)
         {
-            <div class="d-flex justify-content-between align-items-center px-3 py-2 border-top flex-wrap gap-2">
-                <span class="text-muted small">Показано @storagePageItems.Count из @storageTotalFiltered</span>
-                <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" disabled="@(!StoragePickerHasPrev)" @onclick="StoragePickerPrevPage">
-                        <span class="oi oi-chevron-left"></span> Назад
+            <div class="storage-picker-pagination">
+                <p class="storage-picker-count">Показано <strong>@storagePageItems.Count</strong> из <strong>@storageTotalFiltered</strong></p>
+                <div class="storage-picker-pagination-btns">
+                    <button type="button" class="storage-picker-nav-btn" disabled="@(!StoragePickerHasPrev)" @onclick="StoragePickerPrevPage" title="Предыдущая страница">
+                        <span class="oi oi-chevron-left"></span>
                     </button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" disabled="@(!StoragePickerHasNext)" @onclick="StoragePickerNextPage">
-                        Вперёд <span class="oi oi-chevron-right"></span>
+                    <button type="button" class="storage-picker-nav-btn" disabled="@(!StoragePickerHasNext)" @onclick="StoragePickerNextPage" title="Следующая страница">
+                        <span class="oi oi-chevron-right"></span>
                     </button>
                 </div>
             </div>
         }
-        <div class="d-flex justify-content-end px-3 py-2 border-top">
-            <button type="button" class="btn btn-sm btn-outline-secondary" @onclick="CloseStoragePicker">Отмена</button>
+        <div class="storage-picker-footer">
+            <button type="button" class="storage-picker-btn storage-picker-btn--ghost" @onclick="CloseStoragePicker">Закрыть</button>
         </div>
     </div>
 }
