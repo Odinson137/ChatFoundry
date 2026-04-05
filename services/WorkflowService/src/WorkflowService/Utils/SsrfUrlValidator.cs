@@ -41,22 +41,22 @@ public sealed class SsrfUrlValidator
             return false;
         }
 
-        // Block literal hostnames that resolve to loopback
+        
         if (host.Equals("localhost", StringComparison.OrdinalIgnoreCase))
         {
             blockReason = "localhost";
             return false;
         }
 
-        // Check if host is an IP address
+        
         if (IPAddress.TryParse(host, out var ip))
             return IsIpAllowed(ip, out blockReason);
 
-        // IPv6 in brackets (Uri.Host already strips brackets)
+        
         if (host.StartsWith('[') && host.EndsWith(']') && IPAddress.TryParse(host.AsSpan(1, host.Length - 2), out var ip6))
             return IsIpAllowed(ip6, out blockReason);
 
-        // Hostname: allow (we don't resolve to avoid DNS rebinding complexity; optional future: resolve and re-check)
+        
         return true;
     }
 
@@ -73,13 +73,13 @@ public sealed class SsrfUrlValidator
         if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
         {
             var bytes = ip.GetAddressBytes();
-            // 10.0.0.0/8
+            
             if (bytes[0] == 10) { blockReason = "private network (10.0.0.0/8)"; return false; }
-            // 172.16.0.0/12
+            
             if (bytes[0] == 172 && bytes[1] >= 16 && bytes[1] <= 31) { blockReason = "private network (172.16.0.0/12)"; return false; }
-            // 192.168.0.0/16
+            
             if (bytes[0] == 192 && bytes[1] == 168) { blockReason = "private network (192.168.0.0/16)"; return false; }
-            // 169.254.0.0/16 (link-local, includes cloud metadata 169.254.169.254)
+            
             if (bytes[0] == 169 && bytes[1] == 254) { blockReason = "link-local / metadata"; return false; }
         }
         else if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)

@@ -53,7 +53,7 @@ public sealed class TelegramClient(
             {
                 var label = (b.Text ?? "").Trim();
                 if (string.IsNullOrEmpty(label))
-                    return (InlineKeyboardButton?)null;
+                    return null;
                 var data = string.IsNullOrWhiteSpace(b.CallbackData)
                     ? label
                     : b.CallbackData.Trim();

@@ -33,10 +33,10 @@ public class HttpRequestActionExecutor(
         if (node.Data is not HttpRequestNodeData requestData)
             return;
 
-        // Render all text fields with session variables
+        
         var renderedUrl = workflowTextRenderer.RenderText(requestData.Url, session);
 
-        // SSRF protection: block internal and private URLs — treat as error, do not complete successfully
+        
         if (!ssrfUrlValidator.IsUrlAllowed(renderedUrl, out var blockReason))
         {
             throw new InvalidOperationException(

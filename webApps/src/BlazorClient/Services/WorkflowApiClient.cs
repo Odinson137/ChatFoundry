@@ -8,7 +8,7 @@ namespace BlazorClient.Services;
 
 public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
 {
-    // ─── Channels ─────────────────────────────────────────────────────────────
+    
 
     public async Task<List<ChannelDto>> GetChannelsAsync()
     {
@@ -77,7 +77,7 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
             throw new InvalidOperationException(payload.Error);
     }
 
-    // ─── Bots ────────────────────────────────────────────────────────────────
+    
 
     public async Task<List<BotDto>> GetBotsAsync()
     {
@@ -184,7 +184,7 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
         await ExecuteGraphQl<object>(query, variables);
     }
 
-    // ─── Sessions ─────────────────────────────────────────────────────────────
+    
 
     public async Task<List<SessionDto>> GetSessionsAsync(string? statusFilter = null)
     {
@@ -364,7 +364,7 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
         return result.Sessions.Nodes.FirstOrDefault();
     }
 
-    // ─── Workflows ───────────────────────────────────────────────────────────
+    
 
     public async Task<WorkflowResponse?> GetWorkflowByIdAsync(Guid id)
     {
@@ -578,7 +578,7 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
         catch { return false; }
     }
 
-    // ─── Shared ──────────────────────────────────────────────────────────────
+    
 
     private async Task<T> ExecuteGraphQl<T>(string query, object? variables = null)
     {
@@ -614,7 +614,7 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
         await ExecuteGraphQl<object>(query, variables);
     }
 
-    // ─── Response DTOs (private, для десериализацииConnection-обёрток) ──────
+    
 
     private class BotsConnectionResponse
     {

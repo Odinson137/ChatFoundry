@@ -1,6 +1,6 @@
 using System.Text.Json;
 using BlazorClient.Interfaces;
-using BlazorClient.Models; // Убедитесь, что эта using-директива присутствует
+using BlazorClient.Models; 
 using System.Collections.Generic;
 
 namespace BlazorClient.Services;
@@ -11,7 +11,7 @@ public class WorkflowSchemaService : IWorkflowSchemaService
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         PropertyNameCaseInsensitive = true,
-        // Дискриминатор $type может быть не в начале объекта (например: {"text":"...","$type":"Message"})
+        
         AllowOutOfOrderMetadataProperties = true
     };
 

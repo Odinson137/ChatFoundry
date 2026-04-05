@@ -1,4 +1,4 @@
-/* ─── Sessions page: no card border ─────────────────────────────────────── */
+
 
 .sess-card {
     border: none !important;
@@ -11,7 +11,7 @@
     box-shadow: none !important;
 }
 
-/* ─── Filters row: одна строка, одинаковый размер контролов ─────────────── */
+
 
 .sess-filters {
     padding: 0 0 16px;
@@ -33,7 +33,7 @@
     margin-bottom: 0;
 }
 
-/* Одинаковая высота: поле, селекты, кнопка обновить */
+
 .sess-filters-row .sess-input,
 .sess-filters-row .sess-select,
 .sess-filters-row .sess-btn-refresh {
@@ -162,7 +162,7 @@
     color: #94a3b8;
 }
 
-/* ─── Pagination ───────────────────────────────────────────────────────── */
+
 
 .sess-pagination {
     display: flex;

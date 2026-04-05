@@ -125,11 +125,11 @@ var app = builder.Build();
 
 app.MapGet("/", () => "TelegramService!");
 
-//app.UseHttpsRedirection();
+
 app.MapControllers();
 
 var test = app.Services.CreateScope().ServiceProvider.GetRequiredService<ITelegramClient>();
 
-//await test.SetWebhookAsync("https://mongoose-needed-partially.ngrok-free.app/telegramhook/7e56b86d-4fc9-4c71-aab5-5e9a5ea1b9f0", default);
+
 app.Run();
 

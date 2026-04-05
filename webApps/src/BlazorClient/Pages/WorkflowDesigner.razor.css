@@ -1172,7 +1172,7 @@
     cursor: not-allowed;
 }
 
-/* Явный градиент без var(): в scoped CSS переменная --designer-primary-gradient на фоне кнопки может не примениться — тогда белый текст на белом фоне не виден */
+/* NOTE: явный linear-gradient: в scoped CSS var(--designer-primary-gradient) на кнопке может не подставиться — белый текст на белом фоне. */
 .storage-picker-btn--accent {
     padding-left: 1.125rem;
     padding-right: 1.125rem;

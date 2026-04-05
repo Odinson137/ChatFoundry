@@ -25,7 +25,7 @@ public class ClientApiClient(HttpClient http) : IClientApiClient
         var afterArg = after != null ? ", after: $after" : "";
         var searchArg = !string.IsNullOrWhiteSpace(search) ? ", search: $search" : "";
 
-        // Build variable declarations
+        
         var varDecls = new List<string> { "$first: Int!" };
         if (after != null) varDecls.Add("$after: String!");
         if (!string.IsNullOrWhiteSpace(search)) varDecls.Add("$search: String!");
@@ -168,7 +168,7 @@ public class ClientApiClient(HttpClient http) : IClientApiClient
         };
     }
 
-    // ─── Attribute definitions (company) ─────────────────────────────────────
+    
 
     public async Task<List<AttributeDefinitionDto>> GetCompanyAttributeDefinitionsAsync(CancellationToken ct = default)
     {
@@ -231,7 +231,7 @@ public class ClientApiClient(HttpClient http) : IClientApiClient
         return result.DeleteAttributeDefinition;
     }
 
-    // ─── Shared ──────────────────────────────────────────────────────────────
+    
 
     private async Task<T> ExecuteGraphQl<T>(string query, object? variables = null, CancellationToken ct = default)
     {
@@ -253,7 +253,7 @@ public class ClientApiClient(HttpClient http) : IClientApiClient
         return gqlResponse!.Data!;
     }
 
-    // ─── Response DTOs ───────────────────────────────────────────────────────
+    
 
     private class ClientsConnectionResponse
     {

@@ -1,4 +1,4 @@
-/* ===== Layout Shell ===== */
+
 .cf-layout {
     min-height: 100vh;
     display: flex;
@@ -6,7 +6,7 @@
     background: #ffffff;
 }
 
-/* ===== Header ===== */
+
 .cf-header {
     position: sticky;
     top: 0;
@@ -27,7 +27,7 @@
     gap: 2rem;
 }
 
-/* Logo */
+
 .cf-logo {
     display: flex;
     align-items: center;
@@ -52,7 +52,7 @@
     letter-spacing: -0.02em;
 }
 
-/* Navigation area */
+
 .cf-nav {
     flex: 1;
     display: flex;
@@ -101,7 +101,7 @@
     opacity: 1;
 }
 
-/* Header actions (auth + CTA) */
+
 .cf-header-actions {
     flex-shrink: 0;
     display: flex;
@@ -182,12 +182,12 @@
     text-decoration: none;
 }
 
-/* ===== Main Content ===== */
+
 .cf-main {
     flex: 1;
 }
 
-/* ===== Footer ===== */
+
 .cf-footer {
     border-top: 1px solid #f1f5f9;
     background: #fafbfc;
@@ -236,7 +236,7 @@
     color: #6366f1;
 }
 
-/* ===== Responsive ===== */
+
 @media (max-width: 768px) {
     .cf-header-inner {
         padding: 0 1rem;

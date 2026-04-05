@@ -4,7 +4,7 @@
     padding: 2rem;
 }
 
-/* ─── Header ───────────────────────────────────────────────────────────── */
+
 
 .clients-header {
     display: flex;
@@ -36,7 +36,7 @@
     border-radius: 100px;
 }
 
-/* ─── Toolbar ──────────────────────────────────────────────────────────── */
+
 
 .clients-toolbar {
     display: flex;
@@ -125,7 +125,7 @@
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
-/* ─── Table ─────────────────────────────────────────────────────────────── */
+
 
 .clients-table-wrap {
     background: #ffffff;
@@ -225,7 +225,7 @@
     font-size: 0.85rem;
 }
 
-/* ─── Channel Badges ───────────────────────────────────────────────────── */
+
 
 .clients-badges {
     display: flex;
@@ -267,7 +267,7 @@
     color: #c62828;
 }
 
-/* ─── Expanded Detail ──────────────────────────────────────────────────── */
+
 
 .clients-detail-row {
     background: #fafbff;
@@ -340,7 +340,7 @@
     font-weight: 500;
 }
 
-/* ─── Pagination ───────────────────────────────────────────────────────── */
+
 
 .clients-pagination {
     display: flex;
@@ -412,7 +412,7 @@
     color: #0f172a;
 }
 
-/* ─── States ───────────────────────────────────────────────────────────── */
+
 
 .clients-loading {
     display: flex;
@@ -466,7 +466,7 @@
     line-height: 1.6;
 }
 
-/* ─── Responsive ───────────────────────────────────────────────────────── */
+
 
 @media (max-width: 768px) {
     .clients-page {

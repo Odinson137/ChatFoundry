@@ -1,4 +1,4 @@
-/* ===== Shared Section Styles ===== */
+
 .section-inner {
     max-width: 1200px;
     margin: 0 auto;
@@ -29,7 +29,7 @@
     line-height: 1.6;
 }
 
-/* ===== Hero ===== */
+
 .hero {
     background: linear-gradient(180deg, #f8faff 0%, #ffffff 100%);
     overflow: hidden;
@@ -128,7 +128,7 @@
     text-decoration: none;
 }
 
-/* Hero Visual — animated workflow preview */
+
 .hero-visual {
     display: flex;
     justify-content: center;
@@ -196,7 +196,7 @@
     transform: rotate(-45deg);
 }
 
-/* ===== Features ===== */
+
 .features {
     background: #ffffff;
 }
@@ -243,7 +243,7 @@
     margin: 0;
 }
 
-/* ===== How It Works ===== */
+
 .how-it-works {
     background: #f8fafc;
 }
@@ -296,7 +296,7 @@
     flex-shrink: 0;
 }
 
-/* ===== Architecture ===== */
+
 .architecture {
     background: #ffffff;
 }
@@ -346,7 +346,7 @@
     font-family: 'Courier New', monospace;
 }
 
-/* ===== Pricing ===== */
+
 .pricing {
     background: #f8fafc;
 }
@@ -480,7 +480,7 @@
     color: #94a3b8;
 }
 
-/* ===== CTA ===== */
+
 .cta {
     background: linear-gradient(135deg, #0f172a, #1e293b);
     text-align: center;
@@ -505,7 +505,7 @@
     line-height: 1.6;
 }
 
-/* ===== Responsive ===== */
+
 @media (max-width: 1024px) {
     .features-grid,
     .arch-grid {

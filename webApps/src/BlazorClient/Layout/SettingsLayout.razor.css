@@ -5,9 +5,7 @@
     line-height: 2.5;
 }
 
-/* ══════════════════════════════════════
-   SIDEBAR
-   ══════════════════════════════════════ */
+
 
 .settings-sidebar {
     flex-shrink: 0;
@@ -21,7 +19,7 @@
     height: 100%;
 }
 
-/* ── Header ── */
+
 
 .settings-sidebar-header {
     display: flex;
@@ -69,7 +67,7 @@
     line-height: 1.3;
 }
 
-/* ── Nav ── */
+
 
 .settings-nav {
     display: flex;
@@ -106,7 +104,7 @@
     background: #e4e8ee;
 }
 
-/* ── Nav Item ── */
+
 
 .settings-nav-item {
     display: flex !important;
@@ -148,7 +146,7 @@
     transition: height 0.2s ease;
 }
 
-/* Icon container */
+
 .snav-icon {
     width: 30px;
     height: 30px;
@@ -175,7 +173,7 @@
     transition: transform 0.18s ease;
 }
 
-/* Text */
+
 .snav-text {
     flex: 1 1 auto;
     min-width: 0;
@@ -184,7 +182,7 @@
     text-overflow: ellipsis;
 }
 
-/* Arrow */
+
 .snav-arrow {
     display: inline-flex;
     align-items: center;
@@ -201,7 +199,7 @@
     flex-shrink: 0;
 }
 
-/* ── Hover State ── */
+
 
 .settings-nav-item:hover {
     color: #1e293b;
@@ -219,7 +217,7 @@
     color: #94a3b8;
 }
 
-/* ── Active State ── */
+
 
 .settings-nav-item.active {
     color: #4f46e5;
@@ -248,9 +246,7 @@
     color: #6366f1;
 }
 
-/* ══════════════════════════════════════
-   CONTENT AREA
-   ══════════════════════════════════════ */
+
 
 .settings-content {
     flex: 1;
@@ -261,7 +257,7 @@
     height: 100%;
 }
 
-/* ── Page Header Pattern ── */
+
 
 .settings-content ::deep .settings-page-header {
     display: flex;
@@ -288,7 +284,7 @@
     line-height: 1.5;
 }
 
-/* ── Primary Action Button ── */
+
 
 .settings-content ::deep .settings-btn-primary {
     display: inline-flex;
@@ -335,7 +331,7 @@
     border-color: #cbd5e1;
 }
 
-/* ── Card Pattern ── */
+
 
 .settings-content ::deep .settings-card {
     background: #ffffff;
@@ -354,7 +350,7 @@
     padding: 1.5rem;
 }
 
-/* ── Table Pattern ── */
+
 
 .settings-content ::deep .settings-table {
     width: 100%;
@@ -402,7 +398,7 @@
     border-bottom: none;
 }
 
-/* ── Badge Pattern ── */
+
 
 .settings-content ::deep .settings-badge {
     display: inline-flex;
@@ -439,7 +435,7 @@
     color: #64748b;
 }
 
-/* ── Icon Button Pattern ── */
+
 
 .settings-content ::deep .settings-icon-btn {
     display: inline-flex;
@@ -467,7 +463,7 @@
     border-color: #fecaca;
 }
 
-/* ── Empty State Pattern ── */
+
 
 .settings-content ::deep .settings-empty-state {
     text-align: center;
@@ -505,7 +501,7 @@
     margin-right: auto;
 }
 
-/* ── Stat Card Pattern ── */
+
 
 .settings-content ::deep .settings-stat-grid {
     display: grid;
@@ -552,7 +548,7 @@
     margin-bottom: 0.75rem;
 }
 
-/* ── Coming Soon Pattern ── */
+
 
 .settings-content ::deep .coming-soon {
     max-width: 720px;
@@ -590,7 +586,7 @@
     margin-right: auto;
 }
 
-/* ── Modal Pattern ── */
+
 
 .settings-content ::deep .settings-modal-backdrop {
     position: fixed;
@@ -662,7 +658,7 @@
     background: #f8fafc;
 }
 
-/* ── Form Field Pattern ── */
+
 
 .settings-content ::deep .settings-field {
     margin-bottom: 1.25rem;
@@ -724,7 +720,7 @@
     line-height: 1.5;
 }
 
-/* ── Alert Pattern ── */
+
 
 .settings-content ::deep .settings-alert {
     display: flex;
@@ -755,7 +751,7 @@
     border: 1px solid #a7f3d0;
 }
 
-/* ── Spinner ── */
+
 
 .settings-content ::deep .settings-spinner-wrap {
     display: flex;
@@ -776,7 +772,7 @@
     to { transform: rotate(360deg); }
 }
 
-/* ── Responsive ── */
+
 
 @media (max-width: 768px) {
     .settings-sidebar {

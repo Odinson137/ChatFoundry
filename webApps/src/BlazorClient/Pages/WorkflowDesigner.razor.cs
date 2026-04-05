@@ -507,7 +507,7 @@ public partial class WorkflowDesigner : IDisposable
         if (file == null || file.Size == 0) return;
         try
         {
-            await using var stream = file.OpenReadStream(maxAllowedSize: 2 * 1024 * 1024); // 2 MB
+            await using var stream = file.OpenReadStream(maxAllowedSize: 2 * 1024 * 1024); 
             var schema = await JsonSerializer.DeserializeAsync<WorkflowSchema>(stream, WorkflowJsonOptions);
             if (schema == null) return;
             if (schema.InputParameters != null)

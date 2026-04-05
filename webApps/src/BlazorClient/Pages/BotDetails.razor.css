@@ -1,4 +1,4 @@
-/* Bot details page — aligned with ClientDetails / Settings design */
+
 
 .bd-page {
     max-width: 1200px;
@@ -6,7 +6,7 @@
     padding: 2rem;
 }
 
-/* ─── Breadcrumb ──────────────────────────────────────────────────────── */
+
 
 .bd-breadcrumb {
     display: flex;
@@ -33,7 +33,7 @@
     font-weight: 500;
 }
 
-/* ─── Header (title + action) ─────────────────────────────────────────── */
+
 
 .bd-header {
     display: flex;
@@ -162,7 +162,7 @@
     display: block;
 }
 
-/* ─── Modal (каналы) — как на Bots.razor ───────────────────────────────── */
+
 
 .bots-modal-backdrop {
     position: fixed;
@@ -358,7 +358,7 @@
     to { transform: rotate(360deg); }
 }
 
-/* ─── Loading / Error ─────────────────────────────────────────────────── */
+
 
 .bd-loading {
     display: flex;
@@ -421,7 +421,7 @@
     background: #4f46e5;
 }
 
-/* ─── Stat cards grid ─────────────────────────────────────────────────── */
+
 
 .bd-stat-grid {
     display: grid;
@@ -496,7 +496,7 @@
     line-height: 1.5;
 }
 
-/* Status card (active / stopped) ───────────────────────────────────────── */
+
 
 .bd-status-card {
     border-radius: 14px;
@@ -535,7 +535,7 @@
     letter-spacing: -0.02em;
 }
 
-/* ─── Workflow table card ─────────────────────────────────────────────── */
+
 
 .bd-section {
     margin-bottom: 2rem;
@@ -708,7 +708,7 @@
     color: #fff;
 }
 
-/* ─── Responsive ───────────────────────────────────────────────────────── */
+
 
 @media (max-width: 768px) {
     .bd-page {

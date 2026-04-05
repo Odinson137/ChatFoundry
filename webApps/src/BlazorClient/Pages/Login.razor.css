@@ -1,4 +1,4 @@
-/* ===== Login Page ===== */
+
 .login-page {
     min-height: calc(100vh - 64px);
     display: flex;
@@ -19,7 +19,7 @@
     text-align: center;
 }
 
-/* Logo */
+
 .login-logo {
     margin-bottom: 1.5rem;
 }
@@ -29,7 +29,7 @@
     height: 48px;
 }
 
-/* Title */
+
 .login-title {
     font-size: 1.5rem;
     font-weight: 800;
@@ -44,7 +44,7 @@
     margin: 0 0 2rem;
 }
 
-/* Error */
+
 .login-error {
     display: flex;
     align-items: center;
@@ -64,7 +64,7 @@
     flex-shrink: 0;
 }
 
-/* Resend confirmation link (under email_not_confirmed error) */
+
 .login-resend-wrap {
     margin-top: 0.5rem;
     margin-bottom: 1rem;
@@ -93,7 +93,7 @@
     text-decoration: none;
 }
 
-/* Form */
+
 .login-form {
     display: flex;
     flex-direction: column;
@@ -150,7 +150,7 @@
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
 
-/* Button */
+
 .login-btn {
     display: flex;
     align-items: center;
@@ -184,7 +184,7 @@
     cursor: not-allowed;
 }
 
-/* Spinner */
+
 .login-spinner {
     width: 20px;
     height: 20px;
@@ -198,7 +198,7 @@
     to { transform: rotate(360deg); }
 }
 
-/* Footer */
+
 .login-footer {
     margin-top: 2rem;
     padding-top: 1.5rem;
@@ -222,7 +222,7 @@
     color: #4f46e5;
 }
 
-/* ===== Responsive ===== */
+
 @media (max-width: 480px) {
     .login-page {
         padding: 1rem;

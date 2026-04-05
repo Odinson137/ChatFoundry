@@ -1,4 +1,4 @@
-/* Bots list page — aligned with Clients/Settings design */
+
 
 .bots-page {
     max-width: 1200px;
@@ -6,7 +6,7 @@
     padding: 2rem;
 }
 
-/* ─── Header ───────────────────────────────────────────────────────────── */
+
 
 .bots-header {
     display: flex;
@@ -38,7 +38,7 @@
     border-radius: 100px;
 }
 
-/* ─── Primary button ───────────────────────────────────────────────────── */
+
 
 .bots-btn-primary {
     display: inline-flex;
@@ -63,7 +63,7 @@
     color: #fff;
 }
 
-/* ─── Table ─────────────────────────────────────────────────────────────── */
+
 
 .bots-table-wrap {
     background: #ffffff;
@@ -130,7 +130,7 @@
     white-space: nowrap;
 }
 
-/* ─── Badges ───────────────────────────────────────────────────────────── */
+
 
 .bots-badge {
     font-size: 0.75rem;
@@ -150,7 +150,7 @@
     color: #64748b;
 }
 
-/* ─── Action buttons (in table) ─────────────────────────────────────────── */
+
 
 .bots-btn-link {
     display: inline-flex;
@@ -199,7 +199,7 @@
     border-color: #fecaca;
 }
 
-/* ─── Loading / Error / Empty ──────────────────────────────────────────── */
+
 
 .bots-loading {
     display: flex;
@@ -278,7 +278,7 @@
     line-height: 1.6;
 }
 
-/* ─── Modal ────────────────────────────────────────────────────────────── */
+
 
 .bots-modal-backdrop {
     position: fixed;
@@ -461,7 +461,7 @@
     cursor: not-allowed;
 }
 
-/* ─── Responsive ───────────────────────────────────────────────────────── */
+
 
 @media (max-width: 768px) {
     .bots-page {

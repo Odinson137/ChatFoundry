@@ -126,7 +126,7 @@
                 _buttonsText = dto?.Text;
                 _buttonsList = dto?.Buttons;
             }
-            catch { /* ignore */ }
+            catch {  }
         }
     }
 
@@ -149,7 +149,7 @@
                 var dto = JsonSerializer.Deserialize<MessagePayloadDto>(p, JsonOptions);
                 _mediaCaption = dto?.Caption;
             }
-            catch { /* ignore */ }
+            catch {  }
             _mediaResolved = true;
             return;
         }
@@ -187,7 +187,7 @@
         }
         catch
         {
-            /* ignore */
+            
         }
         finally
         {

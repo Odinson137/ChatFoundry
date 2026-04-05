@@ -71,13 +71,13 @@ public sealed class WorkflowGraphParser
         }
     }
 
-    // ========= Вспомогательные методы парсинга элементов =========
+    
 
     private WorkflowNode ParseNode(JsonElement el)
     {
         var id = el.GetProperty("id").GetGuid();
 
-        // Безопасный парсинг Enum
+        
         var typeStr = el.TryGetProperty("type", out var t) ? t.GetString() : "Message";
         if (!Enum.TryParse<WorkflowNodeType>(typeStr, true, out var type))
             type = WorkflowNodeType.Message;

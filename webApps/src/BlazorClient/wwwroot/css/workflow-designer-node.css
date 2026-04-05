@@ -182,10 +182,7 @@
     background: #f8fafc;
 }
 
-/*
- * Порты: в default.styles позиция задана только для .default-node — без неё div пустой и без круга.
- * Явно задаём размеры и фон (как у .default-node .diagram-port).
- */
+/* NOTE: порты — без стилей как у .default-node круг не рисуется (Z.Blazor.Diagrams). */
 .workflow-designer-node-ports {
     position: absolute;
     top: 0;

@@ -12,16 +12,16 @@ public class ClientMutation(IHttpContextAccessor httpContextAccessor) : BaseGrap
         UpdateClientInput input,
         [Service] ClientDbContext context)
     {
-        // var bot = await context.Bots.FindAsync(input.BotId);
-        //
-        // if (bot is null)
-        // {
-        //     return new UpdateBotPayload(null); 
-        // }
-        //
-        // bot.Name = input.Name;
-        //
-        // await context.SaveChangesAsync();
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
 
         return new OkPayload("Data has successfully updated.");
     }

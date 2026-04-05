@@ -52,12 +52,12 @@ services.AddOpenIddict()
     .AddServer(options =>
     {
         options.SetTokenEndpointUris("/connect/token");
-        //options.AllowAuthorizationCodeFlow();
+        
         options.AllowPasswordFlow();
         options.AllowRefreshTokenFlow();
         options.AllowClientCredentialsFlow();
 
-        //options.AcceptAnonymousClients(); // demo only 
+        
         
         options.RegisterScopes(
             "workflow",

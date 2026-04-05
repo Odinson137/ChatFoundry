@@ -1,8 +1,4 @@
-/* ============================================
-   ReplayNodeWidget — custom node for session replay
-   Rendered by Z.Blazor.Diagrams inside its canvas,
-   so these styles must be global (not scoped).
-   ============================================ */
+
 
 .replay-node {
     min-width: 140px;
@@ -16,7 +12,7 @@
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-/* Color variants (left accent border) */
+
 .replay-node--green  { border-left: 4px solid #059669; }
 .replay-node--red    { border-left: 4px solid #dc2626; }
 .replay-node--blue   { border-left: 4px solid #2563eb; }
@@ -25,7 +21,7 @@
 .replay-node--violet { border-left: 4px solid #7c3aed; }
 .replay-node--default { border-left: 4px solid #94a3b8; }
 
-/* Highlight states */
+
 .replay-node--visited {
     border-color: #22c55e;
     box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2), 0 4px 20px rgba(15, 23, 42, 0.08);
@@ -51,7 +47,7 @@
     opacity: 0.5;
 }
 
-/* Header */
+
 .replay-node-header {
     padding: 0.5rem 0.75rem;
     background: #f8fafc;
@@ -64,7 +60,7 @@
     border-radius: 10px 10px 0 0;
 }
 
-/* Badges row — sits below the header inside the node */
+
 .replay-node-badges {
     display: flex;
     align-items: center;
@@ -101,7 +97,7 @@
     font-size: 0.5rem;
 }
 
-/* Порты на краях блока: слева — вход, справа — выход (как в WorkflowDesigner) */
+
 .replay-node-ports {
     position: absolute;
     top: 0;

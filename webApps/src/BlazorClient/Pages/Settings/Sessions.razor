@@ -181,7 +181,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        try { _bots = await ApiClient.GetBotsAsync(); } catch { /* боты опциональны для фильтра */ }
+        try { _bots = await ApiClient.GetBotsAsync(); } catch {  }
         await LoadSessions();
     }
 

@@ -1,4 +1,4 @@
-/* ===== Register Page ===== */
+
 .register-page {
     min-height: calc(100vh - 64px);
     display: flex;
@@ -19,7 +19,7 @@
     text-align: center;
 }
 
-/* Logo */
+
 .register-logo {
     margin-bottom: 1.5rem;
 }
@@ -29,7 +29,7 @@
     height: 48px;
 }
 
-/* Title */
+
 .register-title {
     font-size: 1.5rem;
     font-weight: 800;
@@ -44,7 +44,7 @@
     margin: 0 0 2rem;
 }
 
-/* Error */
+
 .register-error {
     display: flex;
     align-items: center;
@@ -64,7 +64,7 @@
     flex-shrink: 0;
 }
 
-/* Form */
+
 .register-form {
     display: flex;
     flex-direction: column;
@@ -121,7 +121,7 @@
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
 
-/* Button */
+
 .register-btn {
     display: flex;
     align-items: center;
@@ -155,7 +155,7 @@
     cursor: not-allowed;
 }
 
-/* Spinner */
+
 .register-spinner {
     width: 20px;
     height: 20px;
@@ -169,7 +169,7 @@
     to { transform: rotate(360deg); }
 }
 
-/* Footer */
+
 .register-footer {
     margin-top: 2rem;
     padding-top: 1.5rem;
@@ -193,7 +193,7 @@
     color: #4f46e5;
 }
 
-/* ===== Responsive ===== */
+
 @media (max-width: 480px) {
     .register-page {
         padding: 1rem;

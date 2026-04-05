@@ -4,7 +4,7 @@
     padding: 2rem;
 }
 
-/* ─── Breadcrumb ──────────────────────────────────────────────────────── */
+
 
 .cd-breadcrumb {
     display: flex;
@@ -31,7 +31,7 @@
     font-weight: 500;
 }
 
-/* ─── Two-column layout (Variant C) ────────────────────────────────────── */
+
 
 .cd-two-columns {
     display: block;
@@ -74,7 +74,7 @@
     }
 }
 
-/* ─── Info Card ───────────────────────────────────────────────────────── */
+
 
 .cd-info-card {
     background: #ffffff;
@@ -132,7 +132,7 @@
     color: #64748b;
 }
 
-/* ─── Sections ────────────────────────────────────────────────────────── */
+
 
 .cd-section {
     margin-bottom: 2rem;
@@ -157,7 +157,7 @@
     border-radius: 100px;
 }
 
-/* ─── Channel Cards ───────────────────────────────────────────────────── */
+
 
 .cd-channels-grid {
     display: grid;
@@ -226,7 +226,7 @@
     font-weight: 500;
 }
 
-/* ─── Channel Badges ──────────────────────────────────────────────────── */
+
 
 .cd-badge {
     font-size: 0.7rem;
@@ -267,7 +267,7 @@
     color: #c62828;
 }
 
-/* ─── Channel Tabs ────────────────────────────────────────────────────── */
+
 
 .cd-channel-tabs {
     display: flex;
@@ -303,7 +303,7 @@
     font-weight: 600;
 }
 
-/* ─── Chat ────────────────────────────────────────────────────────────── */
+
 
 .cd-chat {
     background: #ffffff;
@@ -345,7 +345,7 @@
     letter-spacing: 0.03em;
 }
 
-/* ─── Message Bubbles ─────────────────────────────────────────────────── */
+
 
 .cd-msg {
     display: flex;
@@ -425,7 +425,7 @@
     text-align: right;
 }
 
-/* ─── Buttons ─────────────────────────────────────────────────────────── */
+
 
 .cd-btn {
     display: inline-flex;
@@ -468,7 +468,7 @@
     border-color: #c7d2fe;
 }
 
-/* ─── States ──────────────────────────────────────────────────────────── */
+
 
 .cd-loading {
     display: flex;
@@ -531,7 +531,7 @@
     margin: 0;
 }
 
-/* ─── Utility ─────────────────────────────────────────────────────────── */
+
 
 .cd-muted {
     color: #94a3b8;
@@ -542,7 +542,7 @@
     font-size: 0.8rem;
 }
 
-/* ─── Responsive ──────────────────────────────────────────────────────── */
+
 
 @media (max-width: 768px) {
     .cd-page {

@@ -33,7 +33,7 @@ namespace WorkflowService.IntegrationTests.Tests
             var db = scope.ServiceProvider.GetRequiredService<WorkflowDbContext>();
             await db.Database.EnsureDeletedAsync();
             await db.Database.EnsureCreatedAsync();
-            // ===== Arrange =====
+            
 
             var channelId = Guid.NewGuid();
             var botId = Guid.NewGuid();
@@ -68,7 +68,7 @@ namespace WorkflowService.IntegrationTests.Tests
             db.Workflows.Add(workflow);
             await db.SaveChangesAsync();
 
-            // ===== Act =====
+            
 
             var incoming = new BotIncomingMessage(
                 channelId,

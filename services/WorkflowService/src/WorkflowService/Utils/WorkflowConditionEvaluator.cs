@@ -136,12 +136,12 @@ public static class WorkflowConditionEvaluator
         if (operand is not string s || string.IsNullOrEmpty(s))
             return operand;
 
-        // Один переменный токен: $key или {{key}} без другого текста — возвращаем значение как есть (для чисел и т.д.)
+        
         var singleVarKey = GetSingleVariableKey(s);
         if (singleVarKey != null)
             return variableService.GetVariable(session, singleVarKey);
 
-        // Иначе собираем строку: подставляем все {{name}} и $key
+        
         return ResolveTemplate(s, session, variableService);
     }
 

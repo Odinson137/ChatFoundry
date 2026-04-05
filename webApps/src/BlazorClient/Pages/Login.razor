@@ -142,7 +142,7 @@
             await Http.PostAsJsonAsync($"{ApiEndpoints.Api}/identity/auth/resend-confirmation", new { email = email.Trim() });
             resendSent = true;
         }
-        catch { /* ignore */ }
+        catch {  }
     }
 
     private async Task HandleLogin()

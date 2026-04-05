@@ -70,7 +70,7 @@ public class VariableService(
             catch (global::Grpc.Core.RpcException ex) when (ex.StatusCode == global::Grpc.Core.StatusCode.NotFound)
             {
                 if (attempt == maxAttempts - 1)
-                    return; // Client still not created; PopulateFromEventParameters already set base attrs
+                    return; 
                 await Task.Delay(delayMs, ct);
                 delayMs *= 2;
             }
@@ -114,7 +114,7 @@ public class VariableService(
         if (string.IsNullOrWhiteSpace(key))
             throw new ArgumentException("Variable key cannot be empty", nameof(key));
 
-        // Short form from DB: {{guid.output}} / {{guid.statusCode}} → resolve as $node.guid.output
+        
         if (NodeOutputKeyRegex.IsMatch(key))
         {
             var nodeKey = "$node." + key;
@@ -203,7 +203,7 @@ public class VariableService(
                     logger.LogWarning(
                         "SetClientAttributes failed after {Attempts} retries (NotFound). ClientId={ClientId}, Channel={Channel}. Attributes will be retried on next sync.",
                         maxAttempts, session.ClientId, session.Channel);
-                    return; // Do not throw — workflow continues; ClientProfileDirty stays true for next sync
+                    return; 
                 }
                 await Task.Delay(delayMs, ct);
                 delayMs *= 2;

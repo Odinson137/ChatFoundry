@@ -25,14 +25,14 @@ public class WorkflowDbContext : DbContext
 
         try
         {
-#pragma warning disable EF1002 // tableName from model metadata, not user input
+#pragma warning disable EF1002 
             Database.ExecuteSqlRaw($"ALTER TABLE \"{tableName}\" ADD COLUMN IF NOT EXISTS \"InputParametersDefinition\" jsonb NOT NULL DEFAULT '[]'");
             Database.ExecuteSqlRaw($"ALTER TABLE \"{tableName}\" ADD COLUMN IF NOT EXISTS \"OutputParametersDefinition\" jsonb NOT NULL DEFAULT '[]'");
 #pragma warning restore EF1002
         }
         catch
         {
-            // Columns may already exist; ignore
+            
         }
     }
     

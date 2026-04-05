@@ -284,7 +284,7 @@
                 {
                     await JS.InvokeVoidAsync("__cdChatScrollToBottomInstant", ChatScrollId);
                 }
-                catch { /* ignore */ }
+                catch {  }
                 _justLoadedMessages = false;
             }
             if (hasMoreMessages && !_scrollListenerAttached)
@@ -369,7 +369,7 @@
         try
         {
             var result = await ClientApi.GetMessagesAsync(selectedChannelId, InitialPageSize);
-            // Реверсируем список, чтобы новые сообщения были внизу
+            
             result.Items.Reverse();
             messages = result.Items;
             hasMoreMessages = result.HasNextPage;
@@ -405,7 +405,7 @@
                 if (state.Value.TryGetProperty("scrollTop", out var st)) prevScrollTop = st.GetDouble();
             }
         }
-        catch { /* ignore */ }
+        catch {  }
 
         try
         {
@@ -427,7 +427,7 @@
             {
                 await JS.InvokeVoidAsync("__cdChatRestoreScroll", ChatScrollId, prevScrollHeight, prevScrollTop);
             }
-            catch { /* ignore */ }
+            catch {  }
         }
     }
 

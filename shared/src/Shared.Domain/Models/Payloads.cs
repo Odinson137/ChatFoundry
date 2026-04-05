@@ -10,8 +10,8 @@ public record AskMessagePayload(
 ) : BotMessagePayload;
 
 public record InlineButton(string Text, string CallbackData);
-//
-// public record LinkMessagePayload(
-//     string Text // Link or File Id 
-// ) : BotMessagePayload;
+
+
+
+
 

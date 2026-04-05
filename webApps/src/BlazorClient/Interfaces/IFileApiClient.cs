@@ -12,9 +12,9 @@ public record FileInfoDto(
     Guid? UploadedByUserId = null,
     Guid? UploadedClientId = null)
 {
-    /// <summary>«Клиент» при загрузке от клиента; иначе «Администратор» (загрузка из панели / сервиса).</summary>
+    /// <summary>«Администратор», если задан <see cref="UploadedByUserId"/> (загрузка из панели / с JWT); иначе «Клиент».</summary>
     public string UploadSourceDisplay =>
-        UploadedClientId.HasValue ? "Клиент" : "Администратор";
+        UploadedByUserId.HasValue ? "Администратор" : "Клиент";
 }
 
 public interface IFileApiClient

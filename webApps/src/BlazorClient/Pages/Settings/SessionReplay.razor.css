@@ -1,6 +1,4 @@
-/* ============================================
-   Session Replay — full-screen viewer
-   ============================================ */
+
 
 :root {
     --replay-primary: #6366f1;
@@ -24,7 +22,7 @@
     background: #fff;
 }
 
-/* ========== Sidebar ========== */
+
 .replay-sidebar {
     width: 340px;
     min-width: 340px;
@@ -77,7 +75,7 @@
     color: var(--replay-slate-400);
 }
 
-/* Session info */
+
 .replay-session-info {
     padding: 1rem 1.25rem;
     border-bottom: 1px solid var(--replay-slate-200);
@@ -116,7 +114,7 @@
     color: var(--replay-slate-500);
 }
 
-/* Tabs */
+
 .replay-tabs {
     display: flex;
     border-bottom: 1px solid var(--replay-slate-200);
@@ -154,7 +152,7 @@
     min-height: 0;
 }
 
-/* Steps */
+
 .replay-steps {
     display: flex;
     flex-direction: column;
@@ -289,7 +287,7 @@
     color: var(--replay-slate-400);
 }
 
-/* Variables */
+
 .replay-variables {
     display: flex;
     flex-direction: column;
@@ -376,7 +374,7 @@
     padding: 2rem 1rem;
 }
 
-/* ========== Main area ========== */
+
 .replay-main {
     flex: 1;
     display: flex;
@@ -439,7 +437,7 @@
     gap: 1rem;
 }
 
-/* Legend */
+
 .replay-legend {
     display: flex;
     align-items: center;
@@ -478,7 +476,7 @@
     border: 1px solid var(--replay-slate-400);
 }
 
-/* Canvas */
+
 .replay-canvas-area {
     flex: 1;
     position: relative;
@@ -493,7 +491,7 @@
     inset: 0;
 }
 
-/* Ports */
+
 .replay-canvas-area ::deep [class*="port"] {
     width: 10px !important;
     height: 10px !important;
@@ -506,7 +504,7 @@
     pointer-events: none !important;
 }
 
-/* Zoom controls */
+
 .replay-zoom-controls {
     position: absolute;
     bottom: 1.5rem;

@@ -2,10 +2,10 @@ using System.Text.Json.Serialization;
 
 namespace BlazorClient.Models;
 
-// Базовый класс/рекорд для всех специфических данных узлов.
-// [JsonDerivedType] помогает System.Text.Json корректно сериализовать/десериализовать
-// полиморфные типы (когда NodeData может быть MessageNodeData, AskNodeData и т.д.).
-// 'typeDiscriminator' должен соответствовать тому, как сервер определяет тип данных.
+
+
+
+
 [JsonDerivedType(typeof(EmptyNodeData), "Empty")]
 [JsonDerivedType(typeof(MessageNodeData), "Message")]
 [JsonDerivedType(typeof(SetVariableNodeData), "SetVariable")]
@@ -30,7 +30,7 @@ public class HttpRequestNodeData : NodeData
 
 public class MessageNodeData : NodeData
 {
-    // Теперь здесь set вместо init, и Blazor сможет привязаться к этому полю
+    
     public string Text { get; set; } = string.Empty;
 }
 

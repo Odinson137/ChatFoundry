@@ -3,14 +3,14 @@ using Blazor.Diagrams.Core.Models;
 
 namespace BlazorClient.Models.Diagram
 {
-    // Типы блоков вашего оркестратора
+    
     public enum BotNodeType
     {
         Start,
-        Message,    // Отправить текст
-        Input,      // Ждать ответа
-        AiProcess,  // Обработка через ChatGPT
-        Condition   // If/Else
+        Message,    
+        Input,      
+        AiProcess,  
+        Condition   
     }
 
     public class BotNodeModel : NodeModel
@@ -22,22 +22,22 @@ namespace BlazorClient.Models.Diagram
             Type = type;
             Title = GetTitle(type);
 
-            // Настраиваем Порты (точки соединения) в зависимости от типа
-            // PortAlignment.Left = Вход, Right = Выход
+            
+            
             
             if (type != BotNodeType.Start)
             {
-                AddPort(PortAlignment.Left); // Вход есть у всех, кроме Старта
+                AddPort(PortAlignment.Left); 
             }
 
             if (type != BotNodeType.Input) 
             {
-                // У обычных блоков 1 выход
+                
                 AddPort(PortAlignment.Right); 
             }
             else
             {
-                // У блока "Вопрос" может быть выхода (ветвление пока упростим)
+                
                 AddPort(PortAlignment.Right);
             }
         }

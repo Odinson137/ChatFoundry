@@ -37,7 +37,7 @@ public class BotOutgoingMessageConsumer(
             MessageKind = msg.MessageKind,
             Payload = msg.MessageJson,
             ClientChannel = clientChannel,
-            InternalMessageId = context.CorrelationId.ToString() // kafka correlationId
+            InternalMessageId = context.CorrelationId.ToString() 
         };
 
         await messageRepository.AddAsync(message, ct);
