@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
@@ -80,7 +81,8 @@ public class TokenController(
             var authenticateResult =
                 await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
 
-            var sub = authenticateResult.Principal!.GetClaim(OpenIddictConstants.Claims.Subject);
+            var refreshPrincipal = authenticateResult.Principal!;
+            var sub = refreshPrincipal.GetClaim(OpenIddictConstants.Claims.Subject);
             var user = sub != null ? await userManager.FindByIdAsync(sub) : null;
 
             var identity = new ClaimsIdentity(
@@ -93,7 +95,11 @@ public class TokenController(
                 identity.AddClaim(new Claim("company_id", user.CompanyId.Value.ToString()));
 
             var principal = new ClaimsPrincipal(identity);
-            principal.SetScopes(request.GetScopes());
+            var requestedScopes = request.GetScopes();
+            var scopesToGrant = !requestedScopes.IsDefaultOrEmpty && requestedScopes.Length > 0
+                ? requestedScopes
+                : refreshPrincipal.GetScopes();
+            principal.SetScopes(scopesToGrant);
             foreach (var claim in principal.Claims)
                 claim.SetDestinations(OpenIddictConstants.Destinations.AccessToken);
             return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);

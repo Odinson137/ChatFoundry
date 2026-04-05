@@ -1,3 +1,4 @@
+using BlazorClient.Models;
 using BlazorClient.Models.DTO;
 
 namespace BlazorClient.Interfaces;
@@ -37,7 +38,15 @@ public interface IWorkflowApiClient
     Task<bool> UpdateWorkflowDefinitionsAsync(Guid workflowId, string nodes, string edges, string layout, List<WorkflowParameterDto>? inputParameters = null, List<WorkflowParameterDto>? outputParameters = null);
     Task<bool> UpdateBotWorkflowAsync(Guid workflowId, bool isActive);
     Task<bool> DeleteBotWorkflowAsync(Guid workflowId);
+
+    /// <summary>Публичный markdown с инструкцией для внешних LLM.</summary>
+    Task<string> GetWorkflowAiInstructionMarkdownAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>Генерация JSON схемы через OpenAI на сервере.</summary>
+    Task<GenerateWorkflowFromAiResult> GenerateWorkflowFromAiAsync(string userPrompt, bool mergeMode, WorkflowSchema? currentWorkflow, CancellationToken cancellationToken = default);
 }
+
+public record GenerateWorkflowFromAiResult(bool Success, string? WorkflowJson, IReadOnlyList<string> Errors);
 
 public record GqlData(GqlWorkflowContent Data);
 public record GqlWorkflowContent(List<WorkflowResponse> Workflows);

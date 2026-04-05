@@ -115,6 +115,9 @@
                 <div id="workflow-json-file-wrap" class="d-none">
                     <InputFile accept=".json,application/json" OnChange="OnImportWorkflowJson" />
                 </div>
+                <button type="button" class="designer-btn-secondary" @onclick="OpenAiModal" title="Сгенерировать схему с помощью AI">
+                    <span class="oi oi-lightbulb"></span> AI
+                </button>
                 <button type="button" class="designer-btn-primary designer-header-save" @onclick="SaveWorkflow" title="Сохранить">
                     <span class="oi oi-circle-check"></span> Сохранить
                 </button>
@@ -1090,6 +1093,13 @@
         }
 
     </main>
+</div>
+
+<div class="workflow-ai-dialog-host">
+    <WorkflowAiDialog @bind-IsOpen="IsAiModalOpen"
+                    GetCurrentSchema="GetCurrentSchema"
+                    GetDiagramNodeCount="GetDiagramNodeCountForAi"
+                    OnSchemaApplied="HandleAiSchemaApplied" />
 </div>
 
 <!-- Модальное окно «Атрибуты и параметры» (2 вкладки) -->

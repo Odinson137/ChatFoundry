@@ -66,6 +66,8 @@ services.AddScoped<IActionExecutor, SubWorkflowActionExecutor>();
 
 services.AddScoped<IMessageSender, MessageSender>();
 services.AddScoped<IOpenAiService, OpenAiService>();
+services.AddSingleton<WorkflowAiPromptProvider>();
+services.AddScoped<WorkflowAiGenerationService>();
 
 services.AddScoped<IActionExecutorFactory, ActionExecutorFactory>();
 services.AddScoped<WorkflowGraphParser>();
@@ -75,6 +77,7 @@ services.AddScoped<IVariableService, VariableService>();
 
 
 services.AddHttpClient();
+services.AddHttpClient("OpenAI");
 
 services.Configure<WorkflowService.Options.OpenAiOptions>(
     builder.Configuration.GetSection(WorkflowService.Options.OpenAiOptions.SectionName));

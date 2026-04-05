@@ -1,0 +1,205 @@
+@using BlazorClient.Configuration
+@using BlazorClient.Interfaces
+@using BlazorClient.Models
+@using Microsoft.JSInterop
+@using System.Text.Json
+@using WorkflowValidation
+@inject IWorkflowApiClient ApiClient
+@inject IJSRuntime JSRuntime
+
+@if (IsOpen)
+{
+    <div class="variables-modal-backdrop" @onclick="CloseAsync"></div>
+    <div class="variables-modal">
+        <div class="variables-modal-header">
+            <h2 class="variables-modal-title">AI: схема workflow</h2>
+            <button type="button" class="variables-modal-close" @onclick="CloseAsync" aria-label="Закрыть" disabled="@AiBusy">
+                <span class="oi oi-x"></span>
+            </button>
+        </div>
+        <div class="variables-modal-body">
+            <div class="mb-3">
+                <div class="text-muted small mb-2">Режим</div>
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="button" class="@(!AiMergeMode ? "designer-btn-primary" : "designer-btn-secondary")" @onclick="() => AiMergeMode = false" disabled="@AiBusy">Новый бот</button>
+                    <button type="button" class="@(AiMergeMode ? "designer-btn-primary" : "designer-btn-secondary")" @onclick="() => AiMergeMode = true" disabled="@AiBusy">Дополнить текущий</button>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Запрос к AI на сервере</label>
+                <textarea class="form-control workflow-ai-dialog-textarea" rows="6" @bind="AiUserPrompt" @bind:event="oninput" disabled="@AiBusy" placeholder="Опишите бота или что добавить к текущей схеме…"></textarea>
+            </div>
+            <div class="mb-3 small">
+                <div class="text-muted mb-1">Инструкция для внешней нейросети (стабильная ссылка, без расхода квоты в приложении):</div>
+                <code class="d-block text-break user-select-all mb-2" style="font-size: 0.8rem;">@WorkflowAiPromptUrl</code>
+                <button type="button" class="designer-btn-secondary me-2" @onclick="CopyAiPromptUrlAsync" disabled="@AiBusy">Копировать ссылку</button>
+                <button type="button" class="designer-btn-secondary" @onclick="DownloadAiInstructionAsync" disabled="@AiBusy">Скачать .md</button>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Вставить JSON от другой нейросети</label>
+                <textarea class="form-control font-monospace small workflow-ai-dialog-textarea-json" rows="8" @bind="AiPasteJson" @bind:event="oninput" disabled="@AiBusy" placeholder="{ &quot;nodes&quot;: … }"></textarea>
+                <button type="button" class="designer-btn-secondary mt-2" @onclick="ApplyAiPasteJsonAsync" disabled="@AiBusy">Применить JSON</button>
+            </div>
+            @if (AiErrors.Count > 0)
+            {
+                <div class="alert alert-danger small mb-3" role="alert">
+                    @foreach (var err in AiErrors)
+                    {
+                        <div>@err</div>
+                    }
+                </div>
+            }
+            <div class="d-flex flex-wrap gap-2 justify-content-end">
+                <button type="button" class="designer-btn-secondary" @onclick="CloseAsync" disabled="@AiBusy">Закрыть</button>
+                <button type="button" class="designer-btn-primary" @onclick="GenerateFromAiAsync" disabled="@AiBusy">
+                    @if (AiBusy)
+                    {
+                        <span>Генерация…</span>
+                    }
+                    else
+                    {
+                        <span>Сгенерировать на сервере</span>
+                    }
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private static readonly JsonSerializerOptions WorkflowJsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        PropertyNameCaseInsensitive = true,
+        WriteIndented = true
+    };
+
+    private static string WorkflowAiPromptUrl => $"{ApiEndpoints.Api}/workflow/public/workflow-ai/prompt";
+
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+    [Parameter] public Func<WorkflowSchema> GetCurrentSchema { get; set; } = null!;
+    [Parameter] public Func<int> GetDiagramNodeCount { get; set; } = null!;
+    [Parameter] public EventCallback<WorkflowSchema> OnSchemaApplied { get; set; }
+
+    private string AiUserPrompt { get; set; } = "";
+    private bool AiMergeMode { get; set; }
+    private string AiPasteJson { get; set; } = "";
+    private bool AiBusy { get; set; }
+    private List<string> AiErrors { get; set; } = [];
+
+    private async Task CloseAsync()
+    {
+        await IsOpenChanged.InvokeAsync(false);
+    }
+
+    private async Task CopyAiPromptUrlAsync()
+    {
+        await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", WorkflowAiPromptUrl);
+    }
+
+    private async Task DownloadAiInstructionAsync()
+    {
+        try
+        {
+            var md = await ApiClient.GetWorkflowAiInstructionMarkdownAsync();
+            await JSRuntime.InvokeVoidAsync("window.__downloadWorkflowJson", "workflow-ai-instruction.md", md);
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Не удалось скачать: {ex.Message}");
+        }
+    }
+
+    private async Task GenerateFromAiAsync()
+    {
+        AiBusy = true;
+        AiErrors.Clear();
+        try
+        {
+            if (string.IsNullOrWhiteSpace(AiUserPrompt))
+            {
+                AiErrors.Add("Введите описание бота или доработки.");
+                return;
+            }
+
+            if (AiMergeMode && GetDiagramNodeCount() == 0)
+            {
+                AiErrors.Add("Нет узлов для режима «дополнить». Выберите «Новый бот» или добавьте узлы на схему.");
+                return;
+            }
+
+            var current = AiMergeMode ? GetCurrentSchema() : null;
+            var result = await ApiClient.GenerateWorkflowFromAiAsync(AiUserPrompt.Trim(), AiMergeMode, current);
+            if (!result.Success)
+            {
+                AiErrors = result.Errors.ToList();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(result.WorkflowJson))
+            {
+                AiErrors.Add("Пустой ответ.");
+                return;
+            }
+
+            var localErrors = WorkflowSchemaValidator.Validate(result.WorkflowJson).ToList();
+            if (localErrors.Count > 0)
+            {
+                AiErrors = localErrors;
+                return;
+            }
+
+            var schema = JsonSerializer.Deserialize<WorkflowSchema>(result.WorkflowJson, WorkflowJsonOptions);
+            if (schema == null)
+            {
+                AiErrors.Add("Не удалось разобрать JSON схемы.");
+                return;
+            }
+
+            await OnSchemaApplied.InvokeAsync(schema);
+            await IsOpenChanged.InvokeAsync(false);
+        }
+        finally
+        {
+            AiBusy = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ApplyAiPasteJsonAsync()
+    {
+        AiErrors.Clear();
+        try
+        {
+            if (string.IsNullOrWhiteSpace(AiPasteJson))
+            {
+                AiErrors.Add("Вставьте JSON схемы.");
+                return;
+            }
+
+            var trimmed = AiPasteJson.Trim();
+            var errs = WorkflowSchemaValidator.Validate(trimmed).ToList();
+            if (errs.Count > 0)
+            {
+                AiErrors = errs;
+                return;
+            }
+
+            var schema = JsonSerializer.Deserialize<WorkflowSchema>(trimmed, WorkflowJsonOptions);
+            if (schema == null)
+            {
+                AiErrors.Add("Не удалось разобрать JSON.");
+                return;
+            }
+
+            await OnSchemaApplied.InvokeAsync(schema);
+            AiPasteJson = "";
+            await IsOpenChanged.InvokeAsync(false);
+        }
+        catch (Exception ex)
+        {
+            AiErrors.Add(ex.Message);
+        }
+    }
+}

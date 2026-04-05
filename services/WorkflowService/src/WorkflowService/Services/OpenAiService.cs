@@ -36,7 +36,7 @@ public class OpenAiService : IOpenAiService
         var client = _httpClientFactory.CreateClient("OpenAI");
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _options.ApiKey);
 
-        var requestBody = new ChatCompletionRequest(_options.Model, apiMessages);
+        var requestBody = new ChatCompletionRequest(_options.Model, apiMessages, null);
         var jsonBody = JsonSerializer.Serialize(requestBody);
         var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
 
@@ -58,6 +58,50 @@ public class OpenAiService : IOpenAiService
         catch (JsonException e)
         {
             // TODO: Log the exception
+            return $"Error: Could not parse the response from OpenAI. {e.Message}";
+        }
+    }
+
+    public async Task<string> GetJsonObjectCompletionAsync(
+        string systemInstruction,
+        string userContent,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(_options.ApiKey) || _options.ApiKey == "YOUR_API_KEY")
+            return string.Empty;
+
+        var messages = new List<ChatMessage>
+        {
+            new("system", systemInstruction),
+            new("user", userContent)
+        };
+
+        var client = _httpClientFactory.CreateClient("OpenAI");
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _options.ApiKey);
+
+        var requestBody = new ChatCompletionRequest(
+            _options.Model,
+            messages,
+            new JsonResponseFormat("json_object"));
+        var jsonBody = JsonSerializer.Serialize(requestBody);
+        var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+
+        try
+        {
+            var response = await client.PostAsync(_options.ApiUrl, content, cancellationToken);
+            response.EnsureSuccessStatusCode();
+
+            var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+            var completionResponse = JsonSerializer.Deserialize<ChatCompletionResponse>(responseBody);
+
+            return completionResponse?.Choices?.FirstOrDefault()?.Message?.Content?.Trim() ?? string.Empty;
+        }
+        catch (HttpRequestException e)
+        {
+            return $"Error: Could not get a response from OpenAI. {e.Message}";
+        }
+        catch (JsonException e)
+        {
             return $"Error: Could not parse the response from OpenAI. {e.Message}";
         }
     }
@@ -106,7 +150,10 @@ public class OpenAiService : IOpenAiService
 
     private record ChatCompletionRequest(
         [property: JsonPropertyName("model")] string Model,
-        [property: JsonPropertyName("messages")] IEnumerable<ChatMessage> Messages);
+        [property: JsonPropertyName("messages")] IEnumerable<ChatMessage> Messages,
+        [property: JsonPropertyName("response_format")] JsonResponseFormat? ResponseFormat);
+
+    private record JsonResponseFormat([property: JsonPropertyName("type")] string Type);
     private record ChatMessage(
         [property: JsonPropertyName("role")] string Role,
         [property: JsonPropertyName("content")] string Content);

@@ -5,7 +5,6 @@
 @attribute [Authorize]
 
 @inject BlazorClient.Interfaces.IWorkflowApiClient ApiClient
-@inject IJSRuntime JsRuntime
 
 <PageTitle>Управление ботами</PageTitle>
 
@@ -112,7 +111,7 @@
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                                     Открыть
                                 </a>
-                                <button class="bots-btn-icon bots-btn-icon-danger" @onclick="() => DeleteBot(bot)" title="Удалить">
+                                <button class="bots-btn-icon bots-btn-icon-danger" @onclick="() => OpenDeleteConfirm(bot)" title="Удалить">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
                                 </button>
                             </td>
@@ -170,6 +169,29 @@
     </div>
 }
 
+@if (showDeleteConfirm && botToDelete != null)
+{
+    <div class="bots-modal-backdrop bots-modal-backdrop-confirm" @onclick="CloseDeleteConfirm"></div>
+    <div class="bots-modal bots-modal-confirm" role="dialog" aria-modal="true" aria-labelledby="bots-delete-title">
+        <div class="bots-modal-header">
+            <h3 class="bots-modal-title" id="bots-delete-title">Удалить бота?</h3>
+            <button type="button" class="bots-modal-close" @onclick="CloseDeleteConfirm" aria-label="Закрыть">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="bots-modal-body">
+            <p class="bots-modal-text">Вы уверены, что хотите удалить бота <strong>@botToDelete.Name</strong>? Это действие нельзя отменить.</p>
+        </div>
+        <div class="bots-modal-footer">
+            <button type="button" class="bots-btn-secondary" @onclick="CloseDeleteConfirm" disabled="@isDeleting">Отмена</button>
+            <button type="button" class="bots-btn-danger" @onclick="ConfirmDeleteAsync" disabled="@isDeleting">
+                @if (isDeleting) { <div class="bots-spinner" style="width:18px;height:18px;border-width:2px;border-top-color:#fff;"></div> }
+                Удалить
+            </button>
+        </div>
+    </div>
+}
+
 @code {
     private List<BotDto> bots = new();
     private List<ChannelDto> availableChannels = new();
@@ -180,6 +202,10 @@
     private bool showModal;
     private bool isEditMode;
     private BotInputModel currentBotModel = new();
+
+    private bool showDeleteConfirm;
+    private BotDto? botToDelete;
+    private bool isDeleting;
 
     protected override async Task OnInitializedAsync()
     {
@@ -252,19 +278,38 @@
         }
     }
 
-    private async Task DeleteBot(BotDto bot)
+    private void OpenDeleteConfirm(BotDto bot)
     {
-        if (!await JsRuntime.InvokeAsync<bool>("confirm", $"Вы уверены, что хотите удалить бота '{bot.Name}'?"))
-            return;
+        botToDelete = bot;
+        showDeleteConfirm = true;
+    }
 
+    private void CloseDeleteConfirm()
+    {
+        if (isDeleting) return;
+        showDeleteConfirm = false;
+        botToDelete = null;
+    }
+
+    private async Task ConfirmDeleteAsync()
+    {
+        if (botToDelete == null) return;
+
+        isDeleting = true;
         try
         {
-            await ApiClient.DeleteBotAsync(bot.Id);
+            await ApiClient.DeleteBotAsync(botToDelete.Id);
+            showDeleteConfirm = false;
+            botToDelete = null;
             await LoadBots();
         }
         catch (Exception ex)
         {
             error = $"Не удалось удалить: {ex.Message}";
+        }
+        finally
+        {
+            isDeleting = false;
         }
     }
 

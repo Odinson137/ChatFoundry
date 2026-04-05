@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Blazored.LocalStorage;
+using BlazorClient.Configuration;
 using BlazorClient.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -69,6 +70,7 @@ public class AuthErrorHandler : DelegatingHandler
                 new KeyValuePair<string, string>("client_id", "client"),
                 new KeyValuePair<string, string>("client_secret", "secret"),
                 new KeyValuePair<string, string>("refresh_token", refreshToken),
+                new KeyValuePair<string, string>("scope", ApiEndpoints.OAuthScopes),
             })
         };
 
@@ -118,7 +120,7 @@ public class AuthErrorHandler : DelegatingHandler
     private static Uri GetTokenEndpoint(HttpRequestMessage request)
     {
         var authority = request.RequestUri?.GetLeftPart(UriPartial.Authority)
-            ?? "https://localhost:5000";
+            ?? ApiEndpoints.Api.TrimEnd('/');
         return new Uri(new Uri(authority), "identity/connect/token");
     }
 

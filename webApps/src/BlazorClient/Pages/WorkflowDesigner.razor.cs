@@ -128,6 +128,8 @@ public partial class WorkflowDesigner : IDisposable
     private List<WorkflowParameterDto> CurrentWorkflowInputParameters { get; set; } = [];
     private List<WorkflowParameterDto> CurrentWorkflowOutputParameters { get; set; } = [];
 
+    private bool IsAiModalOpen { get; set; }
+
     private readonly Dictionary<Guid, string> _nodeTitleById = new();
     private readonly Dictionary<Guid, string> _nodePrefixById = new();
     private readonly Dictionary<string, List<Guid>> _nodeIdsByTitle = new(StringComparer.OrdinalIgnoreCase);
@@ -2177,6 +2179,39 @@ public partial class WorkflowDesigner : IDisposable
         ("and", "И (несколько условий)"),
         ("or", "ИЛИ (несколько условий)")
     };
+
+    private void OpenAiModal()
+    {
+        IsAiModalOpen = true;
+    }
+
+    private int GetDiagramNodeCountForAi() => Diagram.Nodes.Count;
+
+    private Task HandleAiSchemaApplied(WorkflowSchema schema)
+    {
+        if (schema.InputParameters != null)
+            CurrentWorkflowInputParameters = schema.InputParameters
+                .Select(p => new WorkflowParameterDto { Name = p.Name ?? "", DefaultValue = p.DefaultValue, Description = p.Description }).ToList();
+        if (schema.OutputParameters != null)
+            CurrentWorkflowOutputParameters = schema.OutputParameters
+                .Select(p => new WorkflowParameterDto { Name = p.Name ?? "", DefaultValue = p.DefaultValue, Description = p.Description }).ToList();
+
+        _isRestoring = true;
+        try
+        {
+            ApplySchemaToDiagram(schema);
+        }
+        finally
+        {
+            _isRestoring = false;
+        }
+
+        _undoStack.Clear();
+        _undoIndex = -1;
+        PushUndoState();
+        RefreshVariables();
+        return Task.CompletedTask;
+    }
 
     private void OnDragOver(DragEventArgs e)
     {

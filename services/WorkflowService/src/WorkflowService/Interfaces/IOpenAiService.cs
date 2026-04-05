@@ -10,4 +10,10 @@ public interface IOpenAiService
         string prompt,
         IReadOnlyList<(string Role, string Content)>? chatHistory = null,
         CancellationToken cancellationToken = default);
+
+    /// <summary>Ответ модели в формате JSON-объекта (OpenAI response_format json_object).</summary>
+    Task<string> GetJsonObjectCompletionAsync(
+        string systemInstruction,
+        string userContent,
+        CancellationToken cancellationToken = default);
 }

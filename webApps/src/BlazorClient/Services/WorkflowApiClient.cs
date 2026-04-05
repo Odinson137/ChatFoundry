@@ -2,13 +2,62 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using BlazorClient.Configuration;
 using BlazorClient.Interfaces;
+using BlazorClient.Models;
 using BlazorClient.Models.DTO;
 
 namespace BlazorClient.Services;
 
 public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
 {
-    
+    private static readonly JsonSerializerOptions WebJsonOptions = new(JsonSerializerDefaults.Web);
+
+    public async Task<string> GetWorkflowAiInstructionMarkdownAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await http.GetAsync($"{ApiEndpoints.Api}/workflow/public/workflow-ai/prompt", cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadAsStringAsync(cancellationToken);
+    }
+
+    public async Task<GenerateWorkflowFromAiResult> GenerateWorkflowFromAiAsync(string userPrompt, bool mergeMode,
+        WorkflowSchema? currentWorkflow, CancellationToken cancellationToken = default)
+    {
+        var body = new GenerateWorkflowFromAiClientRequest
+        {
+            UserPrompt = userPrompt,
+            Mode = mergeMode ? "merge" : "replace",
+            CurrentWorkflow = mergeMode ? currentWorkflow : null
+        };
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{ApiEndpoints.Api}/workflow/api/workflow-ai/generate")
+        {
+            Content = JsonContent.Create(body, options: WebJsonOptions)
+        };
+
+        var response = await http.SendAsync(request, cancellationToken);
+        var json = await response.Content.ReadAsStringAsync(cancellationToken);
+        if (!response.IsSuccessStatusCode)
+            return new GenerateWorkflowFromAiResult(false, null, [$"Ошибка сервера {(int)response.StatusCode}: {json}"]);
+
+        var dto = JsonSerializer.Deserialize<GenerateWorkflowFromAiResponseDto>(json, WebJsonOptions);
+        if (dto == null)
+            return new GenerateWorkflowFromAiResult(false, null, ["Пустой ответ сервера."]);
+
+        return new GenerateWorkflowFromAiResult(dto.Success, dto.WorkflowJson, dto.Errors ?? []);
+    }
+
+    private sealed class GenerateWorkflowFromAiClientRequest
+    {
+        public string UserPrompt { get; set; } = "";
+        public string Mode { get; set; } = "replace";
+        public WorkflowSchema? CurrentWorkflow { get; set; }
+    }
+
+    private sealed class GenerateWorkflowFromAiResponseDto
+    {
+        public bool Success { get; set; }
+        public string? WorkflowJson { get; set; }
+        public List<string>? Errors { get; set; }
+    }
 
     public async Task<List<ChannelDto>> GetChannelsAsync()
     {

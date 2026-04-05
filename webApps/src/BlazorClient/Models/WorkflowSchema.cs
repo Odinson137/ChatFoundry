@@ -10,6 +10,7 @@ public record WorkflowSchema(
     List<WorkflowParameterDto>? InputParameters = null,
     List<WorkflowParameterDto>? OutputParameters = null);
 
+[JsonConverter(typeof(NodeDefinitionJsonConverter))]
 public record NodeDefinition(Guid Id, string Type, string Label, NodeData? Data);
 
 public record EdgeDefinition(Guid From, Guid To, string? Label, ConditionDefinition? Condition);
