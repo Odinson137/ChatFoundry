@@ -34,6 +34,7 @@ services:
       - ASPNETCORE_Kestrel__Endpoints__Http__Protocols=Http1
       - ASPNETCORE_Kestrel__Endpoints__Grpc__Url=http://+:8081
       - ASPNETCORE_Kestrel__Endpoints__Grpc__Protocols=Http2
+      - Services__BillingServiceGrpc=http://billing-service:8081
     env_file:
       - .env
     ports:
@@ -43,6 +44,8 @@ services:
       workflow-db:
         condition: service_healthy
       redis:
+        condition: service_started
+      billing-service:
         condition: service_started
     networks:
       - app_network
@@ -130,6 +133,7 @@ services:
       - ASPNETCORE_Kestrel__Endpoints__Http__Protocols=Http1
       - ASPNETCORE_Kestrel__Endpoints__Grpc__Url=http://+:8081
       - ASPNETCORE_Kestrel__Endpoints__Grpc__Protocols=Http2
+      - Services__BillingServiceGrpc=http://billing-service:8081
     ports:
       - "5030:8080"
       - "5031:8081"
@@ -137,6 +141,8 @@ services:
       client-db:
         condition: service_healthy
       redis:
+        condition: service_started
+      billing-service:
         condition: service_started
     networks:
       - app_network
@@ -176,6 +182,7 @@ services:
       - ASPNETCORE_Kestrel__Endpoints__Http__Protocols=Http1
       - ASPNETCORE_Kestrel__Endpoints__Grpc__Url=http://+:8081
       - ASPNETCORE_Kestrel__Endpoints__Grpc__Protocols=Http2
+      - Services__BillingServiceGrpc=http://billing-service:8081
     ports:
       - "5050:8080"
       - "5051:8081"
@@ -183,6 +190,8 @@ services:
       company-db:
         condition: service_healthy
       redis:
+        condition: service_started
+      billing-service:
         condition: service_started
     networks:
       - app_network
@@ -199,6 +208,54 @@ services:
       - "5437:5432"
     volumes:
       - company_pgdata:/var/lib/postgresql/data
+      - ./pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+    command: ["postgres", "-c", "hba_file=/etc/postgresql/pg_hba.conf"]
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U foundry -d foundry_db"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  billing-service:
+    container_name: billing_service
+    build:
+      context: ..
+      dockerfile: services/BillingService/src/BillingService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080;http://+:8081
+      - ASPNETCORE_Kestrel__Endpoints__Http__Url=http://+:8080
+      - ASPNETCORE_Kestrel__Endpoints__Http__Protocols=Http1
+      - ASPNETCORE_Kestrel__Endpoints__Grpc__Url=http://+:8081
+      - ASPNETCORE_Kestrel__Endpoints__Grpc__Protocols=Http2
+    env_file:
+      - .env
+    ports:
+      - "5060:8080"
+      - "5061:8081"
+    depends_on:
+      billing-db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    networks:
+      - app_network
+
+  billing-db:
+    image: postgres:16
+    container_name: billing_db
+    restart: always
+    environment:
+      POSTGRES_DB: foundry_db
+      POSTGRES_USER: foundry
+      POSTGRES_PASSWORD: foundry
+    ports:
+      - "5439:5432"
+    volumes:
+      - billing_pgdata:/var/lib/postgresql/data
       - ./pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
     command: ["postgres", "-c", "hba_file=/etc/postgresql/pg_hba.conf"]
     networks:
@@ -329,8 +386,8 @@ services:
       - "4040:4040"
     depends_on:
       - gateway-service
-    environment:
-      NGROK_AUTHTOKEN: 3055WP7065mrJ8lzPXzzEzK9TaR_4EZ3RCkkF3a1nzzM7zfPo
+    env_file:
+      - .env
     command: http "https://gateway-service:8443" --domain probable-dogfish-known.ngrok-free.app
     networks:
       - app_network
@@ -341,6 +398,7 @@ volumes:
   client_pgdata:
   company_pgdata:
   file_pgdata:
+  billing_pgdata:
   redis:
 
 networks:

@@ -66,6 +66,7 @@ services.AddOpenIddict()
             "identity",
             "file",
             "company",
+            "billing",
             OpenIddictConstants.Scopes.OfflineAccess
         );
 
@@ -164,6 +165,7 @@ using (var scope = app.Services.CreateScope())
                 OpenIddictConstants.Permissions.Prefixes.Scope + "identity",
                 OpenIddictConstants.Permissions.Prefixes.Scope + "file",
                 OpenIddictConstants.Permissions.Prefixes.Scope + "company",
+                OpenIddictConstants.Permissions.Prefixes.Scope + "billing",
                 OpenIddictConstants.Permissions.Prefixes.Scope + "offline_access",
 
                 OpenIddictConstants.Permissions.ResponseTypes.Token,

@@ -1,6 +1,8 @@
 @page "/bots"
 @using BlazorClient.Models.DTO
 @using Microsoft.AspNetCore.Authorization
+@using System.Text.Json
+@using System.Text.RegularExpressions
 
 @attribute [Authorize]
 
@@ -135,6 +137,12 @@
             </button>
         </div>
         <div class="bots-modal-body">
+            @if (!string.IsNullOrWhiteSpace(modalError))
+            {
+                <div class="bots-modal-error" role="alert">
+                    @modalError
+                </div>
+            }
             <div class="bots-field">
                 <label class="bots-label">Имя бота</label>
                 <input type="text" class="bots-input" @bind="currentBotModel.Name" placeholder="My Super Bot" />
@@ -198,6 +206,7 @@
     private bool isLoading = true;
     private bool isSaving;
     private string? error;
+    private string? modalError;
 
     private bool showModal;
     private bool isEditMode;
@@ -257,6 +266,7 @@
             return;
 
         isSaving = true;
+        modalError = null;
         try
         {
             var channelIds = currentBotModel.SelectedChannelIds.ToList();
@@ -270,7 +280,7 @@
         }
         catch (Exception ex)
         {
-            error = $"Ошибка сохранения: {ex.Message}";
+            modalError = BuildBotSaveErrorMessage(ex);
         }
         finally
         {
@@ -317,6 +327,7 @@
     {
         currentBotModel = new BotInputModel();
         isEditMode = false;
+        modalError = null;
         showModal = true;
         await LoadChannelsForModal();
     }
@@ -324,7 +335,74 @@
     private void CloseModal()
     {
         showModal = false;
-        error = null;
+        modalError = null;
+    }
+
+    private static string BuildBotSaveErrorMessage(Exception ex)
+    {
+        var rawMessage = ex.Message;
+        var normalizedMessage = TryExtractGraphQlErrorMessage(rawMessage) ?? rawMessage;
+
+        var quotaMatch = Regex.Match(
+            normalizedMessage,
+            @"Quota exceeded \(bots\)\. Limit:\s*(\d+),\s*used:\s*(\d+)\.",
+            RegexOptions.IgnoreCase);
+
+        if (quotaMatch.Success)
+        {
+            var limit = quotaMatch.Groups[1].Value;
+            var used = quotaMatch.Groups[2].Value;
+            return $"Достигнут лимит по количеству ботов: {used} из {limit}. Удалите лишнего бота или перейдите на более высокий тариф.";
+        }
+
+        if (normalizedMessage.Contains("Quota exceeded", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Достигнут лимит по количеству ботов. Удалите лишнего бота или перейдите на более высокий тариф.";
+        }
+
+        if (normalizedMessage.Contains("Arg_NullReferenceException", StringComparison.OrdinalIgnoreCase) ||
+            normalizedMessage.Contains("NullReferenceException", StringComparison.OrdinalIgnoreCase) ||
+            normalizedMessage.Contains("Object reference not set", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Не удалось сохранить бота из-за внутренней ошибки. Обновите страницу и попробуйте снова.";
+        }
+
+        return $"Не удалось сохранить бота. {normalizedMessage}";
+    }
+
+    private static string? TryExtractGraphQlErrorMessage(string message)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+            return null;
+
+        var jsonStartIndex = message.IndexOf("{\"errors\"", StringComparison.OrdinalIgnoreCase);
+        if (jsonStartIndex < 0)
+            return null;
+
+        var jsonPayload = message[jsonStartIndex..];
+        try
+        {
+            using var jsonDocument = JsonDocument.Parse(jsonPayload);
+            if (!jsonDocument.RootElement.TryGetProperty("errors", out var errors) ||
+                errors.ValueKind != JsonValueKind.Array ||
+                errors.GetArrayLength() == 0)
+            {
+                return null;
+            }
+
+            var firstError = errors[0];
+            if (firstError.TryGetProperty("message", out var gqlMessage) &&
+                gqlMessage.ValueKind == JsonValueKind.String)
+            {
+                return gqlMessage.GetString();
+            }
+        }
+        catch
+        {
+            // Ignore malformed payload and fallback to original exception message.
+        }
+
+        return null;
     }
 
     private class BotInputModel

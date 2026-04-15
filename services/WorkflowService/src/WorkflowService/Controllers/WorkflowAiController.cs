@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,12 +27,29 @@ public class WorkflowAiController : ControllerBase
     public async Task<IActionResult> Generate(
         [FromBody] GenerateWorkflowFromAiHttpRequest? body,
         [FromServices] WorkflowAiGenerationService gen,
+        [FromServices] BillingQuotaGuard billing,
         CancellationToken ct)
     {
         if (body is null)
             return BadRequest();
 
+        var companyClaim = User.FindFirstValue("company_id");
+        Guid? companyId = Guid.TryParse(companyClaim, out var cid) ? cid : null;
+
+        try
+        {
+            await billing.EnsureQuotaAsync(companyId, "ai_builder", 0, ct);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { success = false, errors = new[] { ex.Message } });
+        }
+
         var result = await gen.GenerateAsync(body.UserPrompt, body.Mode ?? "replace", body.CurrentWorkflow, ct);
+
+        if (result.Success && companyId.HasValue)
+            await billing.IncrementUsageAsync(companyId, "ai_builder", 1, ct);
+
         return new JsonResult(
             new
             {

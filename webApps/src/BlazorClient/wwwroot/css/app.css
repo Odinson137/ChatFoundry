@@ -21,13 +21,86 @@ a, .btn-link {
     color: #6366f1;
 }
 
-a.settings-nav-item,
-a.settings-nav-item:hover,
-a.settings-nav-item:focus,
-a.settings-nav-item:visited,
-a.settings-nav-item:active {
+a.settings-nav-link {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #4b5563;
     text-decoration: none !important;
-    color: inherit;
+    transition: background 0.15s, color 0.15s;
+    cursor: pointer;
+    line-height: 1.2;
+}
+
+a.settings-nav-link:hover,
+a.settings-nav-link:focus,
+a.settings-nav-link:active,
+a.settings-nav-link:visited {
+    text-decoration: none !important;
+}
+
+a.settings-nav-link:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+a.settings-nav-link:hover .settings-nav-icon {
+    transform: scale(1.06);
+}
+
+a.settings-nav-link.active {
+    background: #eef2ff;
+    color: #4338ca;
+    font-weight: 600;
+}
+
+a.settings-nav-link.active .settings-nav-icon {
+    background: linear-gradient(135deg, #6366f1, #818cf8);
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3);
+}
+
+a.settings-nav-link.active .settings-nav-icon svg {
+    stroke: #fff;
+}
+
+.settings-nav-icon {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.15s, background 0.15s, box-shadow 0.15s;
+}
+
+.settings-nav-icon svg {
+    display: block;
+    flex-shrink: 0;
+}
+
+.settings-nav-icon--indigo { background: #eef2ff; color: #818cf8; }
+.settings-nav-icon--violet { background: #f5f3ff; color: #a78bfa; }
+.settings-nav-icon--emerald { background: #ecfdf5; color: #34d399; }
+.settings-nav-icon--sky    { background: #f0f9ff; color: #38bdf8; }
+.settings-nav-icon--orange { background: #fff7ed; color: #fb923c; }
+.settings-nav-icon--rose   { background: #fff1f2; color: #fb7185; }
+.settings-nav-icon--amber  { background: #fffbeb; color: #f59e0b; }
+
+.settings-nav-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
 }
 
 .btn-primary {

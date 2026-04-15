@@ -34,7 +34,7 @@ else if (!string.IsNullOrEmpty(_error))
         </button>
     </div>
 }
-else if (!_sessions.Any())
+else if (!_sessions.Any() && !HasActiveFilters)
 {
     <div class="settings-empty-state">
         <div class="settings-empty-icon">
@@ -79,59 +79,69 @@ else
                 <input type="date" class="sess-input sess-input-date" @bind="_completedTo" @bind:format="yyyy-MM-dd" @bind:after="OnFilterChanged" />
             </div>
         </div>
-        <table class="settings-table">
-            <thead>
-            <tr>
-                <th>Клиент</th>
-                <th>Бот</th>
-                <th>Канал</th>
-                <th>Статус</th>
-                <th>Шагов</th>
-                <th>Создана</th>
-                <th style="text-align: right;"></th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var s in _sessions)
-            {
+        @if (!_sessions.Any())
+        {
+            <div class="sess-filter-empty">
+                <p>Ничего не найдено</p>
+                <small>Измените фильтры или поисковый запрос</small>
+            </div>
+        }
+        else
+        {
+            <table class="settings-table">
+                <thead>
                 <tr>
-                    <td>
-                        <code class="sess-client-id">@TruncateClientId(s.ClientId)</code>
-                    </td>
-                    <td>
-                        <div class="sess-bot-info">
-                            <span class="sess-bot-name">@(s.Workflow?.Bot?.Name ?? "—")</span>
-                            <span class="sess-bot-version">v@(s.Workflow?.Version ?? 0)</span>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="settings-badge settings-badge-neutral">@FormatChannel(s.Channel)</span>
-                    </td>
-                    <td>
-                        <span class="settings-badge @StatusBadgeClass(s.Status)">@StatusLabel(s.Status)</span>
-                    </td>
-                    <td>
-                        <span class="sess-step-count">@(s.Actions?.Count ?? 0)</span>
-                    </td>
-                    <td>
-                        <div class="sess-date-cell">
-                            <span>@s.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
-                            @if (s.CompletedAt.HasValue)
-                            {
-                                <span class="sess-date-completed">→ @s.CompletedAt.Value.ToLocalTime().ToString("HH:mm")</span>
-                            }
-                        </div>
-                    </td>
-                    <td style="text-align: right;">
-                        <button class="settings-btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" @onclick="() => OpenReplay(s.Id)">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-                            Путь
-                        </button>
-                    </td>
+                    <th>Клиент</th>
+                    <th>Бот</th>
+                    <th>Канал</th>
+                    <th>Статус</th>
+                    <th>Шагов</th>
+                    <th>Создана</th>
+                    <th style="text-align: right;"></th>
                 </tr>
-            }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                @foreach (var s in _sessions)
+                {
+                    <tr>
+                        <td>
+                            <code class="sess-client-id">@TruncateClientId(s.ClientId)</code>
+                        </td>
+                        <td>
+                            <div class="sess-bot-info">
+                                <span class="sess-bot-name">@(s.Workflow?.Bot?.Name ?? "—")</span>
+                                <span class="sess-bot-version">v@(s.Workflow?.Version ?? 0)</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="settings-badge settings-badge-neutral">@FormatChannel(s.Channel)</span>
+                        </td>
+                        <td>
+                            <span class="settings-badge @StatusBadgeClass(s.Status)">@StatusLabel(s.Status)</span>
+                        </td>
+                        <td>
+                            <span class="sess-step-count">@(s.Actions?.Count ?? 0)</span>
+                        </td>
+                        <td>
+                            <div class="sess-date-cell">
+                                <span>@s.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+                                @if (s.CompletedAt.HasValue)
+                                {
+                                    <span class="sess-date-completed">→ @s.CompletedAt.Value.ToLocalTime().ToString("HH:mm")</span>
+                                }
+                            </div>
+                        </td>
+                        <td style="text-align: right;">
+                            <button class="settings-btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" @onclick="() => OpenReplay(s.Id)">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                                Путь
+                            </button>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        }
     </div>
 
     @if (_totalCount > 0)
@@ -178,6 +188,14 @@ else
     private bool _hasPreviousPage;
     private int _totalCount;
     private Timer? _searchDebounceTimer;
+    private bool HasActiveFilters =>
+        !string.IsNullOrWhiteSpace(StatusFilter) ||
+        !string.IsNullOrWhiteSpace(_searchText) ||
+        !string.IsNullOrWhiteSpace(_botIdFilter) ||
+        _createdFrom.HasValue ||
+        _createdTo.HasValue ||
+        _completedFrom.HasValue ||
+        _completedTo.HasValue;
 
     protected override async Task OnInitializedAsync()
     {

@@ -32,7 +32,10 @@ public class SessionRepository(WorkflowDbContext db) : ISessionRepository
 
     public async Task<Session?> GetAsync(Guid sessionId, CancellationToken ct = default)
     {
-        return await db.Sessions.Include(c => c.Workflow).FirstOrDefaultAsync(c => c.Id == sessionId, ct);
+        return await db.Sessions
+            .Include(c => c.Workflow)
+            .ThenInclude(w => w.Bot)
+            .FirstOrDefaultAsync(c => c.Id == sessionId, ct);
     }
 
     public async Task<IReadOnlyList<Session>> GetByParentSessionIdAsync(Guid parentSessionId, CancellationToken ct = default)

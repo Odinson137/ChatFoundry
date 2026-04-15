@@ -1,9 +1,12 @@
+using Billing.Grpc;
 using CompanyService.Data;
 using CompanyService.Entities;
 using CompanyService.Enums;
+using Grpc.Core;
 using HotChocolate;
 using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Shared.Grpc.Identity;
 using Shared.Infrastructure.GraphQl;
 
@@ -12,7 +15,9 @@ namespace CompanyService.GraphQL.Mutations;
 [ExtendObjectType(typeof(Mutation))]
 public class CompanyMemberMutation(
     IHttpContextAccessor httpContextAccessor,
-    UserCompanyService.UserCompanyServiceClient identityGrpc) : BaseGraphQl(httpContextAccessor)
+    UserCompanyService.UserCompanyServiceClient identityGrpc,
+    IConfiguration configuration,
+    global::Billing.Grpc.BillingQuotaService.BillingQuotaServiceClient billingClient) : BaseGraphQl(httpContextAccessor)
 {
     public async Task<CompanyMember> AddMember(
         Guid companyId,
@@ -21,6 +26,27 @@ public class CompanyMemberMutation(
         [Service] CompanyDbContext context,
         CancellationToken ct)
     {
+        if (configuration.GetValue("Billing:Enabled", true))
+        {
+            try
+            {
+                var count = await context.CompanyMembers.CountAsync(m => m.CompanyId == companyId && m.IsActive, ct);
+                var r = await billingClient.CheckQuotaAsync(new CheckQuotaRequest
+                {
+                    CompanyId = companyId.ToString("D"),
+                    QuotaType = "team_members",
+                    ReportedUsage = count
+                }, cancellationToken: ct);
+                if (!r.Allowed)
+                    throw new GraphQLException(
+                        $"Team size quota exceeded. Limit {r.Limit}, current {r.Used}.");
+            }
+            catch (RpcException ex) when (ex.StatusCode == StatusCode.Unavailable)
+            {
+                // allow when billing is down
+            }
+        }
+
         var member = new CompanyMember
         {
             CompanyId = companyId,

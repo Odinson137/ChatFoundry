@@ -1,6 +1,10 @@
+using Billing.Grpc;
 using ClientService.Entities;
 using ClientService.Interfaces;
+using Grpc.Core;
 using MassTransit;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Shared.Application.Events;
 using Shared.Domain.Enums;
 
@@ -10,7 +14,10 @@ public class BotIncomingMessageConsumer(
     IClientRepository clientRepository,
     IClientChannelRepository channelRepository,
     IMessageRepository messageRepository,
-    IBotCompanyResolver botCompanyResolver) : IConsumer<BotIncomingMessage>
+    IBotCompanyResolver botCompanyResolver,
+    global::Billing.Grpc.BillingQuotaService.BillingQuotaServiceClient billingClient,
+    IConfiguration configuration,
+    ILogger<BotIncomingMessageConsumer> logger) : IConsumer<BotIncomingMessage>
 {
     public async Task Consume(ConsumeContext<BotIncomingMessage> context)
     {
@@ -32,6 +39,27 @@ public class BotIncomingMessageConsumer(
 
         if (clientChannel == null)
         {
+            if (companyId.HasValue && configuration.GetValue("Billing:Enabled", true))
+            {
+                try
+                {
+                    var existingCount = await clientRepository.CountByCompanyAsync(companyId, ct);
+                    var check = await billingClient.CheckQuotaAsync(new CheckQuotaRequest
+                    {
+                        CompanyId = companyId.Value.ToString("D"),
+                        QuotaType = "clients",
+                        ReportedUsage = existingCount
+                    }, cancellationToken: ct);
+                    if (!check.Allowed)
+                        throw new InvalidOperationException(
+                            $"Client quota exceeded. Limit {check.Limit}, current {check.Used}.");
+                }
+                catch (RpcException ex) when (ex.StatusCode == StatusCode.Unavailable)
+                {
+                    logger.LogWarning(ex, "Billing unavailable; allowing new client");
+                }
+            }
+
             client = new Client
             {
                 DisplayName = userName,
@@ -52,6 +80,7 @@ public class BotIncomingMessageConsumer(
             };
 
             await channelRepository.AddAsync(clientChannel, ct);
+
         }
         else
         {

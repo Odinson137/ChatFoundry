@@ -22,6 +22,8 @@ public interface IReplayDataProvider
 
 public partial class SessionReplay : IDisposable, IReplayDataProvider
 {
+    private sealed record SessionVariableItem(string DisplayName, string Value);
+
     [Parameter] public Guid SessionId { get; set; }
 
     private BlazorDiagram? Diagram { get; set; }
@@ -166,20 +168,20 @@ public partial class SessionReplay : IDisposable, IReplayDataProvider
         switch (type.ToLower())
         {
             case "start":
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right, new Point(1, 0.5)));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right));
                 break;
             case "end":
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Left, new Point(0, 0.5)));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Left));
                 break;
             case "condition":
             case "aifilter":
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Left, new Point(0, 0.5)));
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right, new Point(1, 0.33)));
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right, new Point(1, 0.67)));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Left));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right));
                 break;
             default:
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Left, new Point(0, 0.5)));
-                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right, new Point(1, 0.5)));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Left));
+                node.AddPort(new WorkflowPortModel(node, PortAlignment.Right));
                 break;
         }
 
@@ -274,6 +276,54 @@ public partial class SessionReplay : IDisposable, IReplayDataProvider
     private List<KeyValuePair<string, string>> GetSessionVariables()
         => GetFilteredVariables().Where(kv => !kv.Key.StartsWith("$global.")).ToList();
 
+    private List<SessionVariableItem> GetSessionVariableItems()
+    {
+        var variables = GetSessionVariables();
+        var items = new List<SessionVariableItem>();
+        var consumedKeys = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (var kv in variables)
+        {
+            if (consumedKeys.Contains(kv.Key))
+                continue;
+
+            if (TryParseNodeVariableKey(kv.Key, out var nodeId, out var suffix)
+                && suffix.Equals("error", StringComparison.OrdinalIgnoreCase)
+                && string.IsNullOrWhiteSpace(kv.Value))
+            {
+                continue;
+            }
+
+            if (TryParseNodeVariableKey(kv.Key, out nodeId, out suffix)
+                && (suffix.Equals("output", StringComparison.OrdinalIgnoreCase)
+                    || suffix.Equals("messageKind", StringComparison.OrdinalIgnoreCase)))
+            {
+                var partnerSuffix = suffix.Equals("output", StringComparison.OrdinalIgnoreCase) ? "messageKind" : "output";
+                var partnerKey = $"$node.{nodeId}.{partnerSuffix}";
+                var partner = variables.FirstOrDefault(v => string.Equals(v.Key, partnerKey, StringComparison.Ordinal));
+
+                if (!string.IsNullOrEmpty(partner.Key) && !consumedKeys.Contains(partner.Key))
+                {
+                    var outputValue = suffix.Equals("output", StringComparison.OrdinalIgnoreCase) ? kv.Value : partner.Value;
+                    var messageKindValue = suffix.Equals("messageKind", StringComparison.OrdinalIgnoreCase) ? kv.Value : partner.Value;
+
+                    items.Add(new SessionVariableItem(
+                        GetNodeLabel(nodeId),
+                        $"Вывод: {DisplayVariableValue(outputValue)}\nТип сообщения: {DisplayMessageKindValue(messageKindValue)}"));
+
+                    consumedKeys.Add(kv.Key);
+                    consumedKeys.Add(partner.Key);
+                    continue;
+                }
+            }
+
+            items.Add(new SessionVariableItem(GetVariableDisplayName(kv.Key), DisplayVariableValue(kv.Value)));
+            consumedKeys.Add(kv.Key);
+        }
+
+        return items;
+    }
+
     /// <summary>Для переменных $node.{guid}.suffix возвращает "Название блока · suffix", иначе ключ как есть.</summary>
     private string GetVariableDisplayName(string key)
     {
@@ -290,6 +340,53 @@ public partial class SessionReplay : IDisposable, IReplayDataProvider
             return key;
         var label = _nodeLabels.TryGetValue(nodeId, out var l) ? l : nodeId.ToString("N")[..8];
         return $"{label} · {suffix}";
+    }
+
+    private static bool TryParseNodeVariableKey(string key, out Guid nodeId, out string suffix)
+    {
+        nodeId = Guid.Empty;
+        suffix = string.Empty;
+
+        const string nodePrefix = "$node.";
+        if (string.IsNullOrEmpty(key) || !key.StartsWith(nodePrefix, StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        var after = key.Substring(nodePrefix.Length);
+        var dot = after.IndexOf('.');
+        if (dot <= 0 || dot == after.Length - 1)
+            return false;
+
+        var guidStr = after.Substring(0, dot);
+        if (!Guid.TryParse(guidStr, out nodeId))
+            return false;
+
+        suffix = after.Substring(dot + 1);
+        return true;
+    }
+
+    private static string DisplayVariableValue(string? value)
+        => string.IsNullOrWhiteSpace(value) ? "(пусто)" : value;
+
+    private static string DisplayMessageKindValue(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return "(пусто)";
+
+        return value.Trim().ToUpperInvariant() switch
+        {
+            "TEXT" => "Текст",
+            "IMAGE" => "Изображение",
+            "VIDEO" => "Видео",
+            "AUDIO" => "Аудио",
+            "VOICE" => "Голос",
+            "FILE" => "Файл",
+            "DOCUMENT" => "Документ",
+            "STICKER" => "Стикер",
+            "LOCATION" => "Локация",
+            "CONTACT" => "Контакт",
+            "BUTTON" => "Кнопка",
+            _ => value
+        };
     }
 
     private static string FormatChannel(string? channel) => channel?.ToUpperInvariant() switch

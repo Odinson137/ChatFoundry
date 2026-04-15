@@ -33,7 +33,8 @@ public class AIGenerateActionExecutor(
 
         if (node.Data is not AIGenerateNodeData aiData || string.IsNullOrWhiteSpace(aiData.Prompt))
         {
-            await producer.Produce(new ActionCompletedEvent(message.Channel, message.ExternalUserId), ct);
+            await producer.Produce(new ActionCompletedEvent(message.Channel, message.ExternalUserId,
+                session.Workflow.Bot.CompanyId), ct);
             return;
         }
 
@@ -53,7 +54,8 @@ public class AIGenerateActionExecutor(
         await variableService.SyncIfDirtyAsync(session, ct);
         await sessionRepository.SaveAsync(session, ct);
 
-        await producer.Produce(new ActionCompletedEvent(message.Channel, message.ExternalUserId), ct);
+        await producer.Produce(new ActionCompletedEvent(message.Channel, message.ExternalUserId,
+            session.Workflow.Bot.CompanyId, CountAsAiWorkflowExecution: true), ct);
     }
 
     private List<(string Role, string Content)> BuildChatHistoryFromActions(

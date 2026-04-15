@@ -1,0 +1,130 @@
+@page "/settings/billing/transactions"
+@layout SettingsLayout
+@using Microsoft.AspNetCore.Authorization
+@using BlazorClient.Models.DTO
+
+@attribute [Authorize]
+
+@inject IBillingApiClient Billing
+
+<PageTitle>Настройки — Транзакции — ChatFoundry</PageTitle>
+
+<div class="settings-page-header">
+    <div>
+        <a class="billing-back-link" href="/settings/billing">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Биллинг
+        </a>
+        <h1 class="settings-page-title">Транзакции</h1>
+        <p class="settings-page-subtitle">История операций с балансом</p>
+    </div>
+</div>
+
+@if (loadError != null)
+{
+    <div class="settings-alert settings-alert-danger">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        <span>@loadError</span>
+    </div>
+}
+else if (isLoading)
+{
+    <div class="settings-spinner-wrap">
+        <div class="settings-spinner"></div>
+    </div>
+}
+else if (_rows == null || !_rows.Any())
+{
+    <div class="settings-empty-state">
+        <div class="settings-empty-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        </div>
+        <div class="settings-empty-title">Нет транзакций</div>
+        <div class="settings-empty-desc">История операций с балансом пока пуста.</div>
+    </div>
+}
+else
+{
+    <div class="settings-card">
+        <table class="settings-table">
+            <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Тип</th>
+                <th>Сумма</th>
+                <th>Баланс после</th>
+                <th>Описание</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var t in _rows)
+            {
+                <tr>
+                    <td>
+                        <div class="billing-tx-date">@t.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</div>
+                        <div class="billing-tx-time">@t.CreatedAt.ToLocalTime().ToString("HH:mm")</div>
+                    </td>
+                    <td>
+                        <span class="settings-badge @TypeBadgeClass(t.Type)">@TypeDisplay(t.Type)</span>
+                    </td>
+                    <td>
+                        <span class="billing-tx-amount" style="color: @AmountColor(t.Amount);">
+                            @(t.Amount > 0 ? "+" : "")@t.Amount.ToString("F2")
+                        </span>
+                        <span class="billing-tx-currency">@("USDT")</span>
+                    </td>
+                    <td>
+                        <span class="billing-tx-balance">@t.BalanceAfter.ToString("F2")</span>
+                        <span class="billing-tx-currency">@("USDT")</span>
+                    </td>
+                    <td class="billing-tx-desc">
+                        @(t.Description ?? "—")
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private IReadOnlyList<BalanceTransactionDto>? _rows;
+    private bool isLoading = true;
+    private string? loadError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _rows = await Billing.GetBalanceTransactionsAsync();
+        }
+        catch (Exception ex)
+        {
+            loadError = $"Не удалось загрузить транзакции: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private static string TypeBadgeClass(string type) => type.ToUpperInvariant() switch
+    {
+        "TOPUP" or "DEPOSIT" => "settings-badge-success",
+        "USAGE" or "CHARGE" => "settings-badge-warning",
+        "REFUND" => "settings-badge-primary",
+        _ => "settings-badge-neutral"
+    };
+
+    private static string TypeDisplay(string type) => type.ToUpperInvariant() switch
+    {
+        "TOPUP" => "Пополнение",
+        "DEPOSIT" => "Зачисление",
+        "USAGE" => "Использование",
+        "CHARGE" => "Списание",
+        "REFUND" => "Возврат",
+        _ => type
+    };
+
+    private static string AmountColor(decimal amount) => amount > 0 ? "#10b981" : amount < 0 ? "#ef4444" : "#64748b";
+}

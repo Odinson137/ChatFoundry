@@ -1,6 +1,25 @@
 # This is a generated file. Not intended for manual editing.
 version: "3.9"
 services:
+  billing-service:
+    build:
+      context: "C:\\Users\\buryy\\RiderProjects\\ChatFoundry"
+      dockerfile: "services/BillingService/src/BillingService/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net10.0/BillingService.dll"
+    environment:
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "billingservice:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry\\services\\BillingService\\src\\\
+      BillingService:/app:rw"
+    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry:/src:rw"
+    - "C:\\Users\\buryy\\.nuget\\packages:/home/app/.nuget/packages"
+    working_dir: "/app"
   client-service:
     build:
       context: "C:\\Users\\buryy\\RiderProjects\\ChatFoundry"

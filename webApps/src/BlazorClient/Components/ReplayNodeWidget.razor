@@ -3,7 +3,7 @@
 @using BlazorClient.Models.Diagram
 @using BlazorClient.Pages.Settings
 
-<div class="replay-node @GetNodeColorClass() @GetHighlightClass()">
+<div class="bd-node replay-node @GetNodeColorClass() @GetHighlightClass()">
     <div class="replay-node-header">@(Node.Title ?? Node.NodeType)</div>
 
     @if (Stats != null || IsCurrentNode)
@@ -32,13 +32,13 @@
     <div class="replay-node-ports replay-node-ports-left">
         @foreach (var port in Node.Ports.Where(p => p.Alignment == PortAlignment.Left))
         {
-            <PortRenderer @key="port.Id" Port="port" Class="replay-port" />
+            <PortRenderer @key="port.Id" Port="port" />
         }
     </div>
     <div class="replay-node-ports replay-node-ports-right">
         @foreach (var port in Node.Ports.Where(p => p.Alignment == PortAlignment.Right))
         {
-            <PortRenderer @key="port.Id" Port="port" Class="replay-port" />
+            <PortRenderer @key="port.Id" Port="port" />
         }
     </div>
 </div>

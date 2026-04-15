@@ -3,6 +3,7 @@
 @using BlazorClient.Models
 @using Microsoft.JSInterop
 @using System.Text.Json
+@using System.Text.RegularExpressions
 @using WorkflowValidation
 @inject IWorkflowApiClient ApiClient
 @inject IJSRuntime JSRuntime
@@ -18,6 +19,15 @@
             </button>
         </div>
         <div class="variables-modal-body">
+            @if (AiErrors.Count > 0)
+            {
+                <div class="alert alert-danger small mb-3" role="alert">
+                    @foreach (var err in AiErrors)
+                    {
+                        <div>@err</div>
+                    }
+                </div>
+            }
             <div class="mb-3">
                 <div class="text-muted small mb-2">Режим</div>
                 <div class="d-flex flex-wrap gap-2">
@@ -29,6 +39,18 @@
                 <label class="form-label">Запрос к AI на сервере</label>
                 <textarea class="form-control workflow-ai-dialog-textarea" rows="6" @bind="AiUserPrompt" @bind:event="oninput" disabled="@AiBusy" placeholder="Опишите бота или что добавить к текущей схеме…"></textarea>
             </div>
+            <div class="mb-3 d-flex justify-content-end">
+                <button type="button" class="designer-btn-primary" @onclick="GenerateFromAiAsync" disabled="@AiBusy">
+                    @if (AiBusy)
+                    {
+                        <span>Генерация…</span>
+                    }
+                    else
+                    {
+                        <span>Сгенерировать</span>
+                    }
+                </button>
+            </div>
             <div class="mb-3 small">
                 <div class="text-muted mb-1">Инструкция для внешней нейросети (стабильная ссылка, без расхода квоты в приложении):</div>
                 <code class="d-block text-break user-select-all mb-2" style="font-size: 0.8rem;">@WorkflowAiPromptUrl</code>
@@ -37,30 +59,11 @@
             </div>
             <div class="mb-3">
                 <label class="form-label">Вставить JSON от другой нейросети</label>
-                <textarea class="form-control font-monospace small workflow-ai-dialog-textarea-json" rows="8" @bind="AiPasteJson" @bind:event="oninput" disabled="@AiBusy" placeholder="{ &quot;nodes&quot;: … }"></textarea>
+                <textarea class="form-control font-monospace small workflow-ai-dialog-textarea-json" rows="8" @bind="AiPasteJson" @bind:event="oninput" disabled="@AiBusy" placeholder='{ "nodes": [ { "id": "00000000-0000... }'></textarea>
                 <button type="button" class="designer-btn-secondary mt-2" @onclick="ApplyAiPasteJsonAsync" disabled="@AiBusy">Применить JSON</button>
             </div>
-            @if (AiErrors.Count > 0)
-            {
-                <div class="alert alert-danger small mb-3" role="alert">
-                    @foreach (var err in AiErrors)
-                    {
-                        <div>@err</div>
-                    }
-                </div>
-            }
             <div class="d-flex flex-wrap gap-2 justify-content-end">
                 <button type="button" class="designer-btn-secondary" @onclick="CloseAsync" disabled="@AiBusy">Закрыть</button>
-                <button type="button" class="designer-btn-primary" @onclick="GenerateFromAiAsync" disabled="@AiBusy">
-                    @if (AiBusy)
-                    {
-                        <span>Генерация…</span>
-                    }
-                    else
-                    {
-                        <span>Сгенерировать на сервере</span>
-                    }
-                </button>
             </div>
         </div>
     </div>
@@ -133,7 +136,7 @@
             var result = await ApiClient.GenerateWorkflowFromAiAsync(AiUserPrompt.Trim(), AiMergeMode, current);
             if (!result.Success)
             {
-                AiErrors = result.Errors.ToList();
+                AiErrors = LocalizeAiErrors(result.Errors);
                 return;
             }
 
@@ -199,7 +202,76 @@
         }
         catch (Exception ex)
         {
-            AiErrors.Add(ex.Message);
+            AiErrors.Add(LocalizeAiError(ex.Message));
+        }
+    }
+
+    private static List<string> LocalizeAiErrors(IEnumerable<string>? errors)
+    {
+        var localized = errors?
+            .Where(e => !string.IsNullOrWhiteSpace(e))
+            .Select(LocalizeAiError)
+            .Distinct()
+            .ToList() ?? [];
+
+        if (localized.Count == 0)
+            localized.Add("Не удалось сгенерировать схему. Попробуйте снова.");
+
+        return localized;
+    }
+
+    private static string LocalizeAiError(string rawMessage)
+    {
+        if (string.IsNullOrWhiteSpace(rawMessage))
+            return "Неизвестная ошибка при генерации схемы.";
+
+        var normalizedMessage = TryExtractAiServerError(rawMessage) ?? rawMessage;
+
+        var quotaMatch = Regex.Match(
+            normalizedMessage,
+            @"Quota exceeded \(ai_builder\)\. Limit:\s*(\d+),\s*used:\s*(\d+)\.",
+            RegexOptions.IgnoreCase);
+
+        if (quotaMatch.Success)
+        {
+            var limit = quotaMatch.Groups[1].Value;
+            var used = quotaMatch.Groups[2].Value;
+            return $"Достигнут лимит генераций AI: {used} из {limit}. Обновите тариф или дождитесь следующего периода.";
+        }
+
+        if (normalizedMessage.Contains("Quota exceeded", StringComparison.OrdinalIgnoreCase))
+            return "Достигнут лимит генераций AI. Обновите тариф или дождитесь следующего периода.";
+
+        return normalizedMessage;
+    }
+
+    private static string? TryExtractAiServerError(string message)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+            return null;
+
+        var jsonStart = message.IndexOf("{\"success\"", StringComparison.OrdinalIgnoreCase);
+        if (jsonStart < 0)
+            return null;
+
+        var jsonPayload = message[jsonStart..];
+        try
+        {
+            using var document = JsonDocument.Parse(jsonPayload);
+            if (!document.RootElement.TryGetProperty("errors", out var errorsElement) ||
+                errorsElement.ValueKind != JsonValueKind.Array ||
+                errorsElement.GetArrayLength() == 0)
+            {
+                return null;
+            }
+
+            return errorsElement.EnumerateArray()
+                .Select(item => item.GetString())
+                .FirstOrDefault(item => !string.IsNullOrWhiteSpace(item));
+        }
+        catch
+        {
+            return null;
         }
     }
 }

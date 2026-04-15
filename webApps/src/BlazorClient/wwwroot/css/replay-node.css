@@ -102,25 +102,38 @@
     position: absolute;
     top: 0;
     bottom: 0;
+    z-index: 20;
     display: flex;
     flex-direction: column;
     justify-content: center;
     gap: 4px;
     pointer-events: none;
+    overflow: visible;
 }
 
 .replay-node-ports-left {
     left: 0;
-    align-items: flex-start;
+    align-items: center;
     transform: translateX(-50%);
 }
 
 .replay-node-ports-right {
     right: 0;
-    align-items: flex-end;
+    align-items: center;
     transform: translateX(50%);
 }
 
+.replay-node-ports .diagram-port,
 .replay-node-ports .replay-port {
     pointer-events: auto;
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    flex: 0 0 auto;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }

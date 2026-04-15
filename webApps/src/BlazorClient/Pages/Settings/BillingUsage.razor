@@ -1,0 +1,183 @@
+@page "/settings/billing/usage"
+@layout SettingsLayout
+@using Microsoft.AspNetCore.Authorization
+@using BlazorClient.Models.DTO
+
+@attribute [Authorize]
+
+@inject IBillingApiClient Billing
+
+<PageTitle>Настройки — Использование — ChatFoundry</PageTitle>
+
+<div class="settings-page-header">
+    <div>
+        <a class="billing-back-link" href="/settings/billing">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Биллинг
+        </a>
+        <h1 class="settings-page-title">Использование</h1>
+        <p class="settings-page-subtitle">Детальная статистика по использованию ресурсов</p>
+    </div>
+</div>
+
+@if (loadError != null)
+{
+    <div class="settings-alert settings-alert-danger">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        <span>@loadError</span>
+    </div>
+}
+else if (isLoading)
+{
+    <div class="settings-spinner-wrap">
+        <div class="settings-spinner"></div>
+    </div>
+}
+else if (_overview == null)
+{
+    <div class="settings-empty-state">
+        <div class="settings-empty-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </div>
+        <div class="settings-empty-title">Нет данных</div>
+        <div class="settings-empty-desc">Не удалось загрузить статистику использования.</div>
+    </div>
+}
+else
+{
+    <!-- AI Usage cards -->
+    <div class="settings-stat-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+        <div class="settings-card billing-usage-detail-card">
+            <div class="settings-card-body">
+                <div class="billing-usage-detail-header">
+                    <div class="billing-usage-detail-icon" style="background: #eef2ff;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    </div>
+                    <div>
+                        <div class="billing-usage-detail-title">AI в workflow</div>
+                        <div class="billing-usage-detail-sub">Выполнения действий с ИИ</div>
+                    </div>
+                </div>
+                <div class="billing-usage-detail-bar-wrap">
+                    <div class="billing-usage-detail-bar-info">
+                        <span class="billing-usage-detail-used">@_overview.AiExecutionsUsed</span>
+                        <span class="billing-usage-detail-max">из @FormatCount(_overview.MaxAiExecutions)</span>
+                    </div>
+                    <div class="billing-usage-progress">
+                        <div class="billing-usage-progress-bar" style="width: @UsagePercent(_overview.AiExecutionsUsed, _overview.MaxAiExecutions)%; background: @UsageColor(_overview.AiExecutionsUsed, _overview.MaxAiExecutions);"></div>
+                    </div>
+                </div>
+                <div class="billing-usage-detail-percent">
+                    <span style="color: @UsageColor(_overview.AiExecutionsUsed, _overview.MaxAiExecutions);">@UsagePercent(_overview.AiExecutionsUsed, _overview.MaxAiExecutions)%</span>
+                    использовано
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-card billing-usage-detail-card">
+            <div class="settings-card-body">
+                <div class="billing-usage-detail-header">
+                    <div class="billing-usage-detail-icon" style="background: #f5f3ff;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    </div>
+                    <div>
+                        <div class="billing-usage-detail-title">AI конструктор</div>
+                        <div class="billing-usage-detail-sub">Генерации через AI Builder</div>
+                    </div>
+                </div>
+                <div class="billing-usage-detail-bar-wrap">
+                    <div class="billing-usage-detail-bar-info">
+                        <span class="billing-usage-detail-used">@_overview.AiBuilderUsed</span>
+                        <span class="billing-usage-detail-max">из @FormatCount(_overview.MaxAiBuilder)</span>
+                    </div>
+                    <div class="billing-usage-progress">
+                        <div class="billing-usage-progress-bar" style="width: @UsagePercent(_overview.AiBuilderUsed, _overview.MaxAiBuilder)%; background: @UsageColor(_overview.AiBuilderUsed, _overview.MaxAiBuilder);"></div>
+                    </div>
+                </div>
+                <div class="billing-usage-detail-percent">
+                    <span style="color: @UsageColor(_overview.AiBuilderUsed, _overview.MaxAiBuilder);">@UsagePercent(_overview.AiBuilderUsed, _overview.MaxAiBuilder)%</span>
+                    использовано
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resource limits table -->
+    <div class="settings-card" style="margin-top: 1rem;">
+        <div class="settings-card-body">
+            <h3 class="billing-section-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                Лимиты ресурсов
+            </h3>
+            <div class="billing-resources-grid">
+                <div class="billing-resource-item">
+                    <div class="billing-resource-icon" style="background: #ecfdf5;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                    </div>
+                    <div class="billing-resource-info">
+                        <div class="billing-resource-name">Клиенты</div>
+                        <div class="billing-resource-desc">Максимум клиентов в системе</div>
+                    </div>
+                    <div class="billing-resource-value">@FormatCount(_overview.MaxClients)</div>
+                </div>
+                <div class="billing-resource-item">
+                    <div class="billing-resource-icon" style="background: #eef2ff;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                    </div>
+                    <div class="billing-resource-info">
+                        <div class="billing-resource-name">Боты</div>
+                        <div class="billing-resource-desc">Максимум ботов</div>
+                    </div>
+                    <div class="billing-resource-value">@FormatCount(_overview.MaxBots)</div>
+                </div>
+                <div class="billing-resource-item">
+                    <div class="billing-resource-icon" style="background: #faf5ff;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                    </div>
+                    <div class="billing-resource-info">
+                        <div class="billing-resource-name">Участники</div>
+                        <div class="billing-resource-desc">Максимум участников команды</div>
+                    </div>
+                    <div class="billing-resource-value">@_overview.MaxTeamMembers</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="settings-alert settings-alert-info" style="margin-top: 1rem;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <span>Подробная аналитика по дням будет доступна в следующих версиях.</span>
+    </div>
+}
+
+@code {
+    private BillingOverviewDto? _overview;
+    private bool isLoading = true;
+    private string? loadError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _overview = await Billing.GetBillingOverviewAsync();
+        }
+        catch (Exception ex)
+        {
+            loadError = $"Не удалось загрузить статистику: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private static string FormatCount(int max) => max >= int.MaxValue - 1000 ? "∞" : max.ToString();
+
+    private static string UsagePercent(int used, int max) =>
+        max >= int.MaxValue - 1000 ? "0" : Math.Min(100, (int)((double)used / max * 100)).ToString();
+
+    private static string UsageColor(int used, int max) =>
+        max >= int.MaxValue - 1000 ? "#6366f1" :
+        (double)used / max > 0.9 ? "#ef4444" :
+        (double)used / max > 0.7 ? "#f59e0b" : "#6366f1";
+}

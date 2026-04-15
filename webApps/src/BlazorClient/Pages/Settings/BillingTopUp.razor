@@ -1,0 +1,153 @@
+@page "/settings/billing/top-up"
+@layout SettingsLayout
+@using Microsoft.AspNetCore.Authorization
+@using BlazorClient.Models.DTO
+
+@attribute [Authorize]
+
+@inject IBillingApiClient Billing
+@inject NavigationManager Nav
+
+<PageTitle>Настройки — Пополнение — ChatFoundry</PageTitle>
+
+<div class="settings-page-header">
+    <div>
+        <a class="billing-back-link" href="/settings/billing">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Биллинг
+        </a>
+        <h1 class="settings-page-title">Пополнение баланса</h1>
+        <p class="settings-page-subtitle">Крипто-оплата через Heleket (USDT)</p>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(loadError))
+{
+    <div class="settings-alert settings-alert-danger">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        <span>@loadError</span>
+    </div>
+}
+
+<div class="billing-topup-layout">
+    <div class="settings-card billing-topup-card">
+        <div class="settings-card-body">
+            <div class="billing-topup-header">
+                <div class="billing-topup-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+                </div>
+                <div>
+                    <h3 class="billing-topup-title">Введите сумму</h3>
+                    <p class="billing-topup-desc">Минимальная сумма пополнения — 10 USDT</p>
+                </div>
+            </div>
+
+            <EditForm Model="_model" OnValidSubmit="Submit">
+                <div class="settings-field">
+                    <label class="settings-label">Сумма (USDT)</label>
+                    <div class="billing-topup-input-wrap">
+                        <input type="number"
+                               @bind="_model.Amount"
+                               class="settings-input billing-topup-input"
+                               placeholder="10.00"
+                               min="10"
+                               step="1" />
+                        <span class="billing-topup-input-suffix">USDT</span>
+                    </div>
+                    <div class="settings-hint">После подтверждения вы будете перенаправлены на страницу оплаты Heleket.</div>
+                </div>
+
+                <!-- Quick amounts -->
+                <div class="billing-topup-quick">
+                    <span class="billing-topup-quick-label">Быстрый выбор:</span>
+                    <div class="billing-topup-quick-btns">
+                        @foreach (var amount in QuickAmounts)
+                        {
+                            <button type="button"
+                                    class="billing-topup-quick-btn @(_model.Amount == amount ? "billing-topup-quick-active" : "")"
+                                    @onclick="() => _model.Amount = amount">
+                                @amount
+                            </button>
+                        }
+                    </div>
+                </div>
+
+                <button type="submit" class="settings-btn-primary billing-topup-submit" disabled="@_busy">
+                    @if (_busy)
+                    {
+                        <div class="settings-spinner" style="width: 16px; height: 16px; border-width: 2px;"></div>
+                    }
+                    else
+                    {
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                    }
+                    Перейти к оплате
+                </button>
+            </EditForm>
+        </div>
+    </div>
+
+    <div class="billing-topup-info">
+        <div class="settings-card">
+            <div class="settings-card-body">
+                <h3 class="billing-topup-info-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    Безопасность оплаты
+                </h3>
+                <ul class="billing-topup-info-list">
+                    <li>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Шифрование через криптографию USDT (TRC-20)
+                    </li>
+                    <li>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Мгновенное зачисление на баланс
+                    </li>
+                    <li>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Без комиссии от ChatFoundry
+                    </li>
+                    <li>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Оплата через сервис Heleket
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private readonly TopUpModel _model = new();
+    private bool _busy;
+    private string? loadError;
+
+    private static readonly int[] QuickAmounts = { 10, 25, 50, 100, 250 };
+
+    private async Task Submit()
+    {
+        _busy = true;
+        loadError = null;
+        try
+        {
+            var r = await Billing.CreateTopUpInvoiceAsync(_model.Amount);
+            if (r.Success && !string.IsNullOrEmpty(r.PaymentUrl))
+                Nav.NavigateTo(r.PaymentUrl, forceLoad: true);
+            else
+                loadError = r.Error ?? "Не удалось создать счёт";
+        }
+        catch (Exception ex)
+        {
+            loadError = ex.Message;
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private sealed class TopUpModel
+    {
+        public decimal Amount { get; set; } = 10;
+    }
+}

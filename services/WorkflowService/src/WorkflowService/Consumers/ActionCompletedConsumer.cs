@@ -107,6 +107,9 @@ public class ActionCompletedConsumer(
         await sessionRepository.SaveAsync(parentSession, ct);
 
         await actionCompletedProducer.Produce(
-            new ActionCompletedEvent(msg.Channel, msg.ClientId), ct);
+            new ActionCompletedEvent(msg.Channel, msg.ClientId,
+                parentSession.Workflow.Bot.CompanyId,
+                msg.CountAsAiWorkflowExecution),
+            ct);
     }
 }

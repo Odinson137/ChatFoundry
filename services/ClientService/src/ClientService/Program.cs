@@ -60,6 +60,12 @@ builder.Services.AddGrpcClient<BotTokenService.BotTokenServiceClient>(o =>
     o.Address = new Uri(address ?? "http://workflow-service:8081");
 });
 
+builder.Services.AddGrpcClient<global::Billing.Grpc.BillingQuotaService.BillingQuotaServiceClient>(o =>
+{
+    var address = builder.Configuration["Services:BillingServiceGrpc"] ?? "http://billing-service:8081";
+    o.Address = new Uri(address);
+});
+
 var kafkaConnectionString = builder.Configuration.GetConnectionString("Kafka");
 builder.Services.AddSingleton(new AdminClientConfig
 {

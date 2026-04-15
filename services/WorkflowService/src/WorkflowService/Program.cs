@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Shared.Application.Events;
 using Shared.Infrastructure.DependencyInjection;
+using Shared.Infrastructure.Licensing;
 using Shared.Infrastructure.GraphQl;
 using Workflow.Grpc.Client;
 using WorkflowService.Actions.Executors;
@@ -92,6 +93,7 @@ services.AddHttpClient<FileUrlResolver>((sp, client) =>
 services.AddScoped<IFileUrlResolver>(sp => sp.GetRequiredService<FileUrlResolver>());
 
 services.AddPostgreSql<WorkflowDbContext>(builder.Configuration);
+services.AddChatFoundryLicense(builder.Configuration);
 
 var kafkaConnectionString = builder.Configuration.GetConnectionString("Kafka");
 builder.Services.AddSingleton(new AdminClientConfig
@@ -157,6 +159,14 @@ services.AddGrpcClient<ClientAttributesService.ClientAttributesServiceClient>(o 
     o.Address = new Uri("http://client-service:8081");
 })
 .AddStandardResilienceHandler();
+
+services.AddGrpcClient<global::Billing.Grpc.BillingQuotaService.BillingQuotaServiceClient>(o =>
+{
+    var address = builder.Configuration["Services:BillingServiceGrpc"] ?? "http://billing-service:8081";
+    o.Address = new Uri(address);
+}).AddStandardResilienceHandler();
+
+services.AddScoped<WorkflowService.Services.BillingQuotaGuard>();
 
 services.AddRedisCache(builder.Configuration, "CacheSettings");
 services.AddScoped<ClientAttributesGrpcClient>();

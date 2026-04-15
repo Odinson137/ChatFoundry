@@ -1,0 +1,201 @@
+@page "/settings/billing/plans"
+@layout SettingsLayout
+@using Microsoft.AspNetCore.Authorization
+@using BlazorClient.Models.DTO
+
+@attribute [Authorize]
+
+@inject IBillingApiClient Billing
+@inject NavigationManager Nav
+
+<PageTitle>Настройки — Тарифы — ChatFoundry</PageTitle>
+
+<div class="settings-page-header">
+    <div>
+        <a class="billing-back-link" href="/settings/billing">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Биллинг
+        </a>
+        <h1 class="settings-page-title">Тарифы</h1>
+        <p class="settings-page-subtitle">Выберите подходящий план для вашей компании</p>
+    </div>
+</div>
+
+@if (loadError != null)
+{
+    <div class="settings-alert settings-alert-danger">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        <span>@loadError</span>
+    </div>
+}
+else if (isLoading)
+{
+    <div class="settings-spinner-wrap">
+        <div class="settings-spinner"></div>
+    </div>
+}
+else if (_plans == null || !_plans.Any())
+{
+    <div class="settings-empty-state">
+        <div class="settings-empty-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <div class="settings-empty-title">Тарифы недоступны</div>
+        <div class="settings-empty-desc">Не удалось загрузить список тарифных планов.</div>
+    </div>
+}
+else
+{
+    <div class="billing-plans-grid">
+        @foreach (var plan in _plans)
+        {
+            var isCurrent = plan.Slug.Equals(_currentPlan, StringComparison.OrdinalIgnoreCase);
+            <div class="billing-plan @((isCurrent ? "billing-plan-current" : ""))">
+                @if (isCurrent)
+                {
+                    <div class="billing-plan-badge">Текущий план</div>
+                }
+                <div class="billing-plan-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        @if (plan.Slug.Equals("enterprise", StringComparison.OrdinalIgnoreCase))
+                        {
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                        }
+                        else if (plan.Slug.Equals("pro", StringComparison.OrdinalIgnoreCase) || plan.Slug.Equals("business", StringComparison.OrdinalIgnoreCase))
+                        {
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                        }
+                        else
+                        {
+                            <circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>
+                        }
+                    </svg>
+                </div>
+                <h3 class="billing-plan-name">@plan.Name</h3>
+                <div class="billing-plan-price">
+                    <span class="billing-plan-amount">$@plan.PricePerMonth</span>
+                    <span class="billing-plan-period">/ мес</span>
+                </div>
+                <div class="billing-plan-divider"></div>
+                <ul class="billing-plan-features">
+                    <li>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        <span>До @FormatCount(plan.MaxClients) клиентов</span>
+                    </li>
+                    <li>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        <span>До @FormatCount(plan.MaxBots) ботов</span>
+                    </li>
+                    <li>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        <span>До @plan.MaxTeamMembers участников</span>
+                    </li>
+                    <li>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        <span>AI workflow: @FormatCount(plan.MaxAiExecutions)</span>
+                        <span class="billing-tooltip-wrap">
+                            <svg class="billing-tooltip-trigger" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            <span class="billing-tooltip">Выполнения AI-действий внутри запущенных ботов (генерация текста, фильтрация, классификация)</span>
+                        </span>
+                    </li>
+                    <li>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        <span>AI конструктор: @FormatCount(plan.MaxAiBuilder)</span>
+                        <span class="billing-tooltip-wrap">
+                            <svg class="billing-tooltip-trigger" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            <span class="billing-tooltip">Генерации через визуальный AI-конструктор при создании и редактировании workflow</span>
+                        </span>
+                    </li>
+                    @if (plan.HasAnalytics)
+                    {
+                        <li>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span>Аналитика</span>
+                        </li>
+                    }
+                    @if (plan.HasApiAccess)
+                    {
+                        <li>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span>API доступ</span>
+                        </li>
+                    }
+                </ul>
+                @if (isCurrent)
+                {
+                    <button class="billing-plan-btn billing-plan-btn-active" disabled>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Активен
+                    </button>
+                }
+                else
+                {
+                    <button class="billing-plan-btn" @onclick="() => SelectPlan(plan.Slug)" disabled="@_busy">
+                        Выбрать
+                    </button>
+                }
+            </div>
+        }
+    </div>
+
+    @if (!string.IsNullOrEmpty(_msg))
+    {
+        <div class="settings-alert @(isSuccess ? "settings-alert-success" : "settings-alert-danger")" style="margin-top: 1.5rem;">
+            <span>@_msg</span>
+        </div>
+    }
+}
+
+@code {
+    private IReadOnlyList<SubscriptionPlanDto>? _plans;
+    private bool isLoading = true;
+    private bool _busy;
+    private bool isSuccess;
+    private string? _msg;
+    private string? loadError;
+    private string _currentPlan = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var plansTask = Billing.GetSubscriptionPlansAsync();
+            var overviewTask = Billing.GetBillingOverviewAsync();
+            await Task.WhenAll(plansTask, overviewTask);
+            _plans = await plansTask;
+            var overview = await overviewTask;
+            _currentPlan = overview?.PlanSlug ?? "";
+        }
+        catch (Exception ex)
+        {
+            loadError = $"Не удалось загрузить тарифы: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SelectPlan(string slug)
+    {
+        _busy = true;
+        _msg = null;
+        isSuccess = false;
+        try
+        {
+            var ok = await Billing.ChangeSubscriptionPlanAsync(slug);
+            isSuccess = ok;
+            _msg = ok ? $"План успешно изменён на {slug}" : "Не удалось сменить план";
+        }
+        catch (Exception ex)
+        {
+            _msg = ex.Message;
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private static string FormatCount(int max) => max >= int.MaxValue - 1000 ? "∞" : max.ToString();
+}

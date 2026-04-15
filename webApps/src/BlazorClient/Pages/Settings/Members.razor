@@ -12,7 +12,13 @@
 
 <div class="settings-page-header">
     <div>
-        <h1 class="settings-page-title">Участники</h1>
+        <h1 class="settings-page-title">
+            Участники
+            @if (!isLoading && members.Any())
+            {
+                <span class="members-count">@members.Count</span>
+            }
+        </h1>
         <p class="settings-page-subtitle">Управление участниками вашей компании</p>
     </div>
 </div>

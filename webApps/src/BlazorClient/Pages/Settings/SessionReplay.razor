@@ -109,17 +109,22 @@
                 {
                     <!-- Переменные -->
                     <div class="replay-variables">
-                        @if (_variables.Any())
+                        @{
+                            var globalVariables = GetGlobalVariables();
+                            var sessionVariableItems = GetSessionVariableItems();
+                        }
+
+                        @if (globalVariables.Any() || sessionVariableItems.Any())
                         {
                             <div class="replay-var-search">
                                 <span class="oi oi-magnifying-glass"></span>
                                 <input type="text" placeholder="Поиск..." @bind="_varSearch" @bind:event="oninput"/>
                             </div>
 
-                            @if (GetGlobalVariables().Any())
+                            @if (globalVariables.Any())
                             {
                                 <div class="replay-var-group-title">Атрибуты ($global)</div>
-                                @foreach (var kv in GetGlobalVariables())
+                                @foreach (var kv in globalVariables)
                                 {
                                     <div class="replay-var-item var-global">
                                         <code class="replay-var-name">@kv.Key</code>
@@ -128,14 +133,14 @@
                                 }
                             }
 
-                            @if (GetSessionVariables().Any())
+                            @if (sessionVariableItems.Any())
                             {
                                 <div class="replay-var-group-title">Переменные сессии</div>
-                                @foreach (var kv in GetSessionVariables())
+                                @foreach (var item in sessionVariableItems)
                                 {
                                     <div class="replay-var-item var-session">
-                                        <code class="replay-var-name">@GetVariableDisplayName(kv.Key)</code>
-                                        <pre class="replay-var-value">@(string.IsNullOrEmpty(kv.Value) ? "(пусто)" : kv.Value)</pre>
+                                        <code class="replay-var-name">@item.DisplayName</code>
+                                        <pre class="replay-var-value">@item.Value</pre>
                                     </div>
                                 }
                             }

@@ -65,13 +65,6 @@ else
             <div class="settings-stat-label">Приглашений</div>
             <div class="settings-stat-value">@invitationsCount</div>
         </div>
-        <div class="settings-stat-card">
-            <div class="settings-stat-icon" style="background: #fff7ed;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-            </div>
-            <div class="settings-stat-label">Лимит участников</div>
-            <div class="settings-stat-value">@company.MaxUsers</div>
-        </div>
     </div>
 
     @if (!string.IsNullOrWhiteSpace(company.Description))

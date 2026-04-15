@@ -39,6 +39,12 @@ services.AddGrpcClient<UserCompanyService.UserCompanyServiceClient>(o =>
     o.Address = new Uri(address);
 });
 
+services.AddGrpcClient<global::Billing.Grpc.BillingQuotaService.BillingQuotaServiceClient>(o =>
+{
+    var address = builder.Configuration["Services:BillingServiceGrpc"] ?? "http://billing-service:8081";
+    o.Address = new Uri(address);
+});
+
 services.AddScoped<Query>();
 services.AddScoped<CompanyMutation>();
 services.AddScoped<CompanyMemberMutation>();

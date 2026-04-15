@@ -360,6 +360,17 @@
     padding: 1.5rem;
 }
 
+.bots-modal-error {
+    margin-bottom: 1rem;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #fecaca;
+    background: #fef2f2;
+    color: #b91c1c;
+    font-size: 0.86rem;
+    line-height: 1.45;
+}
+
 .bots-modal-footer {
     display: flex;
     align-items: center;

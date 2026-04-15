@@ -36,13 +36,35 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
         var response = await http.SendAsync(request, cancellationToken);
         var json = await response.Content.ReadAsStringAsync(cancellationToken);
         if (!response.IsSuccessStatusCode)
-            return new GenerateWorkflowFromAiResult(false, null, [$"Ошибка сервера {(int)response.StatusCode}: {json}"]);
+        {
+            var parsedErrors = TryExtractGenerateWorkflowErrors(json);
+            if (parsedErrors.Count > 0)
+                return new GenerateWorkflowFromAiResult(false, null, parsedErrors);
+
+            return new GenerateWorkflowFromAiResult(false, null, [$"Ошибка сервера {(int)response.StatusCode}. Попробуйте позже."]);
+        }
 
         var dto = JsonSerializer.Deserialize<GenerateWorkflowFromAiResponseDto>(json, WebJsonOptions);
         if (dto == null)
             return new GenerateWorkflowFromAiResult(false, null, ["Пустой ответ сервера."]);
 
         return new GenerateWorkflowFromAiResult(dto.Success, dto.WorkflowJson, dto.Errors ?? []);
+    }
+
+    private static List<string> TryExtractGenerateWorkflowErrors(string json)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+            return [];
+
+        try
+        {
+            var dto = JsonSerializer.Deserialize<GenerateWorkflowFromAiResponseDto>(json, WebJsonOptions);
+            return dto?.Errors?.Where(e => !string.IsNullOrWhiteSpace(e)).ToList() ?? [];
+        }
+        catch
+        {
+            return [];
+        }
     }
 
     private sealed class GenerateWorkflowFromAiClientRequest
@@ -645,8 +667,20 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
 
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         var gqlResponse = JsonSerializer.Deserialize<GraphQLResponse<T>>(jsonString, options);
+        if (gqlResponse == null)
+            throw new InvalidOperationException("Сервер вернул пустой ответ.");
 
-        return gqlResponse!.Data!;
+        var firstGraphQlError = gqlResponse.Errors?
+            .Select(e => e.Message)
+            .FirstOrDefault(m => !string.IsNullOrWhiteSpace(m));
+
+        if (!string.IsNullOrWhiteSpace(firstGraphQlError))
+            throw new InvalidOperationException(firstGraphQlError);
+
+        if (gqlResponse.Data == null)
+            throw new InvalidOperationException("Не удалось обработать ответ сервера.");
+
+        return gqlResponse.Data;
     }
     
     public async Task RefreshChannelWebhookAsync(Guid channelId)

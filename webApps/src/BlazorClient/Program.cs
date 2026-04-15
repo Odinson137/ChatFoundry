@@ -25,6 +25,7 @@ builder.Services.AddScoped<IIdentityApiClient, IdentityApiClient>();
 builder.Services.AddScoped<ICompanyApiClient, CompanyApiClient>();
 builder.Services.AddScoped<IFileApiClient, FileApiClient>();
 builder.Services.AddScoped<IWorkflowSchemaService, WorkflowSchemaService>();
+builder.Services.AddScoped<IBillingApiClient, BillingApiClient>();
 
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddAuthorizationCore();

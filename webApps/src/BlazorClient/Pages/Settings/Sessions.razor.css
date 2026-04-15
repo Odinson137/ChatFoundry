@@ -162,6 +162,23 @@
     color: #94a3b8;
 }
 
+.sess-filter-empty {
+    padding: 32px 16px;
+    text-align: center;
+    color: #64748b;
+}
+
+.sess-filter-empty p {
+    margin: 0 0 8px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.sess-filter-empty small {
+    font-size: 0.85rem;
+    color: #94a3b8;
+}
+
 
 
 .sess-pagination {

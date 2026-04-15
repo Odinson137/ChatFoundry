@@ -6,6 +6,7 @@ using Shared.Application.Events;
 using Shared.Infrastructure.GraphQl;
 using WorkflowService.Data;
 using WorkflowService.Entities;
+using WorkflowService.Services;
 
 namespace WorkflowService.GraphQL.Mutations;
 
@@ -15,8 +16,23 @@ public class BotMutation(IHttpContextAccessor httpContextAccessor) : BaseGraphQl
     public async Task<AddBotPayload> AddBotAsync(
         AddBotInput input,
         [Service] WorkflowDbContext context,
-        [Service] ITopicProducer<TelegramSetWebhookEvent> producer)
+        [Service] ITopicProducer<TelegramSetWebhookEvent> producer,
+        [Service] BillingQuotaGuard billing,
+        CancellationToken ct)
     {
+        if (CompanyId.HasValue)
+        {
+            var count = await context.Bots.CountAsync(b => b.CompanyId == CompanyId, ct);
+            try
+            {
+                await billing.EnsureQuotaAsync(CompanyId, "bots", count, ct);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new GraphQLException(ex.Message);
+            }
+        }
+
         var bot = new Bot
         {
             Name = input.Name,

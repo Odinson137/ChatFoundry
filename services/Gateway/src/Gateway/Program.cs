@@ -108,6 +108,16 @@ builder.Services.AddAuthorization(options =>
         });
     });
 
+    options.AddPolicy("billing", p =>
+    {
+        p.RequireAuthenticatedUser();
+        p.RequireAssertion(ctx =>
+        {
+            var scopes = ctx.User.FindFirst("scope")?.Value.Split(' ', StringSplitOptions.RemoveEmptyEntries) ?? [];
+            return scopes.Contains("billing");
+        });
+    });
+
 });
 
 builder.Services
