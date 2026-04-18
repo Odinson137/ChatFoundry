@@ -2,7 +2,7 @@ using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WorkflowService.Api;
+using WorkflowService.Models;
 using WorkflowService.Services;
 
 namespace WorkflowService.Controllers;

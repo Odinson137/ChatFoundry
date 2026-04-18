@@ -28,13 +28,18 @@ public class WorkflowAiGenerationService(
             ? BuildMergeContent(userPrompt, currentWorkflow.Value)
             : BuildReplaceContent(userPrompt);
 
-        var raw = await openAi.GetJsonObjectCompletionAsync(system, userContent, cancellationToken);
+        string raw;
+        try
+        {
+            raw = await openAi.GetJsonObjectCompletionAsync(system, userContent, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            return new WorkflowAiGenerateResult(false, null, [$"Ошибка OpenAI: {ex.Message}"]);
+        }
 
         if (string.IsNullOrWhiteSpace(raw))
             return new WorkflowAiGenerateResult(false, null, ["Пустой ответ от AI. Проверьте ключ OpenAI в конфигурации сервиса."]);
-
-        if (raw.StartsWith("Error:", StringComparison.OrdinalIgnoreCase))
-            return new WorkflowAiGenerateResult(false, null, [raw]);
 
         raw = StripMarkdownCodeFence(raw);
 

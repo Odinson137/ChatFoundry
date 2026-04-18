@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace WorkflowService.Api;
+namespace WorkflowService.Models;
 
 public sealed class GenerateWorkflowFromAiHttpRequest
 {

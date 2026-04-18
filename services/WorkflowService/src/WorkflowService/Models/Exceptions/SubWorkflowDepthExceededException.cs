@@ -1,4 +1,4 @@
-namespace WorkflowService.Exceptions;
+namespace WorkflowService.Models.Exceptions;
 
 /// <summary>
 /// Thrown when SubWorkflow nesting depth exceeds the allowed maximum (e.g. possible infinite recursion).

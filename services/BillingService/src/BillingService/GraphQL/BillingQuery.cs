@@ -18,10 +18,31 @@ public class BillingQuery(IHttpContextAccessor httpContextAccessor) : BaseGraphQ
         if (!CompanyId.HasValue)
             return null;
 
-        var (sub, _) = await account.EnsureCompanyAsync(CompanyId.Value, ct);
+        var sub = await db.CompanySubscriptions
+            .Include(x => x.Plan)
+            .Include(x => x.PendingPlan)
+            .FirstOrDefaultAsync(x => x.CompanyId == CompanyId.Value, ct);
+
+        if (sub is null)
+            (sub, _) = await account.EnsureCompanyAsync(CompanyId.Value, ct);
+
         var plan = await db.SubscriptionPlans.AsNoTracking().FirstAsync(p => p.Id == sub.PlanId, ct);
         var balance = await db.CompanyBalances.AsNoTracking().FirstOrDefaultAsync(b => b.CompanyId == CompanyId.Value, ct);
-        var usage = await account.GetOrCreateUsageRecordAsync(CompanyId.Value, ct);
+
+        var (pStart, pEnd) = BillingAccountService.GetSubscriptionPeriod(sub);
+        var usage = await account.GetOrCreateUsageRecordAsync(CompanyId.Value, pStart, pEnd, ct);
+
+        string? pendingPlanSlug = null;
+        DateTime? pendingChangeAt = null;
+        if (sub.PendingPlanId.HasValue)
+        {
+            pendingPlanSlug = sub.PendingPlan?.Slug
+                ?? await db.SubscriptionPlans.AsNoTracking()
+                    .Where(p => p.Id == sub.PendingPlanId.Value)
+                    .Select(p => p.Slug)
+                    .FirstOrDefaultAsync(ct);
+            pendingChangeAt = sub.CurrentPeriodEnd;
+        }
 
         static int Cap(int v) => v >= int.MaxValue - 1 ? int.MaxValue : v;
 
@@ -39,7 +60,9 @@ public class BillingQuery(IHttpContextAccessor httpContextAccessor) : BaseGraphQ
             usage.AiBuilderRequestsUsed,
             Cap(plan.MaxAiBuilderRequestsPerMonth),
             plan.HasAnalytics,
-            plan.HasApiAccess);
+            plan.HasApiAccess,
+            pendingPlanSlug,
+            pendingChangeAt);
     }
 
     public async Task<IReadOnlyList<BalanceTransactionDto>> BalanceTransactions(

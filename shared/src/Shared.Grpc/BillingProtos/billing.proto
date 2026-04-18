@@ -37,6 +37,8 @@ message GetCompanyPlanResponse {
   int32 max_ai_builder_requests = 7;
   bool has_analytics = 8;
   bool has_api_access = 9;
+  string pending_plan_slug = 10;
+  string pending_change_at = 11;
 }
 
 message IncrementUsageRequest {

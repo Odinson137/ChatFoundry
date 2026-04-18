@@ -320,24 +320,58 @@
 
                         <div class="mb-3">
                             <label class="form-label">Заголовки</label>
-                            @foreach (var header in httpData.Headers.ToList())
-                            {
-                                <div class="input-group mb-2">
-                                    <input type="text" class="form-control" placeholder="Header Name" value="@header.Key"
-                                           @onchange="@(e => { var newKey = e.Value.ToString(); if (!string.IsNullOrWhiteSpace(newKey)) { httpData.Headers.Remove(header.Key); httpData.Headers[newKey] = header.Value; }})"/>
-                                    <input type="text"
-                                           class="form-control"
-                                           placeholder="Header Value"
-                                           value="@ToDisplayText(httpData.Headers[header.Key])"
-                                           @oninput="e => { httpData.Headers[header.Key] = FromDisplayText(e.Value?.ToString() ?? string.Empty); OnWorkflowChanged(); }" />
-                                    <button class="btn btn-outline-danger" @onclick="() => httpData.Headers.Remove(header.Key)">
-                                        <span class="oi oi-trash"></span>
-                                    </button>
-                                </div>
-                            }
-                            <button class="btn btn-sm btn-outline-primary" @onclick="() => AddHeader(httpData)">
+                            <div class="designer-header-list">
+                                @foreach (var header in httpData.Headers.ToList())
+                                {
+                                    var isExpanded = _expandedHeaderKey == header.Key;
+                                    <div class="designer-header-item @(isExpanded ? "designer-header-item--open" : "")">
+                                        <div class="designer-header-item-row">
+                                            <button type="button" class="designer-header-toggle" title="Значение"
+                                                    @onclick="() => { _expandedHeaderKey = isExpanded ? null : header.Key; }">
+                                                <span class="oi oi-chevron-bottom"></span>
+                                            </button>
+                                            <input type="text"
+                                                   class="designer-header-name-input"
+                                                   placeholder="Content-Type"
+                                                   value="@header.Key"
+                                                   @onchange="@(e => { var newKey = e.Value?.ToString() ?? ""; if (!string.IsNullOrWhiteSpace(newKey) && newKey != header.Key) { var val = httpData.Headers[header.Key]; httpData.Headers.Remove(header.Key); httpData.Headers[newKey] = val; if (_expandedHeaderKey == header.Key) _expandedHeaderKey = newKey; OnWorkflowChanged(); } })"/>
+                                            <button type="button" class="designer-header-remove" title="Удалить заголовок"
+                                                    @onclick="() => { if (_expandedHeaderKey == header.Key) _expandedHeaderKey = null; RemoveHeader(httpData, header.Key); }">
+                                                <span class="oi oi-x"></span>
+                                            </button>
+                                        </div>
+                                        @if (isExpanded)
+                                        {
+                                            <div class="designer-header-value-area">
+                                                <div class="designer-header-value-wrap">
+                                                    <input type="text"
+                                                           class="form-control font-monospace designer-header-value-input"
+                                                           placeholder="application/json"
+                                                           value="@ToDisplayText(httpData.Headers[header.Key])"
+                                                           @oninput="e => { httpData.Headers[header.Key] = FromDisplayText(e.Value?.ToString() ?? string.Empty); OnWorkflowChanged(); }" />
+                                                    <button type="button" class="designer-header-var-btn"
+                                                            title="Вставить переменную"
+                                                            @onclick="() => ShowVariablePicker(v => InsertVariableIntoMapping(httpData.Headers, header.Key, v))">
+                                                        <span class="oi oi-code"></span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                            <button type="button" class="designer-header-add" @onclick="() => AddHeader(httpData)">
                                 <span class="oi oi-plus"></span> Добавить заголовок
                             </button>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="http-continue-on-error-@node.Id"
+                                       checked="@httpData.ContinueOnError"
+                                       @onchange="e => { httpData.ContinueOnError = GetCheckboxChecked(e); OnWorkflowChanged(); }"/>
+                                <label class="form-check-label" for="http-continue-on-error-@node.Id">При ошибке продолжать работу</label>
+                            </div>
+                            <small class="form-text text-muted">Если выключено — сессия завершится при ошибке запроса.</small>
                         </div>
                     }
 
@@ -367,6 +401,15 @@
                                 <label class="form-check-label" for="ai-include-context-@node.Id">Учитывать контекст чата</label>
                             </div>
                             <small class="form-text text-muted">AI получит историю сообщений текущего диалога.</small>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="ai-continue-on-error-@node.Id"
+                                       checked="@aiData.ContinueOnError"
+                                       @onchange="e => { aiData.ContinueOnError = GetCheckboxChecked(e); OnWorkflowChanged(); }"/>
+                                <label class="form-check-label" for="ai-continue-on-error-@node.Id">При ошибке продолжать работу</label>
+                            </div>
+                            <small class="form-text text-muted">Если выключено — сессия завершится при ошибке AI-запроса.</small>
                         </div>
                     }
 

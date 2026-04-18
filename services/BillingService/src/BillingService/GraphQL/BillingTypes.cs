@@ -14,7 +14,9 @@ public record BillingOverviewDto(
     int AiBuilderUsed,
     int MaxAiBuilder,
     bool HasAnalytics,
-    bool HasApiAccess);
+    bool HasApiAccess,
+    string? PendingPlanSlug,
+    DateTime? PendingChangeAt);
 
 public record BalanceTransactionDto(
     Guid Id,
@@ -38,3 +40,10 @@ public record SubscriptionPlanDto(
     bool HasApiAccess);
 
 public record TopUpPayload(bool Success, string? PaymentUrl, string? Error);
+
+public record ChangePlanResultDto(
+    bool Success,
+    string ResultType,
+    string? PendingPlanSlug,
+    DateTime? PendingChangeAt,
+    decimal? CreditApplied);

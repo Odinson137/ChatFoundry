@@ -26,6 +26,7 @@ public class HttpRequestNodeData : NodeData
     public string Url { get; set; } = string.Empty;
     public string? Body { get; set; }
     public Dictionary<string, string> Headers { get; set; } = new();
+    public bool ContinueOnError { get; set; }
 }
 
 public class MessageNodeData : NodeData
@@ -103,6 +104,7 @@ public class AIGenerateNodeData : NodeData
     /// Учитывать контекст чата текущей сессии (сообщения клиента и бота в этом диалоге).
     /// </summary>
     public bool IncludeChatContext { get; set; }
+    public bool ContinueOnError { get; set; }
 }
 
 /// <summary>

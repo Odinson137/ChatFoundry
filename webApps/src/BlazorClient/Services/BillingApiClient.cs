@@ -32,6 +32,8 @@ public class BillingApiClient(HttpClient http) : IBillingApiClient
                 maxAiBuilder
                 hasAnalytics
                 hasApiAccess
+                pendingPlanSlug
+                pendingChangeAt
               }
             }
             """;
@@ -85,16 +87,22 @@ public class BillingApiClient(HttpClient http) : IBillingApiClient
         return data.SubscriptionPlans ?? [];
     }
 
-    public async Task<bool> ChangeSubscriptionPlanAsync(string planSlug,
+    public async Task<ChangePlanResultDto?> ChangeSubscriptionPlanAsync(string planSlug,
         CancellationToken cancellationToken = default)
     {
         var query = """
             mutation($slug: String!) {
-              changeSubscriptionPlan(planSlug: $slug)
+              changeSubscriptionPlan(planSlug: $slug) {
+                success
+                resultType
+                pendingPlanSlug
+                pendingChangeAt
+                creditApplied
+              }
             }
             """;
         var variables = new { slug = planSlug };
-        var data = await ExecuteGraphQl<ChangePlanData>(query, variables, cancellationToken);
+        var data = await ExecuteGraphQl<ChangePlanMutationData>(query, variables, cancellationToken);
         return data.ChangeSubscriptionPlan;
     }
 
@@ -144,9 +152,9 @@ public class BillingApiClient(HttpClient http) : IBillingApiClient
         public List<SubscriptionPlanDto>? SubscriptionPlans { get; set; }
     }
 
-    private sealed class ChangePlanData
+    private sealed class ChangePlanMutationData
     {
-        public bool ChangeSubscriptionPlan { get; set; }
+        public ChangePlanResultDto? ChangeSubscriptionPlan { get; set; }
     }
 
     private sealed class TopUpMutationData

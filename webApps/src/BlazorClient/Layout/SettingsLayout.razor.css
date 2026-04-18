@@ -110,17 +110,42 @@
 }
 
 .settings-nav-label {
-    padding: 16px 8px 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    padding: 12px 8px 6px;
     font-size: 0.6875rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: #9ca3af;
     user-select: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.15s ease;
+    text-align: left;
+    font-family: inherit;
+    line-height: 1;
+}
+
+.settings-nav-label:hover {
+    color: #6b7280;
 }
 
 .settings-nav-section:first-child .settings-nav-label {
     padding-top: 8px;
+}
+
+.settings-nav-chevron {
+    flex-shrink: 0;
+    color: #9ca3af;
+    transition: transform 0.2s ease;
+}
+
+.settings-nav-section--collapsed .settings-nav-chevron {
+    transform: rotate(-90deg);
 }
 
 /* ========== Content area ========== */

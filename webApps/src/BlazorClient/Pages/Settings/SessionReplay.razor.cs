@@ -22,7 +22,9 @@ public interface IReplayDataProvider
 
 public partial class SessionReplay : IDisposable, IReplayDataProvider
 {
-    private sealed record SessionVariableItem(string DisplayName, string Value);
+    private sealed record VariableLine(string Label, string FullValue, string DisplayValue);
+
+    private sealed record SessionVariableItem(string DisplayName, List<VariableLine> Lines, Guid? NodeId = null);
 
     [Parameter] public Guid SessionId { get; set; }
 
@@ -38,6 +40,9 @@ public partial class SessionReplay : IDisposable, IReplayDataProvider
     private int _activeTab;
     private int _selectedStepIndex = -1;
     private string _varSearch = "";
+    private HashSet<Guid> _expandedNodes = new();
+    private string? _modalValue;
+    private string? _modalLabel;
 
     private double _zoomLevel = 1.0;
     private int ZoomPercent => (int)Math.Round(_zoomLevel * 100);
@@ -280,48 +285,107 @@ public partial class SessionReplay : IDisposable, IReplayDataProvider
     {
         var variables = GetSessionVariables();
         var items = new List<SessionVariableItem>();
-        var consumedKeys = new HashSet<string>(StringComparer.Ordinal);
+
+        var nodeGroups = new Dictionary<Guid, List<KeyValuePair<string, string>>>();
+        var nonNodeVariables = new List<KeyValuePair<string, string>>();
 
         foreach (var kv in variables)
         {
-            if (consumedKeys.Contains(kv.Key))
-                continue;
-
-            if (TryParseNodeVariableKey(kv.Key, out var nodeId, out var suffix)
-                && suffix.Equals("error", StringComparison.OrdinalIgnoreCase)
-                && string.IsNullOrWhiteSpace(kv.Value))
+            if (TryParseNodeVariableKey(kv.Key, out var nodeId, out var suffix))
             {
-                continue;
-            }
-
-            if (TryParseNodeVariableKey(kv.Key, out nodeId, out suffix)
-                && (suffix.Equals("output", StringComparison.OrdinalIgnoreCase)
-                    || suffix.Equals("messageKind", StringComparison.OrdinalIgnoreCase)))
-            {
-                var partnerSuffix = suffix.Equals("output", StringComparison.OrdinalIgnoreCase) ? "messageKind" : "output";
-                var partnerKey = $"$node.{nodeId}.{partnerSuffix}";
-                var partner = variables.FirstOrDefault(v => string.Equals(v.Key, partnerKey, StringComparison.Ordinal));
-
-                if (!string.IsNullOrEmpty(partner.Key) && !consumedKeys.Contains(partner.Key))
-                {
-                    var outputValue = suffix.Equals("output", StringComparison.OrdinalIgnoreCase) ? kv.Value : partner.Value;
-                    var messageKindValue = suffix.Equals("messageKind", StringComparison.OrdinalIgnoreCase) ? kv.Value : partner.Value;
-
-                    items.Add(new SessionVariableItem(
-                        GetNodeLabel(nodeId),
-                        $"Вывод: {DisplayVariableValue(outputValue)}\nТип сообщения: {DisplayMessageKindValue(messageKindValue)}"));
-
-                    consumedKeys.Add(kv.Key);
-                    consumedKeys.Add(partner.Key);
+                if (suffix.Equals("error", StringComparison.OrdinalIgnoreCase) && string.IsNullOrWhiteSpace(kv.Value))
                     continue;
+
+                if (!nodeGroups.ContainsKey(nodeId))
+                    nodeGroups[nodeId] = new List<KeyValuePair<string, string>>();
+                nodeGroups[nodeId].Add(new KeyValuePair<string, string>(suffix, kv.Value));
+            }
+            else
+            {
+                nonNodeVariables.Add(kv);
+            }
+        }
+
+        foreach (var (nodeId, vars) in nodeGroups)
+        {
+            var label = GetNodeLabel(nodeId);
+            var lines = new List<VariableLine>();
+
+            var outputVar = vars.FirstOrDefault(v => v.Key.Equals("output", StringComparison.OrdinalIgnoreCase));
+            var messageKindVar = vars.FirstOrDefault(v => v.Key.Equals("messageKind", StringComparison.OrdinalIgnoreCase));
+
+            if (!string.IsNullOrEmpty(outputVar.Key))
+            {
+                lines.Add(BuildLine("Вывод", outputVar.Value));
+                if (!string.IsNullOrEmpty(messageKindVar.Key))
+                    lines.Add(new VariableLine("Тип сообщения", messageKindVar.Value, DisplayMessageKindValue(messageKindVar.Value)));
+
+                foreach (var v in vars.Where(v =>
+                    !v.Key.Equals("output", StringComparison.OrdinalIgnoreCase) &&
+                    !v.Key.Equals("messageKind", StringComparison.OrdinalIgnoreCase)))
+                {
+                    lines.Add(BuildLine(TranslateSuffix(v.Key), v.Value));
+                }
+            }
+            else
+            {
+                foreach (var v in vars)
+                {
+                    if (v.Key.Equals("messageKind", StringComparison.OrdinalIgnoreCase))
+                        lines.Add(new VariableLine("Тип сообщения", v.Value, DisplayMessageKindValue(v.Value)));
+                    else
+                        lines.Add(BuildLine(TranslateSuffix(v.Key), v.Value));
                 }
             }
 
-            items.Add(new SessionVariableItem(GetVariableDisplayName(kv.Key), DisplayVariableValue(kv.Value)));
-            consumedKeys.Add(kv.Key);
+            if (lines.Count > 0)
+                items.Add(new SessionVariableItem(label, lines, nodeId));
+        }
+
+        foreach (var kv in nonNodeVariables)
+        {
+            var line = BuildLine(GetVariableDisplayName(kv.Key), kv.Value);
+            items.Add(new SessionVariableItem(line.Label, [line]));
         }
 
         return items;
+    }
+
+    private static VariableLine BuildLine(string label, string rawValue)
+    {
+        if (string.IsNullOrWhiteSpace(rawValue))
+            return new VariableLine(label, "", "(пусто)");
+
+        var trimmed = rawValue.Trim();
+
+        if (trimmed.Equals("true", StringComparison.OrdinalIgnoreCase))
+            return new VariableLine(label, rawValue, "Да");
+        if (trimmed.Equals("false", StringComparison.OrdinalIgnoreCase))
+            return new VariableLine(label, rawValue, "Нет");
+
+        if (IsJson(trimmed))
+            return new VariableLine(label, rawValue, FormatJson(trimmed));
+
+        return new VariableLine(label, rawValue, trimmed);
+    }
+
+    private static bool IsJson(string value)
+    {
+        var t = value.Trim();
+        return (t.StartsWith("{") && t.EndsWith("}")) || (t.StartsWith("[") && t.EndsWith("]"));
+    }
+
+    private static string FormatJson(string value)
+    {
+        try
+        {
+            var parsed = System.Text.Json.JsonDocument.Parse(value.Trim());
+            return System.Text.Json.JsonSerializer.Serialize(parsed.RootElement, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+        }
+        catch
+        {
+            return value;
+        }
     }
 
     /// <summary>Для переменных $node.{guid}.suffix возвращает "Название блока · suffix", иначе ключ как есть.</summary>
@@ -364,8 +428,65 @@ public partial class SessionReplay : IDisposable, IReplayDataProvider
         return true;
     }
 
+    private static string TranslateSuffix(string suffix) => suffix.ToLowerInvariant() switch
+    {
+        "statuscode" => "Код статуса",
+        "status" => "Статус",
+        "success" => "Успешно",
+        "error" => "Ошибка",
+        "output" => "Вывод",
+        "messagekind" => "Тип сообщения",
+        "response" => "Ответ",
+        "request" => "Запрос",
+        "url" => "URL",
+        "duration" => "Длительность",
+        "input" => "Ввод",
+        "result" => "Результат",
+        "data" => "Данные",
+        "headers" => "Заголовки",
+        "body" => "Тело запроса",
+        _ => suffix
+    };
+
     private static string DisplayVariableValue(string? value)
-        => string.IsNullOrWhiteSpace(value) ? "(пусто)" : value;
+    {
+        if (string.IsNullOrWhiteSpace(value)) return "(пусто)";
+        var trimmed = value.Trim();
+        if (trimmed.Equals("true", StringComparison.OrdinalIgnoreCase)) return "Да";
+        if (trimmed.Equals("false", StringComparison.OrdinalIgnoreCase)) return "Нет";
+        return IsJson(trimmed) ? FormatJson(trimmed) : trimmed;
+    }
+
+    private void OpenValueModal(string label, string fullValue)
+    {
+        _modalLabel = label;
+        _modalValue = IsJson(fullValue) ? FormatJson(fullValue) : fullValue;
+        StateHasChanged();
+    }
+
+    private void CloseValueModal()
+    {
+        _modalValue = null;
+        _modalLabel = null;
+        StateHasChanged();
+    }
+
+    private string GetNodeColorClass(Guid? nodeId)
+    {
+        if (nodeId == null) return "";
+        if (_nodeStats == null || !_nodeStats.TryGetValue(nodeId.Value, out var stats)) return "";
+
+        if (stats.Failed > 0) return "var-node-failed";
+        if (stats.Completed > 0 && stats.Failed == 0) return "var-node-completed";
+        return "var-node-current";
+    }
+
+    private void ToggleNode(Guid nodeId)
+    {
+        if (!_expandedNodes.Remove(nodeId))
+            _expandedNodes.Add(nodeId);
+        StateHasChanged();
+    }
 
     private static string DisplayMessageKindValue(string? value)
     {

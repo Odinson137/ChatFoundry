@@ -1,4 +1,4 @@
-namespace WorkflowService.Options;
+namespace WorkflowService.Configurations;
 
 public class OpenAiOptions
 {

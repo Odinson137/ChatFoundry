@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace WorkflowService.Models.Node;
 
-public sealed class HttpRequestNodeData : NodeData
+public sealed class HttpRequestNodeData : NodeData, IContinueOnError
 {
     /// <summary>
     /// HTTP Method (GET, POST, PUT, DELETE)
@@ -23,4 +23,10 @@ public sealed class HttpRequestNodeData : NodeData
     /// Request Headers. Values can contain variables.
     /// </summary>
     public Dictionary<string, string> Headers { get; set; } = new();
+
+    /// <summary>
+    /// При ошибке HTTP-запроса продолжать выполнение воркфлоу к следующей ноде.
+    /// Если false — сессия завершается при ошибке.
+    /// </summary>
+    public bool ContinueOnError { get; set; }
 }

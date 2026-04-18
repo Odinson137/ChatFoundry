@@ -1,4 +1,5 @@
 using BillingService.Data;
+using BillingService.Entities;
 using BillingService.Enums;
 using Microsoft.EntityFrameworkCore;
 
@@ -35,6 +36,7 @@ public class BillingCycleService(
 
         var due = await db.CompanySubscriptions
             .Include(s => s.Plan)
+            .Include(s => s.PendingPlan)
             .Where(s => s.Status != SubscriptionStatus.Cancelled && s.CurrentPeriodEnd <= now)
             .ToListAsync(ct);
 
@@ -44,6 +46,8 @@ public class BillingCycleService(
             {
                 sub.CurrentPeriodStart = sub.CurrentPeriodEnd;
                 sub.CurrentPeriodEnd = sub.CurrentPeriodEnd.AddMonths(1);
+
+                ApplyPendingPlanChange(sub, logger);
                 sub.ModifiedAt = now;
                 await db.SaveChangesAsync(ct);
                 continue;
@@ -70,6 +74,7 @@ public class BillingCycleService(
         {
             var freePlan = await db.SubscriptionPlans.FirstAsync(p => p.Slug == "free", ct);
             sub.PlanId = freePlan.Id;
+            sub.PendingPlanId = null;
             sub.Status = SubscriptionStatus.Active;
             sub.PastDueSince = null;
             sub.CurrentPeriodStart = now;
@@ -78,5 +83,18 @@ public class BillingCycleService(
             await db.SaveChangesAsync(ct);
             logger.LogInformation("Downgraded company {Company} to free after past due", sub.CompanyId);
         }
+    }
+
+    private static void ApplyPendingPlanChange(CompanySubscription sub, ILogger<BillingCycleService> logger)
+    {
+        if (!sub.PendingPlanId.HasValue)
+            return;
+
+        logger.LogInformation("Company {CompanyId} applying scheduled plan change to {Plan}",
+            sub.CompanyId, sub.PendingPlan?.Slug ?? sub.PendingPlanId.Value.ToString());
+        sub.PlanId = sub.PendingPlanId.Value;
+        sub.PendingPlanId = null;
+        sub.Status = SubscriptionStatus.Active;
+        sub.PastDueSince = null;
     }
 }

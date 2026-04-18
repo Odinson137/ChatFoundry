@@ -18,7 +18,8 @@ public class AIGenerateActionExecutor(
     IVariableService variableService,
     ITopicProducer<ActionCompletedEvent> producer,
     WorkflowGraphParser workflowGraphParser,
-    WorkflowTextRenderer workflowTextRenderer) : IActionExecutor
+    WorkflowTextRenderer workflowTextRenderer,
+    BillingQuotaGuard billingQuotaGuard) : IActionExecutor
 {
     public WorkflowNodeType WorkflowNodeType => WorkflowNodeType.AIGenerate;
 
@@ -40,6 +41,26 @@ public class AIGenerateActionExecutor(
 
         var resolvedPrompt = workflowTextRenderer.RenderText(aiData.Prompt, session);
 
+        try
+        {
+            await billingQuotaGuard.EnsureQuotaAsync(
+                session.Workflow.Bot.CompanyId, "ai_executions", 0, ct);
+        }
+        catch (InvalidOperationException ex)
+        {
+            variableService.SetVariable(session, $"$node.{node.Id}.statusCode", 429);
+            variableService.SetVariable(session, $"$node.{node.Id}.success", false);
+            await variableService.SyncIfDirtyAsync(session, ct);
+            await sessionRepository.SaveAsync(session, ct);
+
+            if (node.Data is not IContinueOnError { ContinueOnError: true }) throw;
+            
+            await producer.Produce(new ActionCompletedEvent(
+                message.Channel, message.ExternalUserId,
+                session.Workflow.Bot.CompanyId, Success: false), ct);
+            return;
+        }
+
         List<(string Role, string Content)>? chatHistory = null;
         if (aiData.IncludeChatContext)
         {
@@ -48,9 +69,31 @@ public class AIGenerateActionExecutor(
             chatHistory.Insert(0, BuildSystemPrompt(session));
         }
 
-        var result = await openAiService.GetCompletionAsync(resolvedPrompt, chatHistory, ct);
+        string result;
+        try
+        {
+            result = await openAiService.GetCompletionAsync(resolvedPrompt, chatHistory, ct);
+        }
+        catch (HttpRequestException ex)
+        {
+            var statusCode = (int)(ex.StatusCode ?? System.Net.HttpStatusCode.InternalServerError);
+            variableService.SetVariable(session, $"$node.{node.Id}.statusCode", statusCode);
+            variableService.SetVariable(session, $"$node.{node.Id}.success", false);
+            await variableService.SyncIfDirtyAsync(session, ct);
+            await sessionRepository.SaveAsync(session, ct);
+
+            if (!aiData.ContinueOnError) throw;
+            
+            await producer.Produce(new ActionCompletedEvent(
+                message.Channel, message.ExternalUserId,
+                session.Workflow.Bot.CompanyId, Success: false), ct);
+            return;
+        }
 
         variableService.SetVariable(session, $"$node.{node.Id}.output", result);
+        variableService.SetVariable(session, $"$node.{node.Id}.statusCode", 200);
+        variableService.SetVariable(session, $"$node.{node.Id}.success", true);
+        
         await variableService.SyncIfDirtyAsync(session, ct);
         await sessionRepository.SaveAsync(session, ct);
 
@@ -85,14 +128,16 @@ public class AIGenerateActionExecutor(
                         var renderedText = workflowTextRenderer.RenderText(msgData.Text, session);
                         list.Add(("assistant", renderedText));
                     }
+
                     break;
                 case WorkflowNodeType.Ask:
                     if (graph.Nodes.TryGetValue(a.NodeId, out var askNode) && askNode.Data is AskNodeData askData
-                        && !string.IsNullOrWhiteSpace(askData.Text))
+                                                                           && !string.IsNullOrWhiteSpace(askData.Text))
                     {
                         var questionText = workflowTextRenderer.RenderText(askData.Text, session);
                         list.Add(("assistant", questionText));
                     }
+
                     if (!string.IsNullOrWhiteSpace(a.Payload))
                         list.Add(("user", a.Payload));
                     break;
@@ -103,6 +148,7 @@ public class AIGenerateActionExecutor(
                     break;
             }
         }
+
         return list;
     }
 
@@ -115,7 +161,8 @@ public class AIGenerateActionExecutor(
             "Always reply in the same language the client uses.";
 
         var globals = session.Variables
-            .Where(kv => kv.Key.StartsWith("$global.", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(kv.Value))
+            .Where(kv => kv.Key.StartsWith("$global.", StringComparison.OrdinalIgnoreCase) &&
+                         !string.IsNullOrWhiteSpace(kv.Value))
             .Select(kv => $"{kv.Key["$global.".Length..]}: {kv.Value}")
             .ToList();
 

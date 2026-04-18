@@ -10,7 +10,7 @@ public class ActionCompletedBillingConsumer(BillingAccountService account, ILogg
     public async Task Consume(ConsumeContext<ActionCompletedEvent> context)
     {
         var msg = context.Message;
-        if (!msg.CountAsAiWorkflowExecution || msg.CompanyId is null)
+        if (!msg.CountAsAiWorkflowExecution || msg.CompanyId is null || !msg.Success)
             return;
 
         try

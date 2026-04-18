@@ -1651,6 +1651,196 @@
     font-size: 0.85rem;
 }
 
+.designer-header-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    border: 1px solid var(--designer-slate-200);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--designer-slate-50);
+}
+
+.designer-header-item {
+    background: #fff;
+    transition: background 0.15s ease;
+}
+
+.designer-header-item:not(:last-child) {
+    border-bottom: 1px solid var(--designer-slate-100);
+}
+
+.designer-header-item--open {
+    background: var(--designer-indigo-50);
+}
+
+.designer-header-item-row {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0 0.25rem 0 0.25rem;
+    height: 34px;
+}
+
+.designer-header-toggle {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--designer-slate-400);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, transform 0.2s ease;
+    padding: 0;
+}
+
+.designer-header-toggle:hover {
+    background: rgba(99, 102, 241, 0.08);
+    color: var(--designer-primary);
+}
+
+.designer-header-item--open .designer-header-toggle {
+    color: var(--designer-primary);
+    transform: rotate(180deg);
+}
+
+.designer-header-toggle .oi {
+    font-size: 0.7rem;
+    transition: transform 0.2s ease;
+}
+
+.designer-header-name-input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    padding: 0 0.25rem;
+    font-size: 0.8125rem;
+    font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, monospace;
+    font-weight: 600;
+    color: var(--designer-slate-800);
+    outline: none;
+}
+
+.designer-header-name-input::placeholder {
+    color: var(--designer-slate-400);
+    font-weight: 400;
+}
+
+.designer-header-remove {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--designer-slate-300);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+    opacity: 0;
+}
+
+.designer-header-item-row:hover .designer-header-remove {
+    opacity: 1;
+}
+
+.designer-header-remove:hover {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.designer-header-remove .oi {
+    font-size: 0.8rem;
+}
+
+.designer-header-value-area {
+    padding: 0 0.625rem 0.625rem 2.75rem;
+}
+
+.designer-header-value-wrap {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--designer-slate-200);
+    border-radius: 8px;
+    background: #fff;
+    padding: 0 0.25rem 0 0.5rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.designer-header-value-wrap:focus-within {
+    border-color: var(--designer-primary);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.designer-header-value-input {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0.35rem 0 !important;
+    background: transparent;
+}
+
+.designer-header-var-btn {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--designer-slate-400);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+    padding: 0;
+}
+
+.designer-header-var-btn:hover {
+    background: var(--designer-indigo-50);
+    color: var(--designer-primary);
+}
+
+.designer-header-var-btn .oi {
+    font-size: 0.8rem;
+}
+
+.designer-header-add {
+    width: 100%;
+    margin-top: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--designer-slate-700);
+    background: #fff;
+    border: 1px solid var(--designer-slate-200);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.designer-header-add:hover {
+    background: var(--designer-indigo-50);
+    border-color: var(--designer-primary);
+    color: var(--designer-primary);
+}
+
+.designer-header-add .oi {
+    font-size: 0.85rem;
+}
+
 .variables-modal-backdrop {
     position: fixed;
     inset: 0;

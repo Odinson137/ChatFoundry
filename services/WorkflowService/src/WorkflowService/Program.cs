@@ -80,14 +80,14 @@ services.AddScoped<IVariableService, VariableService>();
 services.AddHttpClient();
 services.AddHttpClient("OpenAI");
 
-services.Configure<WorkflowService.Options.OpenAiOptions>(
-    builder.Configuration.GetSection(WorkflowService.Options.OpenAiOptions.SectionName));
-services.Configure<WorkflowService.Options.FileServiceOptions>(
-    builder.Configuration.GetSection(WorkflowService.Options.FileServiceOptions.SectionName));
+services.Configure<WorkflowService.Configurations.OpenAiOptions>(
+    builder.Configuration.GetSection(WorkflowService.Configurations.OpenAiOptions.SectionName));
+services.Configure<WorkflowService.Configurations.FileServiceOptions>(
+    builder.Configuration.GetSection(WorkflowService.Configurations.FileServiceOptions.SectionName));
 
 services.AddHttpClient<FileUrlResolver>((sp, client) =>
 {
-    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<WorkflowService.Options.FileServiceOptions>>().Value;
+    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<WorkflowService.Configurations.FileServiceOptions>>().Value;
     client.BaseAddress = new Uri(options.BaseUrl.TrimEnd('/') + "/");
 });
 services.AddScoped<IFileUrlResolver>(sp => sp.GetRequiredService<FileUrlResolver>());

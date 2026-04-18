@@ -21,6 +21,21 @@
     </div>
 </div>
 
+<div class="billing-plan-info">
+    <div class="billing-plan-info-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span><strong>Повышение плана</strong> — смена происходит немедленно, неиспользованная часть текущего периода возвращается на баланс в виде кредита</span>
+    </div>
+    <div class="billing-plan-info-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span><strong>Понижение плана</strong> — текущий план остаётся активным до конца оплаченного периода, затем автоматически переключается на новый</span>
+    </div>
+    <div class="billing-plan-info-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        <span>Кредит за неиспользованный период можно использовать для оплаты будущих подписок</span>
+    </div>
+</div>
+
 @if (loadError != null)
 {
     <div class="settings-alert settings-alert-danger">
@@ -50,10 +65,18 @@ else
         @foreach (var plan in _plans)
         {
             var isCurrent = plan.Slug.Equals(_currentPlan, StringComparison.OrdinalIgnoreCase);
+            var isPending = !isCurrent && plan.Slug.Equals(_pendingPlanSlug, StringComparison.OrdinalIgnoreCase);
+
             <div class="billing-plan @((isCurrent ? "billing-plan-current" : ""))">
                 @if (isCurrent)
                 {
                     <div class="billing-plan-badge">Текущий план</div>
+                }
+                else if (isPending && _pendingChangeAt.HasValue)
+                {
+                    <div class="billing-plan-badge billing-plan-badge-pending">
+                        Запланирован — @_pendingChangeAt.Value.ToString("dd MMM yyyy")
+                    </div>
                 }
                 <div class="billing-plan-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -123,9 +146,24 @@ else
                 </ul>
                 @if (isCurrent)
                 {
-                    <button class="billing-plan-btn billing-plan-btn-active" disabled>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                        Активен
+                    @if (_pendingPlanSlug != null)
+                    {
+                        <button class="billing-plan-btn billing-plan-btn-cancel" @onclick="() => SelectPlan(plan.Slug)" disabled="@_busy">
+                            Отменить смену
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="billing-plan-btn billing-plan-btn-active" disabled>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Активен
+                        </button>
+                    }
+                }
+                else if (isPending)
+                {
+                    <button class="billing-plan-btn billing-plan-btn-pending" disabled>
+                        Ожидает активации
                     </button>
                 }
                 else
@@ -154,6 +192,8 @@ else
     private string? _msg;
     private string? loadError;
     private string _currentPlan = "";
+    private string? _pendingPlanSlug;
+    private DateTime? _pendingChangeAt;
 
     protected override async Task OnInitializedAsync()
     {
@@ -165,6 +205,8 @@ else
             _plans = await plansTask;
             var overview = await overviewTask;
             _currentPlan = overview?.PlanSlug ?? "";
+            _pendingPlanSlug = overview?.PendingPlanSlug;
+            _pendingChangeAt = overview?.PendingChangeAt;
         }
         catch (Exception ex)
         {
@@ -183,13 +225,50 @@ else
         isSuccess = false;
         try
         {
-            var ok = await Billing.ChangeSubscriptionPlanAsync(slug);
-            isSuccess = ok;
-            _msg = ok ? $"План успешно изменён на {slug}" : "Не удалось сменить план";
+            var result = await Billing.ChangeSubscriptionPlanAsync(slug);
+            if (result == null)
+            {
+                _msg = "Не удалось сменить план";
+                return;
+            }
+
+            switch (result.ResultType)
+            {
+                case "UpgradeApplied":
+                    isSuccess = true;
+                    _msg = result.CreditApplied.HasValue
+                        ? $"План изменён на {slug}. Зачислен кредит: {result.CreditApplied.Value:F2} USDT"
+                        : $"План изменён на {slug}";
+                    _currentPlan = slug;
+                    _pendingPlanSlug = null;
+                    _pendingChangeAt = null;
+                    break;
+
+                case "DowngradeScheduled":
+                    isSuccess = true;
+                    _pendingPlanSlug = slug;
+                    _pendingChangeAt = result.PendingChangeAt;
+                    _msg = $"Переход на план {slug} запланирован на {_pendingChangeAt:dd MMM yyyy}. " +
+                           $"Текущий план активен до конца оплаченного периода.";
+                    break;
+
+                case "ClearedPending":
+                    isSuccess = true;
+                    _pendingPlanSlug = null;
+                    _pendingChangeAt = null;
+                    _msg = "Запланированная смена плана отменена";
+                    break;
+
+                default:
+                    _msg = "Выбран текущий план";
+                    break;
+            }
         }
         catch (Exception ex)
         {
-            _msg = ex.Message;
+            _msg = ex.Message.Contains("Insufficient balance", StringComparison.OrdinalIgnoreCase)
+                ? "Недостаточно средств на балансе для смены плана. Пополните баланс и попробуйте снова."
+                : ex.Message;
         }
         finally
         {

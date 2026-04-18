@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
-using WorkflowService.Options;
+using WorkflowService.Configurations;
 
 namespace WorkflowService.Services;
 
@@ -40,26 +40,13 @@ public class OpenAiService : IOpenAiService
         var jsonBody = JsonSerializer.Serialize(requestBody);
         var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
 
-        try
-        {
-            var response = await client.PostAsync(_options.ApiUrl, content, cancellationToken);
-            response.EnsureSuccessStatusCode();
+        var response = await client.PostAsync(_options.ApiUrl, content, cancellationToken);
+        response.EnsureSuccessStatusCode();
 
-            var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
-            var completionResponse = JsonSerializer.Deserialize<ChatCompletionResponse>(responseBody);
+        var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+        var completionResponse = JsonSerializer.Deserialize<ChatCompletionResponse>(responseBody);
 
-            return completionResponse?.Choices?.FirstOrDefault()?.Message?.Content?.Trim() ?? string.Empty;
-        }
-        catch (HttpRequestException e)
-        {
-            // TODO: Log the exception
-            return $"Error: Could not get a response from OpenAI. {e.Message}";
-        }
-        catch (JsonException e)
-        {
-            // TODO: Log the exception
-            return $"Error: Could not parse the response from OpenAI. {e.Message}";
-        }
+        return completionResponse?.Choices?.FirstOrDefault()?.Message?.Content?.Trim() ?? string.Empty;
     }
 
     public async Task<string> GetJsonObjectCompletionAsync(
@@ -86,24 +73,13 @@ public class OpenAiService : IOpenAiService
         var jsonBody = JsonSerializer.Serialize(requestBody);
         var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
 
-        try
-        {
-            var response = await client.PostAsync(_options.ApiUrl, content, cancellationToken);
-            response.EnsureSuccessStatusCode();
+        var response = await client.PostAsync(_options.ApiUrl, content, cancellationToken);
+        response.EnsureSuccessStatusCode();
 
-            var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
-            var completionResponse = JsonSerializer.Deserialize<ChatCompletionResponse>(responseBody);
+        var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+        var completionResponse = JsonSerializer.Deserialize<ChatCompletionResponse>(responseBody);
 
-            return completionResponse?.Choices?.FirstOrDefault()?.Message?.Content?.Trim() ?? string.Empty;
-        }
-        catch (HttpRequestException e)
-        {
-            return $"Error: Could not get a response from OpenAI. {e.Message}";
-        }
-        catch (JsonException e)
-        {
-            return $"Error: Could not parse the response from OpenAI. {e.Message}";
-        }
+        return completionResponse?.Choices?.FirstOrDefault()?.Message?.Content?.Trim() ?? string.Empty;
     }
 
     private static List<ChatMessage> BuildMessages(string prompt, IReadOnlyList<(string Role, string Content)>? chatHistory)

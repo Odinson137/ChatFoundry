@@ -35,11 +35,17 @@ public class BillingQuotaGrpcService(
         if (!Guid.TryParse(request.CompanyId, out var companyId))
             return new GetCompanyPlanResponse();
 
-        var (sub, _) = await account.EnsureCompanyAsync(companyId, context.CancellationToken);
-        var plan = await db.SubscriptionPlans.AsNoTracking()
-            .FirstAsync(p => p.Id == sub.PlanId, context.CancellationToken);
+        var sub = await db.CompanySubscriptions
+            .Include(x => x.Plan)
+            .Include(x => x.PendingPlan)
+            .FirstOrDefaultAsync(x => x.CompanyId == companyId, context.CancellationToken);
 
-        return new GetCompanyPlanResponse
+        if (sub is null)
+            (sub, _) = await account.EnsureCompanyAsync(companyId, context.CancellationToken);
+
+        var plan = sub.Plan;
+
+        var response = new GetCompanyPlanResponse
         {
             PlanSlug = plan.Slug,
             Status = sub.Status.ToString(),
@@ -51,6 +57,14 @@ public class BillingQuotaGrpcService(
             HasAnalytics = plan.HasAnalytics,
             HasApiAccess = plan.HasApiAccess
         };
+
+        if (sub.PendingPlanId.HasValue)
+        {
+            response.PendingPlanSlug = sub.PendingPlan?.Slug ?? "";
+            response.PendingChangeAt = sub.CurrentPeriodEnd.ToString("o");
+        }
+
+        return response;
     }
 
     public override async Task<IncrementUsageResponse> IncrementUsage(IncrementUsageRequest request,

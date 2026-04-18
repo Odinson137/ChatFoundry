@@ -3,7 +3,7 @@ using Shared.Domain.Enums;
 using WorkflowService.Entities;
 using WorkflowService.Enums;
 using WorkflowService.Events;
-using WorkflowService.Exceptions;
+using WorkflowService.Models.Exceptions;
 using WorkflowService.Interfaces;
 using WorkflowService.Models.Node;
 using WorkflowService.Utils;

@@ -104,6 +104,8 @@ public partial class WorkflowDesigner : IDisposable
 
     private bool _conditionTypeDropdownOpen;
 
+    private string? _expandedHeaderKey;
+
     private bool IsStoragePickerOpen { get; set; }
     private MediaNodeData? StoragePickerTarget { get; set; }
     private List<FileInfoDto> StoragePickerAllFiles { get; set; } = [];
@@ -651,7 +653,16 @@ public partial class WorkflowDesigner : IDisposable
         if (httpData?.Headers != null)
         {
             httpData.Headers.Add($"Header-{httpData.Headers.Count + 1}", "");
-            StateHasChanged();
+            OnWorkflowChanged();
+        }
+    }
+
+    private void RemoveHeader(HttpRequestNodeData httpData, string key)
+    {
+        if (httpData?.Headers != null)
+        {
+            httpData.Headers.Remove(key);
+            OnWorkflowChanged();
         }
     }
 
@@ -1240,7 +1251,9 @@ public partial class WorkflowDesigner : IDisposable
                 ($"$node.{id}.output", "Ответ пользователя"),
                 ($"$node.{id}.messageKind", "Тип сообщения")
             ],
-            "aigenerate" => [($"$node.{id}.output", "Результат AI")],
+            "aigenerate" => [($"$node.{id}.output", "Результат AI"),
+                              ($"$node.{id}.statusCode", "Статус-код (statusCode)"),
+                              ($"$node.{id}.success", "Успех запроса (true/false)")],
             "httprequest" => [($"$node.{id}.output", "Тело ответа (response body)"),
                               ($"$node.{id}.statusCode", "Статус-код (statusCode)"),
                               ($"$node.{id}.success", "Успех запроса (true/false)")],

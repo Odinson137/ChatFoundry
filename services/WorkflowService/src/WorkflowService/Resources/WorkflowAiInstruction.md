@@ -71,9 +71,12 @@
   "method": "GET",
   "url": "https://api.example.com/data",
   "headers": {},
-  "body": null
+  "body": null,
+  "continueOnError": false
 }
 ```
+
+`continueOnError` (bool, по умолчанию `false`) — если `true`, при ошибке запроса воркфлоу продолжит выполнение следующей ноды; если `false`, сессия завершается.
 
 **SetAttribute** — запись в атрибут клиента:
 
@@ -84,8 +87,10 @@
 **AIGenerate** — генерация текста нейросетью (поля зависят от конфигурации; минимум укажи промпт, если поле есть в схеме редактора):
 
 ```json
-{ "prompt": "Кратко перескажи: {{input}}" }
+{ "prompt": "Кратко перескажи: {{input}}", "includeChatContext": false, "continueOnError": false }
 ```
+
+`continueOnError` (bool, по умолчанию `false`) — если `true`, при ошибке AI-запроса (quota exceeded, HTTP-ошибка от провайдера) воркфлоу продолжит выполнение следующей ноды; если `false`, сессия завершается.
 
 **Media** — медиа:
 

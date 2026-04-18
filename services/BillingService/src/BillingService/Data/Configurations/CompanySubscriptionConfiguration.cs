@@ -15,5 +15,9 @@ public class CompanySubscriptionConfiguration : BaseEntityTypeConfiguration<Comp
         builder.HasOne(x => x.Plan)
             .WithMany(x => x.Subscriptions)
             .HasForeignKey(x => x.PlanId);
+        builder.HasOne(x => x.PendingPlan)
+            .WithMany()
+            .HasForeignKey(x => x.PendingPlanId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

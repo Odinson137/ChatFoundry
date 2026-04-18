@@ -37,7 +37,15 @@ public class ActionCompletedConsumer(
 
             if (lastUserAction.Status != ActionStatus.Failed)
             {
-                lastUserAction.MarkCompleted();
+                if (!msg.Success)
+                {
+                    lastUserAction.MarkFailed();
+                }
+                else
+                {
+                    lastUserAction.MarkCompleted();
+                }
+
                 await actionRepository.SaveAsync(lastUserAction, ct);
             }
             session.CompletedAt = DateTime.UtcNow;

@@ -16,6 +16,8 @@ public class BillingOverviewDto
     public int MaxAiBuilder { get; set; }
     public bool HasAnalytics { get; set; }
     public bool HasApiAccess { get; set; }
+    public string? PendingPlanSlug { get; set; }
+    public DateTime? PendingChangeAt { get; set; }
 }
 
 public class BalanceTransactionDto
@@ -48,4 +50,13 @@ public class TopUpResultDto
     public bool Success { get; set; }
     public string? PaymentUrl { get; set; }
     public string? Error { get; set; }
+}
+
+public class ChangePlanResultDto
+{
+    public bool Success { get; set; }
+    public string ResultType { get; set; } = "";
+    public string? PendingPlanSlug { get; set; }
+    public DateTime? PendingChangeAt { get; set; }
+    public decimal? CreditApplied { get; set; }
 }

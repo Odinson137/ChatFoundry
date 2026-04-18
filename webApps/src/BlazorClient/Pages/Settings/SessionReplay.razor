@@ -96,10 +96,6 @@
                                             <div class="replay-step-time">@action.CreatedAt.ToLocalTime().ToString("HH:mm:ss")</div>
                                         </div>
                                     </button>
-                                    @if (isFailed)
-                                    {
-                                        <div class="replay-step-error">@(string.IsNullOrEmpty(action.ErrorMessage) ? "Ошибка без описания" : action.ErrorMessage)</div>
-                                    }
                                 </div>
                             }
                         }
@@ -138,10 +134,42 @@
                                 <div class="replay-var-group-title">Переменные сессии</div>
                                 @foreach (var item in sessionVariableItems)
                                 {
-                                    <div class="replay-var-item var-session">
-                                        <code class="replay-var-name">@item.DisplayName</code>
-                                        <pre class="replay-var-value">@item.Value</pre>
-                                    </div>
+                                    if (item.NodeId.HasValue)
+                                    {
+                                        var isExpanded = _expandedNodes.Contains(item.NodeId.Value);
+                                        var colorClass = GetNodeColorClass(item.NodeId);
+                                        <div class="replay-var-node-group">
+                                            <button class="replay-var-node-toggle @colorClass" @onclick="() => ToggleNode(item.NodeId!.Value)">
+                                                <span class="replay-var-node-arrow @(isExpanded ? "expanded" : "")">&#8250;</span>
+                                                <span class="replay-var-node-label">@item.DisplayName</span>
+                                            </button>
+                                            @if (isExpanded)
+                                            {
+                                                <div class="replay-var-node-content">
+                                                    @foreach (var line in item.Lines)
+                                                    {
+                                                        <div class="replay-var-line">
+                                                            <span class="replay-var-line-label">@line.Label:</span>
+                                                            <pre class="replay-var-line-value">@(line.DisplayValue.Length > 100 ? line.DisplayValue[..100] + "..." : line.DisplayValue)</pre>
+                                                            @if (line.Label == "Вывод")
+                                                            {
+                                                                <button class="replay-var-expand-btn" @onclick="() => OpenValueModal(line.Label, line.FullValue)">
+                                                                    Показать
+                                                                </button>
+                                                            }
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="replay-var-item var-session">
+                                            <code class="replay-var-name">@item.DisplayName</code>
+                                            <pre class="replay-var-value">@(item.Lines[0].DisplayValue.Length > 100 ? item.Lines[0].DisplayValue[..100] + "..." : item.Lines[0].DisplayValue)</pre>
+                                        </div>
+                                    }
                                 }
                             }
                         }
@@ -216,4 +244,17 @@
             </div>
         }
     </main>
+
+    @if (_modalValue != null)
+    {
+        <div class="replay-modal-overlay" @onclick="CloseValueModal">
+            <div class="replay-modal" @onclick:stopPropagation="true">
+                <div class="replay-modal-header">
+                    <span class="replay-modal-title">@_modalLabel</span>
+                    <button class="replay-modal-close" @onclick="CloseValueModal">&times;</button>
+                </div>
+                <pre class="replay-modal-body">@_modalValue</pre>
+            </div>
+        </div>
+    }
 </div>
