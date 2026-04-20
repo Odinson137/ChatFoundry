@@ -119,6 +119,7 @@ public class LiveChatMutation(IHttpContextAccessor httpContextAccessor) : BaseGr
     public async Task<LiveChatSession> StartProactiveChatAsync(
         string externalUserId,
         Guid channelId,
+        Guid? channelClientId,
         Shared.Domain.Enums.DefaultChannel channel,
         [Service] ILiveChatSessionRepository repository,
         [Service] LiveChatService liveChatService,
@@ -128,7 +129,6 @@ public class LiveChatMutation(IHttpContextAccessor httpContextAccessor) : BaseGr
         if (string.IsNullOrWhiteSpace(externalUserId))
             throw new GraphQLException("externalUserId is required.");
 
-        // Проверяем что чат ещё не существует
         var existing = await repository.GetActiveByChannelAndClientAsync(channelId, externalUserId, ct);
         if (existing != null)
             throw new GraphQLException("Live chat already exists for this client.");
@@ -138,6 +138,7 @@ public class LiveChatMutation(IHttpContextAccessor httpContextAccessor) : BaseGr
             ExternalUserId = externalUserId,
             Channel = channel,
             ChannelId = channelId,
+            ClientChannelId = channelClientId,
             CompanyId = CompanyId,
             Status = LiveChatSessionStatus.InProgress,
             OperatorId = UserId,
@@ -156,9 +157,10 @@ public class LiveChatMutation(IHttpContextAccessor httpContextAccessor) : BaseGr
                 .SendAsync("NewChatInQueue", new
                 {
                     liveChatSessionId = session.Id,
-                    externalUserId = session.ExternalUserId,
+                    clientId = session.ExternalUserId,
                     clientName = session.ClientFirstName ?? session.ClientUserName ?? session.ExternalUserId,
-                    channel = session.Channel.ToString()
+                    channel = session.Channel.ToString(),
+                    preview = session.LastMessagePreview
                 }, ct);
         }
 

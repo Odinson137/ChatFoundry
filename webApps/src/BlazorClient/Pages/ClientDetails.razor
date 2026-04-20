@@ -504,7 +504,12 @@
             await NotificationApi.StartProactiveChatAsync(
                 channel.ExternalUserId,
                 sourceChannelId,
+                channel.Id,
                 channel.Channel);
+            Navigation.NavigateTo("/livechat");
+        }
+        catch (Exception ex) when (ex.Message.Contains("already exists", StringComparison.OrdinalIgnoreCase))
+        {
             Navigation.NavigateTo("/livechat");
         }
         catch (Exception)

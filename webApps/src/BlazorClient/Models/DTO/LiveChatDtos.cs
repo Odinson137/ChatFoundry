@@ -7,6 +7,7 @@ public class LiveChatSessionDto
     public string ExternalUserId { get; set; } = "";
     public string Channel { get; set; } = "";
     public Guid ChannelId { get; set; }
+    public Guid? ClientChannelId { get; set; }
     public Guid? BotId { get; set; }
     public string? BotName { get; set; }
     public Guid? CompanyId { get; set; }

@@ -17,7 +17,6 @@ public class TransferToOperatorActionExecutor(
 
     public async Task ExecuteAsync(ActionEntity action, ExecuteActionCommand message, CancellationToken ct)
     {
-        await messageSender.SendAsync(action, message, ct);
         var session = await sessionRepository.GetAsync(action.SessionId, ct);
         if (session == null)
             throw new InvalidOperationException($"Session {action.SessionId} not found");

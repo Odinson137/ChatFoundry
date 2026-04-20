@@ -1,79 +1,181 @@
 @page "/livechat"
 @using BlazorClient.Services
 @using BlazorClient.Models.DTO
+@using BlazorClient.Components
 @using Blazored.LocalStorage
 @inject INotificationApiClient ApiClient
 @inject LiveChatStateService State
 @inject SignalRService SignalR
 @inject ILocalStorageService LocalStorage
 
-<div class="cf-livechat">
-    <div class="cf-livechat-sidebar">
-        <h3 class="cf-livechat-sidebar-title">Очередь чатов</h3>
+<div class="cf-lc">
+    <!-- Sidebar -->
+    <div class="cf-lc-sidebar">
+        <div class="cf-lc-sidebar-header">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <h3 class="cf-lc-sidebar-title">Live Chat</h3>
+        </div>
+
         @if (State.QueuedChats.Count == 0 && State.MyChats.Count == 0)
         {
-            <p class="cf-livechat-empty">Нет активных чатов</p>
+            <div class="cf-lc-empty-sidebar">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                <p>Нет активных чатов</p>
+                <span class="cf-lc-empty-hint">Новые чаты появятся здесь автоматически</span>
+            </div>
         }
 
-        @foreach (var chat in State.QueuedChats)
+        @if (State.QueuedChats.Count > 0)
         {
-            <div class="cf-livechat-item" @onclick="() => TakeChat(chat.Id)">
-                <div class="cf-livechat-item-header">
-                    <span class="cf-livechat-item-name">@(chat.ClientFirstName ?? chat.ClientUserName ?? chat.ExternalUserId)</span>
-                    <span class="cf-livechat-item-channel">@chat.Channel</span>
-                </div>
-                <div class="cf-livechat-item-preview">@(chat.LastMessagePreview ?? "...")</div>
-                <button class="cf-livechat-take-btn">Взять чат</button>
+            <div class="cf-lc-section-label">
+                <span>Очередь</span>
+                <span class="cf-lc-count-badge">@State.QueuedChats.Count</span>
             </div>
+            @foreach (var chat in State.QueuedChats)
+            {
+                <div class="cf-lc-item cf-lc-item-queued" @onclick="() => TakeChat(chat.Id)">
+                    <div class="cf-lc-item-avatar">@GetInitials(chat)</div>
+                    <div class="cf-lc-item-body">
+                        <div class="cf-lc-item-row">
+                            <span class="cf-lc-item-name">@(chat.ClientFirstName ?? chat.ClientUserName ?? chat.ExternalUserId)</span>
+                            <span class="cf-lc-item-time">@FormatShortTime(chat.CreatedAt)</span>
+                        </div>
+                        <div class="cf-lc-item-preview">@(chat.LastMessagePreview ?? "Новый запрос")</div>
+                        <div class="cf-lc-item-footer">
+                            <span class="cf-lc-badge cf-lc-badge-@(chat.Channel.ToLowerInvariant())">@chat.Channel</span>
+                        </div>
+                    </div>
+                    <button class="cf-lc-take-btn" title="Взять чат">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </button>
+                </div>
+            }
         }
 
         @if (State.MyChats.Count > 0)
         {
-            <h3 class="cf-livechat-sidebar-title">Мои чаты</h3>
+            <div class="cf-lc-section-label">
+                <span>Мои чаты</span>
+                <span class="cf-lc-count-badge">@State.MyChats.Count</span>
+            </div>
             @foreach (var chat in State.MyChats)
             {
-                <div class="cf-livechat-item cf-livechat-item-active @((State.SelectedChatId == chat.Id) ? "cf-livechat-item-selected" : "")"
+                <div class="cf-lc-item @((State.SelectedChatId == chat.Id) ? "cf-lc-item-selected" : "")"
                      @onclick="() => SelectChat(chat.Id)">
-                    <div class="cf-livechat-item-header">
-                        <span class="cf-livechat-item-name">@(chat.ClientFirstName ?? chat.ClientUserName ?? chat.ExternalUserId)</span>
-                        <span class="cf-livechat-item-channel">@chat.Channel</span>
+                    <div class="cf-lc-item-avatar">@GetInitials(chat)</div>
+                    <div class="cf-lc-item-body">
+                        <div class="cf-lc-item-row">
+                            <span class="cf-lc-item-name">@(chat.ClientFirstName ?? chat.ClientUserName ?? chat.ExternalUserId)</span>
+                            <span class="cf-lc-item-time">@FormatShortTime(chat.TakenAt)</span>
+                        </div>
+                        <div class="cf-lc-item-preview">@(chat.LastMessagePreview ?? "...")</div>
+                        <div class="cf-lc-item-footer">
+                            <span class="cf-lc-badge cf-lc-badge-@(chat.Channel.ToLowerInvariant())">@chat.Channel</span>
+                            @if (chat.BotName != null)
+                            {
+                                <span class="cf-lc-item-bot">via @chat.BotName</span>
+                            }
+                        </div>
                     </div>
-                    <div class="cf-livechat-item-preview">@(chat.LastMessagePreview ?? "...")</div>
                 </div>
             }
         }
     </div>
 
-    <div class="cf-livechat-main">
+    <!-- Main chat area -->
+    <div class="cf-lc-main">
         @if (selectedChat != null)
         {
-            <div class="cf-livechat-header">
-                <span>@(selectedChat.ClientFirstName ?? selectedChat.ClientUserName ?? selectedChat.ExternalUserId)</span>
-                <span class="cf-livechat-header-channel">@selectedChat.Channel</span>
-                @if (selectedChat.BotName != null)
-                {
-                    <span class="cf-livechat-header-bot">via @selectedChat.BotName</span>
-                }
-                <button class="cf-livechat-close-btn" @onclick="CloseChat">Завершить чат</button>
+            <!-- Chat header -->
+            <div class="cf-lc-header">
+                <div class="cf-lc-header-info">
+                    <div class="cf-lc-header-avatar">@GetInitials(selectedChat)</div>
+                    <div class="cf-lc-header-details">
+                        <span class="cf-lc-header-name">@(selectedChat.ClientFirstName ?? selectedChat.ClientUserName ?? selectedChat.ExternalUserId)</span>
+                        <div class="cf-lc-header-meta">
+                            <span class="cf-lc-badge cf-lc-badge-@(selectedChat.Channel.ToLowerInvariant()) cf-lc-badge-sm">@selectedChat.Channel</span>
+                            @if (selectedChat.BotName != null)
+                            {
+                                <span class="cf-lc-header-bot">via @selectedChat.BotName</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <button class="cf-lc-close-btn" @onclick="CloseChat">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    Завершить чат
+                </button>
             </div>
-            <div class="cf-livechat-messages" @ref="_messagesContainer">
-                @foreach (var msg in messages)
+
+            <!-- Messages -->
+            <div class="cf-lc-messages" @ref="_messagesContainer">
+                @if (isLoadingMessages)
                 {
-                    <div class="cf-livechat-message @(msg.IsFromOperator ? "cf-livechat-message-outgoing" : "cf-livechat-message-incoming")">
-                        <div class="cf-livechat-message-text">@msg.Text</div>
-                        <div class="cf-livechat-message-time">@msg.Timestamp.ToString("HH:mm")</div>
+                    <div class="cf-lc-loading-messages">
+                        <div class="cf-lc-spinner"></div>
+                        <p>Загрузка сообщений...</p>
                     </div>
                 }
+                else if (messages.Count == 0)
+                {
+                    <div class="cf-lc-empty-messages">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/>
+                        </svg>
+                        <p>Начните диалог</p>
+                    </div>
+                }
+                else
+                {
+                    @RenderMessages(messages, selectedChat!)
+                }
             </div>
-            <div class="cf-livechat-input">
-                <input type="text" @bind="messageText" @onkeydown="OnKeyDown" placeholder="Введите сообщение..." class="cf-livechat-input-field" />
-                <button class="cf-livechat-send-btn" @onclick="SendMessage" disabled="@string.IsNullOrEmpty(messageText)">Отправить</button>
+
+            <!-- Send error -->
+            @if (!string.IsNullOrEmpty(sendError))
+            {
+                <div class="cf-lc-send-error">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+                    @sendError
+                </div>
+            }
+
+            <!-- Input -->
+            <div class="cf-lc-input">
+                <textarea class="cf-lc-input-field"
+                          @ref="_inputField"
+                          value="@messageText"
+                          @oninput="HandleTextInput"
+                          @onkeydown="OnKeyDown"
+                          placeholder="Введите сообщение..."
+                          rows="1"
+                          disabled="@isSending" />
+                <button class="cf-lc-send-btn" @onclick="SendMessage"
+                        disabled="@isSending || string.IsNullOrEmpty(messageText)">
+                    @if (isSending)
+                    {
+                        <div class="cf-lc-spinner-sm"></div>
+                    }
+                    else
+                    {
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m5 12 7-7 7 7"/>
+                            <path d="M12 19V5"/>
+                        </svg>
+                    }
+                </button>
             </div>
         }
         else
         {
-            <div class="cf-livechat-empty-main">
-                <p>Выберите чат из очереди или начните новый</p>
+            <div class="cf-lc-empty-main">
+                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                <h3>Выберите чат</h3>
+                <p>Возьмите чат из очереди или выберите из активных</p>
             </div>
         }
     </div>

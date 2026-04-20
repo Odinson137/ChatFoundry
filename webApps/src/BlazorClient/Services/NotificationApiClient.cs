@@ -18,6 +18,7 @@ public class NotificationApiClient(HttpClient http) : INotificationApiClient
                             externalUserId
                             channel
                             channelId
+                            clientChannelId
                             botId
                             botName
                             companyId
@@ -85,6 +86,7 @@ public class NotificationApiClient(HttpClient http) : INotificationApiClient
                         externalUserId
                         channel
                         channelId
+                        clientChannelId
                         botId
                         botName
                         companyId
@@ -141,15 +143,16 @@ public class NotificationApiClient(HttpClient http) : INotificationApiClient
         await ExecuteGraphQl<object>(query, variables);
     }
 
-    public async Task<LiveChatSessionDto> StartProactiveChatAsync(string externalUserId, Guid channelId, string channel)
+    public async Task<LiveChatSessionDto> StartProactiveChatAsync(string externalUserId, Guid channelId, Guid? channelClientId, string channel)
     {
         var query = """
-                mutation StartProactiveChat($externalUserId: String!, $channelId: UUID!, $channel: DefaultChannel!) {
-                    startProactiveChat(externalUserId: $externalUserId, channelId: $channelId, channel: $channel) {
+                mutation StartProactiveChat($externalUserId: String!, $channelId: UUID!, $channelClientId: UUID, $channel: DefaultChannel!) {
+                    startProactiveChat(externalUserId: $externalUserId, channelId: $channelId, channelClientId: $channelClientId, channel: $channel) {
                         id
                         externalUserId
                         channel
                         channelId
+                        clientChannelId
                         status
                         operatorId
                         createdAt
@@ -157,7 +160,7 @@ public class NotificationApiClient(HttpClient http) : INotificationApiClient
                 }
                 """;
 
-        var variables = new { externalUserId, channelId, channel };
+        var variables = new { externalUserId, channelId, channelClientId, channel };
         var result = await ExecuteGraphQl<StartProactiveChatResponse>(query, variables);
         return result.StartProactiveChat ?? throw new InvalidOperationException("Failed to start proactive chat");
     }

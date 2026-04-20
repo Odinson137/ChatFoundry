@@ -1,3 +1,4 @@
+using System.Text.Json;
 using BlazorClient.Configuration;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -47,34 +48,47 @@ public class SignalRService
             .WithAutomaticReconnect()
             .Build();
 
-        _connection.On<string, string, string, string, string>("NewChatInQueue",
-            (liveChatSessionId, clientId, clientName, channel, preview) =>
+        _connection.On<JsonElement>("NewChatInQueue",
+            (data) =>
             {
-                OnNewChatInQueue?.Invoke(Guid.Parse(liveChatSessionId), clientId, clientName, channel, preview);
+                var sessionId = Guid.Parse(data.GetProperty("liveChatSessionId").GetString()!);
+                var clientId = data.GetProperty("clientId").GetString()!;
+                var clientName = data.GetProperty("clientName").GetString()!;
+                var channel = data.GetProperty("channel").GetString()!;
+                var preview = data.GetProperty("preview").GetString()!;
+                OnNewChatInQueue?.Invoke(sessionId, clientId, clientName, channel, preview);
             });
 
-        _connection.On<string, string, string, string, DateTime>("MessageReceived",
-            (liveChatSessionId, direction, payload, messageKind, timestamp) =>
+        _connection.On<JsonElement>("MessageReceived",
+            (data) =>
             {
-                OnMessageReceived?.Invoke(Guid.Parse(liveChatSessionId), direction, payload, messageKind, timestamp);
+                var sessionId = Guid.Parse(data.GetProperty("liveChatSessionId").GetString()!);
+                var direction = data.GetProperty("direction").GetString()!;
+                var payload = data.GetProperty("payload").GetString()!;
+                var messageKind = data.GetProperty("messageKind").GetString()!;
+                var timestamp = data.GetProperty("timestamp").GetDateTime();
+                OnMessageReceived?.Invoke(sessionId, direction, payload, messageKind, timestamp);
             });
 
-        _connection.On<string>("ChatTaken",
-            (liveChatSessionId) =>
+        _connection.On<JsonElement>("ChatTaken",
+            (data) =>
             {
-                OnChatTaken?.Invoke(Guid.Parse(liveChatSessionId));
+                var sessionId = Guid.Parse(data.GetProperty("liveChatSessionId").GetString()!);
+                OnChatTaken?.Invoke(sessionId);
             });
 
-        _connection.On<string>("ChatClosed",
-            (liveChatSessionId) =>
+        _connection.On<JsonElement>("ChatClosed",
+            (data) =>
             {
-                OnChatClosed?.Invoke(Guid.Parse(liveChatSessionId));
+                var sessionId = Guid.Parse(data.GetProperty("liveChatSessionId").GetString()!);
+                OnChatClosed?.Invoke(sessionId);
             });
 
-        _connection.On<string>("MessageDelivered",
-            (liveChatSessionId) =>
+        _connection.On<JsonElement>("MessageDelivered",
+            (data) =>
             {
-                OnMessageDelivered?.Invoke(Guid.Parse(liveChatSessionId));
+                var sessionId = Guid.Parse(data.GetProperty("liveChatSessionId").GetString()!);
+                OnMessageDelivered?.Invoke(sessionId);
             });
 
         await _connection.StartAsync();

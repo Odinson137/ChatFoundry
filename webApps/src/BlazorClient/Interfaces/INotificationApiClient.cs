@@ -9,5 +9,5 @@ public interface INotificationApiClient
     Task TakeLiveChatAsync(Guid liveChatSessionId);
     Task SendLiveChatMessageAsync(Guid liveChatSessionId, string text);
     Task CloseLiveChatAsync(Guid liveChatSessionId);
-    Task<LiveChatSessionDto> StartProactiveChatAsync(string externalUserId, Guid channelId, string channel);
+    Task<LiveChatSessionDto> StartProactiveChatAsync(string externalUserId, Guid channelId, Guid? channelClientId, string channel);
 }

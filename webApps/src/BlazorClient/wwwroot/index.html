@@ -196,6 +196,18 @@
             el._cdChatDotNetRef = null;
             el._cdChatScrollAttached = false;
         };
+        window.scrollToBottom = function(el) {
+            if (el) el.scrollTop = el.scrollHeight;
+        };
+        window.__cfLcAutoResize = function(textarea) {
+            textarea.style.height = 'auto';
+            var lineH = parseFloat(getComputedStyle(textarea).lineHeight) || 22;
+            var maxH = lineH * 5;
+            textarea.style.height = Math.min(textarea.scrollHeight, maxH) + 'px';
+        };
+        window.__cfLcResetTextareaHeight = function(textarea) {
+            textarea.style.height = 'auto';
+        };
     </script>
 </body>
 
