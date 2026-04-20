@@ -468,6 +468,32 @@
     border-color: #c7d2fe;
 }
 
+.cd-btn-livechat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #f0fdfa;
+    color: #0d9488;
+    padding: 6px 12px;
+    border: 1px solid #99f6e4;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.cd-btn-livechat:hover:not(:disabled) {
+    background: #ccfbf1;
+    border-color: #5eead4;
+}
+
+.cd-btn-livechat:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 
 
 .cd-loading {

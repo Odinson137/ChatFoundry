@@ -48,6 +48,7 @@ public class ClientApiClient(HttpClient http) : IClientApiClient
                             modifiedAt
                             clientChannels {
                                 id
+                                channelId
                                 channel
                                 externalUserId
                                 phone
@@ -97,6 +98,7 @@ public class ClientApiClient(HttpClient http) : IClientApiClient
                         modifiedAt
                         clientChannels {
                             id
+                            channelId
                             channel
                             externalUserId
                             phone
@@ -183,9 +185,6 @@ public class ClientApiClient(HttpClient http) : IClientApiClient
         return result.CompanyAttributeDefinitions;
     }
 
-    /// <summary>
-    /// Создать атрибут компании. Scope = Company и ссылка на компанию берутся из JWT на сервере.
-    /// </summary>
     public async Task<AttributeDefinitionDto> CreateCompanyAttributeDefinitionAsync(string key, string? displayName,
         string? description, CancellationToken ct = default)
     {

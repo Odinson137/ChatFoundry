@@ -4,8 +4,6 @@ public enum WorkflowNodeType
 {
     
     Start = 0,
-    [Obsolete("End block was removed. Use no outgoing links to end the flow.")]
-    End = 999,
     SubWorkflow = 100,
 
     
@@ -25,8 +23,6 @@ public enum WorkflowNodeType
 
     Condition = 20,     
     Wait = 21,          
-    [Obsolete("SetVariable node type was removed. Use $node.{guid}.output auto-variables instead.")]
-    SetVariable = 22,
     SetAttribute = 24,  
     HttpRequest = 23,   
     
@@ -35,4 +31,6 @@ public enum WorkflowNodeType
     
     
     Command = 50,
+
+    TransferToOperator = 60,
 }

@@ -3,11 +3,6 @@ using System.Text.Json.Serialization;
 
 namespace BlazorClient.Models;
 
-/// <summary>
-/// Десериализация узлов без обязательного <c>$type</c> в <see cref="NodeDefinition.Data"/>:
-/// в БД и экспортах сохраняется только поле <c>type</c> на уровне узла, конкретный класс выводим из него.
-/// Если в <c>data</c> уже есть <c>$type</c> (новый формат), используется стандартная полиморфная десериализация <see cref="NodeData"/>.
-/// </summary>
 public sealed class NodeDefinitionJsonConverter : JsonConverter<NodeDefinition>
 {
     public override NodeDefinition Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -63,6 +58,7 @@ public sealed class NodeDefinitionJsonConverter : JsonConverter<NodeDefinition>
             "aigenerate" => typeof(AIGenerateNodeData),
             "media" => typeof(MediaNodeData),
             "subworkflow" => typeof(SubWorkflowNodeData),
+            "transfertooperator" => typeof(EmptyNodeData),
             _ => typeof(EmptyNodeData)
         };
     }

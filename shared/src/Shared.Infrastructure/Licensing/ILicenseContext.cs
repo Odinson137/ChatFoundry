@@ -1,6 +1,5 @@
 namespace Shared.Infrastructure.Licensing;
 
-/// <summary>Effective limits for self-hosted deployments (from license JWT).</summary>
 public interface ILicenseContext
 {
     bool IsSelfHosted { get; }

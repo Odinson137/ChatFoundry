@@ -1,10 +1,7 @@
-﻿using Shared.Domain.Enums;
+using Shared.Domain.Enums;
 
 namespace Shared.Application.Events;
 
-/// <param name="CompanyId">Set when the workflow session's bot has a company; used for billing usage.</param>
-/// <param name="CountAsAiWorkflowExecution">True when an AI model was invoked (e.g. AIGenerate block).</param>
-/// <param name="Success">False when the action executed but produced an error (e.g. HTTP 400, AI quota exceeded). Workflow continues.</param>
 public record ActionCompletedEvent(
     DefaultChannel Channel,
     string ClientId,

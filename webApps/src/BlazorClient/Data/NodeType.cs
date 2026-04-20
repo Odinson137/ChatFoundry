@@ -13,5 +13,6 @@ public enum NodeType
     AIFilter,
     AIGenerate,
     Media,
-    SubWorkflow
+    SubWorkflow,
+    TransferToOperator
 }

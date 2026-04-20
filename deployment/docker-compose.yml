@@ -140,8 +140,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
-      billing-service:
-        condition: service_started
     networks:
       - app_network
 
@@ -188,8 +186,6 @@ services:
       company-db:
         condition: service_healthy
       redis:
-        condition: service_started
-      billing-service:
         condition: service_started
     networks:
       - app_network
@@ -280,8 +276,6 @@ services:
     depends_on:
       redis:
         condition: service_started
-      file-service:
-        condition: service_started
     networks:
       - app_network
 
@@ -318,6 +312,49 @@ services:
       - "5438:5432"
     volumes:
       - file_pgdata:/var/lib/postgresql/data
+      - ./pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+    command: ["postgres", "-c", "hba_file=/etc/postgresql/pg_hba.conf"]
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U foundry -d foundry_db"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  messenger-hub-service:
+    container_name: messenger_hub_service
+    build:
+      context: ..
+      dockerfile: services/MessengerHubService/src/MessengerHubService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+    env_file:
+      - .env
+    ports:
+      - "5080:8080"
+    depends_on:
+      messenger-hub-db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - app_network
+
+  messenger-hub-db:
+    image: postgres:16
+    container_name: messenger_hub_db
+    restart: always
+    environment:
+      POSTGRES_DB: foundry_db
+      POSTGRES_USER: foundry
+      POSTGRES_PASSWORD: foundry
+    ports:
+      - "5440:5432"
+    volumes:
+      - messenger_hub_pgdata:/var/lib/postgresql/data
       - ./pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
     command: ["postgres", "-c", "hba_file=/etc/postgresql/pg_hba.conf"]
     networks:
@@ -397,6 +434,7 @@ volumes:
   company_pgdata:
   file_pgdata:
   billing_pgdata:
+  messenger_hub_pgdata:
   redis:
 
 networks:

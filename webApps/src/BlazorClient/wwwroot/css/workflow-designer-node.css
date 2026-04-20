@@ -244,6 +244,16 @@
     background: rgba(148, 163, 184, 0.2);
 }
 
+.workflow-designer-node--operator {
+    border-left-color: #0d9488;
+}
+.workflow-designer-node--operator .workflow-designer-node-header {
+    background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+}
+.workflow-designer-node--operator .workflow-designer-node-icon {
+    background: rgba(13, 148, 136, 0.12);
+}
+
 .workflow-designer-node-ports {
     position: absolute;
     top: 0;

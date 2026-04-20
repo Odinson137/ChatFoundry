@@ -102,9 +102,6 @@ public class VariableService(
         session.ClientProfileDirty = true;
     }
 
-    /// <summary>
-    /// Pattern: guid.output, guid.statusCode, guid.error, guid.messageKind — stored in workflow without "node." prefix; resolved as $node.&lt;guid&gt;.&lt;key&gt;.
-    /// </summary>
     private static readonly System.Text.RegularExpressions.Regex NodeOutputKeyRegex = new(
         @"^[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}\.(output|statusCode|error|messageKind)$",
         System.Text.RegularExpressions.RegexOptions.Compiled);

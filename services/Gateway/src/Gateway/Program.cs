@@ -118,6 +118,16 @@ builder.Services.AddAuthorization(options =>
         });
     });
 
+    options.AddPolicy("messenger-hub", p =>
+    {
+        p.RequireAuthenticatedUser();
+        p.RequireAssertion(ctx =>
+        {
+            var scopes = ctx.User.FindFirst("scope")?.Value.Split(' ', StringSplitOptions.RemoveEmptyEntries) ?? [];
+            return scopes.Contains("messenger-hub");
+        });
+    });
+
 });
 
 builder.Services
@@ -156,6 +166,18 @@ app.Use(async (context, next) =>
 });
 
 app.UseCors("BlazorClientPolicy");
+
+// SignalR WebSocket: браузер не отправляет Authorization header,
+// поэтому копируем access_token из query string в header до OpenIddict-валидации.
+app.Use(async (context, next) =>
+{
+    if (string.IsNullOrEmpty(context.Request.Headers.Authorization) &&
+        context.Request.Query.TryGetValue("access_token", out var token))
+    {
+        context.Request.Headers.Authorization = $"Bearer {token}";
+    }
+    await next();
+});
 
 app.UseAuthentication();
 app.UseAuthorization();

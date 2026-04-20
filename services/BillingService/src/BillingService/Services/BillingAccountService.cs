@@ -91,7 +91,6 @@ public class BillingAccountService(
         }
         catch (DbUpdateException)
         {
-            // Concurrent insert — another request created the record first.
             db.ChangeTracker.Clear();
         }
 

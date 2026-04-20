@@ -35,14 +35,14 @@ public sealed class WorkflowGraph(
                 WorkflowConditionEvaluator.Evaluate(outgoingEdge.Condition, session, variableService))
             {
                 var node = GetNode(outgoingEdge.To);
-                return node.Type == WorkflowNodeType.End ? null : node;
+                return node;
             }
         }
 
         var nextNodeId = outgoingEdges.FirstOrDefault(c => c.Condition == null)?.To;
         if (nextNodeId == null) return null;
         var next = GetNode(nextNodeId.Value);
-        return next.Type == WorkflowNodeType.End ? null : next;
+        return next;
     }
 
 }

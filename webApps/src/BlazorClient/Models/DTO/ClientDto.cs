@@ -12,6 +12,7 @@ public class ClientDto
 public class ClientChannelDto
 {
     public Guid Id { get; set; }
+    public Guid? ChannelId { get; set; }
     public string Channel { get; set; } = "";
     public string ExternalUserId { get; set; } = "";
     public string? Phone { get; set; }

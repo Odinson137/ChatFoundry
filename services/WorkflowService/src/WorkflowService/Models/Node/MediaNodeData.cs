@@ -1,8 +1,5 @@
 namespace WorkflowService.Models.Node;
 
-/// <summary>
-/// Тип медиа для узла Media (совпадает с фронтом по числовым значениям).
-/// </summary>
 public enum MediaKind
 {
     Image = 0,
@@ -21,7 +18,6 @@ public sealed class MediaNodeData : NodeData
 {
     public MediaKind MediaKind { get; init; }
     public MediaSourceType SourceType { get; init; }
-    /// <summary>При Url — ссылка; при Attachment — ключ в файловом хранилище.</summary>
     public string Value { get; init; } = "";
     public string? Caption { get; init; }
 }

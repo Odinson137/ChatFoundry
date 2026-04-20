@@ -72,6 +72,7 @@ public class BotIncomingMessageConsumer(
             {
                 Client = client,
                 Channel = channel,
+                ChannelId = msg.ChannelId,
                 ExternalUserId = msg.ExternalUserId,
                 Username = userName,
                 Name = name,
@@ -85,6 +86,9 @@ public class BotIncomingMessageConsumer(
         else
         {
             client = clientChannel.Client;
+            
+            if (clientChannel.ChannelId != msg.ChannelId)
+                clientChannel.ChannelId = msg.ChannelId;
 
             if (!string.IsNullOrWhiteSpace(userName) &&
                 client.DisplayName != userName)

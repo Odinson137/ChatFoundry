@@ -1,0 +1,80 @@
+@page "/livechat"
+@using BlazorClient.Services
+@using BlazorClient.Models.DTO
+@using Blazored.LocalStorage
+@inject IMessengerHubApiClient ApiClient
+@inject LiveChatStateService State
+@inject SignalRService SignalR
+@inject ILocalStorageService LocalStorage
+
+<div class="cf-livechat">
+    <div class="cf-livechat-sidebar">
+        <h3 class="cf-livechat-sidebar-title">Очередь чатов</h3>
+        @if (State.QueuedChats.Count == 0 && State.MyChats.Count == 0)
+        {
+            <p class="cf-livechat-empty">Нет активных чатов</p>
+        }
+
+        @foreach (var chat in State.QueuedChats)
+        {
+            <div class="cf-livechat-item" @onclick="() => TakeChat(chat.Id)">
+                <div class="cf-livechat-item-header">
+                    <span class="cf-livechat-item-name">@(chat.ClientFirstName ?? chat.ClientUserName ?? chat.ExternalUserId)</span>
+                    <span class="cf-livechat-item-channel">@chat.Channel</span>
+                </div>
+                <div class="cf-livechat-item-preview">@(chat.LastMessagePreview ?? "...")</div>
+                <button class="cf-livechat-take-btn">Взять чат</button>
+            </div>
+        }
+
+        @if (State.MyChats.Count > 0)
+        {
+            <h3 class="cf-livechat-sidebar-title">Мои чаты</h3>
+            @foreach (var chat in State.MyChats)
+            {
+                <div class="cf-livechat-item cf-livechat-item-active @((State.SelectedChatId == chat.Id) ? "cf-livechat-item-selected" : "")"
+                     @onclick="() => SelectChat(chat.Id)">
+                    <div class="cf-livechat-item-header">
+                        <span class="cf-livechat-item-name">@(chat.ClientFirstName ?? chat.ClientUserName ?? chat.ExternalUserId)</span>
+                        <span class="cf-livechat-item-channel">@chat.Channel</span>
+                    </div>
+                    <div class="cf-livechat-item-preview">@(chat.LastMessagePreview ?? "...")</div>
+                </div>
+            }
+        }
+    </div>
+
+    <div class="cf-livechat-main">
+        @if (selectedChat != null)
+        {
+            <div class="cf-livechat-header">
+                <span>@(selectedChat.ClientFirstName ?? selectedChat.ClientUserName ?? selectedChat.ExternalUserId)</span>
+                <span class="cf-livechat-header-channel">@selectedChat.Channel</span>
+                @if (selectedChat.BotName != null)
+                {
+                    <span class="cf-livechat-header-bot">via @selectedChat.BotName</span>
+                }
+                <button class="cf-livechat-close-btn" @onclick="CloseChat">Завершить чат</button>
+            </div>
+            <div class="cf-livechat-messages" @ref="_messagesContainer">
+                @foreach (var msg in messages)
+                {
+                    <div class="cf-livechat-message @(msg.IsFromOperator ? "cf-livechat-message-outgoing" : "cf-livechat-message-incoming")">
+                        <div class="cf-livechat-message-text">@msg.Text</div>
+                        <div class="cf-livechat-message-time">@msg.Timestamp.ToString("HH:mm")</div>
+                    </div>
+                }
+            </div>
+            <div class="cf-livechat-input">
+                <input type="text" @bind="messageText" @onkeydown="OnKeyDown" placeholder="Введите сообщение..." class="cf-livechat-input-field" />
+                <button class="cf-livechat-send-btn" @onclick="SendMessage" disabled="@string.IsNullOrEmpty(messageText)">Отправить</button>
+            </div>
+        }
+        else
+        {
+            <div class="cf-livechat-empty-main">
+                <p>Выберите чат из очереди или начните новый</p>
+            </div>
+        }
+    </div>
+</div>

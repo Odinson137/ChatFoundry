@@ -8,9 +8,6 @@ using Microsoft.AspNetCore.Components.Authorization;
 
 namespace BlazorClient.Auth;
 
-/// <summary>
-/// При ответе 401 пробует обновить токен через refresh_token; при неудаче — очищает хранилище и перенаправляет на страницу входа.
-/// </summary>
 public class AuthErrorHandler : DelegatingHandler
 {
     private readonly ILocalStorageService _localStorage;

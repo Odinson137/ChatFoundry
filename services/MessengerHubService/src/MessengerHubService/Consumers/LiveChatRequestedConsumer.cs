@@ -1,0 +1,54 @@
+using MassTransit;
+using Microsoft.AspNetCore.SignalR;
+using MessengerHubService.Entities;
+using MessengerHubService.Enums;
+using MessengerHubService.Hubs;
+using MessengerHubService.Interfaces;
+using MessengerHubService.Services;
+using Shared.Application.Events;
+
+namespace MessengerHubService.Consumers;
+
+public class LiveChatRequestedConsumer(
+    ILiveChatSessionRepository repository,
+    LiveChatService liveChatService,
+    IHubContext<LiveChatHub> hubContext) : IConsumer<LiveChatRequestedEvent>
+{
+    public async Task Consume(ConsumeContext<LiveChatRequestedEvent> context)
+    {
+        var evt = context.Message;
+        var ct = context.CancellationToken;
+
+        var liveChatSession = new LiveChatSession
+        {
+            WorkflowSessionId = evt.SessionId,
+            ExternalUserId = evt.ExternalUserId,
+            Channel = evt.Channel,
+            ChannelId = evt.ChannelId,
+            BotId = evt.BotId,
+            BotName = evt.BotName,
+            CompanyId = evt.CompanyId,
+            ClientFirstName = evt.ClientFirstName,
+            ClientUserName = evt.ClientUserName,
+            LastMessagePreview = evt.LastMessagePreview,
+            Status = LiveChatSessionStatus.Queued
+        };
+
+        await repository.AddAsync(liveChatSession, ct);
+        await liveChatService.SetRedisFlagAsync(evt.ChannelId, evt.ExternalUserId, liveChatSession.Id, ct);
+
+        if (evt.CompanyId.HasValue)
+        {
+            await hubContext.Clients.Group(LiveChatHub.GetCompanyGroupName(evt.CompanyId.Value))
+                .SendAsync("NewChatInQueue", new
+                {
+                    liveChatSessionId = liveChatSession.Id,
+                    clientId = evt.ExternalUserId,
+                    clientName = evt.ClientFirstName ?? evt.ClientUserName ?? evt.ExternalUserId,
+                    channel = evt.Channel.ToString(),
+                    botName = evt.BotName,
+                    preview = evt.LastMessagePreview
+                }, ct);
+        }
+    }
+}

@@ -43,7 +43,6 @@ public class CompanyMemberMutation(
             }
             catch (RpcException ex) when (ex.StatusCode == StatusCode.Unavailable)
             {
-                // allow when billing is down
             }
         }
 

@@ -2,9 +2,6 @@ using System.Text.Json;
 
 namespace WorkflowValidation;
 
-/// <summary>
-/// Проверка JSON схемы workflow (формат экспорта редактора: nodes, edges, layout).
-/// </summary>
 public static class WorkflowSchemaValidator
 {
     private static readonly HashSet<string> AllowedNodeTypes = new(StringComparer.OrdinalIgnoreCase)

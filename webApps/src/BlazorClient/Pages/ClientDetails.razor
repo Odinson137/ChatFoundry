@@ -8,6 +8,7 @@
 @attribute [Authorize]
 @implements IDisposable
 @inject IClientApiClient ClientApi
+@inject IMessengerHubApiClient MessengerHubApi
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
 
@@ -131,6 +132,15 @@
                                 </div>
                             </div>
                         }
+                        <button class="cd-btn cd-btn-livechat" disabled="@isStartingChat"
+                                @onclick="() => StartProactiveChat(ch)">
+                            @if (isStartingChat)
+                            {
+                                <span class="cd-spinner cd-spinner-sm"></span>
+                            }
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            Открыть чат
+                        </button>
                     </div>
                 }
             </div>
@@ -268,6 +278,8 @@
     private const int InitialPageSize = 10;
     private const int LoadMorePageSize = 20;
     private const string ChatScrollId = "cd-chat-scroll";
+
+    private bool isStartingChat;
 
     protected override async Task OnInitializedAsync()
     {
@@ -477,6 +489,28 @@
         if (date == today) return "Сегодня";
         if (date == today.AddDays(-1)) return "Вчера";
         return date.ToString("dd MMMM yyyy");
+    }
+
+    private async Task StartProactiveChat(ClientChannelDto channel)
+    {
+        isStartingChat = true;
+        try
+        {
+            var sourceChannelId = channel.ChannelId
+                ?? throw new InvalidOperationException("Для выбранного канала не найден source ChannelId.");
+            if (string.IsNullOrWhiteSpace(channel.ExternalUserId))
+                throw new InvalidOperationException("Для выбранного канала не найден ExternalUserId.");
+
+            await MessengerHubApi.StartProactiveChatAsync(
+                channel.ExternalUserId,
+                sourceChannelId,
+                channel.Channel);
+            Navigation.NavigateTo("/livechat");
+        }
+        catch (Exception)
+        {
+            isStartingChat = false;
+        }
     }
 
     private static string GetKindIcon(string kind) => kind.ToUpperInvariant() switch

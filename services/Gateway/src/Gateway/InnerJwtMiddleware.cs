@@ -3,11 +3,6 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Gateway;
 
-/// <summary>
-/// After OpenIddict Validation has authenticated the user, decrypts the JWE (if present)
-/// and stores the inner signed JWT in HttpContext.Items so YARP can forward it to backends.
-/// If the token is already a plain JWT (3 parts), stores it as-is.
-/// </summary>
 public class InnerJwtMiddleware
 {
     public const string InnerJwtKey = "Gateway.InnerJwt";
@@ -18,11 +13,13 @@ public class InnerJwtMiddleware
 
     public async Task InvokeAsync(HttpContext context, IConfiguration configuration)
     {
-        if (context.User.Identity?.IsAuthenticated == true &&
-            context.Request.Headers.Authorization.FirstOrDefault() is { } authHeader &&
-            authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+        if (context.User.Identity?.IsAuthenticated == true)
         {
-            var token = authHeader["Bearer ".Length..].Trim();
+            var authHeader = context.Request.Headers.Authorization.FirstOrDefault();
+            var token = !string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)
+                ? authHeader["Bearer ".Length..].Trim()
+                : context.Request.Query["access_token"].FirstOrDefault();
+
             if (!string.IsNullOrEmpty(token))
             {
                 var parts = token.Split('.');

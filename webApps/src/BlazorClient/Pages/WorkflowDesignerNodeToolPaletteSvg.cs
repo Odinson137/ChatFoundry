@@ -44,6 +44,9 @@ internal static class NodeToolPaletteSvg
     public static readonly string Default =
         SvgOpen + """<rect x="4" y="4" width="16" height="16" rx="2" stroke="#64748b" stroke-width="2" fill="#f1f5f9"/>""" + SvgClose;
 
+    public static readonly string TransferToOperator =
+        SvgOpen + """<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="#0d9488" stroke-width="2" fill="none"/><path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="#0d9488" stroke-width="2" fill="none"/><circle cx="18" cy="5" r="3" stroke="#0d9488" stroke-width="2" fill="#f0fdfa"/><path d="M18.5 4v2" stroke="#0d9488" stroke-width="2" stroke-linecap="round"/><path d="M17.5 5h2" stroke="#0d9488" stroke-width="2" stroke-linecap="round"/>""" + SvgClose;
+
     public static string GetCanvasVariantClass(string? nodeType) => nodeType?.ToLowerInvariant() switch
     {
         "start" => "workflow-designer-node--start",
@@ -58,6 +61,7 @@ internal static class NodeToolPaletteSvg
         "aigenerate" => "workflow-designer-node--ai",
         "condition" => "workflow-designer-node--condition",
         "aifilter" => "workflow-designer-node--aifilter",
+        "transfertooperator" => "workflow-designer-node--operator",
         _ => "workflow-designer-node--default"
     };
 
@@ -75,6 +79,7 @@ internal static class NodeToolPaletteSvg
         "aigenerate" => AiGenerate,
         "condition" => Condition,
         "aifilter" => AiFilter,
+        "transfertooperator" => TransferToOperator,
         _ => Default
     };
 }

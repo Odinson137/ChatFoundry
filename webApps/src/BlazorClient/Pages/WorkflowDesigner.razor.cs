@@ -1814,10 +1814,6 @@ public partial class WorkflowDesigner : IDisposable
         return null;
     }
 
-    /// <summary>
-    /// Определяет направление ребра по типам портов: From = узел с выходом (Right), To = узел с входом (Left).
-    /// Так связь сохраняется одинаково независимо от того, от какого блока начали тянуть линию.
-    /// </summary>
     private (Guid? fromId, Guid? toId) GetEdgeFromTo(WorkflowLinkModel l)
     {
         var sourcePort = l.Source?.Model as PortModel;
@@ -1897,6 +1893,7 @@ public partial class WorkflowDesigner : IDisposable
         new NodeToolItem("Логика", "Старт", NodeType.Start, NodeToolPaletteSvg.Start, "green"),
         new NodeToolItem("Логика", "Ожидание", NodeType.Wait, NodeToolPaletteSvg.Wait, "blue"),
         new NodeToolItem("Логика", "Процесс", NodeType.SubWorkflow, NodeToolPaletteSvg.SubWorkflow, "orange"),
+        new NodeToolItem("Логика", "Оператор", NodeType.TransferToOperator, NodeToolPaletteSvg.TransferToOperator, "teal"),
         new NodeToolItem("Контент", "Сообщение", NodeType.Message, NodeToolPaletteSvg.Message, "indigo"),
         new NodeToolItem("Контент", "Вопрос", NodeType.Ask, NodeToolPaletteSvg.Ask, "indigo"),
         new NodeToolItem("Контент", "Медиа", NodeType.Media, NodeToolPaletteSvg.Media, "indigo"),

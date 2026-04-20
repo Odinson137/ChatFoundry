@@ -1,4 +1,5 @@
 using MassTransit;
+using Microsoft.Extensions.Caching.Distributed;
 using Shared.Application.Events;
 using WorkflowService.Entities;
 using WorkflowService.Enums;
@@ -14,12 +15,18 @@ public class BotMessageConsumer(
     IActionFactory actionFactory,
     IActionRepository actionRepository,
     ITopicProducer<ExecuteActionCommand> producer,
-    WorkflowGraphParser workflowGraphParser) : IConsumer<BotIncomingMessage>
+    WorkflowGraphParser workflowGraphParser,
+    IDistributedCache distributedCache) : IConsumer<BotIncomingMessage>
 {
     public async Task Consume(ConsumeContext<BotIncomingMessage> context)
     {
         var msg = context.Message;
         var ct = context.CancellationToken;
+
+        var redisKey = $"livechat:{msg.ChannelId}:{msg.ExternalUserId}";
+        var isActiveLiveChat = await distributedCache.GetStringAsync(redisKey, ct);
+        if (isActiveLiveChat != null)
+            return;
 
         var botIds = await botRepository.GetBotIdsByChannelIdAsync(msg.ChannelId, ct);
         if (botIds.Count == 0)

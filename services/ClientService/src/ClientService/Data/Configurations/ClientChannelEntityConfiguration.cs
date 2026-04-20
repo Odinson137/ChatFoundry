@@ -15,6 +15,8 @@ public class ClientChannelEntityConfiguration : BaseEntityTypeConfiguration<Clie
         builder.Property(x => x.Channel)
             .IsRequired()
             .HasConversion<int>();
+        
+        builder.Property(x => x.ChannelId);
 
         builder.Property(x => x.ExternalUserId)
             .IsRequired()

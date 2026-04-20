@@ -56,18 +56,14 @@ public class ConditionDefinition
 
     public ConditionDefinition() { }
 
-    /// <summary>Возвращает true, если это составное условие (И или ИЛИ).</summary>
     public bool IsComposite => (And != null && And.Count > 0) || (Or != null && Or.Count > 0);
-    /// <summary>Список подусловий для редактирования (либо And, либо Or, либо null).</summary>
     public List<ConditionDefinition>? SubConditions => And ?? Or;
 }
 
-/// <summary>Базовый класс для условий с двумя операндами (Left, Right).</summary>
 public class BinaryConditionBase
 {
     public string Left { get; set; } = string.Empty;
     public string Right { get; set; } = string.Empty;
-    /// <summary>Не учитывать регистр при сравнении.</summary>
     public bool? IgnoreCase { get; set; }
 }
 
@@ -137,7 +133,6 @@ public class InListCondition : BinaryConditionBase
     public InListCondition(string left, string right) { Left = left; Right = right; }
 }
 
-/// <summary>Условие с одним операндом (Left).</summary>
 public class UnaryConditionBase
 {
     public string Left { get; set; } = string.Empty;

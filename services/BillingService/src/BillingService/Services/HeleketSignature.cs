@@ -14,9 +14,6 @@ public static class HeleketSignature
         return Convert.ToHexString(bytes).ToLowerInvariant();
     }
 
-    /// <summary>
-    /// Verifies webhook signature (Heleket: MD5(base64(json_without_sign) + apiKey) == sign).
-    /// </summary>
     public static bool VerifyWebhookJson(string jsonBody, string signFromPayload, string apiKey)
     {
         try

@@ -26,6 +26,9 @@ builder.Services.AddScoped<ICompanyApiClient, CompanyApiClient>();
 builder.Services.AddScoped<IFileApiClient, FileApiClient>();
 builder.Services.AddScoped<IWorkflowSchemaService, WorkflowSchemaService>();
 builder.Services.AddScoped<IBillingApiClient, BillingApiClient>();
+builder.Services.AddScoped<IMessengerHubApiClient, MessengerHubApiClient>();
+builder.Services.AddScoped<SignalRService>();
+builder.Services.AddScoped<LiveChatStateService>();
 
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddAuthorizationCore();

@@ -61,4 +61,14 @@ public class ActionRepository(WorkflowDbContext db) : IActionRepository
                  x.NodeId == nodeId,
             ct);
     }
+
+    public async Task<ActionEntity?> GetProcessingBySessionIdAsync(Guid sessionId, CancellationToken ct)
+    {
+        return await db.Actions
+            .Include(a => a.Session)
+            .ThenInclude(s => s.Workflow)
+            .ThenInclude(w => w.Bot)
+            .FirstOrDefaultAsync(a => a.SessionId == sessionId
+                && a.Status == ActionStatus.Processing, ct);
+    }
 }

@@ -8,6 +8,8 @@ public class ClientChannel : EntityBase
 {
     public DefaultChannel Channel { get; set; }
     
+    public Guid? ChannelId { get; set; }
+    
     public string ExternalUserId { get; set; } = null!;
     
     public string? Phone { get; set; }

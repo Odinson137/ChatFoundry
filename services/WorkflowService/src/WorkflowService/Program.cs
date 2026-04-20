@@ -64,6 +64,7 @@ services.AddScoped<IActionExecutor, HttpRequestActionExecutor>();
 services.AddScoped<IActionExecutor, AIGenerateActionExecutor>();
 services.AddScoped<IActionExecutor, SendMediaActionExecutor>();
 services.AddScoped<IActionExecutor, SubWorkflowActionExecutor>();
+services.AddScoped<IActionExecutor, TransferToOperatorActionExecutor>();
 
 services.AddScoped<IMessageSender, MessageSender>();
 services.AddScoped<IOpenAiService, OpenAiService>();
@@ -119,6 +120,7 @@ services.AddMassTransit(x =>
         rider.AddProducer<BotOutgoingMessage>("bot.message.outgoing");
         rider.AddProducer<ExecuteActionCommand>("workflow.action.execute");
         rider.AddProducer<ActionCompletedEvent>("workflow.action.completed");
+        rider.AddProducer<LiveChatRequestedEvent>("livechat.event");
         
         rider.UsingKafka((context, cfg) =>
         {

@@ -63,6 +63,8 @@
             SubWorkflowNodeData sw => sw.WorkflowId == Guid.Empty
                 ? "Процесс не выбран"
                 : $"Процесс · {sw.WorkflowId}",
+            EmptyNodeData when Node.NodeType?.Equals("TransferToOperator", StringComparison.OrdinalIgnoreCase) == true
+                => "Перевод на оператора",
             _ => null
         };
 

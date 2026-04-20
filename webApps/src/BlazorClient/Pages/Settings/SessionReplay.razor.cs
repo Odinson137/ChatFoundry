@@ -388,7 +388,6 @@ public partial class SessionReplay : IDisposable, IReplayDataProvider
         }
     }
 
-    /// <summary>Для переменных $node.{guid}.suffix возвращает "Название блока · suffix", иначе ключ как есть.</summary>
     private string GetVariableDisplayName(string key)
     {
         const string nodePrefix = "$node.";

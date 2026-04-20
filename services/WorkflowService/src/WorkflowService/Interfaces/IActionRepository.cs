@@ -17,4 +17,6 @@ public interface IActionRepository
     Task<bool> ExistsAsync(Guid sessionId,
         Guid nodeId,
         CancellationToken ct);
+
+    Task<ActionEntity?> GetProcessingBySessionIdAsync(Guid sessionId, CancellationToken ct);
 }
