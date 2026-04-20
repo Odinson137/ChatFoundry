@@ -1,12 +1,12 @@
 using Microsoft.EntityFrameworkCore;
-using MessengerHubService.Data;
-using MessengerHubService.Entities;
-using MessengerHubService.Enums;
-using MessengerHubService.Interfaces;
+using NotificationService.Data;
+using NotificationService.Entities;
+using NotificationService.Enums;
+using NotificationService.Interfaces;
 
-namespace MessengerHubService.Repositories;
+namespace NotificationService.Repositories;
 
-public class LiveChatSessionRepository(MessengerHubDbContext db) : ILiveChatSessionRepository
+public class LiveChatSessionRepository(NotificationDbContext db) : ILiveChatSessionRepository
 {
     public async Task<LiveChatSession?> GetActiveByChannelAndClientAsync(
         Guid channelId, string clientId, CancellationToken ct)

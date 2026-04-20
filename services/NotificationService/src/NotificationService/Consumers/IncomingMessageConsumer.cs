@@ -1,10 +1,10 @@
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;
-using MessengerHubService.Hubs;
-using MessengerHubService.Interfaces;
+using NotificationService.Hubs;
+using NotificationService.Interfaces;
 using Shared.Application.Events;
 
-namespace MessengerHubService.Consumers;
+namespace NotificationService.Consumers;
 
 public class IncomingMessageConsumer(
     ILiveChatSessionRepository repository,

@@ -1,16 +1,16 @@
 using HotChocolate.Data;
-using MessengerHubService.Data;
-using MessengerHubService.Entities;
+using NotificationService.Data;
+using NotificationService.Entities;
 using Shared.Infrastructure.GraphQl;
 
-namespace MessengerHubService.GraphQL;
+namespace NotificationService.GraphQL;
 
 public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpContextAccessor)
 {
     [UsePaging(IncludeTotalCount = true)]
     [UseFiltering]
     [UseSorting]
-    public IQueryable<LiveChatSession> GetLiveChatSessions([Service] MessengerHubDbContext context)
+    public IQueryable<LiveChatSession> GetLiveChatSessions([Service] NotificationDbContext context)
     {
         var query = context.LiveChatSessions.AsQueryable();
         if (CompanyId.HasValue)
@@ -21,7 +21,7 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
     [UseProjection]
     public IQueryable<LiveChatSession> GetLiveChatSession(
         Guid id,
-        [Service] MessengerHubDbContext context)
+        [Service] NotificationDbContext context)
     {
         return context.LiveChatSessions.Where(s => s.Id == id);
     }

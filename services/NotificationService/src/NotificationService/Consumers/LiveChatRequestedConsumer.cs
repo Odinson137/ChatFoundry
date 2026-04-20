@@ -1,13 +1,13 @@
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;
-using MessengerHubService.Entities;
-using MessengerHubService.Enums;
-using MessengerHubService.Hubs;
-using MessengerHubService.Interfaces;
-using MessengerHubService.Services;
+using NotificationService.Entities;
+using NotificationService.Enums;
+using NotificationService.Hubs;
+using NotificationService.Interfaces;
+using NotificationService.Services;
 using Shared.Application.Events;
 
-namespace MessengerHubService.Consumers;
+namespace NotificationService.Consumers;
 
 public class LiveChatRequestedConsumer(
     ILiveChatSessionRepository repository,

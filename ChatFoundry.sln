@@ -86,11 +86,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F6DE5C34-1F3
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BillingService", "services\BillingService\src\BillingService\BillingService.csproj", "{5C578650-F8B4-49CC-8116-F412C83C2A70}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MessengerHubService", "MessengerHubService", "{C9C0E7FB-B59A-494C-C219-76ACA453E800}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NotificationService", "NotificationService", "{C9C0E7FB-B59A-494C-C219-76ACA453E800}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0236A6ED-7E9A-C049-21F6-A76FF09D2643}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessengerHubService", "services\MessengerHubService\src\MessengerHubService\MessengerHubService.csproj", "{C3017C5F-CE00-4AF4-87FB-2218D1306D01}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService", "services\NotificationService\src\NotificationService\NotificationService.csproj", "{C3017C5F-CE00-4AF4-87FB-2218D1306D01}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

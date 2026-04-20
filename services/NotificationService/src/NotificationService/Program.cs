@@ -3,13 +3,13 @@ using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using MessengerHubService.Consumers;
-using MessengerHubService.Data;
-using MessengerHubService.GraphQL;
-using MessengerHubService.Hubs;
-using MessengerHubService.Interfaces;
-using MessengerHubService.Repositories;
-using MessengerHubService.Services;
+using NotificationService.Consumers;
+using NotificationService.Data;
+using NotificationService.GraphQL;
+using NotificationService.Hubs;
+using NotificationService.Interfaces;
+using NotificationService.Repositories;
+using NotificationService.Services;
 using Shared.Application.Events;
 using Shared.Infrastructure.DependencyInjection;
 using Shared.Infrastructure.GraphQl;
@@ -62,7 +62,7 @@ services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-services.AddPostgreSql<MessengerHubDbContext>(builder.Configuration);
+services.AddPostgreSql<NotificationDbContext>(builder.Configuration);
 
 services.AddRedisCache(builder.Configuration, "CacheSettings");
 
@@ -98,7 +98,7 @@ services.AddMassTransit(x =>
 
             cfg.TopicEndpoint<LiveChatRequestedEvent>(
                 "livechat.event",
-                "messenger-hub-service",
+                "notification-service",
                 e =>
                 {
                     e.CreateIfMissing();
@@ -107,7 +107,7 @@ services.AddMassTransit(x =>
 
             cfg.TopicEndpoint<BotIncomingMessage>(
                 "bot.message.incoming",
-                "messenger-hub-service",
+                "notification-service",
                 e =>
                 {
                     e.ConfigureConsumer<IncomingMessageConsumer>(context);
@@ -141,6 +141,6 @@ app.UseAuthorization();
 
 app.MapHub<LiveChatHub>("/hub/livechat");
 app.MapGraphQL();
-app.MapGet("/", () => "Messenger Hub Service is running");
+app.MapGet("/", () => "Notification Service is running");
 
 app.Run();

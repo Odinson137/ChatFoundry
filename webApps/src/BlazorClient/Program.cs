@@ -26,7 +26,7 @@ builder.Services.AddScoped<ICompanyApiClient, CompanyApiClient>();
 builder.Services.AddScoped<IFileApiClient, FileApiClient>();
 builder.Services.AddScoped<IWorkflowSchemaService, WorkflowSchemaService>();
 builder.Services.AddScoped<IBillingApiClient, BillingApiClient>();
-builder.Services.AddScoped<IMessengerHubApiClient, MessengerHubApiClient>();
+builder.Services.AddScoped<INotificationApiClient, NotificationApiClient>();
 builder.Services.AddScoped<SignalRService>();
 builder.Services.AddScoped<LiveChatStateService>();
 

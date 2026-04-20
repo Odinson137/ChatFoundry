@@ -1,15 +1,15 @@
 using HotChocolate;
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;
-using MessengerHubService.Entities;
-using MessengerHubService.Enums;
-using MessengerHubService.Hubs;
-using MessengerHubService.Interfaces;
-using MessengerHubService.Services;
+using NotificationService.Entities;
+using NotificationService.Enums;
+using NotificationService.Hubs;
+using NotificationService.Interfaces;
+using NotificationService.Services;
 using Shared.Application.Events;
 using Shared.Infrastructure.GraphQl;
 
-namespace MessengerHubService.GraphQL;
+namespace NotificationService.GraphQL;
 
 [ExtendObjectType(typeof(Mutation))]
 public class LiveChatMutation(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpContextAccessor)

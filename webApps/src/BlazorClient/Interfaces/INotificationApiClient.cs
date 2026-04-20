@@ -2,7 +2,7 @@ using BlazorClient.Models.DTO;
 
 namespace BlazorClient.Interfaces;
 
-public interface IMessengerHubApiClient
+public interface INotificationApiClient
 {
     Task<List<LiveChatSessionDto>> GetLiveChatSessionsAsync(string? status = null);
     Task<LiveChatSessionDto?> GetLiveChatSessionAsync(Guid id);

@@ -1,7 +1,7 @@
-using MessengerHubService.Entities;
-using MessengerHubService.Enums;
+using NotificationService.Entities;
+using NotificationService.Enums;
 
-namespace MessengerHubService.Interfaces;
+namespace NotificationService.Interfaces;
 
 public interface ILiveChatSessionRepository
 {

@@ -118,13 +118,13 @@ builder.Services.AddAuthorization(options =>
         });
     });
 
-    options.AddPolicy("messenger-hub", p =>
+    options.AddPolicy("notification", p =>
     {
         p.RequireAuthenticatedUser();
         p.RequireAssertion(ctx =>
         {
             var scopes = ctx.User.FindFirst("scope")?.Value.Split(' ', StringSplitOptions.RemoveEmptyEntries) ?? [];
-            return scopes.Contains("messenger-hub");
+            return scopes.Contains("notification");
         });
     });
 

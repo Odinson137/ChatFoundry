@@ -323,11 +323,11 @@ services:
       retries: 10
       start_period: 5s
 
-  messenger-hub-service:
-    container_name: messenger_hub_service
+  notification-service:
+    container_name: notification_service
     build:
       context: ..
-      dockerfile: services/MessengerHubService/src/MessengerHubService/Dockerfile
+      dockerfile: services/NotificationService/src/NotificationService/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8080
@@ -336,16 +336,16 @@ services:
     ports:
       - "5080:8080"
     depends_on:
-      messenger-hub-db:
+      notification-db:
         condition: service_healthy
       redis:
         condition: service_started
     networks:
       - app_network
 
-  messenger-hub-db:
+  notification-db:
     image: postgres:16
-    container_name: messenger_hub_db
+    container_name: notification_db
     restart: always
     environment:
       POSTGRES_DB: foundry_db
@@ -354,7 +354,7 @@ services:
     ports:
       - "5440:5432"
     volumes:
-      - messenger_hub_pgdata:/var/lib/postgresql/data
+      - notification_pgdata:/var/lib/postgresql/data
       - ./pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
     command: ["postgres", "-c", "hba_file=/etc/postgresql/pg_hba.conf"]
     networks:
@@ -434,7 +434,7 @@ volumes:
   company_pgdata:
   file_pgdata:
   billing_pgdata:
-  messenger_hub_pgdata:
+  notification_pgdata:
   redis:
 
 networks:

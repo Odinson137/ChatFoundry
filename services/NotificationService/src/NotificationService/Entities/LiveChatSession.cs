@@ -1,8 +1,8 @@
 using Shared.Domain.Entities;
 using Shared.Domain.Enums;
-using MessengerHubService.Enums;
+using NotificationService.Enums;
 
-namespace MessengerHubService.Entities;
+namespace NotificationService.Entities;
 
 public class LiveChatSession : EntityBase
 {

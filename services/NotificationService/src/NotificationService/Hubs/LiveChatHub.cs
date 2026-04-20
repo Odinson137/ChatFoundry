@@ -2,7 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
-namespace MessengerHubService.Hubs;
+namespace NotificationService.Hubs;
 
 [Authorize]
 public class LiveChatHub : Hub

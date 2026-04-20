@@ -1,13 +1,13 @@
 using Microsoft.EntityFrameworkCore;
-using MessengerHubService.Entities;
+using NotificationService.Entities;
 
-namespace MessengerHubService.Data;
+namespace NotificationService.Data;
 
-public class MessengerHubDbContext : DbContext
+public class NotificationDbContext : DbContext
 {
     public DbSet<LiveChatSession> LiveChatSessions => Set<LiveChatSession>();
 
-    public MessengerHubDbContext(DbContextOptions<MessengerHubDbContext> options) : base(options)
+    public NotificationDbContext(DbContextOptions<NotificationDbContext> options) : base(options)
     {
         Database.EnsureCreated();
     }

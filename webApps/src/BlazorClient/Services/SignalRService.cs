@@ -27,7 +27,7 @@ public class SignalRService
         if (_connection != null)
             return;
 
-        var hubUrl = $"{ApiEndpoints.Api}/messenger-hub/hub/livechat";
+        var hubUrl = $"{ApiEndpoints.Api}/notification/hub/livechat";
 
         _connection = new HubConnectionBuilder()
             .WithUrl(hubUrl, options =>

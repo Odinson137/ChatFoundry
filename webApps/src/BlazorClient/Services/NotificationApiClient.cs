@@ -6,7 +6,7 @@ using BlazorClient.Models.DTO;
 
 namespace BlazorClient.Services;
 
-public class MessengerHubApiClient(HttpClient http) : IMessengerHubApiClient
+public class NotificationApiClient(HttpClient http) : INotificationApiClient
 {
     private static readonly JsonSerializerOptions WebJsonOptions = new(JsonSerializerDefaults.Web);
 
@@ -164,7 +164,7 @@ public class MessengerHubApiClient(HttpClient http) : IMessengerHubApiClient
 
     private async Task<T> ExecuteGraphQl<T>(string query, object? variables = null)
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{ApiEndpoints.Api}/messenger-hub/graphql");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{ApiEndpoints.Api}/notification/graphql");
         var payload = new { query, variables };
         request.Content = JsonContent.Create(payload);
 

@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Caching.Distributed;
-using MessengerHubService.Interfaces;
+using NotificationService.Interfaces;
 
-namespace MessengerHubService.Services;
+namespace NotificationService.Services;
 
 public static class LiveChatRedisKeys
 {

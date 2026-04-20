@@ -1,4 +1,4 @@
-namespace MessengerHubService.Enums;
+namespace NotificationService.Enums;
 
 public enum LiveChatSessionStatus
 {

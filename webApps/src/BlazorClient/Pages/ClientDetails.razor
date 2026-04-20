@@ -8,7 +8,7 @@
 @attribute [Authorize]
 @implements IDisposable
 @inject IClientApiClient ClientApi
-@inject IMessengerHubApiClient MessengerHubApi
+@inject INotificationApiClient NotificationApi
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
 
@@ -501,7 +501,7 @@
             if (string.IsNullOrWhiteSpace(channel.ExternalUserId))
                 throw new InvalidOperationException("Для выбранного канала не найден ExternalUserId.");
 
-            await MessengerHubApi.StartProactiveChatAsync(
+            await NotificationApi.StartProactiveChatAsync(
                 channel.ExternalUserId,
                 sourceChannelId,
                 channel.Channel);
