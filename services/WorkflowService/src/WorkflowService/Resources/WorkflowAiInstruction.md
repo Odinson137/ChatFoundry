@@ -36,7 +36,7 @@
 
 Используй в основном типы, доступные в палитре редактора:
 
-`Start`, `Wait`, `SubWorkflow`, `Message`, `Ask`, `Media`, `HttpRequest`, `SetAttribute`, `AIGenerate`
+`Start`, `Wait`, `SubWorkflow`, `Message`, `Ask`, `Media`, `HttpRequest`, `SetAttribute`, `AIGenerate`, `TransferToOperator`
 
 Также допустимы типы движка (если нужны по смыслу): `Input`, `Condition`, `AIFilter`, `Command`, а также медиа-варианты `Image`, `Video`, `Audio`, `Voice`, `File`, `Sticker`, `Link`.
 
@@ -106,7 +106,13 @@
 {}
 ```
 
-**Condition / Wait / Start** — часто достаточно `{}` или без дополнительных полей.
+**Condition / Wait / Start / TransferToOperator** — часто достаточно `{}` или без дополнительных полей.
+
+**TransferToOperator** — передача диалога живому оператору (после этого узла работа бота приостанавливается, пока оператор не закроет чат):
+
+```json
+{}
+```
 
 ## Рёбра (`edges[]`)
 

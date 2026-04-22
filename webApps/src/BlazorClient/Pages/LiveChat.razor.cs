@@ -3,6 +3,7 @@ using BlazorClient.Services;
 using BlazorClient.Components;
 using BlazorClient.Interfaces;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
@@ -13,6 +14,7 @@ public partial class LiveChat : IDisposable
 {
     [Inject] private IJSRuntime JS { get; set; } = null!;
     [Inject] private IClientApiClient ClientApi { get; set; } = null!;
+    [Inject] private IFileApiClient FileApi { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
     [SupplyParameterFromQuery(Name = "chatId")]
     private Guid? ChatId { get; set; }
@@ -26,6 +28,11 @@ public partial class LiveChat : IDisposable
     private string? sendError;
     private Guid? clientPageId; // resolved ClientId for the header link
     private string? conflictError; // shown when another operator already has the chat
+
+    // File attachment state
+    private IBrowserFile? _selectedFile;
+    private string? _selectedFileName;
+    private string? _selectedFileContentType;
 
     // Buffer for SignalR messages received while chat was not selected
     private readonly Dictionary<Guid, List<ChatMessage>> _pendingMessages = new();
@@ -209,27 +216,74 @@ public partial class LiveChat : IDisposable
 
     private async Task SendMessage()
     {
-        if (string.IsNullOrWhiteSpace(messageText) || State.SelectedChatId == null) return;
+        var sessionId = State.SelectedChatId;
+        if (sessionId == null) return;
+        if (string.IsNullOrWhiteSpace(messageText) && _selectedFile == null) return;
 
         var text = messageText.Trim();
+        var hasFile = _selectedFile != null;
+        var fileContentType = _selectedFileContentType;
+        var fileName = _selectedFileName;
+        var fileToUpload = _selectedFile;
+
+        // Clear input state immediately
         messageText = "";
         isSending = true;
         sendError = null;
+        ClearAttachment();
         await ResetTextareaAndClearValue();
         StateHasChanged();
 
-        messages.Add(new ChatMessage(text, true, DateTime.UtcNow, "TEXT"));
-        State.UpdateLastMessagePreview(State.SelectedChatId.Value, text);
-        StateHasChanged();
-        await ScrollToBottom();
-
         try
         {
-            await ApiClient.SendLiveChatMessageAsync(State.SelectedChatId.Value, text);
+            if (hasFile && fileToUpload != null)
+            {
+                // Upload file first
+                var uploadResult = await FileApi.UploadFileAsync(
+                    fileToUpload.OpenReadStream(maxAllowedSize: 20 * 1024 * 1024),
+                    fileName ?? "file",
+                    fileContentType,
+                    ct: CancellationToken.None);
+
+                if (uploadResult == null)
+                {
+                    sendError = "Не удалось загрузить файл";
+                    return;
+                }
+
+                var fileId = uploadResult.Id;
+                var messageKind = ContentTypeToMessageKind(fileContentType ?? "application/octet-stream");
+                var payloadJson = System.Text.Json.JsonSerializer.Serialize(
+                    new { text = fileId, caption = string.IsNullOrWhiteSpace(text) ? null : text });
+
+                // Optimistic UI
+                messages.Add(new ChatMessage(payloadJson, true, DateTime.UtcNow, messageKind));
+                var previewText = string.IsNullOrWhiteSpace(text)
+                    ? $"\U0001F4CE {fileName}"
+                    : text;
+                State.UpdateLastMessagePreview(sessionId.Value, previewText);
+                StateHasChanged();
+                await ScrollToBottom();
+
+                // Send via API
+                await ApiClient.SendLiveChatMessageAsync(
+                    sessionId.Value, fileId, messageKind,
+                    string.IsNullOrWhiteSpace(text) ? null : text);
+            }
+            else
+            {
+                // Text-only
+                messages.Add(new ChatMessage(text, true, DateTime.UtcNow, "TEXT"));
+                State.UpdateLastMessagePreview(sessionId.Value, text);
+                StateHasChanged();
+                await ScrollToBottom();
+
+                await ApiClient.SendLiveChatMessageAsync(sessionId.Value, text);
+            }
         }
         catch
         {
-            sendError = "Не удалось отправить сообщение";
+            sendError = hasFile ? "Не удалось отправить файл" : "Не удалось отправить сообщение";
             messages.Add(new ChatMessage("(ошибка отправки)", false, DateTime.UtcNow, "TEXT"));
         }
         finally
@@ -237,6 +291,41 @@ public partial class LiveChat : IDisposable
             isSending = false;
             StateHasChanged();
         }
+    }
+
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file == null) return;
+
+        const long maxFileSize = 20 * 1024 * 1024;
+        if (file.Size > maxFileSize)
+        {
+            sendError = "Файл превышает 20 МБ.";
+            return;
+        }
+
+        _selectedFile = file;
+        _selectedFileName = file.Name;
+        _selectedFileContentType = file.ContentType;
+        sendError = null;
+        StateHasChanged();
+    }
+
+    private void ClearAttachment()
+    {
+        _selectedFile = null;
+        _selectedFileName = null;
+        _selectedFileContentType = null;
+    }
+
+    private static string ContentTypeToMessageKind(string contentType)
+    {
+        var ct = contentType.ToLowerInvariant();
+        if (ct.StartsWith("image/")) return "PHOTO";
+        if (ct.StartsWith("video/")) return "VIDEO";
+        if (ct.StartsWith("audio/")) return "AUDIO";
+        return "DOCUMENT";
     }
 
     private async Task CloseChat()

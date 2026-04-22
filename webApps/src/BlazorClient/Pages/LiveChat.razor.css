@@ -560,13 +560,84 @@
 }
 
 /* ===== Input area ===== */
+.cf-lc-input-wrap {
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border-top: 1px solid #f1f5f9;
+}
+
+.cf-lc-attachment {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 24px 4px;
+    gap: 10px;
+}
+
+.cf-lc-attachment-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #6366f1;
+    min-width: 0;
+}
+
+.cf-lc-attachment-name {
+    font-size: 0.8rem;
+    color: #475569;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 300px;
+}
+
+.cf-lc-attachment-remove {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: transparent;
+    color: #94a3b8;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
+}
+
+.cf-lc-attachment-remove:hover {
+    background: #fef2f2;
+    color: #ef4444;
+}
+
+.cf-lc-attach-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: transparent;
+    color: #94a3b8;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
+    border: none;
+}
+
+.cf-lc-attach-btn:hover {
+    background: #f1f5f9;
+    color: #6366f1;
+}
+
 .cf-lc-input {
     display: flex;
     align-items: flex-end;
     gap: 10px;
     padding: 14px 24px;
     background: #ffffff;
-    border-top: 1px solid #f1f5f9;
 }
 
 .cf-lc-input-field {
@@ -796,6 +867,14 @@ a.cf-lc-header-name::after {
 
     .cf-lc-input {
         padding: 10px 14px;
+    }
+
+    .cf-lc-attachment {
+        padding: 8px 14px 4px;
+    }
+
+    .cf-lc-attachment-name {
+        max-width: 160px;
     }
 
     .cf-lc-close-btn span {

@@ -51,7 +51,9 @@ public class LiveChatMutation(IHttpContextAccessor httpContextAccessor) : BaseGr
         [Service] LiveChatService liveChatService,
         [Service] ITopicProducer<BotOutgoingMessage> outgoingProducer,
         [Service] IHubContext<LiveChatHub> hubContext,
-        CancellationToken ct)
+        CancellationToken ct,
+        MessageKind? messageKind = null,
+        string? caption = null)
     {
         var session = await repository.GetWithIncludesAsync(liveChatSessionId, ct)
                       ?? throw new GraphQLException("Live chat session not found.");
@@ -62,13 +64,23 @@ public class LiveChatMutation(IHttpContextAccessor httpContextAccessor) : BaseGr
         if (session.OperatorId != UserId)
             throw new GraphQLException("You are not assigned to this chat.");
 
-        var payloadJson = System.Text.Json.JsonSerializer.Serialize(new { text });
+        var kind = messageKind ?? MessageKind.Text;
+        string payloadJson;
+        if (kind == MessageKind.Text)
+        {
+            payloadJson = System.Text.Json.JsonSerializer.Serialize(new { text });
+        }
+        else
+        {
+            payloadJson = System.Text.Json.JsonSerializer.Serialize(new { text, caption });
+        }
+
         await outgoingProducer.Produce(new BotOutgoingMessage(
             session.ChannelId,
             session.Channel,
             session.ExternalUserId,
             payloadJson,
-            Shared.Domain.Enums.MessageKind.Text,
+            kind,
             session.CompanyId), ct);
 
         if (session.CompanyId.HasValue)

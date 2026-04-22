@@ -131,6 +131,18 @@ public class NotificationApiClient(HttpClient http) : INotificationApiClient
         await ExecuteGraphQl<object>(query, variables);
     }
 
+    public async Task SendLiveChatMessageAsync(Guid liveChatSessionId, string text, string messageKind, string? caption = null)
+    {
+        var query = """
+                mutation SendLiveChatMessage($id: UUID!, $text: String!, $messageKind: MessageKind, $caption: String) {
+                    sendLiveChatMessage(liveChatSessionId: $id, text: $text, messageKind: $messageKind, caption: $caption)
+                }
+                """;
+
+        var variables = new { id = liveChatSessionId, text, messageKind, caption };
+        await ExecuteGraphQl<object>(query, variables);
+    }
+
     public async Task CloseLiveChatAsync(Guid liveChatSessionId)
     {
         var query = """
