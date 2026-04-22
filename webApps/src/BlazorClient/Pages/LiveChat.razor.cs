@@ -13,6 +13,10 @@ public partial class LiveChat : IDisposable
 {
     [Inject] private IJSRuntime JS { get; set; } = null!;
     [Inject] private IClientApiClient ClientApi { get; set; } = null!;
+    [Inject] private NavigationManager Navigation { get; set; } = null!;
+    [SupplyParameterFromQuery(Name = "chatId")]
+    private Guid? ChatId { get; set; }
+
     private ElementReference _messagesContainer;
     private ElementReference _inputField;
     private string messageText = "";
@@ -20,6 +24,8 @@ public partial class LiveChat : IDisposable
     private bool isSending;
     private bool isLoadingMessages;
     private string? sendError;
+    private Guid? clientPageId; // resolved ClientId for the header link
+    private string? conflictError; // shown when another operator already has the chat
 
     // Buffer for SignalR messages received while chat was not selected
     private readonly Dictionary<Guid, List<ChatMessage>> _pendingMessages = new();
@@ -41,6 +47,40 @@ public partial class LiveChat : IDisposable
         SignalR.OnMessageDelivered += HandleMessageDelivered;
 
         await LoadChats();
+        await TryAutoSelectChat();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (ChatId.HasValue)
+        {
+            await LoadChats();
+            await TryAutoSelectChat();
+        }
+    }
+
+    private async Task TryAutoSelectChat()
+    {
+        var chatIdToSelect = ChatId ?? State.SelectedChatId;
+        var chatExists = State.QueuedChats.Any(c => c.Id == chatIdToSelect)
+                         || State.MyChats.Any(c => c.Id == chatIdToSelect);
+        if (chatIdToSelect.HasValue && chatExists)
+        {
+            await SelectChat(chatIdToSelect.Value);
+        }
+        else if (!chatIdToSelect.HasValue)
+        {
+            State.SelectedChatId = null;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender && _lastAutoResizedText != messageText)
+        {
+            _lastAutoResizedText = messageText;
+            await AutoResizeInput();
+        }
     }
 
     private async Task LoadChats()
@@ -60,6 +100,7 @@ public partial class LiveChat : IDisposable
 
     private async Task TakeChat(Guid chatId)
     {
+        conflictError = null;
         try
         {
             await ApiClient.TakeLiveChatAsync(chatId);
@@ -68,8 +109,15 @@ public partial class LiveChat : IDisposable
             messages.Clear();
             await LoadMessageHistory(chatId);
         }
-        catch
+        catch (Exception ex)
         {
+            var msg = ex.Message;
+            if (msg.Contains("not in queue", StringComparison.OrdinalIgnoreCase))
+            {
+                conflictError = "Этот чат уже обрабатывается другим оператором.";
+                // Refresh list to reflect current state
+                await LoadChats();
+            }
         }
     }
 
@@ -78,6 +126,7 @@ public partial class LiveChat : IDisposable
         State.SelectedChatId = chatId;
         messages.Clear();
         sendError = null;
+        conflictError = null;
         await LoadMessageHistory(chatId);
     }
 
@@ -89,11 +138,25 @@ public partial class LiveChat : IDisposable
         isLoadingMessages = true;
         StateHasChanged();
 
+        // Resolve client page link in background
+        _ = ResolveClientPageLinkAsync(chat.ClientChannelId);
+
         try
         {
             if (chat.ClientChannelId.HasValue)
             {
                 var result = await ClientApi.GetMessagesAsync(chat.ClientChannelId.Value, 50);
+                result.Items.Reverse();
+                messages = result.Items.Select(m => new ChatMessage(
+                    m.Payload ?? "",
+                    m.Direction.Equals("OUTGOING", StringComparison.OrdinalIgnoreCase),
+                    m.CreatedAt,
+                    m.MessageKind
+                )).ToList();
+            }
+            else
+            {
+                var result = await ClientApi.GetMessagesByChannelAsync(chat.ChannelId, chat.ExternalUserId, chat.Channel, 50);
                 result.Items.Reverse();
                 messages = result.Items.Select(m => new ChatMessage(
                     m.Payload ?? "",
@@ -125,18 +188,38 @@ public partial class LiveChat : IDisposable
         }
     }
 
+    private async Task ResolveClientPageLinkAsync(Guid? clientChannelId)
+    {
+        if (clientChannelId == null || clientPageId != null) return;
+        try
+        {
+            clientPageId = await ClientApi.GetClientIdByChannelIdAsync(clientChannelId.Value);
+            StateHasChanged();
+        }
+        catch
+        {
+            // Link won't be shown — non-critical
+        }
+    }
+
+    private void DismissConflictError()
+    {
+        conflictError = null;
+    }
+
     private async Task SendMessage()
     {
-        if (string.IsNullOrEmpty(messageText) || State.SelectedChatId == null) return;
+        if (string.IsNullOrWhiteSpace(messageText) || State.SelectedChatId == null) return;
 
         var text = messageText.Trim();
         messageText = "";
         isSending = true;
         sendError = null;
-        await ResetTextareaHeight();
+        await ResetTextareaAndClearValue();
         StateHasChanged();
 
         messages.Add(new ChatMessage(text, true, DateTime.UtcNow, "TEXT"));
+        State.UpdateLastMessagePreview(State.SelectedChatId.Value, text);
         StateHasChanged();
         await ScrollToBottom();
 
@@ -167,6 +250,8 @@ public partial class LiveChat : IDisposable
         }
         catch { }
     }
+
+    private string? _lastAutoResizedText;
 
     private async Task HandleTextInput(ChangeEventArgs e)
     {
@@ -201,15 +286,26 @@ public partial class LiveChat : IDisposable
         catch { }
     }
 
-    private void HandleNewChatInQueue(Guid id, string clientId, string clientName, string channel, string preview)
+    private async Task ResetTextareaAndClearValue()
     {
-        State.AddOrUpdateFromSignalR(id, clientId, clientName, channel, preview);
+        try
+        {
+            await JS.InvokeVoidAsync("__cfLcResetTextareaAndClear", _inputField);
+        }
+        catch { }
+    }
+
+    private void HandleNewChatInQueue(Guid id, string clientId, string clientName, string channel, Guid channelId, string preview)
+    {
+        State.AddOrUpdateFromSignalR(id, clientId, clientName, channel, channelId, preview);
         InvokeAsync(StateHasChanged);
     }
 
     private void HandleMessageReceived(Guid id, string direction, string payload, string messageKind, DateTime timestamp)
     {
         var msg = new ChatMessage(payload, false, timestamp, messageKind);
+
+        State.UpdateLastMessagePreview(id, payload);
 
         if (State.SelectedChatId == id && !isLoadingMessages)
         {
@@ -290,14 +386,28 @@ public partial class LiveChat : IDisposable
 
     private static string FormatDateSeparator(DateTime date)
     {
-        var today = DateTime.UtcNow.Date;
-        if (date == today) return "Сегодня";
-        if (date == today.AddDays(-1)) return "Вчера";
-        return date.ToString("dd MMMM yyyy");
+        var localDate = date.ToLocalTime().Date;
+        var today = DateTime.Today;
+        if (localDate == today) return "Сегодня";
+        if (localDate == today.AddDays(-1)) return "Вчера";
+        return localDate.ToString("dd MMMM yyyy");
     }
 
     private static string FormatShortTime(DateTime? dt) =>
-        dt?.ToString("HH:mm") ?? "";
+        dt?.ToLocalTime().ToString("HH:mm") ?? "";
+
+    private static readonly System.Text.RegularExpressions.Regex JsonPayloadRegex = new(@"^\s*\{.*""\s*:\s*""", System.Text.RegularExpressions.RegexOptions.Compiled);
+
+    private static readonly Dictionary<string, string> PreviewTranslations = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "Transferring to operator...", "Перевод на оператора..." },
+        { "Transferring to operator", "Перевод на оператора" },
+    };
+
+    private static string FormatPreview(string? preview) =>
+        string.IsNullOrWhiteSpace(preview) ? "" :
+        PreviewTranslations.TryGetValue(preview.Trim(), out var translated) ? translated :
+        JsonPayloadRegex.IsMatch(preview) ? "\U0001F4CE Файл" : preview;
 
     private RenderFragment RenderMessages(List<ChatMessage> msgs, LiveChatSessionDto chat)
     {
@@ -340,7 +450,7 @@ public partial class LiveChat : IDisposable
 
                 builder.OpenElement(50, "span");
                 builder.AddAttribute(51, "class", "cd-msg-time");
-                builder.AddContent(52, msg.Timestamp.ToString("HH:mm"));
+                builder.AddContent(52, msg.Timestamp.ToLocalTime().ToString("HH:mm"));
                 builder.CloseElement();
 
                 builder.CloseElement(); // bubble

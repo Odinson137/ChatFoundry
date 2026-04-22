@@ -5,4 +5,5 @@ internal sealed record ClientAttributesCacheDto(
     string? Username,
     string? Phone,
     string? Email,
-    Dictionary<string, string> CustomAttributes);
+    Dictionary<string, string> CustomAttributes,
+    string? ClientChannelId = null);

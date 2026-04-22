@@ -501,16 +501,12 @@
             if (string.IsNullOrWhiteSpace(channel.ExternalUserId))
                 throw new InvalidOperationException("Для выбранного канала не найден ExternalUserId.");
 
-            await NotificationApi.StartProactiveChatAsync(
+            var session = await NotificationApi.StartProactiveChatAsync(
                 channel.ExternalUserId,
                 sourceChannelId,
                 channel.Id,
                 channel.Channel);
-            Navigation.NavigateTo("/livechat");
-        }
-        catch (Exception ex) when (ex.Message.Contains("already exists", StringComparison.OrdinalIgnoreCase))
-        {
-            Navigation.NavigateTo("/livechat");
+            Navigation.NavigateTo($"/livechat?chatId={session.Id}");
         }
         catch (Exception)
         {

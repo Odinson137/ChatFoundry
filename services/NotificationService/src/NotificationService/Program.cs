@@ -13,6 +13,7 @@ using NotificationService.Services;
 using Shared.Application.Events;
 using Shared.Infrastructure.DependencyInjection;
 using Shared.Infrastructure.GraphQl;
+using Workflow.Grpc.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -66,8 +67,15 @@ services.AddPostgreSql<NotificationDbContext>(builder.Configuration);
 
 services.AddRedisCache(builder.Configuration, "CacheSettings");
 
+services.AddGrpcClient<ClientAttributesService.ClientAttributesServiceClient>(o =>
+{
+    o.Address = new Uri("http://client-service:8081");
+})
+.AddStandardResilienceHandler();
+
 services.AddScoped<ILiveChatSessionRepository, LiveChatSessionRepository>();
 services.AddScoped<LiveChatService>();
+services.AddScoped<IClientAttributesService, ClientChannelResolverService>();
 
 services.AddSignalR();
 

@@ -42,7 +42,7 @@
                             <span class="cf-lc-item-name">@(chat.ClientFirstName ?? chat.ClientUserName ?? chat.ExternalUserId)</span>
                             <span class="cf-lc-item-time">@FormatShortTime(chat.CreatedAt)</span>
                         </div>
-                        <div class="cf-lc-item-preview">@(chat.LastMessagePreview ?? "Новый запрос")</div>
+                        <div class="cf-lc-item-preview">@(FormatPreview(chat.LastMessagePreview) is "" ? "Новый запрос" : FormatPreview(chat.LastMessagePreview))</div>
                         <div class="cf-lc-item-footer">
                             <span class="cf-lc-badge cf-lc-badge-@(chat.Channel.ToLowerInvariant())">@chat.Channel</span>
                         </div>
@@ -70,12 +70,12 @@
                             <span class="cf-lc-item-name">@(chat.ClientFirstName ?? chat.ClientUserName ?? chat.ExternalUserId)</span>
                             <span class="cf-lc-item-time">@FormatShortTime(chat.TakenAt)</span>
                         </div>
-                        <div class="cf-lc-item-preview">@(chat.LastMessagePreview ?? "...")</div>
+                        <div class="cf-lc-item-preview">@(FormatPreview(chat.LastMessagePreview) is "" ? "..." : FormatPreview(chat.LastMessagePreview))</div>
                         <div class="cf-lc-item-footer">
                             <span class="cf-lc-badge cf-lc-badge-@(chat.Channel.ToLowerInvariant())">@chat.Channel</span>
                             @if (chat.BotName != null)
                             {
-                                <span class="cf-lc-item-bot">via @chat.BotName</span>
+                                <span class="cf-lc-item-bot">бот: @chat.BotName</span>
                             }
                         </div>
                     </div>
@@ -86,6 +86,25 @@
 
     <!-- Main chat area -->
     <div class="cf-lc-main">
+        <!-- Conflict error overlay -->
+        @if (!string.IsNullOrEmpty(conflictError))
+        {
+            <div class="cf-lc-conflict-overlay" @onclick="DismissConflictError">
+                <div class="cf-lc-conflict-card" @onclick:stopPropagation>
+                    <div class="cf-lc-conflict-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" x2="12" y1="8" y2="12"/>
+                            <line x1="12" x2="12.01" y1="16" y2="16"/>
+                        </svg>
+                    </div>
+                    <h3 class="cf-lc-conflict-title">Чат недоступен</h3>
+                    <p class="cf-lc-conflict-text">@conflictError</p>
+                    <button class="cf-lc-conflict-btn" @onclick="DismissConflictError">Понятно</button>
+                </div>
+            </div>
+        }
+
         @if (selectedChat != null)
         {
             <!-- Chat header -->
@@ -93,12 +112,19 @@
                 <div class="cf-lc-header-info">
                     <div class="cf-lc-header-avatar">@GetInitials(selectedChat)</div>
                     <div class="cf-lc-header-details">
-                        <span class="cf-lc-header-name">@(selectedChat.ClientFirstName ?? selectedChat.ClientUserName ?? selectedChat.ExternalUserId)</span>
+                        @if (clientPageId.HasValue)
+                        {
+                            <a href="@($"/clients/{clientPageId}")" class="cf-lc-header-name" target="_blank">@(selectedChat.ClientFirstName ?? selectedChat.ClientUserName ?? selectedChat.ExternalUserId)</a>
+                        }
+                        else
+                        {
+                            <span class="cf-lc-header-name">@(selectedChat.ClientFirstName ?? selectedChat.ClientUserName ?? selectedChat.ExternalUserId)</span>
+                        }
                         <div class="cf-lc-header-meta">
                             <span class="cf-lc-badge cf-lc-badge-@(selectedChat.Channel.ToLowerInvariant()) cf-lc-badge-sm">@selectedChat.Channel</span>
                             @if (selectedChat.BotName != null)
                             {
-                                <span class="cf-lc-header-bot">via @selectedChat.BotName</span>
+                                <span class="cf-lc-header-bot">бот: @selectedChat.BotName</span>
                             }
                         </div>
                     </div>
@@ -146,14 +172,13 @@
             <div class="cf-lc-input">
                 <textarea class="cf-lc-input-field"
                           @ref="_inputField"
-                          value="@messageText"
                           @oninput="HandleTextInput"
                           @onkeydown="OnKeyDown"
                           placeholder="Введите сообщение..."
                           rows="1"
                           disabled="@isSending" />
                 <button class="cf-lc-send-btn" @onclick="SendMessage"
-                        disabled="@isSending || string.IsNullOrEmpty(messageText)">
+                        disabled="@(isSending || string.IsNullOrWhiteSpace(messageText))">
                     @if (isSending)
                     {
                         <div class="cf-lc-spinner-sm"></div>

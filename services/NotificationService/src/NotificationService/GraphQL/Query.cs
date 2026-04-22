@@ -12,10 +12,11 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
     [UseSorting]
     public IQueryable<LiveChatSession> GetLiveChatSessions([Service] NotificationDbContext context)
     {
-        var query = context.LiveChatSessions.AsQueryable();
-        if (CompanyId.HasValue)
-            query = query.Where(s => s.CompanyId == CompanyId.Value);
-        return query.OrderByDescending(s => s.CreatedAt);
+        var query = context.LiveChatSessions
+            .Where(s => s.CompanyId == CompanyId!.Value)
+            .OrderByDescending(s => s.CreatedAt)
+            .AsQueryable();
+        return query;
     }
 
     [UseProjection]

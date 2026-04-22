@@ -7,6 +7,7 @@ using NotificationService.Hubs;
 using NotificationService.Interfaces;
 using NotificationService.Services;
 using Shared.Application.Events;
+using Shared.Domain.Enums;
 using Shared.Infrastructure.GraphQl;
 
 namespace NotificationService.GraphQL;
@@ -120,9 +121,10 @@ public class LiveChatMutation(IHttpContextAccessor httpContextAccessor) : BaseGr
         string externalUserId,
         Guid channelId,
         Guid? channelClientId,
-        Shared.Domain.Enums.DefaultChannel channel,
+        DefaultChannel channel,
         [Service] ILiveChatSessionRepository repository,
         [Service] LiveChatService liveChatService,
+        [Service] IClientAttributesService clientAttributesService,
         [Service] IHubContext<LiveChatHub> hubContext,
         CancellationToken ct)
     {
@@ -131,14 +133,30 @@ public class LiveChatMutation(IHttpContextAccessor httpContextAccessor) : BaseGr
 
         var existing = await repository.GetActiveByChannelAndClientAsync(channelId, externalUserId, ct);
         if (existing != null)
-            throw new GraphQLException("Live chat already exists for this client.");
+            return existing;
+
+        ClientChannelInfo? clientInfo = null;
+        try
+        {
+            clientInfo = await clientAttributesService.GetClientChannelInfoAsync(
+                externalUserId,
+                channel.ToString(),
+                channelId,
+                ct);
+        }
+        catch
+        {
+            // ignored — fallback to no enrichment
+        }
 
         var session = new LiveChatSession
         {
             ExternalUserId = externalUserId,
             Channel = channel,
             ChannelId = channelId,
-            ClientChannelId = channelClientId,
+            ClientChannelId = clientInfo?.Id ?? channelClientId,
+            ClientFirstName = clientInfo?.Name,
+            ClientUserName = clientInfo?.Username,
             CompanyId = CompanyId,
             Status = LiveChatSessionStatus.InProgress,
             OperatorId = UserId,

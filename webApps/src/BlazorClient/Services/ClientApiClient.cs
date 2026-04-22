@@ -122,6 +122,21 @@ public class ClientApiClient(HttpClient http) : IClientApiClient
         return result.Clients.Nodes.FirstOrDefault();
     }
 
+    public async Task<Guid?> GetClientIdByChannelIdAsync(Guid clientChannelId)
+    {
+        var query = """
+            query GetClientByChannelId($channelId: UUID!) {
+                clients(first: 1, where: { clientChannels: { some: { id: { eq: $channelId } } } }) {
+                    nodes { id }
+                }
+            }
+            """;
+
+        var variables = new Dictionary<string, object?> { ["channelId"] = clientChannelId };
+        var result = await ExecuteGraphQl<ClientsConnectionResponse>(query, variables);
+        return result.Clients.Nodes.FirstOrDefault()?.Id;
+    }
+
     public async Task<MessagesPageResult> GetMessagesAsync(Guid clientChannelId, int first, string? after = null)
     {
         var varDecls = new List<string> { "$clientChannelId: UUID!", "$first: Int!" };
@@ -171,6 +186,57 @@ public class ClientApiClient(HttpClient http) : IClientApiClient
     }
 
     
+
+    public async Task<MessagesPageResult> GetMessagesByChannelAsync(Guid channelId, string externalUserId, string channel, int first)
+    {
+        var query = """
+            query GetMessagesByChannel($channelId: UUID!, $externalUserId: String!, $channel: DefaultChannel!, $first: Int!) {
+                messages(
+                    first: $first,
+                    where: {
+                        clientChannel: {
+                            channelId: { eq: $channelId },
+                            externalUserId: { eq: $externalUserId },
+                            channel: { eq: $channel }
+                        }
+                    },
+                    order: [{ createdAt: DESC }]
+                ) {
+                    totalCount
+                    pageInfo {
+                        hasNextPage
+                        endCursor
+                    }
+                    nodes {
+                        id
+                        payload
+                        direction
+                        messageKind
+                        createdAt
+                    }
+                }
+            }
+            """;
+
+        var variables = new Dictionary<string, object?>
+        {
+            ["channelId"] = channelId,
+            ["externalUserId"] = externalUserId,
+            ["channel"] = channel.ToUpperInvariant(),
+            ["first"] = first
+        };
+
+        var result = await ExecuteGraphQl<MessagesConnectionResponse>(query, variables);
+        var connection = result.Messages;
+
+        return new MessagesPageResult
+        {
+            Items = connection.Nodes,
+            TotalCount = connection.TotalCount,
+            HasNextPage = connection.PageInfo.HasNextPage,
+            EndCursor = connection.PageInfo.EndCursor
+        };
+    }
 
     public async Task<List<AttributeDefinitionDto>> GetCompanyAttributeDefinitionsAsync(CancellationToken ct = default)
     {

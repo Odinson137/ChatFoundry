@@ -17,11 +17,14 @@ public sealed class CachingClientAttributesGrpcClient(
     private const string KeyPrefix = "client:attrs:";
     private static readonly Newtonsoft.Json.JsonSerializerSettings JsonSettings = new() { NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore };
 
-    private static string CacheKey(string externalUserId, string channel) => $"{KeyPrefix}{externalUserId}:{channel}";
+    private static string CacheKey(string externalUserId, string channel, string? channelId)
+        => string.IsNullOrEmpty(channelId)
+            ? $"{KeyPrefix}{externalUserId}:{channel}"
+            : $"{KeyPrefix}{externalUserId}:{channel}:{channelId}";
 
     public async Task<GetClientAttributesResponse> GetClientAttributesAsync(GetClientAttributesRequest request, CancellationToken cancellationToken = default)
     {
-        var key = CacheKey(request.ExternalUserId, request.Channel);
+        var key = CacheKey(request.ExternalUserId, request.Channel, request.ChannelId);
         try
         {
             var cached = await cache.GetStringAsync(key, cancellationToken);
@@ -55,7 +58,7 @@ public sealed class CachingClientAttributesGrpcClient(
     public async Task<SetClientAttributesResponse> SetClientAttributesAsync(SetClientAttributesRequest request, CancellationToken cancellationToken = default)
     {
         var response = await inner.SetClientAttributesAsync(request, cancellationToken);
-        var key = CacheKey(request.ExternalUserId, request.Channel);
+        var key = CacheKey(request.ExternalUserId, request.Channel, request.ChannelId);
         try
         {
             await cache.RemoveAsync(key, cancellationToken);
@@ -75,12 +78,16 @@ public sealed class CachingClientAttributesGrpcClient(
             attrs?.Username,
             attrs?.Phone,
             attrs?.Email,
-            new Dictionary<string, string>(response.CustomAttributes));
+            new Dictionary<string, string>(response.CustomAttributes),
+            response.ClientChannelId);
     }
 
     private static GetClientAttributesResponse ToResponse(ClientAttributesCacheDto dto)
     {
         var response = new GetClientAttributesResponse();
+        if (!string.IsNullOrEmpty(dto.ClientChannelId))
+            response.ClientChannelId = dto.ClientChannelId;
+
         var hasAnyBase = dto.Name != null || dto.Username != null || dto.Phone != null || dto.Email != null;
         if (hasAnyBase)
         {

@@ -15,7 +15,7 @@ public class LiveChatStateService
                ?? MyChats.FirstOrDefault(c => c.Id == SelectedChatId);
     }
 
-    public void AddOrUpdateFromSignalR(Guid liveChatSessionId, string externalUserId, string clientName, string channel, string? preview = null)
+    public void AddOrUpdateFromSignalR(Guid liveChatSessionId, string externalUserId, string clientName, string channel, Guid channelId, string? preview = null)
     {
         var existing = QueuedChats.FirstOrDefault(c => c.Id == liveChatSessionId);
         if (existing == null)
@@ -26,6 +26,7 @@ public class LiveChatStateService
                 ExternalUserId = externalUserId,
                 ClientFirstName = clientName,
                 Channel = channel,
+                ChannelId = channelId,
                 LastMessagePreview = preview,
                 Status = "Queued",
                 CreatedAt = DateTime.UtcNow
@@ -40,6 +41,16 @@ public class LiveChatStateService
         {
             QueuedChats.Remove(chat);
             MyChats.Insert(0, chat);
+        }
+    }
+
+    public void UpdateLastMessagePreview(Guid liveChatSessionId, string preview)
+    {
+        var chat = MyChats.FirstOrDefault(c => c.Id == liveChatSessionId)
+                   ?? QueuedChats.FirstOrDefault(c => c.Id == liveChatSessionId);
+        if (chat != null)
+        {
+            chat.LastMessagePreview = preview;
         }
     }
 

@@ -13,8 +13,11 @@ public interface IClientApiClient
         string sortDirection = "DESC");
 
     Task<ClientDto?> GetClientByIdAsync(Guid clientId);
+    Task<Guid?> GetClientIdByChannelIdAsync(Guid clientChannelId);
 
     Task<MessagesPageResult> GetMessagesAsync(Guid clientChannelId, int first, string? after = null);
+
+    Task<MessagesPageResult> GetMessagesByChannelAsync(Guid channelId, string externalUserId, string channel, int first);
 
     Task<List<AttributeDefinitionDto>> GetCompanyAttributeDefinitionsAsync(CancellationToken ct = default);
     Task<AttributeDefinitionDto> CreateCompanyAttributeDefinitionAsync(string key, string? displayName, string? description, CancellationToken ct = default);

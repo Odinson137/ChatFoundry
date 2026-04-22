@@ -12,12 +12,27 @@ namespace NotificationService.Consumers;
 public class LiveChatRequestedConsumer(
     ILiveChatSessionRepository repository,
     LiveChatService liveChatService,
+    IClientAttributesService clientAttributesService,
     IHubContext<LiveChatHub> hubContext) : IConsumer<LiveChatRequestedEvent>
 {
     public async Task Consume(ConsumeContext<LiveChatRequestedEvent> context)
     {
         var evt = context.Message;
         var ct = context.CancellationToken;
+
+        ClientChannelInfo? clientInfo = null;
+        try
+        {
+            clientInfo = await clientAttributesService.GetClientChannelInfoAsync(
+                evt.ExternalUserId,
+                evt.Channel.ToString(),
+                evt.ChannelId,
+                ct);
+        }
+        catch
+        {
+            // ignored — fallback to event data
+        }
 
         var liveChatSession = new LiveChatSession
         {
@@ -28,8 +43,9 @@ public class LiveChatRequestedConsumer(
             BotId = evt.BotId,
             BotName = evt.BotName,
             CompanyId = evt.CompanyId,
-            ClientFirstName = evt.ClientFirstName,
-            ClientUserName = evt.ClientUserName,
+            ClientChannelId = clientInfo?.Id,
+            ClientFirstName = clientInfo?.Name ?? evt.ClientFirstName,
+            ClientUserName = clientInfo?.Username ?? evt.ClientUserName,
             LastMessagePreview = evt.LastMessagePreview,
             Status = LiveChatSessionStatus.Queued
         };
@@ -44,8 +60,9 @@ public class LiveChatRequestedConsumer(
                 {
                     liveChatSessionId = liveChatSession.Id,
                     clientId = evt.ExternalUserId,
-                    clientName = evt.ClientFirstName ?? evt.ClientUserName ?? evt.ExternalUserId,
-                    channel = evt.Channel.ToString(),
+                    clientName = liveChatSession.ClientFirstName ?? liveChatSession.ClientUserName ?? evt.ExternalUserId,
+                    channel = evt.Channel.ToString().ToUpperInvariant(),
+                    channelId = evt.ChannelId,
                     botName = evt.BotName,
                     preview = evt.LastMessagePreview
                 }, ct);

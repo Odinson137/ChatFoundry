@@ -11,6 +11,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
+builder.Services.AddScoped<ITokenRefreshService, TokenRefreshService>();
 builder.Services.AddScoped<AuthErrorHandler>();
 builder.Services.AddScoped(sp =>
 {

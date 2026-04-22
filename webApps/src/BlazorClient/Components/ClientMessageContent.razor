@@ -47,7 +47,7 @@
         else if (!string.IsNullOrEmpty(_mediaUrl))
         {
             <div class="cd-msg-media">
-                <a href="@_mediaUrl" target="_blank" rel="noopener" class="cd-msg-media-link">Скачать файл@(_mediaFileName != null ? $" — {_mediaFileName}" : "")</a>
+                <a href="@_mediaUrl" target="_blank" rel="noopener" class="cd-msg-media-link">@(_mediaFileName != null ? $"{_mediaFileName}" : "")</a>
                 @if (!string.IsNullOrWhiteSpace(_mediaCaption))
                 {
                     <div class="cd-msg-media-caption">@_mediaCaption</div>

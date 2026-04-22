@@ -10,6 +10,7 @@ namespace WorkflowService.Actions.Executors;
 public class TransferToOperatorActionExecutor(
     IMessageSender messageSender,
     ISessionRepository sessionRepository,
+    IVariableService variableService,
     ITopicProducer<LiveChatRequestedEvent> producer
 ) : IActionExecutor
 {
@@ -23,6 +24,9 @@ public class TransferToOperatorActionExecutor(
 
         var workflow = session.Workflow;
 
+        var clientFirstName = variableService.GetVariable(session, "$global.name");
+        var clientUserName = variableService.GetVariable(session, "$global.username");
+
         await producer.Produce(new LiveChatRequestedEvent(
             session.Id,
             session.ClientId,
@@ -31,8 +35,8 @@ public class TransferToOperatorActionExecutor(
             workflow.BotId,
             workflow.Bot.Name,
             workflow.Bot.CompanyId,
-            null,
-            null,
+            clientFirstName,
+            clientUserName,
             "Transferring to operator..."
         ), ct);
     }

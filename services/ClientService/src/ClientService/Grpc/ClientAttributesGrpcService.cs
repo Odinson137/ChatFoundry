@@ -18,17 +18,21 @@ public sealed class ClientAttributesGrpcService(
         if (!Enum.TryParse<DefaultChannel>(request.Channel, true, out var channel))
             throw new RpcException(new Status(StatusCode.InvalidArgument, $"Unknown channel: {request.Channel}"));
 
-        var clientChannel = await db.ClientChannels
+        var query = db.ClientChannels
             .Include(c => c.Attributes)
-            .FirstOrDefaultAsync(c =>
-                c.Channel == channel &&
-                c.ExternalUserId == request.ExternalUserId, context.CancellationToken);
+            .Where(c => c.Channel == channel && c.ExternalUserId == request.ExternalUserId);
+
+        if (!string.IsNullOrEmpty(request.ChannelId) && Guid.TryParse(request.ChannelId, out var channelId))
+            query = query.Where(c => c.ChannelId == channelId);
+
+        var clientChannel = await query.FirstOrDefaultAsync(context.CancellationToken);
 
         if (clientChannel == null)
             throw new RpcException(new Status(StatusCode.NotFound, "Client channel not found"));
 
         var response = new GetClientAttributesResponse
         {
+            ClientChannelId = clientChannel.Id.ToString(),
             BaseAttributes = new BaseAttributes
             {
                 Name = clientChannel.Name,
@@ -53,11 +57,14 @@ public sealed class ClientAttributesGrpcService(
         if (!Enum.TryParse<DefaultChannel>(request.Channel, true, out var channel))
             throw new RpcException(new Status(StatusCode.InvalidArgument, $"Unknown channel: {request.Channel}"));
 
-        var clientChannel = await db.ClientChannels
+        var query = db.ClientChannels
             .Include(c => c.Attributes)
-            .FirstOrDefaultAsync(c =>
-                c.Channel == channel &&
-                c.ExternalUserId == request.ExternalUserId, context.CancellationToken);
+            .Where(c => c.Channel == channel && c.ExternalUserId == request.ExternalUserId);
+
+        if (!string.IsNullOrEmpty(request.ChannelId) && Guid.TryParse(request.ChannelId, out var channelId))
+            query = query.Where(c => c.ChannelId == channelId);
+
+        var clientChannel = await query.FirstOrDefaultAsync(context.CancellationToken);
 
         if (clientChannel == null)
             throw new RpcException(new Status(StatusCode.NotFound, "Client channel not found"));
