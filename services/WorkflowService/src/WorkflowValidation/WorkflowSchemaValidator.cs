@@ -6,7 +6,7 @@ public static class WorkflowSchemaValidator
 {
     private static readonly HashSet<string> AllowedNodeTypes = new(StringComparer.OrdinalIgnoreCase)
     {
-        "Start", "Message", "Ask", "Input", "Condition", "Wait", "Media", "SetAttribute",
+        "Start", "TimerStart", "Message", "Ask", "Input", "Condition", "Wait", "Media", "SetAttribute",
         "HttpRequest", "AIFilter", "AIGenerate", "SubWorkflow", "Command",
         "Image", "Video", "Audio", "Voice", "File", "Sticker", "Link"
     };

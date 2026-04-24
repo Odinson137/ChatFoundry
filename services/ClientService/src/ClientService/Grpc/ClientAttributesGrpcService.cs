@@ -100,4 +100,113 @@ public sealed class ClientAttributesGrpcService(
 
         return new SetClientAttributesResponse { Success = true };
     }
+
+    public override async Task<GetClientsByFilterResponse> GetClientsByFilter(
+        GetClientsByFilterRequest request,
+        ServerCallContext context)
+    {
+        var companyId = string.IsNullOrEmpty(request.CompanyId) ? (Guid?)null : Guid.Parse(request.CompanyId);
+        var query = db.ClientChannels
+            .Include(c => c.Client)
+            .Include(c => c.Attributes)
+            .Where(c => c.Client != null && (companyId == null || c.Client.CompanyId == companyId));
+
+        if (request.ClientIds.Count > 0)
+            query = query.Where(c => request.ClientIds.Contains(c.ExternalUserId));
+
+        if (request.Channels.Count > 0)
+            query = query.Where(c => request.Channels.Contains((int)c.Channel));
+
+        foreach (var condition in request.AttributeConditions)
+        {
+            query = ApplyAttributeCondition(query, condition);
+        }
+
+        var clients = await query
+            .Select(c => new FilteredClient
+            {
+                ExternalUserId = c.ExternalUserId,
+                Channel = (int)c.Channel,
+                ChannelId = c.ChannelId.ToString(),
+            })
+            .ToListAsync(context.CancellationToken);
+
+        var response = new GetClientsByFilterResponse();
+        response.Clients.AddRange(clients);
+        return response;
+    }
+
+    private static IQueryable<ClientChannel> ApplyAttributeCondition(
+        IQueryable<ClientChannel> query,
+        ClientAttributeFilterCondition condition)
+    {
+        var op = condition.Operator.ToLowerInvariant();
+        var value = condition.Value;
+
+        if (!condition.IsCustomAttribute)
+        {
+            return ApplyStringFilter(query, condition.AttributeKey, op, value);
+        }
+
+        // Custom attribute: filter through the Attributes collection
+        query = query.Where(c => c.Attributes.Any(a =>
+            a.Key == condition.AttributeKey));
+
+        return op switch
+        {
+            "equals" => query.Where(c => c.Attributes.Any(a =>
+                a.Key == condition.AttributeKey && a.Value == value)),
+            "notequals" => query.Where(c => c.Attributes.Any(a =>
+                a.Key == condition.AttributeKey && a.Value != value)),
+            "contains" => query.Where(c => c.Attributes.Any(a =>
+                a.Key == condition.AttributeKey && a.Value.Contains(value))),
+            "startswith" => query.Where(c => c.Attributes.Any(a =>
+                a.Key == condition.AttributeKey && a.Value.StartsWith(value))),
+            "endswith" => query.Where(c => c.Attributes.Any(a =>
+                a.Key == condition.AttributeKey && a.Value.EndsWith(value))),
+            _ => query
+        };
+    }
+
+    private static IQueryable<ClientChannel> ApplyStringFilter(
+        IQueryable<ClientChannel> query,
+        string key,
+        string op,
+        string value)
+    {
+        return key.ToLowerInvariant() switch
+        {
+            "name" => ApplyBaseAttributeFilter(query, op, value,
+                c => c.Name != null && EF.Functions.Like(c.Name, GetLikePattern(op, value))),
+            "username" => ApplyBaseAttributeFilter(query, op, value,
+                c => c.Username != null && EF.Functions.Like(c.Username, GetLikePattern(op, value))),
+            "phone" => ApplyBaseAttributeFilter(query, op, value,
+                c => c.Phone != null && EF.Functions.Like(c.Phone, GetLikePattern(op, value))),
+            "email" => ApplyBaseAttributeFilter(query, op, value,
+                c => c.Email != null && EF.Functions.Like(c.Email, GetLikePattern(op, value))),
+            _ => query
+        };
+    }
+
+    private static IQueryable<ClientChannel> ApplyBaseAttributeFilter(
+        IQueryable<ClientChannel> query,
+        string op,
+        string value,
+        System.Linq.Expressions.Expression<Func<ClientChannel, bool>> likePredicate)
+    {
+        return op switch
+        {
+            "equals" or "contains" or "startswith" or "endswith" => query.Where(likePredicate),
+            _ => query
+        };
+    }
+
+    private static string GetLikePattern(string op, string value) => op switch
+    {
+        "equals" => value,
+        "contains" => $"%{value}%",
+        "startswith" => $"{value}%",
+        "endswith" => $"%{value}",
+        _ => value
+    };
 }

@@ -625,6 +625,8 @@ public partial class WorkflowDesigner : IDisposable
             NodeType.AIGenerate => new AIGenerateNodeData { Prompt = "" },
             NodeType.Media => new MediaNodeData { SourceType = MediaSourceType.Attachment },
             NodeType.SubWorkflow => new SubWorkflowNodeData(),
+            NodeType.Wait => new WaitNodeData(),
+            NodeType.TimerStart => new TimerStartNodeData(),
             _ => null
         };
 
@@ -1892,6 +1894,7 @@ public partial class WorkflowDesigner : IDisposable
     [
         new NodeToolItem("Логика", "Старт", NodeType.Start, NodeToolPaletteSvg.Start, "green"),
         new NodeToolItem("Логика", "Ожидание", NodeType.Wait, NodeToolPaletteSvg.Wait, "blue"),
+        new NodeToolItem("Логика", "Таймер", NodeType.TimerStart, NodeToolPaletteSvg.TimerStart, "green"),
         new NodeToolItem("Логика", "Процесс", NodeType.SubWorkflow, NodeToolPaletteSvg.SubWorkflow, "orange"),
         new NodeToolItem("Логика", "Оператор", NodeType.TransferToOperator, NodeToolPaletteSvg.TransferToOperator, "teal"),
         new NodeToolItem("Контент", "Сообщение", NodeType.Message, NodeToolPaletteSvg.Message, "indigo"),

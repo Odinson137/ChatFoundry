@@ -65,6 +65,11 @@
                 : $"Процесс · {sw.WorkflowId}",
             EmptyNodeData when Node.NodeType?.Equals("TransferToOperator", StringComparison.OrdinalIgnoreCase) == true
                 => "Перевод на оператора",
+            WaitNodeData w when string.IsNullOrWhiteSpace(w.Duration) => null,
+            WaitNodeData w => $"Ожидание: {w.Duration} {UnitToRu(w.Unit)}",
+            TimerStartNodeData ts => ts.ScheduleType?.Equals("Cron", StringComparison.OrdinalIgnoreCase) == true
+                ? $"Таймер: {ts.CronExpression}"
+                : $"Таймер: {ts.FireTimeUtc}",
             _ => null
         };
 
@@ -96,4 +101,13 @@
         if (t.Length <= max) return t;
         return t[..(max - 1)] + "…";
     }
+
+    private static string UnitToRu(string unit) => unit.ToLowerInvariant() switch
+    {
+        "seconds" => "сек.",
+        "minutes" => "мин.",
+        "hours" => "ч.",
+        "days" => "дн.",
+        _ => unit
+    };
 }

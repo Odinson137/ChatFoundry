@@ -59,6 +59,8 @@ public sealed class NodeDefinitionJsonConverter : JsonConverter<NodeDefinition>
             "media" => typeof(MediaNodeData),
             "subworkflow" => typeof(SubWorkflowNodeData),
             "transfertooperator" => typeof(EmptyNodeData),
+            "wait" => typeof(WaitNodeData),
+            "timerstart" => typeof(TimerStartNodeData),
             _ => typeof(EmptyNodeData)
         };
     }

@@ -11,6 +11,8 @@ namespace BlazorClient.Models;
 [JsonDerivedType(typeof(AIGenerateNodeData), "AIGenerate")]
 [JsonDerivedType(typeof(MediaNodeData), "Media")]
 [JsonDerivedType(typeof(SubWorkflowNodeData), "SubWorkflow")]
+[JsonDerivedType(typeof(WaitNodeData), "Wait")]
+[JsonDerivedType(typeof(TimerStartNodeData), "TimerStart")]
 
 public abstract class NodeData { }
 
@@ -107,4 +109,34 @@ public class SubWorkflowNodeData : NodeData
     public Dictionary<string, string> InputMappings { get; set; } = new();
 
     public Dictionary<string, string> OutputMappings { get; set; } = new();
+}
+
+public class WaitNodeData : NodeData
+{
+    public string Duration { get; set; } = "60";
+    public string Unit { get; set; } = "Seconds";
+}
+
+public class TimerStartNodeData : NodeData
+{
+    public string ScheduleType { get; set; } = "OneTime";
+    public string? FireTimeUtc { get; set; }
+    public string? CronExpression { get; set; }
+    public string Timezone { get; set; } = "UTC";
+    public ClientFilterCriteria? ClientFilter { get; set; }
+}
+
+public class ClientFilterCriteria
+{
+    public List<string> ClientIds { get; set; } = new();
+    public List<ClientAttributeFilterCondition> AttributeConditions { get; set; } = new();
+    public List<int> Channels { get; set; } = new();
+}
+
+public class ClientAttributeFilterCondition
+{
+    public string AttributeKey { get; set; } = "";
+    public string Operator { get; set; } = "equals";
+    public string Value { get; set; } = "";
+    public bool IsCustomAttribute { get; set; }
 }

@@ -14,5 +14,6 @@ public enum NodeType
     AIGenerate,
     Media,
     SubWorkflow,
-    TransferToOperator
+    TransferToOperator,
+    TimerStart
 }

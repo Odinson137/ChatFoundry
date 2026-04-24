@@ -47,9 +47,13 @@ internal static class NodeToolPaletteSvg
     public static readonly string TransferToOperator =
         SvgOpen + """<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="#0d9488" stroke-width="2" fill="none"/><path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="#0d9488" stroke-width="2" fill="none"/><circle cx="18" cy="5" r="3" stroke="#0d9488" stroke-width="2" fill="#f0fdfa"/><path d="M18.5 4v2" stroke="#0d9488" stroke-width="2" stroke-linecap="round"/><path d="M17.5 5h2" stroke="#0d9488" stroke-width="2" stroke-linecap="round"/>""" + SvgClose;
 
+    public static readonly string TimerStart =
+        SvgOpen + """<rect x="3" y="4" width="18" height="16" rx="2" stroke="#059669" stroke-width="2" fill="#ecfdf5"/><path d="M12 8v4l3 2" stroke="#059669" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M3 10h2M19 10h2M12 4v2" stroke="#059669" stroke-width="2" stroke-linecap="round"/>""" + SvgClose;
+
     public static string GetCanvasVariantClass(string? nodeType) => nodeType?.ToLowerInvariant() switch
     {
         "start" => "workflow-designer-node--start",
+        "timerstart" => "workflow-designer-node--start",
         "end" => "workflow-designer-node--end",
         "wait" => "workflow-designer-node--wait",
         "message" => "workflow-designer-node--message",
@@ -68,6 +72,7 @@ internal static class NodeToolPaletteSvg
     public static string GetCanvasIconSvg(string? nodeType) => nodeType?.ToLowerInvariant() switch
     {
         "start" => Start,
+        "timerstart" => TimerStart,
         "end" => End,
         "wait" => Wait,
         "message" => Message,

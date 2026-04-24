@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+option csharp_namespace = "Scheduler.Grpc";
+
+package scheduler;
+
+service SchedulerGrpcService {
+  rpc ScheduleWaitJob (ScheduleWaitJobRequest) returns (ScheduleWaitJobResponse);
+  rpc CancelWaitJob (CancelWaitJobRequest) returns (CancelWaitJobResponse);
+  rpc RegisterTimerStart (RegisterTimerStartRequest) returns (RegisterTimerStartResponse);
+  rpc UnregisterTimerStart (UnregisterTimerStartRequest) returns (UnregisterTimerStartResponse);
+}
+
+// --- Wait Job ---
+
+message ScheduleWaitJobRequest {
+  string job_key = 1;
+  int64 fire_at_unix_ms = 2;
+  string channel = 3;
+  string client_id = 4;
+  string company_id = 5;
+}
+
+message ScheduleWaitJobResponse {
+  bool success = 1;
+}
+
+message CancelWaitJobRequest {
+  string job_key = 1;
+}
+
+message CancelWaitJobResponse {
+  bool success = 1;
+}
+
+// --- Timer Start ---
+
+message RegisterTimerStartRequest {
+  string job_key = 1;
+  string schedule_type = 2;
+  string fire_time_utc = 3;
+  string cron_expression = 4;
+  string timezone = 5;
+  string client_filter_json = 6;
+  string workflow_id = 7;
+  string bot_id = 8;
+  string channel_id = 9;
+  string company_id = 10;
+  string channel = 11;
+}
+
+message RegisterTimerStartResponse {
+  bool success = 1;
+}
+
+message UnregisterTimerStartRequest {
+  string job_key = 1;
+}
+
+message UnregisterTimerStartResponse {
+  bool success = 1;
+}

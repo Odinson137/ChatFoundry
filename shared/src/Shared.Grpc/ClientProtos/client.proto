@@ -9,6 +9,7 @@ import "google/protobuf/wrappers.proto";
 service ClientAttributesService {
   rpc GetClientAttributes (GetClientAttributesRequest) returns (GetClientAttributesResponse);
   rpc SetClientAttributes (SetClientAttributesRequest) returns (SetClientAttributesResponse);
+  rpc GetClientsByFilter (GetClientsByFilterRequest) returns (GetClientsByFilterResponse);
 }
 
 // --- Get ---
@@ -44,4 +45,30 @@ message BaseAttributes {
 
 message SetClientAttributesResponse {
   bool success = 1;
+}
+
+// --- Filter ---
+
+message GetClientsByFilterRequest {
+  string company_id = 1;
+  repeated string client_ids = 2;
+  repeated ClientAttributeFilterCondition attribute_conditions = 3;
+  repeated int32 channels = 4;
+}
+
+message ClientAttributeFilterCondition {
+  string attribute_key = 1;
+  string operator = 2;
+  string value = 3;
+  bool is_custom_attribute = 4;
+}
+
+message GetClientsByFilterResponse {
+  repeated FilteredClient clients = 1;
+}
+
+message FilteredClient {
+  string external_user_id = 1;
+  int32 channel = 2;
+  string channel_id = 3;
 }

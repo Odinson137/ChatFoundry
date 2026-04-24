@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Shared.Application.Events;
 using Shared.Infrastructure.DependencyInjection;
 using Shared.Infrastructure.Licensing;
+using Scheduler.Grpc;
 using Shared.Infrastructure.GraphQl;
 using Workflow.Grpc.Client;
 using WorkflowService.Actions.Executors;
@@ -65,6 +66,7 @@ services.AddScoped<IActionExecutor, AIGenerateActionExecutor>();
 services.AddScoped<IActionExecutor, SendMediaActionExecutor>();
 services.AddScoped<IActionExecutor, SubWorkflowActionExecutor>();
 services.AddScoped<IActionExecutor, TransferToOperatorActionExecutor>();
+services.AddScoped<IActionExecutor, WaitActionExecutor>();
 
 services.AddScoped<IMessageSender, MessageSender>();
 services.AddScoped<IOpenAiService, OpenAiService>();
@@ -166,6 +168,11 @@ services.AddGrpcClient<global::Billing.Grpc.BillingQuotaService.BillingQuotaServ
 {
     var address = builder.Configuration["Services:BillingServiceGrpc"] ?? "http://billing-service:8081";
     o.Address = new Uri(address);
+}).AddStandardResilienceHandler();
+
+services.AddGrpcClient<SchedulerGrpcService.SchedulerGrpcServiceClient>(o =>
+{
+    o.Address = new Uri("http://scheduler-service:8081");
 }).AddStandardResilienceHandler();
 
 services.AddScoped<WorkflowService.Services.BillingQuotaGuard>();

@@ -18,7 +18,7 @@ public sealed class WorkflowGraph(
             : throw new InvalidOperationException($"Node '{id}' not found");
 
     public WorkflowNode GetStartNode()
-        => Nodes.Values.First(n => n.Type == WorkflowNodeType.Start);
+        => Nodes.Values.First(n => n.Type is WorkflowNodeType.Start or WorkflowNodeType.TimerStart);
 
     public WorkflowNode? GetNextNode(Guid completedActionNodeId, Session session, IVariableService variableService)
     {

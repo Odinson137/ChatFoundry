@@ -537,6 +537,143 @@
                             </div>
                         }
                     }
+
+                    @if (node is WorkflowNodeModel { Data: WaitNodeData waitData })
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">Длительность</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" min="1"
+                                       value="@waitData.Duration"
+                                       @oninput="e => { waitData.Duration = e.Value?.ToString() ?? string.Empty; OnWorkflowChanged(); }" />
+                                <select class="form-select" style="max-width:140px;"
+                                        value="@waitData.Unit"
+                                        @onchange="e => { waitData.Unit = e.Value?.ToString() ?? string.Empty; OnWorkflowChanged(); }">
+                                    <option value="Seconds">Секунды</option>
+                                    <option value="Minutes">Минуты</option>
+                                    <option value="Hours">Часы</option>
+                                    <option value="Days">Дни</option>
+                                </select>
+                            </div>
+                            <small class="form-text text-muted">Можно использовать переменные, например <code>{{$node.123.output}}</code></small>
+                        </div>
+                    }
+
+                    @if (node is WorkflowNodeModel { Data: TimerStartNodeData timerData })
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">Тип расписания</label>
+                            <select class="form-select"
+                                    value="@timerData.ScheduleType"
+                                    @onchange="e => { timerData.ScheduleType = e.Value?.ToString() ?? string.Empty; OnWorkflowChanged(); }">
+                                <option value="OneTime">Однократно</option>
+                                <option value="Cron">По расписанию (Cron)</option>
+                            </select>
+                        </div>
+
+                        @if (timerData.ScheduleType == "OneTime")
+                        {
+                            <div class="mb-3">
+                                <label class="form-label">Дата и время (UTC)</label>
+                                <input type="datetime-local" class="form-control"
+                                       value="@timerData.FireTimeUtc"
+                                       @oninput="e => { timerData.FireTimeUtc = e.Value?.ToString() ?? string.Empty; OnWorkflowChanged(); }" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="mb-3">
+                                <label class="form-label">Cron выражение</label>
+                                <input type="text" class="form-control font-monospace"
+                                       value="@timerData.CronExpression"
+                                       placeholder="0 0 10 * * ?"
+                                       @oninput="e => { timerData.CronExpression = e.Value?.ToString() ?? string.Empty; OnWorkflowChanged(); }" />
+                                <small class="form-text text-muted">Пример: <code>0 0 10 * * ?</code> — каждый день в 10:00</small>
+                            </div>
+                        }
+
+                        <div class="mb-3">
+                            <label class="form-label">Часовой пояс</label>
+                            <input type="text" class="form-control"
+                                   value="@timerData.Timezone"
+                                   @oninput="e => { timerData.Timezone = e.Value?.ToString() ?? string.Empty; OnWorkflowChanged(); }" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Фильтр клиентов</label>
+                            <small class="form-text text-muted d-block mb-2">
+                                Оставьте пустым для всех клиентов компании, или добавьте условия фильтрации.
+                            </small>
+
+                            <div class="mb-2">
+                                <label class="form-label">Каналы</label>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    @foreach (var ch in new[] { "Telegram", "Web", "WhatsApp" })
+                                    {
+                                        var chIdx = ch switch { "Telegram" => 0, "Web" => 1, "WhatsApp" => 2, _ => -1 };
+                                        var isSelected = timerData.ClientFilter?.Channels?.Contains(chIdx) == true;
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="@($"ch-{ch}")" checked="@isSelected"
+                                                   @onchange="e => {
+                                                       timerData.ClientFilter ??= new ClientFilterCriteria();
+                                                       var isChecked = e.Value is bool b && b;
+                                                       if (isChecked)
+                                                           timerData.ClientFilter.Channels.Add(chIdx);
+                                                       else
+                                                           timerData.ClientFilter.Channels.RemoveAll(x => x == chIdx);
+                                                       OnWorkflowChanged();
+                                                   }" />
+                                            <label class="form-check-label" for="@($"ch-{ch}")">@ch</label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="mb-2">
+                                <label class="form-label">Условия по атрибутам</label>
+                                @if (timerData.ClientFilter?.AttributeConditions != null)
+                                {
+                                    @foreach (var cond in timerData.ClientFilter.AttributeConditions.ToList())
+                                    {
+                                        <div class="input-group mb-2">
+                                            <input type="text" class="form-control" style="max-width:120px;"
+                                                   placeholder="Ключ" value="@cond.AttributeKey"
+                                                   @oninput="e => { cond.AttributeKey = e.Value?.ToString() ?? string.Empty; OnWorkflowChanged(); }" />
+                                            <select class="form-select" style="max-width:120px;"
+                                                    value="@cond.Operator"
+                                                    @onchange="e => { cond.Operator = e.Value?.ToString() ?? string.Empty; OnWorkflowChanged(); }">
+                                                <option value="equals">Равно</option>
+                                                <option value="notequals">Не равно</option>
+                                                <option value="contains">Содержит</option>
+                                                <option value="startswith">Начинается с</option>
+                                                <option value="endswith">Заканчивается на</option>
+                                            </select>
+                                            <input type="text" class="form-control"
+                                                   placeholder="Значение" value="@cond.Value"
+                                                   @oninput="e => { cond.Value = e.Value?.ToString() ?? string.Empty; OnWorkflowChanged(); }" />
+                                            <div class="input-group-text">
+                                                <input class="form-check-input" type="checkbox" title="Кастомный атрибут"
+                                                       checked="@cond.IsCustomAttribute"
+                                                       @onchange="e => { cond.IsCustomAttribute = e.Value is bool b && b; OnWorkflowChanged(); }" />
+                                            </div>
+                                            <button type="button" class="btn btn-outline-danger"
+                                                    @onclick="() => { timerData.ClientFilter!.AttributeConditions.Remove(cond); OnWorkflowChanged(); }">
+                                                <span class="oi oi-x"></span>
+                                            </button>
+                                        </div>
+                                    }
+                                }
+                                <button type="button" class="btn btn-sm btn-outline-primary"
+                                        @onclick="() => {
+                                            timerData.ClientFilter ??= new ClientFilterCriteria();
+                                            timerData.ClientFilter.AttributeConditions.Add(new ClientAttributeFilterCondition());
+                                            OnWorkflowChanged();
+                                        }">
+                                    <span class="oi oi-plus"></span> Добавить условие
+                                </button>
+                            </div>
+                        </div>
+                    }
                 }
                 else if (SelectedModel is WorkflowLinkModel link)
                 {

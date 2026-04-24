@@ -1,9 +1,13 @@
+using System.Text.Json;
 using HotChocolate;
 using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
+using Scheduler.Grpc;
 using Shared.Infrastructure.GraphQl;
 using WorkflowService.Data;
 using WorkflowService.Entities;
+using WorkflowService.Enums;
+using WorkflowService.Models.Node;
 
 namespace WorkflowService.GraphQL.Mutations;
 
@@ -12,7 +16,8 @@ public class BotWorkflowMutation
 {
     public async Task<AddBotWorkflowPayload> AddBotWorkflowAsync(
         AddBotWorkflowInput input,
-        [Service] WorkflowDbContext context)
+        [Service] WorkflowDbContext context,
+        [Service] SchedulerGrpcService.SchedulerGrpcServiceClient? schedulerClient = null)
     {
         var workflow = new BotWorkflow
         {
@@ -31,14 +36,21 @@ public class BotWorkflowMutation
             await context.Workflows.Where(w => w.BotId == input.BotId).ExecuteUpdateAsync(s => s.SetProperty(w => w.IsActiveBotWorkflow, false));
         await context.SaveChangesAsync();
 
+        if (workflow.IsActiveBotWorkflow)
+            await SyncTimerStartScheduleAsync(workflow, context, schedulerClient);
+
         return new AddBotWorkflowPayload(workflow);
     }
 
     public async Task<UpdateBotWorkflowPayload> UpdateBotWorkflowAsync(
         UpdateBotWorkflowInput input,
-        [Service] WorkflowDbContext context)
+        [Service] WorkflowDbContext context,
+        [Service] SchedulerGrpcService.SchedulerGrpcServiceClient? schedulerClient = null)
     {
-        var workflow = await context.Workflows.FindAsync(input.WorkflowId);
+        var workflow = await context.Workflows
+            .Include(w => w.Bot)
+            .ThenInclude(b => b.BotChannels)
+            .FirstOrDefaultAsync(w => w.Id == input.WorkflowId);
 
         if (workflow is null)
         {
@@ -62,12 +74,15 @@ public class BotWorkflowMutation
 
         await context.SaveChangesAsync();
 
+        await SyncTimerStartScheduleAsync(workflow, context, schedulerClient);
+
         return new UpdateBotWorkflowPayload(workflow);
     }
 
     public async Task<DeleteBotWorkflowPayload> DeleteBotWorkflowAsync(
         DeleteBotWorkflowInput input,
-        [Service] WorkflowDbContext context)
+        [Service] WorkflowDbContext context,
+        [Service] SchedulerGrpcService.SchedulerGrpcServiceClient? schedulerClient = null)
     {
         var workflow = await context.Workflows.FindAsync(input.WorkflowId);
 
@@ -75,6 +90,8 @@ public class BotWorkflowMutation
         {
             return new DeleteBotWorkflowPayload(null);
         }
+
+        await UnregisterTimerStartAsync(workflow.Id, schedulerClient);
 
         context.Workflows.Remove(workflow);
         await context.SaveChangesAsync();
@@ -114,6 +131,107 @@ public class BotWorkflowMutation
         await context.SaveChangesAsync();
 
         return new CopyBotWorkflowPayload(copy);
+    }
+
+    private static async Task SyncTimerStartScheduleAsync(
+        BotWorkflow workflow,
+        WorkflowDbContext context,
+        SchedulerGrpcService.SchedulerGrpcServiceClient? schedulerClient)
+    {
+        if (schedulerClient == null)
+            return;
+
+        var jobKey = $"timer:{workflow.Id}";
+        var timerNode = FindTimerStartNode(workflow.NodesDefinition);
+
+        if (!workflow.IsActiveBotWorkflow || timerNode == null || !timerNode.HasValue)
+        {
+            await UnregisterTimerStartAsync(workflow.Id, schedulerClient);
+            return;
+        }
+
+        var timerElement = timerNode.Value;
+        var data = timerElement.GetProperty("data");
+        var scheduleType = data.TryGetProperty("scheduleType", out var st) ? st.GetString() ?? "OneTime" : "OneTime";
+        var fireTimeUtc = data.TryGetProperty("fireTimeUtc", out var ft) ? ft.GetString() : null;
+        var cronExpression = data.TryGetProperty("cronExpression", out var ce) ? ce.GetString() : null;
+        var timezone = data.TryGetProperty("timezone", out var tz) ? tz.GetString() ?? "UTC" : "UTC";
+
+        var clientFilterJson = data.TryGetProperty("clientFilter", out var cf)
+            ? cf.ValueKind != JsonValueKind.Null ? cf.GetRawText() : null
+            : null;
+
+        // Get first bot channel for the scheduler to publish messages
+        string? channelId = null;
+        string? channel = null;
+        if (workflow.Bot?.BotChannels?.Count > 0)
+        {
+            var botChannel = workflow.Bot.BotChannels.First();
+            channelId = botChannel.ChannelId.ToString();
+            channel = botChannel.Channel.ToString();
+        }
+
+        if (channelId == null || channel == null)
+            return;
+
+        try
+        {
+            await schedulerClient.RegisterTimerStartAsync(new RegisterTimerStartRequest
+            {
+                JobKey = jobKey,
+                ScheduleType = scheduleType,
+                FireTimeUtc = fireTimeUtc ?? "",
+                CronExpression = cronExpression ?? "",
+                Timezone = timezone,
+                ClientFilterJson = clientFilterJson ?? "",
+                WorkflowId = workflow.Id.ToString(),
+                BotId = workflow.BotId.ToString(),
+                ChannelId = channelId,
+                CompanyId = (workflow.Bot?.CompanyId ?? Guid.Empty).ToString(),
+                Channel = channel,
+            });
+        }
+        catch
+        {
+            // Best-effort: scheduler might be unavailable
+        }
+    }
+
+    private static async Task UnregisterTimerStartAsync(
+        Guid workflowId,
+        SchedulerGrpcService.SchedulerGrpcServiceClient? schedulerClient)
+    {
+        if (schedulerClient == null)
+            return;
+
+        try
+        {
+            await schedulerClient.UnregisterTimerStartAsync(new UnregisterTimerStartRequest
+            {
+                JobKey = $"timer:{workflowId}",
+            });
+        }
+        catch
+        {
+            // Best-effort
+        }
+    }
+
+    private static JsonElement? FindTimerStartNode(string nodesJson)
+    {
+        if (string.IsNullOrWhiteSpace(nodesJson))
+            return null;
+
+        using var doc = JsonDocument.Parse(nodesJson);
+        foreach (var el in doc.RootElement.EnumerateArray())
+        {
+            if (el.TryGetProperty("type", out var t) &&
+                t.ValueKind == JsonValueKind.String &&
+                t.GetString() == "TimerStart")
+                return el;
+        }
+
+        return null;
     }
 }
 

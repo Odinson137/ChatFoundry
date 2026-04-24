@@ -25,6 +25,7 @@
         <Protobuf Include="CompanyProtos\company_registration.proto" GrpcServices="Both" />
         <Protobuf Include="IdentityProtos\user_company.proto" GrpcServices="Both" />
         <Protobuf Include="BillingProtos\billing.proto" GrpcServices="Both" />
+        <Protobuf Include="SchedulerProtos\scheduler.proto" GrpcServices="Both" />
     </ItemGroup>
 
 </Project>

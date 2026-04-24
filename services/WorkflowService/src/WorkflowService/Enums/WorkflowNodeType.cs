@@ -33,4 +33,6 @@ public enum WorkflowNodeType
     Command = 50,
 
     TransferToOperator = 60,
+
+    TimerStart = 101,
 }

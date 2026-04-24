@@ -366,6 +366,52 @@ services:
       retries: 10
       start_period: 5s
 
+  scheduler-service:
+    container_name: scheduler_service
+    build:
+      context: ..
+      dockerfile: services/SchedulerService/src/SchedulerService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080;http://+:8081
+      - ASPNETCORE_Kestrel__Endpoints__Http__Url=http://+:8080
+      - ASPNETCORE_Kestrel__Endpoints__Http__Protocols=Http1
+      - ASPNETCORE_Kestrel__Endpoints__Grpc__Url=http://+:8081
+      - ASPNETCORE_Kestrel__Endpoints__Grpc__Protocols=Http2
+    ports:
+      - "5090:8080"
+      - "5091:8081"
+    depends_on:
+      scheduler-db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    networks:
+      - app_network
+
+  scheduler-db:
+    image: postgres:16
+    container_name: scheduler_db
+    restart: always
+    environment:
+      POSTGRES_DB: foundry_db
+      POSTGRES_USER: foundry
+      POSTGRES_PASSWORD: foundry
+    ports:
+      - "5441:5432"
+    volumes:
+      - scheduler_pgdata:/var/lib/postgresql/data
+      - ./pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+    command: ["postgres", "-c", "hba_file=/etc/postgresql/pg_hba.conf"]
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U foundry -d foundry_db"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
   redis:
     image: redis
     container_name: redis
@@ -435,6 +481,7 @@ volumes:
   file_pgdata:
   billing_pgdata:
   notification_pgdata:
+  scheduler_pgdata:
   redis:
 
 networks:

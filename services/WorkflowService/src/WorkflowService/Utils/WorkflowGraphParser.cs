@@ -118,6 +118,8 @@ public sealed class WorkflowGraphParser
             WorkflowNodeType.HttpRequest => data.Deserialize<HttpRequestNodeData>(JsonOptions) ?? NodeData.Empty,
             WorkflowNodeType.AIGenerate => data.Deserialize<AIGenerateNodeData>(JsonOptions) ?? NodeData.Empty,
             WorkflowNodeType.Media => data.Deserialize<MediaNodeData>(JsonOptions) ?? NodeData.Empty,
+            WorkflowNodeType.Wait => data.Deserialize<WaitNodeData>(JsonOptions) ?? NodeData.Empty,
+            WorkflowNodeType.TimerStart => data.Deserialize<TimerStartNodeData>(JsonOptions) ?? NodeData.Empty,
             _ => NodeData.Empty
         };
     }
