@@ -50,6 +50,9 @@ public partial class WorkflowDesigner : IDisposable
     [Inject] private IFileApiClient FileApiClient { get; set; } = null!;
     [Inject] private IClientApiClient ClientApiClient { get; set; } = null!;
 
+    private List<ChannelDto> AvailableChannels { get; set; } = [];
+    private string UserTimezone { get; set; } = "UTC";
+
     [Parameter] public Guid WorkflowId { get; set; }
 
     private BlazorDiagram Diagram { get; set; } = null!;
@@ -141,6 +144,8 @@ public partial class WorkflowDesigner : IDisposable
         InitializeDiagram();
         await LoadWorkflowData();
         await LoadCompanyAttributes();
+        await LoadAvailableChannels();
+        await LoadUserTimezone();
         RefreshVariables();
         RefreshNodeVariableCache();
     }
@@ -161,6 +166,43 @@ public partial class WorkflowDesigner : IDisposable
         {
             CompanyAttributeDefinitions = new List<AttributeDefinitionDto>();
         }
+    }
+
+    private async Task LoadAvailableChannels()
+    {
+        try
+        {
+            AvailableChannels = await ApiClient.GetChannelsAsync();
+        }
+        catch
+        {
+            AvailableChannels = [];
+        }
+    }
+
+    private async Task LoadUserTimezone()
+    {
+        try
+        {
+            UserTimezone = await JSRuntime.InvokeAsync<string>("() => Intl.DateTimeFormat().resolvedOptions().timeZone");
+        }
+        catch
+        {
+            UserTimezone = "UTC";
+        }
+    }
+
+    private void AddFilterCondition(TimerStartNodeData timerData)
+    {
+        timerData.ClientFilter ??= new ClientFilterCriteria();
+        timerData.ClientFilter.AttributeConditions.Add(new ClientAttributeFilterCondition());
+        OnWorkflowChanged();
+    }
+
+    private void RemoveFilterCondition(TimerStartNodeData timerData, ClientAttributeFilterCondition cond)
+    {
+        timerData.ClientFilter?.AttributeConditions.Remove(cond);
+        OnWorkflowChanged();
     }
 
     private IEnumerable<string> GetAttributeKeysForModal()
@@ -200,6 +242,15 @@ public partial class WorkflowDesigner : IDisposable
         {
             if (seen.Add(k)) yield return k;
         }
+    }
+
+    private string GetAttributeDropdownLabel(string key)
+    {
+        var attr = CompanyAttributeDefinitions.FirstOrDefault(a =>
+            string.Equals(a.Key, key, StringComparison.OrdinalIgnoreCase));
+        if (attr != null && !string.IsNullOrWhiteSpace(attr.DisplayName))
+            return attr.DisplayName;
+        return key;
     }
 
     private static string NormalizeAttributeKey(string? value)
@@ -576,6 +627,7 @@ public partial class WorkflowDesigner : IDisposable
         switch (type.ToLower())
         {
             case "start":
+            case "timerstart":
                 node.AddPort(new WorkflowPortModel(node, PortAlignment.Right));
                 break;
             case "end":
@@ -626,7 +678,7 @@ public partial class WorkflowDesigner : IDisposable
             NodeType.Media => new MediaNodeData { SourceType = MediaSourceType.Attachment },
             NodeType.SubWorkflow => new SubWorkflowNodeData(),
             NodeType.Wait => new WaitNodeData(),
-            NodeType.TimerStart => new TimerStartNodeData(),
+            NodeType.TimerStart => new TimerStartNodeData { Timezone = UserTimezone },
             _ => null
         };
 
@@ -1530,7 +1582,7 @@ public partial class WorkflowDesigner : IDisposable
 
         return filtered.GroupBy(v => v.Type switch
         {
-            VariableType.GlobalAttribute => "Атрибуты ($global.*)",
+            VariableType.GlobalAttribute => "Атрибуты",
             VariableType.System => "Системные",
             VariableType.User => "Пользователь",
             VariableType.Custom => "Переменные",
@@ -1724,7 +1776,7 @@ public partial class WorkflowDesigner : IDisposable
 
         return filtered.GroupBy(v => v.Type switch
         {
-            VariableType.GlobalAttribute => "Атрибуты ($global.*)",
+            VariableType.GlobalAttribute => "Атрибуты",
             VariableType.System => "Системные",
             VariableType.User => "Пользователь",
             VariableType.Custom => "Параметры",
@@ -1893,8 +1945,8 @@ public partial class WorkflowDesigner : IDisposable
     private static readonly List<NodeToolItem> AllNodeTools =
     [
         new NodeToolItem("Логика", "Старт", NodeType.Start, NodeToolPaletteSvg.Start, "green"),
-        new NodeToolItem("Логика", "Ожидание", NodeType.Wait, NodeToolPaletteSvg.Wait, "blue"),
         new NodeToolItem("Логика", "Таймер", NodeType.TimerStart, NodeToolPaletteSvg.TimerStart, "green"),
+        new NodeToolItem("Логика", "Ожидание", NodeType.Wait, NodeToolPaletteSvg.Wait, "blue"),
         new NodeToolItem("Логика", "Процесс", NodeType.SubWorkflow, NodeToolPaletteSvg.SubWorkflow, "orange"),
         new NodeToolItem("Логика", "Оператор", NodeType.TransferToOperator, NodeToolPaletteSvg.TransferToOperator, "teal"),
         new NodeToolItem("Контент", "Сообщение", NodeType.Message, NodeToolPaletteSvg.Message, "indigo"),

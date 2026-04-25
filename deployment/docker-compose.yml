@@ -384,8 +384,6 @@ services:
     depends_on:
       scheduler-db:
         condition: service_healthy
-      kafka:
-        condition: service_started
     networks:
       - app_network
 

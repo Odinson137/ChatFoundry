@@ -54,13 +54,13 @@ message GetClientsByFilterRequest {
   repeated string client_ids = 2;
   repeated ClientAttributeFilterCondition attribute_conditions = 3;
   repeated int32 channels = 4;
+  repeated string channel_ids = 5;
 }
 
 message ClientAttributeFilterCondition {
   string attribute_key = 1;
   string operator = 2;
   string value = 3;
-  bool is_custom_attribute = 4;
 }
 
 message GetClientsByFilterResponse {

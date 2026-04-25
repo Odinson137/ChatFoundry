@@ -19,9 +19,9 @@ public class TimerStartJob(
         var dataMap = context.MergedJobDataMap;
 
         var companyIdStr = dataMap.GetString("companyId")!;
-        var botIdStr = dataMap.GetString("botId")!;
-        var channelIdStr = dataMap.GetString("channelId")!;
-        var channel = (DefaultChannel)dataMap.GetInt("channel");
+        // var botIdStr = dataMap.GetString("botId")!;
+        // var channelIdStr = dataMap.GetString("channelId")!;
+        // var channel = (DefaultChannel)dataMap.GetInt("channel");
         var clientFilterJson = dataMap.GetString("clientFilterJson");
 
         Guid companyId = Guid.Parse(companyIdStr);
@@ -51,7 +51,6 @@ public class TimerStartJob(
                                 AttributeKey = cond.AttributeKey,
                                 Operator = cond.Operator,
                                 Value = cond.Value,
-                                IsCustomAttribute = cond.IsCustomAttribute,
                             });
                         }
                     }
@@ -89,7 +88,8 @@ public class TimerStartJob(
                 MessageExternalId: Guid.NewGuid().ToString(),
                 Parameters: new Dictionary<MessageParameter, string>(),
                 MessageKind: MessageKind.Text,
-                companyId);
+                CompanyId: companyId,
+                Source: BotIncomingMessageSource.Timer);
 
             await botMessageProducer.Produce(message, context.CancellationToken);
         }
@@ -107,6 +107,5 @@ public class TimerStartJob(
         public string AttributeKey { get; set; } = "";
         public string Operator { get; set; } = "equals";
         public string Value { get; set; } = "";
-        public bool IsCustomAttribute { get; set; }
     }
 }

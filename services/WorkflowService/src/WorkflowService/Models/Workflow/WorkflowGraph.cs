@@ -2,6 +2,7 @@ using WorkflowService.Entities;
 using WorkflowService.Enums;
 using WorkflowService.Interfaces;
 using WorkflowService.Utils;
+using Shared.Domain.Enums;
 
 namespace WorkflowService.Models.Workflow;
 
@@ -17,8 +18,17 @@ public sealed class WorkflowGraph(
             ? node
             : throw new InvalidOperationException($"Node '{id}' not found");
 
-    public WorkflowNode GetStartNode()
-        => Nodes.Values.First(n => n.Type is WorkflowNodeType.Start or WorkflowNodeType.TimerStart);
+    public WorkflowNode GetStartNode(BotIncomingMessageSource source = BotIncomingMessageSource.Client)
+    {
+        var startNodeType = source switch
+        {
+            BotIncomingMessageSource.Timer => WorkflowNodeType.TimerStart,
+            _ => WorkflowNodeType.Start,
+        };
+
+        // TODO добавить обработчик ошибок
+        return Nodes.Values.First(n => n.Type == startNodeType);
+    }
 
     public WorkflowNode? GetNextNode(Guid completedActionNodeId, Session session, IVariableService variableService)
     {

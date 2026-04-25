@@ -15,7 +15,7 @@
 <div class="settings-page-header">
     <div>
         <h1 class="settings-page-title">Атрибуты</h1>
-        <p class="settings-page-subtitle">Глобальные атрибуты компании, доступные как <code style="font-size: 0.82rem; color: #6366f1; background: #eef2ff; padding: 2px 6px; border-radius: 4px;">$global.ключ</code> в workflow</p>
+        <p class="settings-page-subtitle">Глобальные атрибуты компании, доступные в workflow</p>
     </div>
     <button class="settings-btn-primary" @onclick="OpenCreateAttributeModal">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -67,7 +67,7 @@ else
             {
                 <tr>
                     <td>
-                        <code class="attr-key">$global.@attr.Key</code>
+                        <code class="attr-key">@attr.Key</code>
                     </td>
                     <td>
                         <span class="attr-display-name">@(attr.DisplayName ?? "—")</span>

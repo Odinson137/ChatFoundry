@@ -13,7 +13,7 @@ public class ClientFilterCriteria
 {
     public List<string> ClientIds { get; set; } = [];
     public List<ClientAttributeFilterCondition> AttributeConditions { get; set; } = [];
-    public List<int> Channels { get; set; } = [];
+    public List<Guid> Channels { get; set; } = [];
 }
 
 public class ClientAttributeFilterCondition
@@ -21,5 +21,4 @@ public class ClientAttributeFilterCondition
     public string AttributeKey { get; set; } = "";
     public string Operator { get; set; } = "equals";
     public string Value { get; set; } = "";
-    public bool IsCustomAttribute { get; set; }
 }

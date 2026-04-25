@@ -67,6 +67,7 @@ services.AddScoped<IActionExecutor, SendMediaActionExecutor>();
 services.AddScoped<IActionExecutor, SubWorkflowActionExecutor>();
 services.AddScoped<IActionExecutor, TransferToOperatorActionExecutor>();
 services.AddScoped<IActionExecutor, WaitActionExecutor>();
+services.AddScoped<IActionExecutor, TimeStartActionExecutor>();
 
 services.AddScoped<IMessageSender, MessageSender>();
 services.AddScoped<IOpenAiService, OpenAiService>();

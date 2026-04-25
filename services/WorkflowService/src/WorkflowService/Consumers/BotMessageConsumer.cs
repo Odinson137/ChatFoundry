@@ -40,9 +40,7 @@ public class BotMessageConsumer(
                 session = await sessionResolver.ResolveForBotAsync(msg, botId, ct);
 
                 var graph = workflowGraphParser.Parse(session.Workflow.NodesDefinition, session.Workflow.EdgesDefinition);
-                var currentNode = session.CurrentNodeId == null
-                    ? graph.GetStartNode()
-                    : graph.GetNode(session.CurrentNodeId.Value);
+                var currentNode = graph.GetNode(session.CurrentNodeId!.Value);
 
                 var action = await actionFactory.CreateAsync(
                     session,
@@ -63,5 +61,4 @@ public class BotMessageConsumer(
         }
     }
 }
-
 

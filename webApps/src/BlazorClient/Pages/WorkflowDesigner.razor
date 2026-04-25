@@ -247,7 +247,7 @@
                                 <option value="">— Выберите атрибут —</option>
                                 @foreach (var key in GetAttributeKeysForDropdown())
                                 {
-                                    <option value="@key">$global.@key</option>
+                                    <option value="@key">@GetAttributeDropdownLabel(key)</option>
                                 }
                             </select>
                             <small class="form-text text-muted">
@@ -574,7 +574,7 @@
                         @if (timerData.ScheduleType == "OneTime")
                         {
                             <div class="mb-3">
-                                <label class="form-label">Дата и время (UTC)</label>
+                                <label class="form-label">Дата и время</label>
                                 <input type="datetime-local" class="form-control"
                                        value="@timerData.FireTimeUtc"
                                        @oninput="e => { timerData.FireTimeUtc = e.Value?.ToString() ?? string.Empty; OnWorkflowChanged(); }" />
@@ -596,7 +596,9 @@
                             <label class="form-label">Часовой пояс</label>
                             <input type="text" class="form-control"
                                    value="@timerData.Timezone"
+                                   placeholder="@UserTimezone"
                                    @oninput="e => { timerData.Timezone = e.Value?.ToString() ?? string.Empty; OnWorkflowChanged(); }" />
+                            <small class="form-text text-muted">Ваш часовой пояс: <code>@UserTimezone</code></small>
                         </div>
 
                         <div class="mb-3">
@@ -605,70 +607,87 @@
                                 Оставьте пустым для всех клиентов компании, или добавьте условия фильтрации.
                             </small>
 
-                            <div class="mb-2">
-                                <label class="form-label">Каналы</label>
-                                <div class="d-flex gap-2 flex-wrap">
-                                    @foreach (var ch in new[] { "Telegram", "Web", "WhatsApp" })
-                                    {
-                                        var chIdx = ch switch { "Telegram" => 0, "Web" => 1, "WhatsApp" => 2, _ => -1 };
-                                        var isSelected = timerData.ClientFilter?.Channels?.Contains(chIdx) == true;
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="@($"ch-{ch}")" checked="@isSelected"
-                                                   @onchange="e => {
-                                                       timerData.ClientFilter ??= new ClientFilterCriteria();
-                                                       var isChecked = e.Value is bool b && b;
-                                                       if (isChecked)
-                                                           timerData.ClientFilter.Channels.Add(chIdx);
-                                                       else
-                                                           timerData.ClientFilter.Channels.RemoveAll(x => x == chIdx);
-                                                       OnWorkflowChanged();
-                                                   }" />
-                                            <label class="form-check-label" for="@($"ch-{ch}")">@ch</label>
-                                        </div>
-                                    }
+                            @if (AvailableChannels.Count > 0)
+                            {
+                                <div class="card p-3 mb-2 border-secondary shadow-sm">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="small fw-bold">Каналы</span>
+                                    </div>
+                                    <div class="d-flex flex-column gap-2">
+                                        @foreach (var ch in AvailableChannels)
+                                        {
+                                            var isSelected = timerData.ClientFilter?.Channels?.Contains(ch.Id) == true;
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="@($"ch-{ch.Id}")" checked="@isSelected"
+                                                       @onchange="e => {
+                                                           timerData.ClientFilter ??= new ClientFilterCriteria();
+                                                           var isChecked = e.Value is bool b && b;
+                                                           if (isChecked)
+                                                               timerData.ClientFilter.Channels.Add(ch.Id);
+                                                           else
+                                                               timerData.ClientFilter.Channels.RemoveAll(x => x == ch.Id);
+                                                           OnWorkflowChanged();
+                                                       }" />
+                                                <label class="form-check-label d-flex align-items-center gap-1" for="@($"ch-{ch.Id}")">
+                                                    @ch.Name
+                                                    <span class="badge bg-secondary bg-opacity-10 text-secondary" style="font-size:0.7rem;">@ch.ChannelType</span>
+                                                </label>
+                                            </div>
+                                        }
+                                    </div>
                                 </div>
-                            </div>
+                            }
 
                             <div class="mb-2">
                                 <label class="form-label">Условия по атрибутам</label>
                                 @if (timerData.ClientFilter?.AttributeConditions != null)
                                 {
-                                    @foreach (var cond in timerData.ClientFilter.AttributeConditions.ToList())
+                                    @for (var condIdx = 0; condIdx < timerData.ClientFilter.AttributeConditions.Count; condIdx++)
                                     {
-                                        <div class="input-group mb-2">
-                                            <input type="text" class="form-control" style="max-width:120px;"
-                                                   placeholder="Ключ" value="@cond.AttributeKey"
-                                                   @oninput="e => { cond.AttributeKey = e.Value?.ToString() ?? string.Empty; OnWorkflowChanged(); }" />
-                                            <select class="form-select" style="max-width:120px;"
-                                                    value="@cond.Operator"
-                                                    @onchange="e => { cond.Operator = e.Value?.ToString() ?? string.Empty; OnWorkflowChanged(); }">
-                                                <option value="equals">Равно</option>
-                                                <option value="notequals">Не равно</option>
-                                                <option value="contains">Содержит</option>
-                                                <option value="startswith">Начинается с</option>
-                                                <option value="endswith">Заканчивается на</option>
-                                            </select>
-                                            <input type="text" class="form-control"
-                                                   placeholder="Значение" value="@cond.Value"
-                                                   @oninput="e => { cond.Value = e.Value?.ToString() ?? string.Empty; OnWorkflowChanged(); }" />
-                                            <div class="input-group-text">
-                                                <input class="form-check-input" type="checkbox" title="Кастомный атрибут"
-                                                       checked="@cond.IsCustomAttribute"
-                                                       @onchange="e => { cond.IsCustomAttribute = e.Value is bool b && b; OnWorkflowChanged(); }" />
+                                        var cond = timerData.ClientFilter.AttributeConditions[condIdx];
+                                        var idx = condIdx;
+                                        <div class="card p-3 mb-2 border-secondary shadow-sm">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <span class="small fw-bold">Условие @(idx + 1)</span>
+                                                <button type="button" class="designer-ask-remove" title="Удалить" @onclick="() => RemoveFilterCondition(timerData, cond)">
+                                                    <span class="oi oi-trash"></span>
+                                                </button>
                                             </div>
-                                            <button type="button" class="btn btn-outline-danger"
-                                                    @onclick="() => { timerData.ClientFilter!.AttributeConditions.Remove(cond); OnWorkflowChanged(); }">
-                                                <span class="oi oi-x"></span>
-                                            </button>
+                                            <div class="mb-2 designer-var-row">
+                                                <label class="small text-muted d-flex justify-content-between align-items-center">
+                                                    <span>Ключ</span>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(cond, nameof(cond.AttributeKey), v))"><span class="oi oi-code"></span> {}</button>
+                                                </label>
+                                                <input type="text" class="form-control variable-input" placeholder="name, email, ..."
+                                                       value="@ToDisplayText(cond.AttributeKey)"
+                                                       @oninput="e => { UpdateFieldAndCheckAtMention(e, cond, nameof(cond.AttributeKey)); OnWorkflowChanged(); }"/>
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="small text-muted">Оператор</label>
+                                                <select class="form-select form-select-sm"
+                                                        value="@cond.Operator"
+                                                        @onchange="e => { cond.Operator = e.Value?.ToString() ?? string.Empty; OnWorkflowChanged(); }">
+                                                    <option value="equals">Равно</option>
+                                                    <option value="notequals">Не равно</option>
+                                                    <option value="contains">Содержит</option>
+                                                    <option value="startswith">Начинается с</option>
+                                                    <option value="endswith">Заканчивается на</option>
+                                                </select>
+                                            </div>
+                                            <div class="designer-var-row">
+                                                <label class="small text-muted d-flex justify-content-between align-items-center">
+                                                    <span>Значение</span>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(cond, nameof(cond.Value), v))"><span class="oi oi-code"></span> {}</button>
+                                                </label>
+                                                <input type="text" class="form-control variable-input" placeholder="Значение"
+                                                       value="@ToDisplayText(cond.Value)"
+                                                       @oninput="e => { UpdateFieldAndCheckAtMention(e, cond, nameof(cond.Value)); OnWorkflowChanged(); }"/>
+                                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                                            </div>
                                         </div>
                                     }
                                 }
-                                <button type="button" class="btn btn-sm btn-outline-primary"
-                                        @onclick="() => {
-                                            timerData.ClientFilter ??= new ClientFilterCriteria();
-                                            timerData.ClientFilter.AttributeConditions.Add(new ClientAttributeFilterCondition());
-                                            OnWorkflowChanged();
-                                        }">
+                                <button type="button" class="designer-ask-add" @onclick="() => AddFilterCondition(timerData)">
                                     <span class="oi oi-plus"></span> Добавить условие
                                 </button>
                             </div>
@@ -1318,7 +1337,7 @@
                         @foreach (var key in attrKeys)
                         {
                             <div class="variables-modal-item var-global">
-                                <code>$global.@key</code>
+                                <code>@key</code>
                                 <span class="text-muted">@(attrDisplay.TryGetValue(key, out var dn) ? dn : GetAttributeDisplayName(key))</span>
                             </div>
                         }
@@ -1457,7 +1476,7 @@
                                     </span>
                                     <div class="variable-picker-item-body">
                                         <span class="variable-picker-item-name">@GetVariableDisplayName(variable)</span>
-                                        <span class="variable-picker-item-code">@variable.Name</span>
+                                        <span class="variable-picker-item-code">@(variable.Name.StartsWith("$global.", StringComparison.OrdinalIgnoreCase) ? variable.Name["$global.".Length..] : variable.Name)</span>
                                     </div>
                                     <span class="variable-picker-item-add oi oi-plus"></span>
                                 </button>

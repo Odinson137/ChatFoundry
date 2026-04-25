@@ -144,22 +144,72 @@ public class BotWorkflowMutation
         var jobKey = $"timer:{workflow.Id}";
         var timerNode = FindTimerStartNode(workflow.NodesDefinition);
 
-        if (!workflow.IsActiveBotWorkflow || timerNode == null || !timerNode.HasValue)
-        {
-            await UnregisterTimerStartAsync(workflow.Id, schedulerClient);
-            return;
-        }
+        // if (!workflow.IsActiveBotWorkflow || timerNode == null || !timerNode.HasValue)
+        // {
+           var test = UnregisterTimerStartAsync(workflow.Id, schedulerClient);
+            // return;
+        // }
 
         var timerElement = timerNode.Value;
         var data = timerElement.GetProperty("data");
         var scheduleType = data.TryGetProperty("scheduleType", out var st) ? st.GetString() ?? "OneTime" : "OneTime";
-        var fireTimeUtc = data.TryGetProperty("fireTimeUtc", out var ft) ? ft.GetString() : null;
+        var fireTime = data.TryGetProperty("fireTimeUtc", out var ft) ? ft.GetString() : null;
         var cronExpression = data.TryGetProperty("cronExpression", out var ce) ? ce.GetString() : null;
         var timezone = data.TryGetProperty("timezone", out var tz) ? tz.GetString() ?? "UTC" : "UTC";
 
+        // Convert local fire time + timezone to UTC
+        string? fireTimeUtc = null;
+        if (!string.IsNullOrEmpty(fireTime) && scheduleType.Equals("OneTime", StringComparison.OrdinalIgnoreCase))
+        {
+            try
+            {
+                var tzInfo = TimeZoneInfo.FindSystemTimeZoneById(timezone);
+                var localTime = DateTimeOffset.Parse(fireTime);
+                fireTimeUtc = TimeZoneInfo.ConvertTime(localTime, tzInfo).UtcDateTime.ToString("O");
+            }
+            catch
+            {
+                fireTimeUtc = fireTime;
+            }
+        }
+
+        // Process clientFilterJson: convert channel GUIDs to int channel types
         var clientFilterJson = data.TryGetProperty("clientFilter", out var cf)
             ? cf.ValueKind != JsonValueKind.Null ? cf.GetRawText() : null
             : null;
+
+        if (!string.IsNullOrEmpty(clientFilterJson))
+        {
+            try
+            {
+                var filterDoc = JsonDocument.Parse(clientFilterJson);
+                var filterObj = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(clientFilterJson);
+                if (filterObj != null && filterObj.TryGetValue("channels", out var channelsEl) && channelsEl.ValueKind == JsonValueKind.Array)
+                {
+                    var channelGuids = channelsEl.EnumerateArray()
+                        .Select(e => Guid.TryParse(e.GetString(), out var g) ? g : (Guid?)null)
+                        .Where(g => g.HasValue)
+                        .Select(g => g!.Value)
+                        .ToList();
+
+                    if (channelGuids.Count > 0)
+                    {
+                        var channelTypeInts = await context.MessengerChannels
+                            .Where(c => channelGuids.Contains(c.Id))
+                            .Select(c => (int)c.ChannelType)
+                            .Distinct()
+                            .ToListAsync();
+
+                        filterObj["channels"] = JsonSerializer.SerializeToElement(channelTypeInts);
+                        clientFilterJson = JsonSerializer.Serialize(filterObj);
+                    }
+                }
+            }
+            catch
+            {
+                // Keep original JSON if processing fails
+            }
+        }
 
         // Get first bot channel for the scheduler to publish messages
         string? channelId = null;
@@ -168,14 +218,16 @@ public class BotWorkflowMutation
         {
             var botChannel = workflow.Bot.BotChannels.First();
             channelId = botChannel.ChannelId.ToString();
-            channel = botChannel.Channel.ToString();
+            //channel = botChannel.Channel.ToString();
         }
 
-        if (channelId == null || channel == null)
+        if (channelId == null)
             return;
 
         try
         {
+            await test;
+            
             await schedulerClient.RegisterTimerStartAsync(new RegisterTimerStartRequest
             {
                 JobKey = jobKey,
@@ -188,7 +240,7 @@ public class BotWorkflowMutation
                 BotId = workflow.BotId.ToString(),
                 ChannelId = channelId,
                 CompanyId = (workflow.Bot?.CompanyId ?? Guid.Empty).ToString(),
-                Channel = channel,
+                Channel = channelId,
             });
         }
         catch
@@ -222,7 +274,7 @@ public class BotWorkflowMutation
         if (string.IsNullOrWhiteSpace(nodesJson))
             return null;
 
-        using var doc = JsonDocument.Parse(nodesJson);
+        var doc = JsonDocument.Parse(nodesJson);
         foreach (var el in doc.RootElement.EnumerateArray())
         {
             if (el.TryGetProperty("type", out var t) &&

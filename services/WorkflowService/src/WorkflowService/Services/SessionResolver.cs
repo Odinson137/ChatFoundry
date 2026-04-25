@@ -21,7 +21,7 @@ public class SessionResolver(
             var workflow = await workflowRepository
                 .GetActiveWorkflowAsync(botId, ct) ?? throw new InvalidOperationException($"Active workflow not found for bot {botId}.");
 
-            var node = workflowGraphParser.Parse(workflow.NodesDefinition, workflow.EdgesDefinition).GetStartNode();
+            var node = workflowGraphParser.Parse(workflow.NodesDefinition, workflow.EdgesDefinition).GetStartNode(message.Source);
 
             session = new Session
             {

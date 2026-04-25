@@ -10,5 +10,6 @@ public record BotIncomingMessage(
     string MessageExternalId,
     IReadOnlyDictionary<MessageParameter, string> Parameters,
     MessageKind MessageKind = MessageKind.Text,
-    Guid? CompanyId = null
+    Guid? CompanyId = null,
+    BotIncomingMessageSource Source = BotIncomingMessageSource.Client
 );

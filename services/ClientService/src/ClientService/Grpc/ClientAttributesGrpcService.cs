@@ -117,6 +117,12 @@ public sealed class ClientAttributesGrpcService(
         if (request.Channels.Count > 0)
             query = query.Where(c => request.Channels.Contains((int)c.Channel));
 
+        if (request.ChannelIds.Count > 0)
+        {
+            var channelGuids = request.ChannelIds.Select(Guid.Parse).ToList();
+            query = query.Where(c => c.ChannelId.HasValue && channelGuids.Contains(c.ChannelId.Value));
+        }
+
         foreach (var condition in request.AttributeConditions)
         {
             query = ApplyAttributeCondition(query, condition);
@@ -136,6 +142,11 @@ public sealed class ClientAttributesGrpcService(
         return response;
     }
 
+    private static readonly HashSet<string> BaseAttributeKeys = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "name", "username", "phone", "email"
+    };
+
     private static IQueryable<ClientChannel> ApplyAttributeCondition(
         IQueryable<ClientChannel> query,
         ClientAttributeFilterCondition condition)
@@ -143,7 +154,7 @@ public sealed class ClientAttributesGrpcService(
         var op = condition.Operator.ToLowerInvariant();
         var value = condition.Value;
 
-        if (!condition.IsCustomAttribute)
+        if (BaseAttributeKeys.Contains(condition.AttributeKey))
         {
             return ApplyStringFilter(query, condition.AttributeKey, op, value);
         }
