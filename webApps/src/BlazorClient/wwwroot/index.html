@@ -212,6 +212,33 @@
             textarea.value = '';
             textarea.style.height = 'auto';
         };
+        window.__getUserTimezone = function() {
+            try { return Intl.DateTimeFormat().resolvedOptions().timeZone; }
+            catch (e) { return "UTC"; }
+        };
+        window.__getTimezoneOffsets = function(timezonesJson) {
+            var tzList = JSON.parse(timezonesJson);
+            var result = {};
+            var now = new Date();
+            var utcStr = now.toLocaleString('en-US', { timeZone: 'UTC' });
+            var utcDate = new Date(utcStr);
+            for (var i = 0; i < tzList.length; i++) {
+                var tz = tzList[i];
+                try {
+                    var tzStr = now.toLocaleString('en-US', { timeZone: tz });
+                    var tzDate = new Date(tzStr);
+                    var diff = Math.round((tzDate - utcDate) / 60000);
+                    var sign = diff >= 0 ? '+' : '-';
+                    diff = Math.abs(diff);
+                    var h = Math.floor(diff / 60);
+                    var m = diff % 60;
+                    result[tz] = m > 0 ? sign + h + ':' + String(m).padStart(2, '0') : sign + h;
+                } catch (e) {
+                    result[tz] = '+0';
+                }
+            }
+            return JSON.stringify(result);
+        };
     </script>
 </body>
 

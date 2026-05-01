@@ -22,16 +22,8 @@ public class LiveChatMutation(IHttpContextAccessor httpContextAccessor) : BaseGr
         [Service] IHubContext<LiveChatHub> hubContext,
         CancellationToken ct)
     {
-        var session = await repository.GetWithIncludesAsync(liveChatSessionId, ct)
-                      ?? throw new GraphQLException("Live chat session not found.");
-
-        if (session.Status != LiveChatSessionStatus.Queued)
-            throw new GraphQLException("Chat is not in queue.");
-
-        session.Status = LiveChatSessionStatus.InProgress;
-        session.OperatorId = UserId;
-        session.TakenAt = DateTime.UtcNow;
-        await repository.SaveAsync(session, ct);
+        var session = await repository.TryTakeAsync(liveChatSessionId, UserId, ct)
+                      ?? throw new GraphQLException("Chat is not in queue.");
 
         await liveChatService.SetRedisFlagAsync(session.ChannelId, session.ExternalUserId, session.Id, ct);
 

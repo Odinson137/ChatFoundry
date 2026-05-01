@@ -3,6 +3,7 @@ using NotificationService.Data;
 using NotificationService.Entities;
 using NotificationService.Enums;
 using NotificationService.Interfaces;
+using NotificationService.Repositories;
 
 namespace NotificationService.Repositories;
 
@@ -40,5 +41,19 @@ public class LiveChatSessionRepository(NotificationDbContext db) : ILiveChatSess
         return await db.LiveChatSessions
             .Where(s => s.Status == LiveChatSessionStatus.Queued || s.Status == LiveChatSessionStatus.InProgress)
             .ToListAsync(ct);
+    }
+
+    public async Task<LiveChatSession?> TryTakeAsync(Guid id, Guid operatorId, CancellationToken ct)
+    {
+        var rows = await db.LiveChatSessions
+            .Where(s => s.Id == id && s.Status == LiveChatSessionStatus.Queued)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(x => x.Status, LiveChatSessionStatus.InProgress)
+                .SetProperty(x => x.OperatorId, operatorId)
+                .SetProperty(x => x.TakenAt, DateTime.UtcNow)
+                .SetProperty(x => x.ModifiedAt, DateTime.UtcNow),
+                ct);
+
+        return rows == 0 ? null : await db.LiveChatSessions.FindAsync([id], ct);
     }
 }

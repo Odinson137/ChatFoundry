@@ -157,15 +157,15 @@ public class BotWorkflowMutation
         var cronExpression = data.TryGetProperty("cronExpression", out var ce) ? ce.GetString() : null;
         var timezone = data.TryGetProperty("timezone", out var tz) ? tz.GetString() ?? "UTC" : "UTC";
 
-        // Convert local fire time + timezone to UTC
+        // Convert local fire time (in user's timezone) to UTC
         string? fireTimeUtc = null;
         if (!string.IsNullOrEmpty(fireTime) && scheduleType.Equals("OneTime", StringComparison.OrdinalIgnoreCase))
         {
             try
             {
                 var tzInfo = TimeZoneInfo.FindSystemTimeZoneById(timezone);
-                var localTime = DateTimeOffset.Parse(fireTime);
-                fireTimeUtc = TimeZoneInfo.ConvertTime(localTime, tzInfo).UtcDateTime.ToString("O");
+                var localDateTime = DateTime.SpecifyKind(DateTime.Parse(fireTime), DateTimeKind.Unspecified);
+                fireTimeUtc = TimeZoneInfo.ConvertTimeToUtc(localDateTime, tzInfo).ToString("O");
             }
             catch
             {

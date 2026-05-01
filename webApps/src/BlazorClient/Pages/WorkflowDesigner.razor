@@ -594,11 +594,17 @@
 
                         <div class="mb-3">
                             <label class="form-label">Часовой пояс</label>
-                            <input type="text" class="form-control"
+                            <input type="text" class="form-control" list="tz-list"
                                    value="@timerData.Timezone"
                                    placeholder="@UserTimezone"
                                    @oninput="e => { timerData.Timezone = e.Value?.ToString() ?? string.Empty; OnWorkflowChanged(); }" />
-                            <small class="form-text text-muted">Ваш часовой пояс: <code>@UserTimezone</code></small>
+                            <datalist id="tz-list">
+                                @foreach (var tz in CommonTimezones)
+                                {
+                                    var offset = TimezoneOffsets.GetValueOrDefault(tz.Id, "");
+                                    <option value="@tz.Id">@tz.Label (@offset)</option>
+                                }
+                            </datalist>
                         </div>
 
                         <div class="mb-3">

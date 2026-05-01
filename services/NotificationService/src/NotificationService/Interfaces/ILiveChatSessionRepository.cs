@@ -10,4 +10,5 @@ public interface ILiveChatSessionRepository
     Task AddAsync(LiveChatSession session, CancellationToken ct);
     Task SaveAsync(LiveChatSession session, CancellationToken ct);
     Task<IReadOnlyList<LiveChatSession>> GetActiveSessionsAsync(CancellationToken ct);
+    Task<LiveChatSession?> TryTakeAsync(Guid id, Guid operatorId, CancellationToken ct);
 }

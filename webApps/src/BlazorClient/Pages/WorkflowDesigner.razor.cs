@@ -52,6 +52,33 @@ public partial class WorkflowDesigner : IDisposable
 
     private List<ChannelDto> AvailableChannels { get; set; } = [];
     private string UserTimezone { get; set; } = "UTC";
+    private Dictionary<string, string> TimezoneOffsets { get; set; } = new();
+
+    private static readonly (string Id, string Label)[] CommonTimezones =
+    [
+        ("UTC", "UTC"),
+        ("Europe/London", "Лондон"), ("Europe/Paris", "Париж"), ("Europe/Berlin", "Берлин"),
+        ("Europe/Madrid", "Мадрид"), ("Europe/Rome", "Рим"), ("Europe/Amsterdam", "Амстердам"),
+        ("Europe/Brussels", "Брюссель"), ("Europe/Vienna", "Вена"), ("Europe/Warsaw", "Варшава"),
+        ("Europe/Prague", "Прага"), ("Europe/Budapest", "Будапешт"), ("Europe/Bucharest", "Бухарест"),
+        ("Europe/Athens", "Афины"), ("Europe/Helsinki", "Хельсинки"),
+        ("Europe/Istanbul", "Стамбул"), ("Europe/Moscow", "Москва"), ("Europe/Minsk", "Минск"), ("Europe/Kiev", "Киев"),
+        ("Asia/Dubai", "Дубай"), ("Asia/Karachi", "Карачи"), ("Asia/Kolkata", "Калькутта"),
+        ("Asia/Dhaka", "Дакка"), ("Asia/Bangkok", "Бангкок"), ("Asia/Singapore", "Сингапур"),
+        ("Asia/Hong_Kong", "Гонконг"), ("Asia/Shanghai", "Шанхай"), ("Asia/Taipei", "Тайбэй"),
+        ("Asia/Tokyo", "Токио"), ("Asia/Seoul", "Сеул"),
+        ("Australia/Sydney", "Сидней"), ("Australia/Melbourne", "Мельбурн"),
+        ("Australia/Perth", "Перт"),
+        ("Pacific/Auckland", "Окленд"),
+        ("America/New_York", "Нью-Йорк"), ("America/Chicago", "Чикаго"),
+        ("America/Denver", "Денвер"), ("America/Los_Angeles", "Лос-Анджелес"),
+        ("America/Toronto", "Торонто"), ("America/Vancouver", "Ванкувер"),
+        ("America/Mexico_City", "Мехико"), ("America/Sao_Paulo", "Сан-Паулу"),
+        ("America/Argentina/Buenos_Aires", "Буэнос-Айрес"), ("America/Bogota", "Богота"),
+        ("America/Lima", "Лима"),
+        ("Africa/Cairo", "Каир"), ("Africa/Lagos", "Лагос"),
+        ("Africa/Johannesburg", "Йоханнесбург"), ("Africa/Nairobi", "Найроби"),
+    ];
 
     [Parameter] public Guid WorkflowId { get; set; }
 
@@ -142,10 +169,10 @@ public partial class WorkflowDesigner : IDisposable
     protected override async Task OnInitializedAsync()
     {
         InitializeDiagram();
+        await LoadUserTimezone();
         await LoadWorkflowData();
         await LoadCompanyAttributes();
         await LoadAvailableChannels();
-        await LoadUserTimezone();
         RefreshVariables();
         RefreshNodeVariableCache();
     }
@@ -184,11 +211,22 @@ public partial class WorkflowDesigner : IDisposable
     {
         try
         {
-            UserTimezone = await JSRuntime.InvokeAsync<string>("() => Intl.DateTimeFormat().resolvedOptions().timeZone");
+            UserTimezone = await JSRuntime.InvokeAsync<string>("__getUserTimezone");
         }
         catch
         {
             UserTimezone = "UTC";
+        }
+
+        try
+        {
+            var idsJson = JsonSerializer.Serialize(CommonTimezones.Select(t => t.Id));
+            var json = await JSRuntime.InvokeAsync<string>("__getTimezoneOffsets", idsJson);
+            TimezoneOffsets = JsonSerializer.Deserialize<Dictionary<string, string>>(json) ?? new();
+        }
+        catch
+        {
+            TimezoneOffsets = CommonTimezones.ToDictionary(t => t.Id, _ => "+0");
         }
     }
 
@@ -409,6 +447,8 @@ public partial class WorkflowDesigner : IDisposable
         {
             if (node.Data is AskNodeData ask)
                 NormalizeAskButtons(ask);
+            if (node.Data is TimerStartNodeData timer && timer.Timezone == "UTC")
+                timer.Timezone = UserTimezone;
         }
 
         RefreshNodeVariableCache();
@@ -1699,7 +1739,9 @@ public partial class WorkflowDesigner : IDisposable
         if (Diagram == null)
             return [];
 
-        var nodes = Diagram.Nodes.Cast<WorkflowNodeModel>().ToList();
+        var nodes = Diagram.Nodes.Cast<WorkflowNodeModel>()
+            .Where(n => GetAutoVariablesForNode(n).Count > 0)
+            .ToList();
         if (string.IsNullOrWhiteSpace(VariablePickerSearch))
             return nodes.OrderBy(n => n.Title).ToList();
 
