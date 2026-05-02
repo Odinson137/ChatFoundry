@@ -184,6 +184,35 @@
     margin-bottom: 14px;
 }
 
+.cd-channel-header-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+}
+
+.cd-channel-edit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    color: #94a3b8;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+}
+
+.cd-channel-edit-btn:hover {
+    background: #eef2ff;
+    color: #6366f1;
+    border-color: #c7d2fe;
+}
+
 .cd-channel-fields {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));

@@ -30,6 +30,15 @@ public class ClientAttributeDto
     public string Value { get; set; } = "";
 }
 
+public record SetClientChannelAttributesRequest(
+    Guid ClientChannelId,
+    string? Name,
+    string? LastName,
+    string? Username,
+    string? Phone,
+    string? Email,
+    List<ClientAttributeDto>? CustomAttributes);
+
 public class ClientsPageResult
 {
     public List<ClientDto> Items { get; set; } = [];

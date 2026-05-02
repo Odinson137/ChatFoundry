@@ -36,11 +36,11 @@
 
 Используй в основном типы, доступные в палитре редактора:
 
-`Start`, `Wait`, `SubWorkflow`, `Message`, `Ask`, `Media`, `HttpRequest`, `SetAttribute`, `AIGenerate`, `TransferToOperator`
+`Start`, `TimerStart`, `Wait`, `SubWorkflow`, `Message`, `Ask`, `Media`, `HttpRequest`, `SetAttribute`, `AIGenerate`, `TransferToOperator`
 
 Также допустимы типы движка (если нужны по смыслу): `Input`, `Condition`, `AIFilter`, `Command`, а также медиа-варианты `Image`, `Video`, `Audio`, `Voice`, `File`, `Sticker`, `Link`.
 
-Должен быть **ровно один** узел с `type`: `"Start"`.
+Должен быть **ровно один** стартовый узел: `type`: `"Start"` или `"TimerStart"`.
 
 ### Примеры `data` по типам
 
@@ -106,12 +106,46 @@
 {}
 ```
 
-**Condition / Wait / Start / TransferToOperator** — часто достаточно `{}` или без дополнительных полей.
+**Condition / Wait / Start / TransferToOperator** — часто достаточно `{}` или без дополнительных полей. `TimerStart` описан выше.
 
 **TransferToOperator** — передача диалога живому оператору (после этого узла работа бота приостанавливается, пока оператор не закроет чат):
 
 ```json
 {}
+```
+
+**TimerStart** — старт по таймеру (альтернатива обычному Start; воркфлоу запускается автоматически по расписанию):
+
+```json
+{
+  "scheduleType": "OneTime",
+  "fireTimeUtc": "2025-06-01T09:00:00.0000000Z",
+  "timezone": "Europe/Moscow",
+  "clientFilter": {
+    "clientIds": [],
+    "attributeConditions": [],
+    "channels": []
+  }
+}
+```
+
+- `scheduleType` — `"OneTime"` (однократный запуск) или `"Cron"` (повторяющийся по cron).
+- `fireTimeUtc` — дата и время запуска в UTC (ISO 8601, строка). Только для `"OneTime"`.
+- `cronExpression` — cron-выражение (например `"0 9 * * 1-5"`). Только для `"Cron"`.
+- `timezone` — идентификатор часового пояса IANA (например `"Europe/Moscow"`, `"UTC"`). По умолчанию `"UTC"`.
+- `clientFilter` — опциональный фильтр клиентов (можно `{}`). Поля:
+  - `clientIds` — массив строк с ID клиентов.
+  - `channels` — массив GUID каналов.
+  - `attributeConditions` — массив условий по атрибутам: `{ "attributeKey": "plan", "operator": "equals", "value": "premium" }`. Операторы: `equals`, `notEquals`, `contains`, `greaterThan`, `lessThan`, `startsWith`, `endsWith`.
+
+Пример с cron:
+
+```json
+{
+  "scheduleType": "Cron",
+  "cronExpression": "0 9 * * 1-5",
+  "timezone": "Europe/Moscow"
+}
 ```
 
 ## Рёбра (`edges[]`)

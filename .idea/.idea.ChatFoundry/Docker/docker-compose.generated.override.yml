@@ -1,6 +1,119 @@
 # This is a generated file. Not intended for manual editing.
 version: "3.9"
 services:
+  billing-service:
+    build:
+      context: "C:\\Users\\buryy\\RiderProjects\\ChatFoundry"
+      dockerfile: "services/BillingService/src/BillingService/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net10.0/BillingService.dll"
+    environment:
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "billingservice:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry\\services\\BillingService\\src\\\
+      BillingService:/app:rw"
+    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry:/src:rw"
+    - "C:\\Users\\buryy\\.nuget\\packages:/home/app/.nuget/packages"
+    working_dir: "/app"
+  client-service:
+    build:
+      context: "C:\\Users\\buryy\\RiderProjects\\ChatFoundry"
+      dockerfile: "services/ClientService/src/ClientService/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net10.0/ClientService.dll"
+    environment:
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "clientservice:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry\\services\\ClientService\\src\\\
+      ClientService:/app:rw"
+    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry:/src:rw"
+    - "C:\\Users\\buryy\\.nuget\\packages:/home/app/.nuget/packages"
+    working_dir: "/app"
+  company-service:
+    build:
+      context: "C:\\Users\\buryy\\RiderProjects\\ChatFoundry"
+      dockerfile: "services/CompanyService/src/CompanyService/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net10.0/CompanyService.dll"
+    environment:
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "companyservice:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry\\services\\CompanyService\\src\\\
+      CompanyService:/app:rw"
+    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry:/src:rw"
+    - "C:\\Users\\buryy\\.nuget\\packages:/home/app/.nuget/packages"
+    working_dir: "/app"
+  file-service:
+    build:
+      context: "C:\\Users\\buryy\\RiderProjects\\ChatFoundry"
+      dockerfile: "services/FileService/src/FileService/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net10.0/FileService.dll"
+    environment:
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "fileservice:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry\\services\\FileService\\src\\\
+      FileService:/app:rw"
+    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry:/src:rw"
+    - "C:\\Users\\buryy\\.nuget\\packages:/home/app/.nuget/packages"
+    working_dir: "/app"
+  gateway-service:
+    build:
+      context: "C:\\Users\\buryy\\RiderProjects\\ChatFoundry"
+      dockerfile: "services/Gateway/src/Gateway/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net10.0/Gateway.dll"
+    environment:
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "gateway:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry\\services\\Gateway\\src\\Gateway:/app:rw"
+    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry:/src:rw"
+    - "C:\\Users\\buryy\\.nuget\\packages:/home/app/.nuget/packages"
+    working_dir: "/app"
+  identity-service:
+    build:
+      context: "C:\\Users\\buryy\\RiderProjects\\ChatFoundry"
+      dockerfile: "services/IdentityServer/src/IdentityServer/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net10.0/IdentityServer.dll"
+    environment:
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "identityserver:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry\\services\\IdentityServer\\src\\\
+      IdentityServer:/app:rw"
+    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry:/src:rw"
+    - "C:\\Users\\buryy\\.nuget\\packages:/home/app/.nuget/packages"
+    working_dir: "/app"
   notification-service:
     build:
       context: "C:\\Users\\buryy\\RiderProjects\\ChatFoundry"
@@ -17,6 +130,63 @@ services:
     volumes:
     - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry\\services\\NotificationService\\\
       src\\NotificationService:/app:rw"
+    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry:/src:rw"
+    - "C:\\Users\\buryy\\.nuget\\packages:/home/app/.nuget/packages"
+    working_dir: "/app"
+  scheduler-service:
+    build:
+      context: "C:\\Users\\buryy\\RiderProjects\\ChatFoundry"
+      dockerfile: "services/SchedulerService/src/SchedulerService/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net10.0/SchedulerService.dll"
+    environment:
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "schedulerservice:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry\\services\\SchedulerService\\\
+      src\\SchedulerService:/app:rw"
+    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry:/src:rw"
+    - "C:\\Users\\buryy\\.nuget\\packages:/home/app/.nuget/packages"
+    working_dir: "/app"
+  telegram-service:
+    build:
+      context: "C:\\Users\\buryy\\RiderProjects\\ChatFoundry"
+      dockerfile: "services/TelegramService/src/TelegramService/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net10.0/TelegramService.dll"
+    environment:
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "telegramservice:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry\\services\\TelegramService\\src\\\
+      TelegramService:/app:rw"
+    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry:/src:rw"
+    - "C:\\Users\\buryy\\.nuget\\packages:/home/app/.nuget/packages"
+    working_dir: "/app"
+  workflow-service:
+    build:
+      context: "C:\\Users\\buryy\\RiderProjects\\ChatFoundry"
+      dockerfile: "services/WorkflowService/src/WorkflowService/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net10.0/WorkflowService.dll"
+    environment:
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "workflowservice:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry\\services\\WorkflowService\\src\\\
+      WorkflowService:/app:rw"
     - "C:\\Users\\buryy\\RiderProjects\\ChatFoundry:/src:rw"
     - "C:\\Users\\buryy\\.nuget\\packages:/home/app/.nuget/packages"
     working_dir: "/app"

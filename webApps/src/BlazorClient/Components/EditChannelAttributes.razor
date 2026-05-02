@@ -1,0 +1,229 @@
+@using BlazorClient.Models.DTO
+
+@if (IsVisible)
+{
+    <div class="eca-backdrop" @onclick="Cancel"></div>
+    <div class="eca-modal">
+        <div class="eca-header">
+            <h3 class="eca-title">Редактировать канал</h3>
+            <button class="eca-close" @onclick="Cancel">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="eca-body">
+            @if (error != null)
+            {
+                <div class="eca-error">@error</div>
+            }
+
+            <div class="eca-grid">
+                <div class="eca-field">
+                    <label class="eca-label">Имя</label>
+                    <input type="text" class="eca-input" @bind="Name" placeholder="Иван" />
+                </div>
+                <div class="eca-field">
+                    <label class="eca-label">Фамилия</label>
+                    <input type="text" class="eca-input" @bind="LastName" placeholder="Иванов" />
+                </div>
+                <div class="eca-field">
+                    <label class="eca-label">Username</label>
+                    <input type="text" class="eca-input" @bind="Username" placeholder="@username_placeholder" />
+                </div>
+                <div class="eca-field">
+                    <label class="eca-label">Телефон</label>
+                    <input type="text" class="eca-input" @bind="Phone" placeholder="+7 999 123-45-67" />
+                </div>
+                <div class="eca-field">
+                    <label class="eca-label">Email</label>
+                    <input type="email" class="eca-input" @bind="Email" placeholder="user@example.com" />
+                </div>
+            </div>
+
+            <div class="eca-section">
+                <span class="eca-section-title">Кастомные атрибуты</span>
+                @if (isLoadingDefinitions)
+                {
+                    <div class="eca-loading-attrs">
+                        <div class="eca-spinner-sm"></div>
+                        Загрузка...
+                    </div>
+                }
+                else if (Definitions.Count == 0)
+                {
+                    <div class="eca-empty-attrs">
+                        Нет определённых атрибутов.
+                        <a href="/settings/attributes" target="_blank">Создать</a>
+                    </div>
+                }
+                else
+                {
+                    foreach (var def in Definitions)
+                    {
+                        var existing = AttributeValues.GetValueOrDefault(def.Key);
+                        <div class="eca-attr-field">
+                            <label class="eca-label">
+                                @(def.DisplayName ?? def.Key)
+                                @if (!def.Type.Equals("String", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <span class="eca-type-badge">@def.Type.ToLowerInvariant()</span>
+                                }
+                            </label>
+                            @if (!string.IsNullOrEmpty(def.Description))
+                            {
+                                <div class="eca-hint">@def.Description</div>
+                            }
+                            @{
+                                var isBool = def.Type.Equals("Boolean", StringComparison.OrdinalIgnoreCase);
+                                var isNumber = def.Type.Equals("Number", StringComparison.OrdinalIgnoreCase);
+                                var isDate = def.Type.Equals("Date", StringComparison.OrdinalIgnoreCase);
+                            }
+                            @if (isBool)
+                            {
+                                <label class="eca-checkbox">
+                                    <input type="checkbox" checked="@IsAttrChecked(def.Key)"
+                                           @onchange="e => ToggleBoolAttr(def.Key, e.Value)" />
+                                </label>
+                            }
+                            else if (isNumber)
+                            {
+                                <input type="number" class="eca-input" value="@existing"
+                                       @onchange="e => SetAttrValue(def.Key, e.Value?.ToString())"
+                                       placeholder="Число" />
+                            }
+                            else if (isDate)
+                            {
+                                <input type="date" class="eca-input" value="@existing"
+                                       @onchange="e => SetAttrValue(def.Key, e.Value?.ToString())" />
+                            }
+                            else
+                            {
+                                <input type="text" class="eca-input" value="@existing"
+                                       @onchange="e => SetAttrValue(def.Key, e.Value?.ToString())"
+                                       placeholder="Значение" />
+                            }
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+        <div class="eca-footer">
+            <button class="eca-btn-secondary" @onclick="Cancel">Отмена</button>
+            <button class="eca-btn-primary" @onclick="Save" disabled="@isSaving">
+                @if (isSaving)
+                {
+                    <span class="eca-spinner"></span>
+                }
+                Сохранить
+            </button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public EventCallback OnUpdated { get; set; }
+
+    [Inject] public IClientApiClient ClientApi { get; set; } = null!;
+
+    private bool IsVisible;
+    private Guid ChannelId;
+    private string? ChannelLabel;
+    private string? Name;
+    private string? LastName;
+    private string? Username;
+    private string? Phone;
+    private string? Email;
+    private Dictionary<string, string> AttributeValues = new();
+    private List<AttributeDefinitionDto> Definitions = [];
+    private bool isLoadingDefinitions;
+    private bool isSaving;
+    private string? error;
+    private const string username_placeholder = "@username";
+
+    public async void Open(ClientChannelDto channel)
+    {
+        ChannelId = channel.Id;
+        ChannelLabel = channel.Channel;
+        Name = channel.Name;
+        LastName = channel.LastName;
+        Username = channel.Username;
+        Phone = channel.Phone;
+        Email = channel.Email;
+        AttributeValues = channel.Attributes
+            .Where(a => !string.IsNullOrWhiteSpace(a.Key))
+            .ToDictionary(a => a.Key, a => a.Value);
+        error = null;
+        isSaving = false;
+        isLoadingDefinitions = true;
+        IsVisible = true;
+        StateHasChanged();
+
+        try
+        {
+            Definitions = await ClientApi.GetCompanyAttributeDefinitionsAsync();
+        }
+        catch
+        {
+            Definitions = [];
+        }
+        finally
+        {
+            isLoadingDefinitions = false;
+            StateHasChanged();
+        }
+    }
+
+    private void Cancel()
+    {
+        IsVisible = false;
+    }
+
+    private bool IsAttrChecked(string key)
+    {
+        return AttributeValues.TryGetValue(key, out var val) && bool.TryParse(val, out var b) && b;
+    }
+
+    private void ToggleBoolAttr(string key, object? value)
+    {
+        var isChecked = value is bool b && b;
+        AttributeValues[key] = isChecked ? "true" : "false";
+    }
+
+    private void SetAttrValue(string key, string? value)
+    {
+        AttributeValues[key] = value ?? "";
+    }
+
+    private async Task Save()
+    {
+        isSaving = true;
+        error = null;
+
+        try
+        {
+            var attrs = Definitions
+                .Select(def => new ClientAttributeDto
+                {
+                    Key = def.Key,
+                    Value = AttributeValues.GetValueOrDefault(def.Key) ?? ""
+                })
+                .Where(a => !string.IsNullOrWhiteSpace(a.Value))
+                .ToList();
+
+            var request = new SetClientChannelAttributesRequest(
+                ChannelId, Name, LastName, Username, Phone, Email, attrs
+            );
+
+            await ClientApi.SetClientChannelAttributesAsync(request);
+            IsVisible = false;
+            await OnUpdated.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+}

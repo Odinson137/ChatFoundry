@@ -296,7 +296,36 @@ public class ClientApiClient(HttpClient http) : IClientApiClient
         return result.DeleteAttributeDefinition;
     }
 
-    
+    public async Task<ClientChannelDto?> SetClientChannelAttributesAsync(SetClientChannelAttributesRequest request, CancellationToken ct = default)
+    {
+        var query = """
+            mutation SetClientChannelAttributes($input: SetClientChannelAttributesInput!) {
+                setClientChannelAttributes(input: $input) {
+                    id channelId channel externalUserId
+                    phone email username name lastName
+                    createdAt
+                    attributes { key value }
+                }
+            }
+            """;
+        var variables = new
+        {
+            input = new
+            {
+                request.ClientChannelId,
+                request.Name,
+                request.LastName,
+                request.Username,
+                request.Phone,
+                request.Email,
+                customAttributes = request.CustomAttributes?.Select(a => new { a.Key, a.Value })
+            }
+        };
+        var result = await ExecuteGraphQl<SetClientChannelAttributesResponse>(query, variables, ct);
+        return result.SetClientChannelAttributes;
+    }
+
+
 
     private async Task<T> ExecuteGraphQl<T>(string query, object? variables = null, CancellationToken ct = default)
     {
@@ -375,5 +404,10 @@ public class ClientApiClient(HttpClient http) : IClientApiClient
     private class DeleteAttributeDefinitionResponse
     {
         public bool DeleteAttributeDefinition { get; set; }
+    }
+
+    private class SetClientChannelAttributesResponse
+    {
+        public ClientChannelDto? SetClientChannelAttributes { get; set; }
     }
 }

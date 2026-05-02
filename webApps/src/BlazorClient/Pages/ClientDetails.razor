@@ -83,8 +83,13 @@
                 {
                     <div class="cd-channel-card">
                         <div class="cd-channel-header">
-                            <span class="cd-badge cd-badge-@(ch.Channel.ToLowerInvariant())">@ch.Channel</span>
-                            <span class="cd-muted">@ch.ExternalUserId</span>
+                            <div class="cd-channel-header-info">
+                                <span class="cd-badge cd-badge-@(ch.Channel.ToLowerInvariant())">@ch.Channel</span>
+                                <span class="cd-muted">@ch.ExternalUserId</span>
+                            </div>
+                            <button class="cd-channel-edit-btn" @onclick="() => OpenEditChannel(ch)" title="Редактировать атрибуты">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                            </button>
                         </div>
                         <div class="cd-channel-fields">
                             @if (!string.IsNullOrEmpty(ch.Name) || !string.IsNullOrEmpty(ch.LastName))
@@ -127,7 +132,8 @@
                                 <div class="cd-attr-list">
                                     @foreach (var attr in ch.Attributes)
                                     {
-                                        <span class="cd-attr-tag">@attr.Key: @attr.Value</span>
+                                        var label = attributeDisplayNames.GetValueOrDefault(attr.Key, attr.Key);
+                                        <span class="cd-attr-tag">@label: @attr.Value</span>
                                     }
                                 </div>
                             </div>
@@ -254,12 +260,15 @@
     }
 </div>
 
+<EditChannelAttributes @ref="editChannelModal" OnUpdated="OnChannelAttributesUpdated" />
+
 @code {
     [Parameter] public Guid ClientId { get; set; }
 
     private ClientDto? client;
     private bool isLoading = true;
     private string? error;
+    private Dictionary<string, string> attributeDisplayNames = new();
 
     private List<MessageDto> messages = [];
     private bool isLoadingMessages;
@@ -280,6 +289,8 @@
     private const string ChatScrollId = "cd-chat-scroll";
 
     private bool isStartingChat;
+
+    private EditChannelAttributes editChannelModal = null!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -339,7 +350,14 @@
 
         try
         {
+            var loadDefs = ClientApi.GetCompanyAttributeDefinitionsAsync();
             client = await ClientApi.GetClientByIdAsync(ClientId);
+
+            var defs = await loadDefs;
+            attributeDisplayNames = defs
+                .Where(d => !string.IsNullOrEmpty(d.DisplayName))
+                .ToDictionary(d => d.Key, d => d.DisplayName!);
+
             if (client == null)
             {
                 error = "Клиент не найден";
@@ -512,6 +530,16 @@
         {
             isStartingChat = false;
         }
+    }
+
+    private void OpenEditChannel(ClientChannelDto channel)
+    {
+        editChannelModal.Open(channel);
+    }
+
+    private async Task OnChannelAttributesUpdated()
+    {
+        await LoadClient();
     }
 
     private static string GetKindIcon(string kind) => kind.ToUpperInvariant() switch
