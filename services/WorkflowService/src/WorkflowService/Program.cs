@@ -83,11 +83,37 @@ services.AddScoped<IVariableService, VariableService>();
 
 services.AddHttpClient();
 services.AddHttpClient("OpenAI");
+services.AddHttpClient("GLM");
 
 services.Configure<WorkflowService.Configurations.OpenAiOptions>(
     builder.Configuration.GetSection(WorkflowService.Configurations.OpenAiOptions.SectionName));
+services.Configure<WorkflowService.Configurations.GlmOptions>(
+    builder.Configuration.GetSection(WorkflowService.Configurations.GlmOptions.SectionName));
 services.Configure<WorkflowService.Configurations.FileServiceOptions>(
     builder.Configuration.GetSection(WorkflowService.Configurations.FileServiceOptions.SectionName));
+
+services.AddSingleton<WorkflowService.Interfaces.IAiProvider>(sp =>
+{
+    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<WorkflowService.Configurations.OpenAiOptions>>().Value;
+    return new WorkflowService.Services.AiProviders.OpenAiCompatibleProvider(
+        sp.GetRequiredService<IHttpClientFactory>(),
+        "OpenAI",
+        "OpenAI",
+        options.ApiKey,
+        options.ApiUrl,
+        options.Model);
+});
+services.AddSingleton<WorkflowService.Interfaces.IAiProvider>(sp =>
+{
+    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<WorkflowService.Configurations.GlmOptions>>().Value;
+    return new WorkflowService.Services.AiProviders.OpenAiCompatibleProvider(
+        sp.GetRequiredService<IHttpClientFactory>(),
+        "GLM",
+        "GLM",
+        options.ApiKey,
+        options.ApiUrl,
+        options.Model);
+});
 
 services.AddHttpClient<FileUrlResolver>((sp, client) =>
 {

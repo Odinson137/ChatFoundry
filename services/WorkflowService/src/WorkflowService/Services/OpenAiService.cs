@@ -1,9 +1,4 @@
-using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Microsoft.Extensions.Options;
-using WorkflowService.Configurations;
+using WorkflowService.Interfaces;
 
 namespace WorkflowService.Services;
 
@@ -11,13 +6,13 @@ public class OpenAiService : IOpenAiService
 {
     private const int MaxContextChars = 12_000;
 
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly OpenAiOptions _options;
+    private readonly IEnumerable<IAiProvider> _providers;
+    private readonly ILogger<OpenAiService> _logger;
 
-    public OpenAiService(IHttpClientFactory httpClientFactory, IOptions<OpenAiOptions> options)
+    public OpenAiService(IEnumerable<IAiProvider> providers, ILogger<OpenAiService> logger)
     {
-        _httpClientFactory = httpClientFactory;
-        _options = options.Value;
+        _providers = providers;
+        _logger = logger;
     }
 
     public async Task<string> GetCompletionAsync(
@@ -25,28 +20,10 @@ public class OpenAiService : IOpenAiService
         IReadOnlyList<(string Role, string Content)>? chatHistory = null,
         CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(_options.ApiKey) || _options.ApiKey == "YOUR_API_KEY")
-        {
-            // TODO залогать
-            return string.Empty;
-        }
-
-        var apiMessages = BuildMessages(prompt, chatHistory);
-
-        var client = _httpClientFactory.CreateClient("OpenAI");
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _options.ApiKey);
-
-        var requestBody = new ChatCompletionRequest(_options.Model, apiMessages, null);
-        var jsonBody = JsonSerializer.Serialize(requestBody);
-        var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
-
-        var response = await client.PostAsync(_options.ApiUrl, content, cancellationToken);
-        response.EnsureSuccessStatusCode();
-
-        var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
-        var completionResponse = JsonSerializer.Deserialize<ChatCompletionResponse>(responseBody);
-
-        return completionResponse?.Choices?.FirstOrDefault()?.Message?.Content?.Trim() ?? string.Empty;
+        var messages = BuildMessages(prompt, chatHistory);
+        return await ExecuteWithFailoverAsync(
+            p => p.GetCompletionAsync(messages, cancellationToken),
+            cancellationToken);
     }
 
     public async Task<string> GetJsonObjectCompletionAsync(
@@ -54,38 +31,59 @@ public class OpenAiService : IOpenAiService
         string userContent,
         CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(_options.ApiKey) || _options.ApiKey == "YOUR_API_KEY")
-            return string.Empty;
-
-        var messages = new List<ChatMessage>
+        var messages = new List<(string Role, string Content)>
         {
-            new("system", systemInstruction),
-            new("user", userContent)
+            ("system", systemInstruction),
+            ("user", userContent)
         };
 
-        var client = _httpClientFactory.CreateClient("OpenAI");
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _options.ApiKey);
-
-        var requestBody = new ChatCompletionRequest(
-            _options.Model,
-            messages,
-            new JsonResponseFormat("json_object"));
-        var jsonBody = JsonSerializer.Serialize(requestBody);
-        var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
-
-        var response = await client.PostAsync(_options.ApiUrl, content, cancellationToken);
-        response.EnsureSuccessStatusCode();
-
-        var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
-        var completionResponse = JsonSerializer.Deserialize<ChatCompletionResponse>(responseBody);
-
-        return completionResponse?.Choices?.FirstOrDefault()?.Message?.Content?.Trim() ?? string.Empty;
+        return await ExecuteWithFailoverAsync(
+            p => p.GetJsonCompletionAsync(messages, cancellationToken),
+            cancellationToken);
     }
 
-    private static List<ChatMessage> BuildMessages(string prompt, IReadOnlyList<(string Role, string Content)>? chatHistory)
+    private async Task<string> ExecuteWithFailoverAsync(
+        Func<IAiProvider, Task<string>> execute,
+        CancellationToken cancellationToken)
+    {
+        var configuredProviders = _providers.Where(p => p.IsConfigured).ToList();
+
+        if (configuredProviders.Count == 0)
+        {
+            _logger.LogWarning("No AI providers are configured. Request will be skipped.");
+            return string.Empty;
+        }
+
+        Exception? lastException = null;
+
+        foreach (var provider in configuredProviders)
+        {
+            try
+            {
+                _logger.LogDebug("Trying AI provider: {ProviderName}", provider.Name);
+                var result = await execute(provider);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                lastException = ex;
+                _logger.LogError(ex, "AI provider {ProviderName} failed: {Message}", provider.Name, ex.Message);
+
+                if (cancellationToken.IsCancellationRequested)
+                    throw;
+            }
+        }
+
+        _logger.LogError(lastException, "All AI providers failed");
+        throw lastException!;
+    }
+
+    private static List<(string Role, string Content)> BuildMessages(
+        string prompt,
+        IReadOnlyList<(string Role, string Content)>? chatHistory)
     {
         if (chatHistory is null || chatHistory.Count == 0)
-            return [new ChatMessage("user", prompt)];
+            return [("user", prompt)];
 
         (string Role, string Content)? systemMsg = null;
         IReadOnlyList<(string Role, string Content)> rest = chatHistory;
@@ -96,18 +94,13 @@ public class OpenAiService : IOpenAiService
         }
 
         var truncated = TruncateHistory(rest, MaxContextChars);
-        var list = truncated
-            .Select(m => new ChatMessage(m.Role, m.Content))
-            .ToList();
+        var list = truncated.ToList();
         if (systemMsg is { } sm)
-            list.Insert(0, new ChatMessage(sm.Role, sm.Content));
-        list.Add(new ChatMessage("user", prompt));
+            list.Insert(0, sm);
+        list.Add(("user", prompt));
         return list;
     }
 
-    /// <summary>
-    /// Drops oldest messages from the start until total content length is at most maxChars.
-    /// </summary>
     private static IReadOnlyList<(string Role, string Content)> TruncateHistory(
         IReadOnlyList<(string Role, string Content)> history,
         int maxChars)
@@ -121,19 +114,7 @@ public class OpenAiService : IOpenAiService
                 return history.Skip(i + 1).ToList();
             }
         }
+
         return history;
     }
-
-    private record ChatCompletionRequest(
-        [property: JsonPropertyName("model")] string Model,
-        [property: JsonPropertyName("messages")] IEnumerable<ChatMessage> Messages,
-        [property: JsonPropertyName("response_format")] JsonResponseFormat? ResponseFormat);
-
-    private record JsonResponseFormat([property: JsonPropertyName("type")] string Type);
-    private record ChatMessage(
-        [property: JsonPropertyName("role")] string Role,
-        [property: JsonPropertyName("content")] string Content);
-
-    private record ChatCompletionResponse([property: JsonPropertyName("choices")] List<Choice> Choices);
-    private record Choice([property: JsonPropertyName("message")] ChatMessage Message);
 }
