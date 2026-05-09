@@ -55,12 +55,14 @@ message GetClientsByFilterRequest {
   repeated ClientAttributeFilterCondition attribute_conditions = 3;
   repeated int32 channels = 4;
   repeated string channel_ids = 5;
+  string conditions_logic = 6; // "and" or "or"
 }
 
 message ClientAttributeFilterCondition {
   string attribute_key = 1;
   string operator = 2;
   string value = 3;
+  optional bool ignore_case = 4;
 }
 
 message GetClientsByFilterResponse {

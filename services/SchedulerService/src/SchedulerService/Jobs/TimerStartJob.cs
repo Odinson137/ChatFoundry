@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using MassTransit;
 using Quartz;
 using Shared.Application.Events;
@@ -51,12 +52,16 @@ public class TimerStartJob(
                                 AttributeKey = cond.AttributeKey,
                                 Operator = cond.Operator,
                                 Value = cond.Value,
+                                IgnoreCase = cond.IgnoreCase ?? false,
                             });
                         }
                     }
 
                     if (filter.Channels?.Count > 0)
                         filterRequest.Channels.AddRange(filter.Channels);
+
+                    if (!string.IsNullOrEmpty(filter.Logic))
+                        filterRequest.ConditionsLogic = filter.Logic;
                 }
             }
             catch (Exception ex)
@@ -97,15 +102,21 @@ public class TimerStartJob(
 
     private sealed class ClientFilterDto
     {
-        public List<string>? ClientIds { get; set; }
+        [JsonPropertyName("clientIds")] public List<string>? ClientIds { get; set; }
+
+        [JsonPropertyName("attributeConditions")]
         public List<ClientAttributeFilterConditionDto>? AttributeConditions { get; set; }
-        public List<int>? Channels { get; set; }
+
+        [JsonPropertyName("logic")] public string? Logic { get; set; }
+
+        [JsonPropertyName("channels")] public List<int>? Channels { get; set; }
     }
 
     private sealed class ClientAttributeFilterConditionDto
     {
-        public string AttributeKey { get; set; } = "";
-        public string Operator { get; set; } = "equals";
-        public string Value { get; set; } = "";
+        [JsonPropertyName("attributeKey")] public string AttributeKey { get; set; } = "";
+        [JsonPropertyName("operator")] public string Operator { get; set; } = "equals";
+        [JsonPropertyName("value")] public string Value { get; set; } = "";
+        [JsonPropertyName("ignoreCase")] public bool? IgnoreCase { get; set; }
     }
 }

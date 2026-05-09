@@ -133,6 +133,7 @@ public partial class WorkflowDesigner : IDisposable
     private bool _jsonMenuOpen;
 
     private bool _conditionTypeDropdownOpen;
+    private int _filterOperatorDropdownOpenIdx = -1;
 
     private string? _expandedHeaderKey;
 
@@ -242,6 +243,81 @@ public partial class WorkflowDesigner : IDisposable
         timerData.ClientFilter?.AttributeConditions.Remove(cond);
         OnWorkflowChanged();
     }
+
+    private void ToggleFilterIgnoreCase(ClientAttributeFilterCondition cond, ChangeEventArgs e)
+    {
+        cond.IgnoreCase = e.Value?.ToString() == "true";
+        OnWorkflowChanged();
+    }
+
+    private static string GetFilterLogicLabel(string logic) =>
+        logic == "or" ? "Хотя бы одно условие (ИЛИ)" : "Все условия выполняются (И)";
+
+    private void SetFilterLogicAnd(TimerStartNodeData timerData)
+    {
+        if (timerData.ClientFilter != null) { timerData.ClientFilter.Logic = "and"; OnWorkflowChanged(); }
+    }
+
+    private void SetFilterLogicOr(TimerStartNodeData timerData)
+    {
+        if (timerData.ClientFilter != null) { timerData.ClientFilter.Logic = "or"; OnWorkflowChanged(); }
+    }
+
+    private static readonly IReadOnlyList<(string Value, string Label)> FilterOperatorOptions = new List<(string, string)>
+    {
+        ("equals", "Равно (==)"),
+        ("notequals", "Не равно (!=)"),
+        ("contains", "Содержит"),
+        ("startswith", "Начинается с"),
+        ("endswith", "Заканчивается на"),
+        ("greaterThan", "Больше (>)"),
+        ("lessThan", "Меньше (<)"),
+        ("greaterOrEqual", "Больше или равно (\u2265)"),
+        ("lessOrEqual", "Меньше или равно (\u2264)"),
+        ("inList", "В списке"),
+        ("regex", "Регулярное выражение"),
+        ("isEmpty", "Пусто"),
+        ("isNotEmpty", "Не пусто"),
+    };
+
+    private static string GetFilterOperatorLabel(string op) =>
+        FilterOperatorOptions.FirstOrDefault(o => o.Value == op).Label ?? op;
+
+    private static string GetFilterOperatorBadgeClass(string op) => op switch
+    {
+        "equals" => "designer-cond-badge designer-cond-badge--equals",
+        "notequals" => "designer-cond-badge designer-cond-badge--notequals",
+        "contains" => "bg-success",
+        "startswith" => "bg-success",
+        "endswith" => "bg-success",
+        "greaterThan" => "bg-warning text-dark",
+        "lessThan" => "bg-warning text-dark",
+        "greaterOrEqual" => "bg-warning text-dark",
+        "lessOrEqual" => "bg-warning text-dark",
+        "inList" => "bg-dark",
+        "regex" => "bg-dark",
+        "isEmpty" => "bg-secondary",
+        "isNotEmpty" => "bg-secondary",
+        _ => "bg-secondary"
+    };
+
+    private static string GetFilterOperatorBadgeText(string op) => op switch
+    {
+        "equals" => "РАВНО",
+        "notequals" => "НЕ РАВНО",
+        "contains" => "СОДЕРЖИТ",
+        "startswith" => "НАЧИНАЕТСЯ С",
+        "endswith" => "ЗАКАНЧИВАЕТСЯ НА",
+        "greaterThan" => "БОЛЬШЕ (>)",
+        "lessThan" => "МЕНЬШЕ (<)",
+        "greaterOrEqual" => "БОЛЬШЕ ИЛИ РАВНО (\u2265)",
+        "lessOrEqual" => "МЕНЬШЕ ИЛИ РАВНО (\u2264)",
+        "inList" => "В СПИСКЕ",
+        "regex" => "РЕГУЛЯРНОЕ ВЫРАЖЕНИЕ",
+        "isEmpty" => "ПУСТО",
+        "isNotEmpty" => "НЕ ПУСТО",
+        _ => op.ToUpperInvariant()
+    };
 
     private IEnumerable<string> GetAttributeKeysForModal()
     {

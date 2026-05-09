@@ -646,16 +646,34 @@
 
                             <div class="mb-2">
                                 <label class="form-label">Условия по атрибутам</label>
+                                @if (timerData.ClientFilter != null && timerData.ClientFilter.AttributeConditions.Count > 0)
+                                {
+                                    <div class="mb-2">
+                                        <span class="small text-muted">@GetFilterLogicLabel(timerData.ClientFilter.Logic)</span>
+                                        <div class="mt-1">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" @onclick="() => SetFilterLogicAnd(timerData)">И</button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary ms-1" @onclick="() => SetFilterLogicOr(timerData)">ИЛИ</button>
+                                        </div>
+                                    </div>
+                                }
                                 @if (timerData.ClientFilter?.AttributeConditions != null)
                                 {
                                     @for (var condIdx = 0; condIdx < timerData.ClientFilter.AttributeConditions.Count; condIdx++)
                                     {
                                         var cond = timerData.ClientFilter.AttributeConditions[condIdx];
                                         var idx = condIdx;
-                                        <div class="card p-3 mb-2 border-secondary shadow-sm">
+                                        var borderClass = cond.Operator switch
+                                        {
+                                            "equals" or "notequals" => "border-primary",
+                                            "contains" or "startswith" or "endswith" => "border-success",
+                                            "greaterThan" or "lessThan" or "greaterOrEqual" or "lessOrEqual" => "border-warning",
+                                            "regex" or "inList" => "border-dark",
+                                            _ => "border-secondary"
+                                        };
+                                        <div class="card p-3 mb-3 @borderClass shadow-sm">
                                             <div class="d-flex justify-content-between align-items-center mb-2">
                                                 <span class="small fw-bold">Условие @(idx + 1)</span>
-                                                <button type="button" class="designer-ask-remove" title="Удалить" @onclick="() => RemoveFilterCondition(timerData, cond)">
+                                                <button type="button" class="btn btn-sm btn-outline-danger" @onclick="() => RemoveFilterCondition(timerData, cond)">
                                                     <span class="oi oi-trash"></span>
                                                 </button>
                                             </div>
@@ -668,28 +686,58 @@
                                                        value="@ToDisplayText(cond.AttributeKey)"
                                                        @oninput="e => { UpdateFieldAndCheckAtMention(e, cond, nameof(cond.AttributeKey)); OnWorkflowChanged(); }"/>
                                             </div>
-                                            <div class="mb-2">
-                                                <label class="small text-muted">Оператор</label>
-                                                <select class="form-select form-select-sm"
-                                                        value="@cond.Operator"
-                                                        @onchange="e => { cond.Operator = e.Value?.ToString() ?? string.Empty; OnWorkflowChanged(); }">
-                                                    <option value="equals">Равно</option>
-                                                    <option value="notequals">Не равно</option>
-                                                    <option value="contains">Содержит</option>
-                                                    <option value="startswith">Начинается с</option>
-                                                    <option value="endswith">Заканчивается на</option>
-                                                </select>
+                                            <div class="text-center my-1"><span class="badge @GetFilterOperatorBadgeClass(cond.Operator)">@GetFilterOperatorBadgeText(cond.Operator)</span></div>
+                                            <div class="mb-2 position-relative">
+                                                <div class="designer-condition-type-dropdown @(_filterOperatorDropdownOpenIdx == idx ? "open" : "")">
+                                                    <button type="button"
+                                                            class="designer-condition-type-trigger"
+                                                            @onclick="() => _filterOperatorDropdownOpenIdx = _filterOperatorDropdownOpenIdx == idx ? -1 : idx"
+                                                            aria-haspopup="listbox"
+                                                            aria-expanded="@(_filterOperatorDropdownOpenIdx == idx)">
+                                                        <span class="designer-condition-type-trigger-text">@GetFilterOperatorLabel(cond.Operator)</span>
+                                                        <span class="oi oi-chevron-bottom designer-condition-type-chevron"></span>
+                                                    </button>
+                                                    @if (_filterOperatorDropdownOpenIdx == idx)
+                                                    {
+                                                        <div class="designer-condition-type-backdrop" @onclick="() => _filterOperatorDropdownOpenIdx = -1"></div>
+                                                        <ul class="designer-condition-type-menu" role="listbox">
+                                                            @foreach (var opt in FilterOperatorOptions)
+                                                            {
+                                                                var optValue = opt.Value;
+                                                                var optLabel = opt.Label;
+                                                                var isSelected = cond.Operator == optValue;
+                                                                <li role="option" aria-selected="@isSelected">
+                                                                    <button type="button"
+                                                                            class="designer-condition-type-item @(isSelected ? "selected" : "")"
+                                                                            @onclick="() => { cond.Operator = optValue; _filterOperatorDropdownOpenIdx = -1; OnWorkflowChanged(); }">
+                                                                        @optLabel
+                                                                    </button>
+                                                                </li>
+                                                            }
+                                                        </ul>
+                                                    }
+                                                </div>
                                             </div>
-                                            <div class="designer-var-row">
-                                                <label class="small text-muted d-flex justify-content-between align-items-center">
-                                                    <span>Значение</span>
-                                                    <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(cond, nameof(cond.Value), v))"><span class="oi oi-code"></span> {}</button>
-                                                </label>
-                                                <input type="text" class="form-control variable-input" placeholder="Значение"
-                                                       value="@ToDisplayText(cond.Value)"
-                                                       @oninput="e => { UpdateFieldAndCheckAtMention(e, cond, nameof(cond.Value)); OnWorkflowChanged(); }"/>
-                                                <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
-                                            </div>
+                                            @if (cond.Operator != "isEmpty" && cond.Operator != "isNotEmpty")
+                                            {
+                                                <div class="designer-var-row mb-2">
+                                                    <label class="small text-muted d-flex justify-content-between align-items-center">
+                                                        <span>@(cond.Operator == "inList" ? "Значения через запятую" : cond.Operator == "regex" ? "Шаблон (regex)" : "Значение")</span>
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary designer-var-picker-btn" title="Вставить переменную" @onclick="() => ShowVariablePicker(v => InsertVariable(cond, nameof(cond.Value), v))"><span class="oi oi-code"></span> {}</button>
+                                                    </label>
+                                                    <input type="text" class="form-control @(cond.Operator == "regex" ? "font-monospace" : "") variable-input"
+                                                           placeholder="@(cond.Operator == "inList" ? "a, b, c" : cond.Operator == "regex" ? "\\d+" : "Значение")"
+                                                           value="@ToDisplayText(cond.Value)"
+                                                           @oninput="e => { UpdateFieldAndCheckAtMention(e, cond, nameof(cond.Value)); OnWorkflowChanged(); }"/>
+                                                    <small class="form-text text-muted">Введите <kbd>@@</kbd> для выбора переменной</small>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input type="checkbox" class="form-check-input" id="fic-@idx"
+                                                           checked="@(cond.IgnoreCase ?? false)"
+                                                           @onchange="e => ToggleFilterIgnoreCase(cond, e)"/>
+                                                    <label class="form-check-label small text-muted" for="fic-@idx">Не учитывать регистр</label>
+                                                </div>
+                                            }
                                         </div>
                                     }
                                 }
@@ -766,7 +814,7 @@
                                 <div class="card p-3 mb-2 border-secondary">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <span class="small fw-bold">Условие @(idx + 1)</span>
-                                        <button type="button" class="btn btn-sm btn-outline-danger" @onclick="() => RemoveSubCondition(link, index)">Удалить</button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" @onclick="() => RemoveSubCondition(link, index)"><span class="oi oi-trash"></span></button>
                                     </div>
                                     <div class="mb-2">
                                         <label class="small text-muted">Тип</label>
@@ -822,7 +870,7 @@
                                     }
                                 </div>
                             }
-                            <button type="button" class="btn btn-sm btn-outline-primary" @onclick="() => AddSubCondition(link)"><span class="oi oi-plus"></span> Добавить условие</button>
+                            <button type="button" class="designer-ask-add" @onclick="() => AddSubCondition(link)"><span class="oi oi-plus"></span> Добавить условие</button>
                         </div>
                     }
                     else if (link.Condition?.Equals != null)

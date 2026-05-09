@@ -130,6 +130,7 @@ public class ClientFilterCriteria
 {
     public List<string> ClientIds { get; set; } = new();
     public List<ClientAttributeFilterCondition> AttributeConditions { get; set; } = new();
+    public string Logic { get; set; } = "and";
     public List<Guid> Channels { get; set; } = new();
 }
 
@@ -138,4 +139,5 @@ public class ClientAttributeFilterCondition
     public string AttributeKey { get; set; } = "";
     public string Operator { get; set; } = "equals";
     public string Value { get; set; } = "";
+    public bool? IgnoreCase { get; set; }
 }
