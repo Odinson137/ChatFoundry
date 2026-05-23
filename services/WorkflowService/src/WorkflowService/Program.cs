@@ -25,6 +25,7 @@ using WorkflowService.Services;
 using WorkflowService.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddChatFoundryObservability("workflow-service");
 
 var services = builder.Services;
 services.AddControllers();
@@ -234,6 +235,7 @@ builder.Services
     .AddSorting();
 
 var app = builder.Build();
+app.UseChatFoundryObservability();
 
 app.MapGrpcService<BotTokenGrpcService>();
 

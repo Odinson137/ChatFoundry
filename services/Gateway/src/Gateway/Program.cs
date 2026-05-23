@@ -1,9 +1,11 @@
 using System.Net.Http.Headers;
 using Gateway;
 using OpenIddict.Validation.AspNetCore;
+using Shared.Infrastructure.DependencyInjection;
 using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddChatFoundryObservability("gateway");
 
 builder.Configuration.AddEnvironmentVariables(prefix: null);
 
@@ -151,6 +153,7 @@ builder.Services
     });
 
 var app = builder.Build();
+app.UseChatFoundryObservability();
 
 app.UseRouting();
 

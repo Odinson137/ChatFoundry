@@ -11,6 +11,7 @@ using Shared.Grpc.Company;
 using Shared.Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddChatFoundryObservability("identity-service");
 
 var services = builder.Services;
 
@@ -120,6 +121,7 @@ services.AddGraphQLServer()
     .AddQueryType<MeQuery>();
 
 var app = builder.Build();
+app.UseChatFoundryObservability();
 
 app.UseRouting();
 app.UseAuthentication();

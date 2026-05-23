@@ -1,5 +1,6 @@
 using MassTransit;
 using Quartz;
+using Shared.Infrastructure.DependencyInjection;
 using Quartz.Impl.Matchers;
 using Scheduler.Grpc;
 using SchedulerService;
@@ -10,6 +11,7 @@ using Shared.Domain.Enums;
 using Workflow.Grpc.Client;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddChatFoundryObservability("scheduler-service");
 
 var services = builder.Services;
 var kafkaConnectionString = builder.Configuration.GetConnectionString("Kafka");
@@ -80,6 +82,7 @@ services.AddGrpcClient<ClientAttributesService.ClientAttributesServiceClient>(o 
 .AddStandardResilienceHandler();
 
 var app = builder.Build();
+app.UseChatFoundryObservability();
 
 app.MapGrpcService<SchedulerGrpcServiceImpl>();
 

@@ -13,6 +13,7 @@ using Shared.Infrastructure.GraphQl;
 using HotChocolate.Types;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddChatFoundryObservability("file-service");
 
 builder.Services.Configure<GcsStorageOptions>(
     builder.Configuration.GetSection(GcsStorageOptions.SectionName));
@@ -56,6 +57,7 @@ builder.Services
     .ModifyRequestOptions(o => o.IncludeExceptionDetails = builder.Environment.IsDevelopment());
 
 var app = builder.Build();
+app.UseChatFoundryObservability();
 
 using (var scope = app.Services.CreateScope())
 {

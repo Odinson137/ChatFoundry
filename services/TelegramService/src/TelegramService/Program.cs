@@ -15,6 +15,7 @@ using TelegramService.Options;
 using Workflow.Grpc;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddChatFoundryObservability("telegram-service");
 
 builder.Services.Configure<TelegramOptions>(
     builder.Configuration.GetSection(TelegramOptions.SectionName));
@@ -122,6 +123,7 @@ services.AddScoped<IMediaUploader, MediaUploader>();
 
 
 var app = builder.Build();
+app.UseChatFoundryObservability();
 
 app.MapGet("/", () => "TelegramService!");
 

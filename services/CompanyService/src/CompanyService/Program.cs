@@ -8,6 +8,7 @@ using Shared.Grpc.Identity;
 using Shared.Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddChatFoundryObservability("company-service");
 var services = builder.Services;
 
 services.AddControllers();
@@ -62,6 +63,7 @@ services
     .AddSorting();
 
 var app = builder.Build();
+app.UseChatFoundryObservability();
 
 app.UseHttpsRedirection();
 app.UseRouting();

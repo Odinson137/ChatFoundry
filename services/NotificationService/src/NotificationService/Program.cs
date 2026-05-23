@@ -16,6 +16,7 @@ using Shared.Infrastructure.GraphQl;
 using Workflow.Grpc.Client;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddChatFoundryObservability("notification-service");
 
 var services = builder.Services;
 services.AddControllers();
@@ -136,6 +137,7 @@ builder.Services
     .AddSorting();
 
 var app = builder.Build();
+app.UseChatFoundryObservability();
 
 using (var scope = app.Services.CreateScope())
 {

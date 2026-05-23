@@ -18,6 +18,7 @@ using Shared.Infrastructure.Options;
 using Workflow.Grpc;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddChatFoundryObservability("client-service");
 var services = builder.Services;
 
 services.AddHttpContextAccessor();
@@ -126,6 +127,7 @@ builder.Services
     .ModifyRequestOptions(opt => opt.IncludeExceptionDetails = true);
 
 var app = builder.Build();
+app.UseChatFoundryObservability();
 
 app.UseRouting();
 app.UseAuthentication();

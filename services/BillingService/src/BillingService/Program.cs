@@ -13,6 +13,7 @@ using Shared.Infrastructure.DependencyInjection;
 using Shared.Infrastructure.GraphQl;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddChatFoundryObservability("billing-service");
 var services = builder.Services;
 
 services.AddControllers();
@@ -91,6 +92,7 @@ services
     .AddSorting();
 
 var app = builder.Build();
+app.UseChatFoundryObservability();
 
 using (var scope = app.Services.CreateScope())
 {
