@@ -5,6 +5,7 @@
 .claude
 .cursor
 .gemini
+.idea
 commit_message.tmp
 
 /services/FileService/src/FileService/google-storage-creds.json
