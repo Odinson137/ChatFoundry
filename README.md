@@ -33,6 +33,28 @@ Designed with a robust microservice architecture, ChatFoundry scales effortlessl
 * **🏢 Multi-Tenancy & Billing:** Built-in workspace separation (`CompanyService`), subscription plans, and crypto payment gateway integration (Heleket/USDT).
 * **🔒 Enterprise Compliance:** Database-per-service architecture allows strict data residency compliance (like 152-FZ in the CIS region).
 
+### 📸 Interface Previews
+
+<!-- Place your workflow editor screenshot here -->
+> 🖼 **Visual Workflow Designer:**  
+> `![Workflow Editor](link_to_image)`
+
+<!-- Place your payment settings & balance screenshot here -->
+> 🖼 **Billing & Payment Settings:**  
+> `![Billing & Balance](link_to_image)`
+
+<!-- Place your live chat screenshot here -->
+> 🖼 **Live Operator Chat:**  
+> `![Live Chat](link_to_image)`
+
+<!-- Place your client card screenshot here -->
+> 🖼 **CRM Client Card:**  
+> `![Client Details](link_to_image)`
+
+<!-- Place your sessions replay screenshot here -->
+> 🖼 **Session Replay & Analytics:**  
+> `![Sessions Replay](link_to_image)`
+
 ## 🏗 Architecture
 
 ChatFoundry is built on a modern **Event-Driven Microservices** topology.
