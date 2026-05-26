@@ -7,9 +7,43 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-test:
-    name: Build & Test
+  format-check:
+    name: Verify Code Formatting
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+          cache: true
+
+      - name: Restore Solution
+        run: dotnet restore ChatFoundry.sln
+
+      - name: Verify Formatting
+        run: dotnet format ChatFoundry.sln --verify-no-changes --no-restore
+
+  test-services:
+    name: Test ${{ matrix.service.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [
+          { name: "BillingService", path: "services/BillingService/tests/BillingService.IntegrationTests/BillingService.IntegrationTests.csproj" },
+          { name: "ClientService", path: "services/ClientService/tests/ClientService.IntegrationTests/ClientService.IntegrationTests.csproj" },
+          { name: "CompanyService", path: "services/CompanyService/tests/CompanyService.IntegrationTests/CompanyService.IntegrationTests.csproj" },
+          { name: "FileService", path: "services/FileService/tests/FileService.IntegrationTests/FileService.IntegrationTests.csproj" },
+          { name: "Gateway", path: "services/Gateway/tests/Gateway.IntegrationTests/Gateway.IntegrationTests.csproj" },
+          { name: "IdentityServer", path: "services/IdentityServer/tests/IdentityServer.IntegrationTests/IdentityServer.IntegrationTests.csproj" },
+          { name: "NotificationService", path: "services/NotificationService/tests/NotificationService.IntegrationTests/NotificationService.IntegrationTests.csproj" },
+          { name: "SchedulerService", path: "services/SchedulerService/tests/SchedulerService.IntegrationTests/SchedulerService.IntegrationTests.csproj" },
+          { name: "TelegramService", path: "services/TelegramService/tests/TelegramService.IntegrationTests/TelegramService.IntegrationTests.csproj" },
+          { name: "WorkflowService", path: "services/WorkflowService/tests/WorkflowService.IntegrationTests/WorkflowService.IntegrationTests.csproj" }
+        ]
 
     steps:
       - name: Checkout repository
@@ -21,14 +55,11 @@ jobs:
           dotnet-version: '10.0.x'
           cache: true
 
-      - name: Restore dependencies
-        run: dotnet restore ChatFoundry.sln
+      - name: Restore Project
+        run: dotnet restore ${{ matrix.service.path }}
 
-      - name: Verify formatting
-        run: dotnet format ChatFoundry.sln --verify-no-changes --no-restore
-
-      - name: Build Solution
-        run: dotnet build ChatFoundry.sln --configuration Release --no-restore
+      - name: Build Project
+        run: dotnet build ${{ matrix.service.path }} --configuration Release --no-restore
 
       - name: Run Tests
-        run: dotnet test ChatFoundry.sln --configuration Release --no-build --no-restore --verbosity normal
+        run: dotnet test ${{ matrix.service.path }} --configuration Release --no-build --no-restore --verbosity normal
