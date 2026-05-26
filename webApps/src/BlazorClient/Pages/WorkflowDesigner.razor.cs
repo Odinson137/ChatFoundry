@@ -13,13 +13,8 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using BlazorClient.Components;
 using BlazorClient.Models.Diagram;
 
@@ -678,7 +673,7 @@ public partial class WorkflowDesigner : IDisposable
         if (file == null || file.Size == 0) return;
         try
         {
-            await using var stream = file.OpenReadStream(maxAllowedSize: 2 * 1024 * 1024); 
+            await using var stream = file.OpenReadStream(maxAllowedSize: 2 * 1024 * 1024);
             var schema = await JsonSerializer.DeserializeAsync<WorkflowSchema>(stream, WorkflowJsonOptions);
             if (schema == null) return;
             if (schema.InputParameters != null)
@@ -801,7 +796,7 @@ public partial class WorkflowDesigner : IDisposable
         var node = CreateNodeInstance(_draggedType.Value.ToString(), label, point, data: initialData);
         Diagram.Nodes.Add(node);
         _draggedType = null;
-        
+
         RefreshVariables();
     }
 
@@ -1500,7 +1495,7 @@ public partial class WorkflowDesigner : IDisposable
             RegexOptions.Compiled);
 
     private static readonly Regex NodeDisplayVarRegexPretty =
-        new(@"\{\{(?<label>[^·]+)·(?<key>[a-zA-Z0-9_]+)\}\}",             RegexOptions.Compiled);
+        new(@"\{\{(?<label>[^·]+)·(?<key>[a-zA-Z0-9_]+)\}\}", RegexOptions.Compiled);
 
     private static readonly Regex NodeDisplayVarRegexLegacy =
         new(@"\{\{(?<label>[^#\{\}]+)#(?<prefix>[0-9a-fA-F]{8,32})\.(?<key>[a-zA-Z0-9_]+)\}\}",

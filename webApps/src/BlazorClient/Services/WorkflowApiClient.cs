@@ -148,7 +148,7 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
             throw new InvalidOperationException(payload.Error);
     }
 
-    
+
 
     public async Task<List<BotDto>> GetBotsAsync()
     {
@@ -255,7 +255,7 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
         await ExecuteGraphQl<object>(query, variables);
     }
 
-    
+
 
     public async Task<List<SessionDto>> GetSessionsAsync(string? statusFilter = null)
     {
@@ -435,7 +435,7 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
         return result.Sessions.Nodes.FirstOrDefault();
     }
 
-    
+
 
     public async Task<WorkflowResponse?> GetWorkflowByIdAsync(Guid id)
     {
@@ -649,7 +649,7 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
         catch { return false; }
     }
 
-    
+
 
     private async Task<T> ExecuteGraphQl<T>(string query, object? variables = null)
     {
@@ -682,7 +682,7 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
 
         return gqlResponse.Data;
     }
-    
+
     public async Task RefreshChannelWebhookAsync(Guid channelId)
     {
         var query = """
@@ -697,7 +697,7 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
         await ExecuteGraphQl<object>(query, variables);
     }
 
-    
+
 
     private class BotsConnectionResponse
     {

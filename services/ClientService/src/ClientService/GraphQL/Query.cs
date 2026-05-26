@@ -1,5 +1,4 @@
 using ClientService.Data;
-using ClientService.Data.Enums;
 using ClientService.Entities;
 using ClientService.Interfaces;
 using HotChocolate;

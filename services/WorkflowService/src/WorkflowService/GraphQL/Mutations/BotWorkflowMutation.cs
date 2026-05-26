@@ -6,8 +6,6 @@ using Scheduler.Grpc;
 using Shared.Infrastructure.GraphQl;
 using WorkflowService.Data;
 using WorkflowService.Entities;
-using WorkflowService.Enums;
-using WorkflowService.Models.Node;
 
 namespace WorkflowService.GraphQL.Mutations;
 
@@ -146,8 +144,8 @@ public class BotWorkflowMutation
 
         // if (!workflow.IsActiveBotWorkflow || timerNode == null || !timerNode.HasValue)
         // {
-           var test = UnregisterTimerStartAsync(workflow.Id, schedulerClient);
-            // return;
+        var test = UnregisterTimerStartAsync(workflow.Id, schedulerClient);
+        // return;
         // }
 
         var timerElement = timerNode.Value;
@@ -227,7 +225,7 @@ public class BotWorkflowMutation
         try
         {
             await test;
-            
+
             await schedulerClient.RegisterTimerStartAsync(new RegisterTimerStartRequest
             {
                 JobKey = jobKey,
@@ -290,11 +288,11 @@ public class BotWorkflowMutation
 #region Records for GraphQL
 
 public record AddBotWorkflowInput(
-    Guid BotId, 
-    string NodesDefinition, 
-    string EdgesDefinition, 
-    string LayoutDefinition, 
-    int Version = 1, 
+    Guid BotId,
+    string NodesDefinition,
+    string EdgesDefinition,
+    string LayoutDefinition,
+    int Version = 1,
     bool IsActiveBotWorkflow = false,
     string? InputParametersDefinition = null,
     string? OutputParametersDefinition = null);
@@ -302,11 +300,11 @@ public record AddBotWorkflowInput(
 public record AddBotWorkflowPayload(BotWorkflow BotWorkflow);
 
 public record UpdateBotWorkflowInput(
-    Guid WorkflowId, 
-    string? NodesDefinition, 
-    string? EdgesDefinition, 
-    string? LayoutDefinition, 
-    int? Version, 
+    Guid WorkflowId,
+    string? NodesDefinition,
+    string? EdgesDefinition,
+    string? LayoutDefinition,
+    int? Version,
     bool? IsActiveBotWorkflow,
     string? InputParametersDefinition = null,
     string? OutputParametersDefinition = null);

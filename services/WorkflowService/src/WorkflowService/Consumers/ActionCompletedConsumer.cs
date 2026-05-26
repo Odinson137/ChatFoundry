@@ -105,7 +105,7 @@ public class ActionCompletedConsumer(
             foreach (var (parentKey, childKey) in subData.OutputMappings)
             {
                 if (string.IsNullOrEmpty(childKey) || string.IsNullOrEmpty(parentKey)) continue;
-                
+
                 var value = variableService.GetVariable(childSession, childKey);
                 variableService.SetVariable(parentSession, parentKey, value);
             }

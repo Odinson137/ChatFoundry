@@ -1,5 +1,4 @@
 using Quartz;
-using Quartz.Impl.Triggers;
 using Scheduler.Grpc;
 using SchedulerService.Jobs;
 

@@ -6,7 +6,6 @@ using BillingService.Data;
 using BillingService.Entities;
 using BillingService.Enums;
 using BillingService.Options;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace BillingService.Services;

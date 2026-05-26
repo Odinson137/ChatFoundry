@@ -12,13 +12,13 @@ public abstract class BaseEntityTypeConfiguration<TEntity> : IEntityTypeConfigur
 
         builder.Property(x => x.Id)
             .ValueGeneratedNever();
-        
+
         builder.Property(x => x.CreatedAt)
             .IsRequired();
 
         builder.Property(x => x.ModifiedAt)
             .IsRequired();
-        
+
         builder.HasIndex(x => x.CreatedAt);
     }
 }

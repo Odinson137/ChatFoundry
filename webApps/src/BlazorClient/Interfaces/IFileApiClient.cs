@@ -12,7 +12,6 @@ public record FileInfoDto(
     Guid? UploadedByUserId = null,
     Guid? UploadedClientId = null)
 {
-    /// <summary>«Администратор», если задан <see cref="UploadedByUserId"/> (загрузка из панели / с JWT); иначе «Клиент».</summary>
     public string UploadSourceDisplay =>
         UploadedByUserId.HasValue ? "Администратор" : "Клиент";
 }

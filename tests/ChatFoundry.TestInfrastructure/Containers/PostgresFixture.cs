@@ -4,7 +4,7 @@ namespace ChatFoundry.TestInfrastructure.Containers;
 
 public class PostgresFixture
 {
-    private static readonly Lazy<PostgreSqlContainer> Container = new(() => 
+    private static readonly Lazy<PostgreSqlContainer> Container = new(() =>
         new PostgreSqlBuilder()
             .WithImage("postgres:16-alpine")
             .WithDatabase("chatfoundry_test")

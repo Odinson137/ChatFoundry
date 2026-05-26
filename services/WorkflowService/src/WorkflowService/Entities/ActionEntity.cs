@@ -12,16 +12,12 @@ public class ActionEntity : EntityBase
     public Guid NodeId { get; set; }
     public string? Payload { get; set; }
 
-    /// <summary>Тип входящего сообщения пользователя для этого действия (Start/Input).</summary>
     public MessageKind MessageKind { get; set; } = MessageKind.Unknown;
 
     public WorkflowNodeType WorkflowNodeType { get; set; }
 
     public ActionStatus Status { get; set; } = ActionStatus.Pending;
 
-    /// <summary>
-    /// Error message when Status is Failed (e.g. exception message from executor).
-    /// </summary>
     public string? ErrorMessage { get; set; }
 
     public void MarkInProgress()
@@ -33,7 +29,7 @@ public class ActionEntity : EntityBase
     {
         Status = ActionStatus.Completed;
     }
-    
+
     public void MarkFailed()
     {
         Status = ActionStatus.Failed;

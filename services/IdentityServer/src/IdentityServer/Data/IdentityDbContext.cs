@@ -13,7 +13,7 @@ public class IdentityDbContext
     {
         Database.EnsureCreated();
     }
-    
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

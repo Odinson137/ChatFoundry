@@ -1,7 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
 using ChatFoundry.TestInfrastructure.Factories;
-using ChatFoundry.TestInfrastructure.Extensions;
 
 namespace Gateway.IntegrationTests.Fixtures;
 

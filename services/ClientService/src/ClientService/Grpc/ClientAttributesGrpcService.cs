@@ -359,22 +359,22 @@ public sealed class ClientAttributesGrpcService(
 
     private static IQueryable<ClientChannel> ApplyCustomFilter(
         IQueryable<ClientChannel> query, string key, string op, string value, bool ic) => op switch
-    {
-        "equals" when ic => query.Where(c => c.Attributes.Any(a => a.Key == key && EF.Functions.ILike(a.Value, value))),
-        "equals" => query.Where(c => c.Attributes.Any(a => a.Key == key && a.Value == value)),
-        "notequals" when ic => query.Where(c => c.Attributes.Any(a => a.Key == key && !EF.Functions.ILike(a.Value, value))),
-        "notequals" => query.Where(c => c.Attributes.Any(a => a.Key == key && a.Value != value)),
-        "contains" when ic => query.Where(c => c.Attributes.Any(a => a.Key == key && EF.Functions.ILike(a.Value, $"%{value}%"))),
-        "contains" => query.Where(c => c.Attributes.Any(a => a.Key == key && EF.Functions.Like(a.Value, $"%{value}%"))),
-        "startswith" when ic => query.Where(c => c.Attributes.Any(a => a.Key == key && EF.Functions.ILike(a.Value, $"{value}%"))),
-        "startswith" => query.Where(c => c.Attributes.Any(a => a.Key == key && EF.Functions.Like(a.Value, $"{value}%"))),
-        "endswith" when ic => query.Where(c => c.Attributes.Any(a => a.Key == key && EF.Functions.ILike(a.Value, $"%{value}"))),
-        "endswith" => query.Where(c => c.Attributes.Any(a => a.Key == key && EF.Functions.Like(a.Value, $"%{value}"))),
-        "isempty" => query.Where(c => c.Attributes.Any(a => a.Key == key && string.IsNullOrEmpty(a.Value))),
-        "isnotempty" => query.Where(c => c.Attributes.Any(a => a.Key == key && !string.IsNullOrEmpty(a.Value))),
-        "inlist" => CustomInList(query, key, value, ic),
-        _ => query
-    };
+        {
+            "equals" when ic => query.Where(c => c.Attributes.Any(a => a.Key == key && EF.Functions.ILike(a.Value, value))),
+            "equals" => query.Where(c => c.Attributes.Any(a => a.Key == key && a.Value == value)),
+            "notequals" when ic => query.Where(c => c.Attributes.Any(a => a.Key == key && !EF.Functions.ILike(a.Value, value))),
+            "notequals" => query.Where(c => c.Attributes.Any(a => a.Key == key && a.Value != value)),
+            "contains" when ic => query.Where(c => c.Attributes.Any(a => a.Key == key && EF.Functions.ILike(a.Value, $"%{value}%"))),
+            "contains" => query.Where(c => c.Attributes.Any(a => a.Key == key && EF.Functions.Like(a.Value, $"%{value}%"))),
+            "startswith" when ic => query.Where(c => c.Attributes.Any(a => a.Key == key && EF.Functions.ILike(a.Value, $"{value}%"))),
+            "startswith" => query.Where(c => c.Attributes.Any(a => a.Key == key && EF.Functions.Like(a.Value, $"{value}%"))),
+            "endswith" when ic => query.Where(c => c.Attributes.Any(a => a.Key == key && EF.Functions.ILike(a.Value, $"%{value}"))),
+            "endswith" => query.Where(c => c.Attributes.Any(a => a.Key == key && EF.Functions.Like(a.Value, $"%{value}"))),
+            "isempty" => query.Where(c => c.Attributes.Any(a => a.Key == key && string.IsNullOrEmpty(a.Value))),
+            "isnotempty" => query.Where(c => c.Attributes.Any(a => a.Key == key && !string.IsNullOrEmpty(a.Value))),
+            "inlist" => CustomInList(query, key, value, ic),
+            _ => query
+        };
 
     private static IQueryable<ClientChannel> CustomInList(
         IQueryable<ClientChannel> query, string key, string value, bool ic)

@@ -3,7 +3,6 @@ using NotificationService.Data;
 using NotificationService.Entities;
 using NotificationService.Enums;
 using NotificationService.Interfaces;
-using NotificationService.Repositories;
 
 namespace NotificationService.Repositories;
 

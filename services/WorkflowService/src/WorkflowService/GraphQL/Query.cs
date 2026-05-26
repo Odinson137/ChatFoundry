@@ -30,7 +30,7 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
             return context.MessengerChannels.Where(c => c.CompanyId == CompanyId.Value);
         return context.MessengerChannels.Where(c => c.CreatedUserId == UserId);
     }
-    
+
     [UsePaging(IncludeTotalCount = true)]
     [UseFiltering]
     [UseSorting]
@@ -51,18 +51,18 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
 
         return query.OrderByDescending(s => s.CreatedAt);
     }
-    
+
     [UsePaging(IncludeTotalCount = true)]
-    [UseProjection] 
+    [UseProjection]
     [UseFiltering]
     [UseSorting]
     public DbSet<BotWorkflow> GetWorkflows([Service] WorkflowDbContext context)
     {
         return context.Workflows;
     }
-        
+
     [UsePaging(IncludeTotalCount = true)]
-    [UseProjection] 
+    [UseProjection]
     [UseFiltering]
     [UseSorting]
     public DbSet<ActionEntity> GetActionEntities([Service] WorkflowDbContext context)

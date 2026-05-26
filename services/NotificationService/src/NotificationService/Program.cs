@@ -1,7 +1,6 @@
 using Confluent.Kafka;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using NotificationService.Consumers;
 using NotificationService.Data;

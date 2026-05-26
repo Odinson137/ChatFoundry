@@ -1,4 +1,3 @@
-using HotChocolate.Data;
 using NotificationService.Data;
 using NotificationService.Entities;
 using Shared.Infrastructure.GraphQl;

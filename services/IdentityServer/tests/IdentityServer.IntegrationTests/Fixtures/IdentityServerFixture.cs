@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using ChatFoundry.TestInfrastructure.Factories;
-using ChatFoundry.TestInfrastructure.Extensions;
 using IdentityServer.Data;
 
 namespace IdentityServer.IntegrationTests.Fixtures;

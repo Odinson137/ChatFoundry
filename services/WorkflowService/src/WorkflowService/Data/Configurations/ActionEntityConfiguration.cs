@@ -17,7 +17,7 @@ public class ActionEntityConfiguration : BaseEntityTypeConfiguration<ActionEntit
 
         builder.Property(x => x.Payload)
             .HasMaxLength(1000);
-        
+
         builder.Property(x => x.Status)
             .IsRequired()
             .HasConversion<int>();

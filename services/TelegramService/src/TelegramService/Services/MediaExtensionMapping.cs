@@ -1,8 +1,5 @@
 namespace TelegramService.Services;
 
-/// <summary>
-/// Соответствие расширений файлов способу отправки в Telegram (sendPhoto, sendVideo, sendAudio, sendDocument).
-/// </summary>
 internal static class MediaExtensionMapping
 {
     private static readonly HashSet<string> PhotoExtensions = new(StringComparer.OrdinalIgnoreCase)

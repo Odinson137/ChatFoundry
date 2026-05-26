@@ -1,4 +1,3 @@
-using HotChocolate;
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;
 using NotificationService.Entities;

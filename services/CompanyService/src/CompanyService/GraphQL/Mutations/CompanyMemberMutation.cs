@@ -6,7 +6,6 @@ using Grpc.Core;
 using HotChocolate;
 using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Shared.Grpc.Identity;
 using Shared.Infrastructure.GraphQl;
 

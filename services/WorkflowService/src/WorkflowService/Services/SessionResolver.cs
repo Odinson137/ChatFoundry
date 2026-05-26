@@ -52,7 +52,7 @@ public class SessionResolver(
         var session = await sessionRepository.GetAsync(sessionId, ct);
         if (session == null)
             return;
-        
+
         session.Status = SessionStatus.Completed;
         await sessionRepository.SaveAsync(session, ct);
     }

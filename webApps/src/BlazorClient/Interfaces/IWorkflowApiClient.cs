@@ -5,7 +5,7 @@ namespace BlazorClient.Interfaces;
 
 public interface IWorkflowApiClient
 {
-    
+
     Task<List<ChannelDto>> GetChannelsAsync();
     Task<ChannelDto> AddChannelAsync(string name, string token, string channelType);
     Task<ChannelDto> UpdateChannelAsync(Guid channelId, string name, string? token, string channelType);
@@ -18,13 +18,12 @@ public interface IWorkflowApiClient
     Task<BotDto> UpdateBotAsync(Guid botId, string name, IReadOnlyList<Guid>? channelIds = null);
     Task DeleteBotAsync(Guid botId);
 
-    
+
     Task<List<SessionDto>> GetSessionsAsync(string? statusFilter = null);
-    /// <summary>Постраничная загрузка сессий (cursor-based).</summary>
     Task<SessionsPageResult> GetSessionsPagedAsync(int first, string? after = null, SessionListFilter? filter = null);
     Task<SessionDto?> GetSessionByIdAsync(Guid sessionId);
 
-    
+
     Task<WorkflowResponse?> GetWorkflowByIdAsync(Guid id);
     Task<List<WorkflowListItem>> GetWorkflowsListAsync();
     Task<WorkflowListPage> GetWorkflowsPageAsync(int first = 10, string? after = null, int? last = null, string? before = null);

@@ -11,7 +11,7 @@ public class ClientDbContext : DbContext
     {
         Database.EnsureCreated();
     }
-    
+
     public DbSet<Client> Clients => Set<Client>();
     public DbSet<ClientChannel> ClientChannels => Set<ClientChannel>();
     public DbSet<Message> Messages => Set<Message>();

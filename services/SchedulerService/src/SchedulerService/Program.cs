@@ -1,13 +1,11 @@
 using MassTransit;
 using Quartz;
 using Shared.Infrastructure.DependencyInjection;
-using Quartz.Impl.Matchers;
 using Scheduler.Grpc;
 using SchedulerService;
 using SchedulerService.Grpc;
 using SchedulerService.Jobs;
 using Shared.Application.Events;
-using Shared.Domain.Enums;
 using Workflow.Grpc.Client;
 
 var builder = WebApplication.CreateBuilder(args);

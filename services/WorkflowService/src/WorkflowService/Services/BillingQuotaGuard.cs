@@ -1,6 +1,5 @@
 using Billing.Grpc;
 using Grpc.Core;
-using Microsoft.Extensions.Configuration;
 
 namespace WorkflowService.Services;
 

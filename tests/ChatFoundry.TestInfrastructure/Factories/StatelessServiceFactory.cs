@@ -12,7 +12,7 @@ using Xunit;
 
 namespace ChatFoundry.TestInfrastructure.Factories;
 
-public abstract class StatelessServiceFactory<TProgram> 
+public abstract class StatelessServiceFactory<TProgram>
     : WebApplicationFactory<TProgram>, IAsyncLifetime, ITestFixture
     where TProgram : class
 {
@@ -28,7 +28,7 @@ public abstract class StatelessServiceFactory<TProgram>
         if (NeedsPostgres) tasks.Add(PostgresFixture.StartAsync());
         if (NeedsKafka) tasks.Add(KafkaFixture.StartAsync());
         if (NeedsRedis) tasks.Add(RedisFixture.StartAsync());
-        
+
         if (tasks.Any())
         {
             await Task.WhenAll(tasks);

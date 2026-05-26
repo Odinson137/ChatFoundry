@@ -54,7 +54,7 @@ public class AIGenerateActionExecutor(
             await sessionRepository.SaveAsync(session, ct);
 
             if (node.Data is not IContinueOnError { ContinueOnError: true }) throw;
-            
+
             await producer.Produce(new ActionCompletedEvent(
                 message.Channel, message.ExternalUserId,
                 session.Workflow.Bot.CompanyId, Success: false), ct);
@@ -83,7 +83,7 @@ public class AIGenerateActionExecutor(
             await sessionRepository.SaveAsync(session, ct);
 
             if (!aiData.ContinueOnError) throw;
-            
+
             await producer.Produce(new ActionCompletedEvent(
                 message.Channel, message.ExternalUserId,
                 session.Workflow.Bot.CompanyId, Success: false), ct);
@@ -93,7 +93,7 @@ public class AIGenerateActionExecutor(
         variableService.SetVariable(session, $"$node.{node.Id}.output", result);
         variableService.SetVariable(session, $"$node.{node.Id}.statusCode", 200);
         variableService.SetVariable(session, $"$node.{node.Id}.success", true);
-        
+
         await variableService.SyncIfDirtyAsync(session, ct);
         await sessionRepository.SaveAsync(session, ct);
 

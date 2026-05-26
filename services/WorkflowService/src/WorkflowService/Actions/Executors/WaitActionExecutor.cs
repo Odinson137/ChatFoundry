@@ -1,5 +1,4 @@
 using Scheduler.Grpc;
-using Shared.Domain.Enums;
 using WorkflowService.Entities;
 using WorkflowService.Enums;
 using WorkflowService.Events;

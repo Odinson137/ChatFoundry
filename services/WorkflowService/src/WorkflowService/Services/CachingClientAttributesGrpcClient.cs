@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Shared.Infrastructure.Options;
 using Workflow.Grpc.Client;

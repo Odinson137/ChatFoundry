@@ -17,7 +17,7 @@ public sealed class SendTelegramMessageConsumer(
     {
         var message = context.Message;
         if (message.Channel != DefaultChannel.Telegram) return;
-        
+
         if (string.IsNullOrEmpty(message.MessageJson)) return;
 
         logger.LogInformation(

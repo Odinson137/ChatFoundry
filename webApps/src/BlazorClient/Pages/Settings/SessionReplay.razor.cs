@@ -224,7 +224,7 @@ public partial class SessionReplay : IDisposable, IReplayDataProvider
         }
     }
 
-    
+
     public NodeStats? GetStats(Guid nodeId) => _nodeStats?.GetValueOrDefault(nodeId);
 
     public bool IsCurrentNode(Guid nodeId) => _session?.CurrentNodeId == nodeId;

@@ -4,7 +4,7 @@ namespace ChatFoundry.TestInfrastructure.Containers;
 
 public class RedisFixture
 {
-    private static readonly Lazy<RedisContainer> Container = new(() => 
+    private static readonly Lazy<RedisContainer> Container = new(() =>
         new RedisBuilder()
             .WithImage("redis:7-alpine")
             .Build());

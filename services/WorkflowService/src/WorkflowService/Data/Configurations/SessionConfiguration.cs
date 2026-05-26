@@ -10,14 +10,14 @@ public class SessionConfiguration : BaseEntityTypeConfiguration<Session>
     public override void Configure(EntityTypeBuilder<Session> builder)
     {
         base.Configure(builder);
-        
+
         builder.Property(x => x.ClientId)
             .IsRequired()
             .HasMaxLength(200);
 
         builder.Property(x => x.Channel)
             .IsRequired()
-            .HasConversion<int>(); 
+            .HasConversion<int>();
 
         builder.Property(x => x.CurrentNodeId)
             .IsRequired()
@@ -25,7 +25,7 @@ public class SessionConfiguration : BaseEntityTypeConfiguration<Session>
 
         builder.Property(x => x.Status)
             .IsRequired()
-            .HasConversion<int>(); 
+            .HasConversion<int>();
 
         builder.Property(x => x.CompletedAt);
 

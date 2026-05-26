@@ -8,7 +8,7 @@ namespace Shared.Infrastructure.DependencyInjection;
 public static class PostgreSqlExtensions
 {
     public static IServiceCollection AddPostgreSql<TContext>(
-        this IServiceCollection services, 
+        this IServiceCollection services,
         IConfiguration configuration,
         string connectionName = "DefaultConnection")
         where TContext : DbContext

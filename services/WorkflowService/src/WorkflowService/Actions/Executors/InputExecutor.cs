@@ -5,7 +5,6 @@ using WorkflowService.Entities;
 using WorkflowService.Enums;
 using WorkflowService.Events;
 using WorkflowService.Interfaces;
-using WorkflowService.Models.Node;
 using WorkflowService.Utils;
 
 namespace WorkflowService.Actions.Executors;

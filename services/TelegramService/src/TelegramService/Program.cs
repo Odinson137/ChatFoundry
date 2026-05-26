@@ -1,5 +1,4 @@
 using Confluent.Kafka;
-using File.Grpc;
 using MassTransit;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
@@ -49,9 +48,9 @@ builder.Services.AddControllers()
         settings.NullValueHandling = NullValueHandling.Ignore;
         settings.MissingMemberHandling = MissingMemberHandling.Ignore;
         settings.DefaultValueHandling = DefaultValueHandling.Ignore;
-        
+
         settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-        
+
         settings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
     });
 
@@ -73,7 +72,7 @@ services.AddMassTransit(x =>
         rider.AddProducer<BotIncomingMessage>("bot.message.incoming");
         rider.AddProducer<ActionCompletedEvent>("workflow.action.completed");
         rider.AddProducer<TelegramSetWebhookEvent>("telegram.set-webhook");
-        
+
         rider.AddConsumer<SendTelegramMessageConsumer>();
         rider.AddConsumer<SetTelegramWebhookConsumer>();
 

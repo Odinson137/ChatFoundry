@@ -15,7 +15,7 @@ public class ExecuteActionConsumer(
     {
         var message = context.Message;
         var ct = context.CancellationToken;
-        
+
         var action = await actionRepository.GetAsync(message.ActionId, ct);
 
         if (action == null)

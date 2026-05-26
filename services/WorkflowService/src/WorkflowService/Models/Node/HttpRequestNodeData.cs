@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace WorkflowService.Models.Node;
 
 public sealed class HttpRequestNodeData : NodeData, IContinueOnError

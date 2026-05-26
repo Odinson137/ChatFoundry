@@ -1,5 +1,4 @@
 using NotificationService.Entities;
-using NotificationService.Enums;
 
 namespace NotificationService.Interfaces;
 

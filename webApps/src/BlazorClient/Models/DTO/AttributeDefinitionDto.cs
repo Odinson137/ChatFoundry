@@ -1,5 +1,3 @@
-using BlazorClient.Interfaces;
-
 namespace BlazorClient.Models.DTO;
 
 public class AttributeDefinitionDto

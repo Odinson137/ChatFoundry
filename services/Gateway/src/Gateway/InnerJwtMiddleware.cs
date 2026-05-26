@@ -25,7 +25,7 @@ public class InnerJwtMiddleware
                 var parts = token.Split('.');
                 if (parts.Length == 5)
                 {
-                    
+
                     var keyBase64 = configuration["OpenIddict:EncryptionKey"];
                     if (!string.IsNullOrEmpty(keyBase64))
                     {
@@ -41,10 +41,10 @@ public class InnerJwtMiddleware
                                 ValidateIssuer = false,
                                 ValidateAudience = false,
                                 ValidateLifetime = false,
-                                
+
                                 SignatureValidator = (string innerToken, TokenValidationParameters _) =>
                                 {
-                                    innerJwtCaptured = innerToken; 
+                                    innerJwtCaptured = innerToken;
                                     return new JwtSecurityToken(innerToken);
                                 }
                             };
@@ -54,13 +54,13 @@ public class InnerJwtMiddleware
                         }
                         catch
                         {
-                            
+
                         }
                     }
                 }
                 else if (parts.Length == 3)
                 {
-                    
+
                     context.Items[InnerJwtKey] = token;
                 }
             }

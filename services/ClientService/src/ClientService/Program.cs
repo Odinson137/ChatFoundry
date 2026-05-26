@@ -85,7 +85,7 @@ builder.Services.AddMassTransit(x =>
     {
         rider.AddConsumer<BotIncomingMessageConsumer>();
         rider.AddConsumer<BotOutgoingMessageConsumer>();
-        
+
         rider.UsingKafka((context, cfg) =>
         {
             cfg.Host(kafkaConnectionString);
@@ -98,7 +98,7 @@ builder.Services.AddMassTransit(x =>
                     e.CreateIfMissing();
                     e.ConfigureConsumer<BotIncomingMessageConsumer>(context);
                 });
-            
+
             cfg.TopicEndpoint<BotOutgoingMessage>(
                 "bot.message.outgoing",
                 groupName,

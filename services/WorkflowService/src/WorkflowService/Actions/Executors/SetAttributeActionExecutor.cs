@@ -9,10 +9,6 @@ using WorkflowService.Utils;
 
 namespace WorkflowService.Actions.Executors;
 
-/// <summary>
-/// Исполнитель блока «Атрибут» — запись в глобальные атрибуты клиента (сохраняются между сессиями).
-/// Атрибуты доступны как переменные $client.* и загружаются при открытии workflow.
-/// </summary>
 public class SetAttributeActionExecutor(
     ITopicProducer<ActionCompletedEvent> producer,
     ISessionRepository sessionRepository,

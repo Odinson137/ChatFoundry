@@ -10,10 +10,6 @@ namespace ClientService.GraphQL.Mutations;
 [ExtendObjectType(typeof(Mutation))]
 public class AttributeDefinitionMutation(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpContextAccessor)
 {
-    /// <summary>
-    /// Создать атрибут в контексте текущей компании (scope = Company, scopeEntityId = CompanyId из JWT).
-    /// Не требует передачи scope/scopeEntityId — привязка к компании на стороне сервера.
-    /// </summary>
     public async Task<AttributeDefinition> CreateCompanyAttributeDefinition(
         string key,
         string? displayName,
@@ -58,9 +54,9 @@ public class AttributeDefinitionMutation(IHttpContextAccessor httpContextAccesso
             DisplayName = displayName,
             Description = description
         };
-    
+
         await attributeDefinitionRepository.AddAsync(attributeDefinition, ct);
-    
+
         return attributeDefinition;
     }
 

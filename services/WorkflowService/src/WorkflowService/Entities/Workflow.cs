@@ -15,7 +15,7 @@ public class BotWorkflow : EntityBase
     public string LayoutDefinition { get; set; } = "[]";
 
     public int Version { get; set; } = 1;
-    
+
     public bool IsActiveBotWorkflow { get; set; } = false;
 
     public string InputParametersDefinition { get; set; } = "[]";

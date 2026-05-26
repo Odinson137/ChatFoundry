@@ -1,8 +1,6 @@
 using BillingService.Data;
 using BillingService.Enums;
 using BillingService.Services;
-using HotChocolate;
-using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
 using Shared.Infrastructure.GraphQl;
 

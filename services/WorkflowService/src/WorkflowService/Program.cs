@@ -145,13 +145,13 @@ services.AddMassTransit(x =>
         rider.AddConsumer<ExecuteActionConsumer>();
         rider.AddConsumer<ActionCompletedConsumer>();
         rider.AddProducer<TelegramSetWebhookEvent>("telegram.set-webhook");
-        
+
         rider.AddProducer<BotIncomingMessage>("bot.message.incoming");
         rider.AddProducer<BotOutgoingMessage>("bot.message.outgoing");
         rider.AddProducer<ExecuteActionCommand>("workflow.action.execute");
         rider.AddProducer<ActionCompletedEvent>("workflow.action.completed");
         rider.AddProducer<LiveChatRequestedEvent>("livechat.event");
-        
+
         rider.UsingKafka((context, cfg) =>
         {
             cfg.Host(kafkaConnectionString);
@@ -230,7 +230,7 @@ builder.Services
     .AddTypeExtension<BotWorkflowMutation>()
     .AddType<MessengerChannelType>()
     .AddType<WorkflowService.GraphQL.Types.BotWorkflowType>()
-    .AddProjections() 
+    .AddProjections()
     .AddFiltering()
     .AddSorting();
 

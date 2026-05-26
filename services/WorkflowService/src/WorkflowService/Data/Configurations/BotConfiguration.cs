@@ -22,7 +22,7 @@ public class BotConfiguration : BaseEntityTypeConfiguration<Bot>
 
         builder.HasIndex(x => x.CreatedUserId);
         builder.HasIndex(x => x.CompanyId);
-        
+
         builder.HasMany(b => b.Workflows)
             .WithOne(w => w.Bot)
             .HasForeignKey(w => w.BotId)

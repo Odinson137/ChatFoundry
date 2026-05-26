@@ -146,17 +146,17 @@ public sealed class TelegramAudioDto
 public sealed class TelegramGetFileResponseDto
 {
     [JsonProperty("ok")] public bool Ok { get; init; }
-    
+
     [JsonProperty("result")] public TelegramFileDto Result { get; init; } = null!;
 }
 
 public sealed class TelegramFileDto
 {
     [JsonProperty("file_id")] public string FileId { get; init; } = null!;
-    
+
     [JsonProperty("file_unique_id")] public string FileUniqueId { get; init; } = null!;
-    
+
     [JsonProperty("file_size")] public long FileSize { get; init; }
-    
+
     [JsonProperty("file_path")] public string FilePath { get; init; } = null!;
 }

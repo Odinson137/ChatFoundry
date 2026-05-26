@@ -29,7 +29,7 @@ public class HttpRequestNodeData : NodeData
 
 public class MessageNodeData : NodeData
 {
-    
+
     public string Text { get; set; } = string.Empty;
 }
 

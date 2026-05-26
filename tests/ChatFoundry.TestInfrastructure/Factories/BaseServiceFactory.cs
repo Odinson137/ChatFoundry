@@ -13,7 +13,7 @@ using Xunit;
 
 namespace ChatFoundry.TestInfrastructure.Factories;
 
-public abstract class BaseServiceFactory<TProgram, TDbContext> 
+public abstract class BaseServiceFactory<TProgram, TDbContext>
     : WebApplicationFactory<TProgram>, IAsyncLifetime, ITestFixture
     where TProgram : class
     where TDbContext : DbContext
@@ -28,7 +28,7 @@ public abstract class BaseServiceFactory<TProgram, TDbContext>
         var tasks = new List<Task> { PostgresFixture.StartAsync() };
         if (NeedsKafka) tasks.Add(KafkaFixture.StartAsync());
         if (NeedsRedis) tasks.Add(RedisFixture.StartAsync());
-        
+
         await Task.WhenAll(tasks);
 
         Respawner = new DatabaseRespawner(PostgresFixture.ConnectionString);

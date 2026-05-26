@@ -21,9 +21,9 @@ public class IncomingMessageConsumer(
 
         liveChat.LastMessagePreview = msg.Payload;
         liveChat.ModifiedAt = DateTime.UtcNow;
-        
+
         await repository.SaveAsync(liveChat, ct);
-        
+
         if (liveChat.CompanyId.HasValue)
         {
             await hubContext.Clients.Group(LiveChatHub.GetCompanyGroupName(liveChat.CompanyId.Value))

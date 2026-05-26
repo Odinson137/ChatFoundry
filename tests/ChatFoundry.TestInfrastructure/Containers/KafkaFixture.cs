@@ -4,7 +4,7 @@ namespace ChatFoundry.TestInfrastructure.Containers;
 
 public class KafkaFixture
 {
-    private static readonly Lazy<KafkaContainer> Container = new(() => 
+    private static readonly Lazy<KafkaContainer> Container = new(() =>
         new KafkaBuilder()
             .WithImage("confluentinc/cp-kafka:7.6.0")
             .Build());

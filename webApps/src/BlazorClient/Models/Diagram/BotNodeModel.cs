@@ -3,14 +3,14 @@ using Blazor.Diagrams.Core.Models;
 
 namespace BlazorClient.Models.Diagram
 {
-    
+
     public enum BotNodeType
     {
         Start,
-        Message,    
-        Input,      
-        AiProcess,  
-        Condition   
+        Message,
+        Input,
+        AiProcess,
+        Condition
     }
 
     public class BotNodeModel : NodeModel
@@ -22,22 +22,22 @@ namespace BlazorClient.Models.Diagram
             Type = type;
             Title = GetTitle(type);
 
-            
-            
-            
+
+
+
             if (type != BotNodeType.Start)
             {
-                AddPort(PortAlignment.Left); 
+                AddPort(PortAlignment.Left);
             }
 
-            if (type != BotNodeType.Input) 
+            if (type != BotNodeType.Input)
             {
-                
-                AddPort(PortAlignment.Right); 
+
+                AddPort(PortAlignment.Right);
             }
             else
             {
-                
+
                 AddPort(PortAlignment.Right);
             }
         }

@@ -70,7 +70,6 @@ public class ChannelMutation(
         return new DeleteChannelPayload(channel, null);
     }
 
-    /// <summary>Актуализирует webhook для одного канала (отправляет TelegramSetWebhookEvent).</summary>
     public async Task<RefreshChannelWebhookPayload> RefreshChannelWebhookAsync(
         RefreshChannelWebhookInput input,
         [Service] WorkflowDbContext context)

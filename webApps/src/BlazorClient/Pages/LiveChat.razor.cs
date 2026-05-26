@@ -1,10 +1,8 @@
 using BlazorClient.Models.DTO;
-using BlazorClient.Services;
 using BlazorClient.Components;
 using BlazorClient.Interfaces;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 

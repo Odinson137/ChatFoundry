@@ -104,7 +104,6 @@ public static class WorkflowConditionEvaluator
         return string.IsNullOrWhiteSpace(s);
     }
 
-    /// <summary>Сравнение с поддержкой чисел и строк. Числа сравниваются по величине, иначе — по строке.</summary>
     private static int Compare(BinaryCondition condition, Session session, IVariableService variableService)
     {
         var left = ResolveOperand(condition.Left, session, variableService);
@@ -136,16 +135,15 @@ public static class WorkflowConditionEvaluator
         if (operand is not string s || string.IsNullOrEmpty(s))
             return operand;
 
-        
+
         var singleVarKey = GetSingleVariableKey(s);
         if (singleVarKey != null)
             return variableService.GetVariable(session, singleVarKey);
 
-        
+
         return ResolveTemplate(s, session, variableService);
     }
 
-    /// <summary>Если строка — один токен переменной ($key или {{key}}), возвращает key; иначе null.</summary>
     private static string? GetSingleVariableKey(string s)
     {
         s = s.Trim();

@@ -53,13 +53,13 @@ services.AddOpenIddict()
     .AddServer(options =>
     {
         options.SetTokenEndpointUris("/connect/token");
-        
+
         options.AllowPasswordFlow();
         options.AllowRefreshTokenFlow();
         options.AllowClientCredentialsFlow();
 
-        
-        
+
+
         options.RegisterScopes(
             "workflow",
             "client",
@@ -79,7 +79,7 @@ services.AddOpenIddict()
 
         options.AddDevelopmentSigningCertificate();
         options.SetIssuer(new Uri("http://identity-service:8080/"));
-        
+
         options.UseAspNetCore().EnableTokenEndpointPassthrough().DisableTransportSecurityRequirement();
 
         options.AddEventHandler<OpenIddictServerEvents.ProcessSignInContext>(builder =>

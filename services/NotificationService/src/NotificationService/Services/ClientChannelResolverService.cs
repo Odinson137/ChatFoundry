@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NotificationService.Interfaces;
 using Shared.Infrastructure.Options;

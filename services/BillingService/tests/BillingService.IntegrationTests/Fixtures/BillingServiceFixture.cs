@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using ChatFoundry.TestInfrastructure.Factories;
-using ChatFoundry.TestInfrastructure.Extensions;
 using BillingService.Data;
 
 namespace BillingService.IntegrationTests.Fixtures;

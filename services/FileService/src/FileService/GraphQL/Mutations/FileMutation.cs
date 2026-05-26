@@ -1,7 +1,6 @@
 using FileService.Entities;
 using FileService.Interfaces;
 using FileService.Services;
-using HotChocolate;
 using HotChocolate.Types;
 using Shared.Infrastructure.GraphQl;
 

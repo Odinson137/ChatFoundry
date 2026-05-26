@@ -3,8 +3,6 @@ using ClientService.Entities;
 using ClientService.Interfaces;
 using Grpc.Core;
 using MassTransit;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Shared.Application.Events;
 using Shared.Domain.Enums;
 
@@ -86,7 +84,7 @@ public class BotIncomingMessageConsumer(
         else
         {
             client = clientChannel.Client;
-            
+
             if (clientChannel.ChannelId != msg.ChannelId)
                 clientChannel.ChannelId = msg.ChannelId;
 

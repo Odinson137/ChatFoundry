@@ -15,9 +15,6 @@ public class WorkflowDbContext : DbContext
         EnsureWorkflowParameterColumns();
     }
 
-    /// <summary>
-    /// Adds InputParametersDefinition and OutputParametersDefinition columns if missing (EnsureCreated does not alter existing tables).
-    /// </summary>
     private void EnsureWorkflowParameterColumns()
     {
         var tableName = Model.FindEntityType(typeof(BotWorkflow))?.GetTableName();
@@ -32,10 +29,10 @@ public class WorkflowDbContext : DbContext
         }
         catch
         {
-            
+
         }
     }
-    
+
     public DbSet<Bot> Bots => Set<Bot>();
     public DbSet<MessengerChannel> MessengerChannels => Set<MessengerChannel>();
     public DbSet<BotChannel> BotChannels => Set<BotChannel>();
@@ -57,7 +54,7 @@ public class WorkflowDbContext : DbContext
                     (c1, c2) => c1.SequenceEqual(c2),
                     c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.Key.GetHashCode(), v.Value.GetHashCode())),
                     c => c.ToDictionary(entry => entry.Key, entry => entry.Value)));
-        
+
         modelBuilder.Entity<Session>()
             .Ignore(s => s.ClientProfileDirty);
     }

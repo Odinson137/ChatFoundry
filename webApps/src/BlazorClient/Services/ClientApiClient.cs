@@ -25,7 +25,7 @@ public class ClientApiClient(HttpClient http) : IClientApiClient
         var afterArg = after != null ? ", after: $after" : "";
         var searchArg = !string.IsNullOrWhiteSpace(search) ? ", search: $search" : "";
 
-        
+
         var varDecls = new List<string> { "$first: Int!" };
         if (after != null) varDecls.Add("$after: String!");
         if (!string.IsNullOrWhiteSpace(search)) varDecls.Add("$search: String!");
@@ -185,7 +185,7 @@ public class ClientApiClient(HttpClient http) : IClientApiClient
         };
     }
 
-    
+
 
     public async Task<MessagesPageResult> GetMessagesByChannelAsync(Guid channelId, string externalUserId, string channel, int first)
     {
@@ -347,7 +347,7 @@ public class ClientApiClient(HttpClient http) : IClientApiClient
         return gqlResponse!.Data!;
     }
 
-    
+
 
     private class ClientsConnectionResponse
     {

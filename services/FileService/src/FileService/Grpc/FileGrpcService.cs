@@ -1,4 +1,3 @@
-using System.IO;
 using File.Grpc;
 using FileService.Interfaces;
 using FileService.Services;

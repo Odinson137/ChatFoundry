@@ -6,7 +6,7 @@ using Xunit;
 
 namespace ChatFoundry.TestInfrastructure.Base;
 
-public abstract class BaseIntegrationTest<TFixture, TDbContext> 
+public abstract class BaseIntegrationTest<TFixture, TDbContext>
     : IClassFixture<TFixture>, IAsyncLifetime
     where TFixture : class, ITestFixture
     where TDbContext : DbContext
@@ -54,7 +54,7 @@ public abstract class BaseIntegrationTest<TFixture, TDbContext>
     }
 }
 
-public abstract class BaseStatelessIntegrationTest<TFixture> 
+public abstract class BaseStatelessIntegrationTest<TFixture>
     : IClassFixture<TFixture>, IAsyncLifetime
     where TFixture : class, ITestFixture
 {

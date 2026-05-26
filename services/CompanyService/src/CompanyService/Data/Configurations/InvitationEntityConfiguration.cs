@@ -1,5 +1,4 @@
 using CompanyService.Entities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shared.Infrastructure.EntityTypeConfiguration;
 

@@ -23,10 +23,6 @@ public class Session : EntityBase
     public Guid? ParentSessionId { get; set; }
     public Session? ParentSession { get; set; }
 
-    /// <summary>
-    /// The SubWorkflow action in the parent session that spawned this child.
-    /// Used to resume the correct node after child completes.
-    /// </summary>
     public Guid? ParentActionId { get; set; }
 
     public int Depth { get; set; }

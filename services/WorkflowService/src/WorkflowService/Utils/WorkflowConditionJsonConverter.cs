@@ -4,7 +4,7 @@ using WorkflowService.Models.Workflow;
 
 namespace WorkflowService.Utils;
 
-public sealed class WorkflowConditionJsonConverter 
+public sealed class WorkflowConditionJsonConverter
     : JsonConverter<WorkflowCondition>
 {
     public override WorkflowCondition ReadJson(

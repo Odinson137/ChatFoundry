@@ -5,7 +5,7 @@ public abstract record BotMessagePayload;
 public record MessagePayload(string Text, string? Caption = null) : BotMessagePayload;
 
 public record AskMessagePayload(
-    string Text, 
+    string Text,
     List<InlineButton> Buttons
 ) : BotMessagePayload;
 

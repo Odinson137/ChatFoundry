@@ -71,7 +71,7 @@ public partial class BotDetails
     private async Task SetActive(Guid id)
     {
         var success = await ApiClient.UpdateBotWorkflowAsync(id, true);
-    
+
         if (success) await LoadBotData();
         else await Js.InvokeVoidAsync("alert", "Ошибка при активации");
     }
@@ -82,7 +82,7 @@ public partial class BotDetails
         if (!confirmed) return;
 
         var success = await ApiClient.DeleteBotWorkflowAsync(id);
-    
+
         if (success) await LoadBotData();
         else await Js.InvokeVoidAsync("alert", "Ошибка при удалении. Возможно, версия используется в активных сессиях.");
     }

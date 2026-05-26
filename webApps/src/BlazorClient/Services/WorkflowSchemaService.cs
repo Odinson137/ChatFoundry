@@ -1,7 +1,6 @@
 using System.Text.Json;
 using BlazorClient.Interfaces;
-using BlazorClient.Models; 
-using System.Collections.Generic;
+using BlazorClient.Models;
 
 namespace BlazorClient.Services;
 
@@ -11,7 +10,7 @@ public class WorkflowSchemaService : IWorkflowSchemaService
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         PropertyNameCaseInsensitive = true,
-        
+
         AllowOutOfOrderMetadataProperties = true
     };
 

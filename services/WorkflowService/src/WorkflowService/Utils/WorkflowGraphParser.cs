@@ -71,13 +71,13 @@ public sealed class WorkflowGraphParser
         }
     }
 
-    
+
 
     private WorkflowNode ParseNode(JsonElement el)
     {
         var id = el.GetProperty("id").GetGuid();
 
-        
+
         var typeStr = el.TryGetProperty("type", out var t) ? t.GetString() : "Message";
         if (!Enum.TryParse<WorkflowNodeType>(typeStr, true, out var type))
             type = WorkflowNodeType.Message;
