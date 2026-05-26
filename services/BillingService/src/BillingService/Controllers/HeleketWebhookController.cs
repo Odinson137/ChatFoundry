@@ -72,7 +72,7 @@ public class HeleketWebhookController(
 
         if (status is "paid" or "paid_over")
         {
-            decimal credit = payment.Amount;
+            var credit = payment.Amount;
             if (root.TryGetProperty("merchant_amount", out var ma) && ma.ValueKind == JsonValueKind.String)
             {
                 if (decimal.TryParse(ma.GetString(), System.Globalization.NumberStyles.Any,

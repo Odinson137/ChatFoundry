@@ -76,3 +76,6 @@ app.MapGrpcService<CompanyService.Grpc.CompanyRegistrationGrpcService>();
 app.MapGet("/", () => "Company Service is running");
 
 app.Run();
+
+
+public partial class Program { }

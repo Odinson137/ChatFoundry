@@ -43,7 +43,7 @@
         if (Node.Data == null) return null;
         var fmt = PreviewFormatter;
 
-        string? raw = Node.Data switch
+        var raw = Node.Data switch
         {
             MessageNodeData m => string.IsNullOrWhiteSpace(m.Text) ? null : m.Text,
             AskNodeData a => string.IsNullOrWhiteSpace(a.Text) ? null : a.Text,

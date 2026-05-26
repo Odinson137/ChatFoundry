@@ -142,3 +142,6 @@ app.MapGet("/", () => "Client Service is running");
 
 app.Run();
 
+
+
+public partial class Program { }

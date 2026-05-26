@@ -20,14 +20,10 @@ public class TimerStartJob(
         var dataMap = context.MergedJobDataMap;
 
         var companyIdStr = dataMap.GetString("companyId")!;
-        // var botIdStr = dataMap.GetString("botId")!;
-        // var channelIdStr = dataMap.GetString("channelId")!;
-        // var channel = (DefaultChannel)dataMap.GetInt("channel");
         var clientFilterJson = dataMap.GetString("clientFilterJson");
 
-        Guid companyId = Guid.Parse(companyIdStr);
+        var companyId = Guid.Parse(companyIdStr);
 
-        // Query ClientService for matching clients
         var filterRequest = new GetClientsByFilterRequest
         {
             CompanyId = companyIdStr,
@@ -82,7 +78,6 @@ public class TimerStartJob(
             return;
         }
 
-        // Publish BotIncomingMessage for each matching client
         foreach (var client in filterResponse.Clients)
         {
             var message = new BotIncomingMessage(

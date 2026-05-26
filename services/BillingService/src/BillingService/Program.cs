@@ -111,3 +111,6 @@ app.MapGraphQL();
 app.MapGet("/", () => "Billing Service is running");
 
 await app.RunAsync();
+
+
+public partial class Program { }

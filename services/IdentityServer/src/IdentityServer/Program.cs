@@ -130,7 +130,7 @@ app.MapControllers();
 app.MapGraphQL();
 app.MapGrpcService<IdentityServer.Grpc.UserCompanyGrpcService>();
 
-app.MapGet("/", () => "IdentityServer sample running");
+app.MapGet("/", () => "Identity Server is running");
 
 
 using (var scope = app.Services.CreateScope())
@@ -179,3 +179,5 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
+
+public partial class Program { }

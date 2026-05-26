@@ -89,3 +89,6 @@ app.MapGrpcService<SchedulerGrpcServiceImpl>();
 app.MapGet("/", () => "Scheduler Service is running");
 
 app.Run();
+
+
+public partial class Program { }

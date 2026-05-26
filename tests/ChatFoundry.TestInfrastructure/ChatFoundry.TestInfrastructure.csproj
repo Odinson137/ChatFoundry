@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../Directory.Build.props" />
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <!-- Отключаем автоматический импорт xUnit Runner для самой библиотеки, если он мешает, но в Directory.Build.props IsTestProject=true, что нормально -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\shared\src\Shared.Infrastructure\Shared.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\shared\src\Shared.Grpc\Shared.Grpc.csproj" />
+  </ItemGroup>
+</Project>

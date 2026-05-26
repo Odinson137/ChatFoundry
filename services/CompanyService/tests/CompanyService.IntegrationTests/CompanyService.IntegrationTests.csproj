@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../../../tests/Directory.Build.props" />
+  <ItemGroup>
+    <ProjectReference Include="../../src/CompanyService/CompanyService.csproj" />
+    <ProjectReference Include="../../../../tests/ChatFoundry.TestInfrastructure/ChatFoundry.TestInfrastructure.csproj" />
+  </ItemGroup>
+</Project>

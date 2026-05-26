@@ -253,3 +253,5 @@ app.MapGet("/run", () => "Workflow executed")
 app.MapGraphQL();
 
 app.Run();
+
+public partial class Program { }

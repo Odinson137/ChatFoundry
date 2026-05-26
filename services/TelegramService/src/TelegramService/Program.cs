@@ -125,7 +125,7 @@ services.AddScoped<IMediaUploader, MediaUploader>();
 var app = builder.Build();
 app.UseChatFoundryObservability();
 
-app.MapGet("/", () => "TelegramService!");
+app.MapGet("/", () => "Telegram Service is running");
 
 
 app.MapControllers();
@@ -135,3 +135,6 @@ var test = app.Services.CreateScope().ServiceProvider.GetRequiredService<ITelegr
 
 app.Run();
 
+
+
+public partial class Program { }

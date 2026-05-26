@@ -86,7 +86,7 @@ public class OpenAiService : IOpenAiService
             return [("user", prompt)];
 
         (string Role, string Content)? systemMsg = null;
-        IReadOnlyList<(string Role, string Content)> rest = chatHistory;
+        var rest = chatHistory;
         if (chatHistory.Count > 0 && string.Equals(chatHistory[0].Role, "system", StringComparison.OrdinalIgnoreCase))
         {
             systemMsg = chatHistory[0];

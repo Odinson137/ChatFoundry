@@ -154,3 +154,6 @@ app.MapGraphQL();
 app.MapGet("/", () => "Notification Service is running");
 
 app.Run();
+
+
+public partial class Program { }

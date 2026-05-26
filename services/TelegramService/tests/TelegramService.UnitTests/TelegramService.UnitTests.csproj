@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../../../tests/Directory.Build.props" />
+  <ItemGroup>
+    <ProjectReference Include="../../src/TelegramService/TelegramService.csproj" />
+  </ItemGroup>
+</Project>

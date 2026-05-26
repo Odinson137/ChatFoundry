@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../../../tests/Directory.Build.props" />
+  <ItemGroup>
+    <ProjectReference Include="../../src/FileService/FileService.csproj" />
+  </ItemGroup>
+</Project>

@@ -73,3 +73,6 @@ app.MapGraphQL();
 app.MapGet("/", () => "File Service is running");
 
 app.Run();
+
+
+public partial class Program { }
