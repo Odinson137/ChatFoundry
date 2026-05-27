@@ -1,10 +1,9 @@
 namespace WorkflowService.Configurations;
 
-public class GlmOptions
+public class LlmProviderOptions
 {
-    public const string SectionName = "Glm";
-
+    public string Name { get; set; } = string.Empty;
     public string ApiKey { get; set; } = string.Empty;
     public string ApiUrl { get; set; } = string.Empty;
-    public string Model { get; set; } = "GLM-4.6";
+    public string Model { get; set; } = string.Empty;
 }

@@ -37,23 +37,23 @@ Designed with a robust microservice architecture, ChatFoundry scales effortlessl
 
 <!-- Place your workflow editor screenshot here -->
 > 🖼 **Visual Workflow Designer:**  
-> `![Workflow Editor](link_to_image)`
+> ![img.png](images/img.png)
 
 <!-- Place your payment settings & balance screenshot here -->
 > 🖼 **Billing & Payment Settings:**  
-> `![Billing & Balance](link_to_image)`
+> ![img_1.png](images/img_1.png)
 
 <!-- Place your live chat screenshot here -->
 > 🖼 **Live Operator Chat:**  
-> `![Live Chat](link_to_image)`
+> ![img_2.png](images/img_2.png)
 
 <!-- Place your client card screenshot here -->
 > 🖼 **CRM Client Card:**  
-> `![Client Details](link_to_image)`
+> ![img_3.png](images/img_3.png)
 
 <!-- Place your sessions replay screenshot here -->
 > 🖼 **Session Replay & Analytics:**  
-> `![Sessions Replay](link_to_image)`
+> ![img_4.png](images/img_4.png)
 
 ## 🏗 Architecture
 
@@ -98,6 +98,7 @@ ChatFoundry is built on a modern **Event-Driven Microservices** topology.
 | **FileService** | `5070 / 5071` | S3-compatible media upload and attachment processing. |
 | **NotificationService** | `5080` | Internal application notifications. |
 | **SchedulerService** | `5090 / 5091` | Distributed cron jobs and delayed workflow actions (TimeStart/Wait nodes). |
+| **FreeLlmApiService** | `3001` | OpenAI-compatible endpoint aggregating multiple free LLM providers with automatic routing and fallback mechanisms. |
 
 ## 🚀 Getting Started (Local Development)
 
