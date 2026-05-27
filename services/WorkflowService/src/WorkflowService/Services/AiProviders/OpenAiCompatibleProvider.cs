@@ -43,7 +43,11 @@ public class OpenAiCompatibleProvider : IAiProvider
         var client = _httpClientFactory.CreateClient(_httpClientName);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
 
-        var requestBody = new ChatCompletionRequest(_model, messages.Select(m => new ChatMessage(m.Role, m.Content)), null);
+        var model = string.Equals(_model, "auto", StringComparison.OrdinalIgnoreCase) || string.IsNullOrWhiteSpace(_model)
+            ? null
+            : _model;
+
+        var requestBody = new ChatCompletionRequest(model, messages.Select(m => new ChatMessage(m.Role, m.Content)), null);
         return await SendRequestAsync(client, requestBody, cancellationToken);
     }
 
@@ -54,8 +58,12 @@ public class OpenAiCompatibleProvider : IAiProvider
         var client = _httpClientFactory.CreateClient(_httpClientName);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
 
+        var model = string.Equals(_model, "auto", StringComparison.OrdinalIgnoreCase) || string.IsNullOrWhiteSpace(_model)
+            ? null
+            : _model;
+
         var requestBody = new ChatCompletionRequest(
-            _model,
+            model,
             messages.Select(m => new ChatMessage(m.Role, m.Content)),
             new JsonResponseFormat("json_object"));
 
@@ -83,7 +91,7 @@ public class OpenAiCompatibleProvider : IAiProvider
     }
 
     private record ChatCompletionRequest(
-        [property: JsonPropertyName("model")] string Model,
+        [property: JsonPropertyName("model"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Model,
         [property: JsonPropertyName("messages")] IEnumerable<ChatMessage> Messages,
         [property: JsonPropertyName("response_format")] JsonResponseFormat? ResponseFormat);
 

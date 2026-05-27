@@ -528,6 +528,22 @@ services:
     networks:
       - app_network
 
+  freellmapi-service:
+    container_name: freellmapi_service
+    build:
+      context: ../services/FreeLlmApiService
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - ENCRYPTION_KEY=${FREELLM_ENCRYPTION_KEY}
+    ports:
+      - "3001:3001"
+    volumes:
+      - freellmapi_data:/app/server/data
+    networks:
+      - app_network
+
 volumes:
   seq_data:
   prometheus_data:
@@ -541,6 +557,7 @@ volumes:
   notification_pgdata:
   scheduler_pgdata:
   redis:
+  freellmapi_data:
 
 networks:
   app_network:

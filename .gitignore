@@ -9,3 +9,11 @@
 commit_message.tmp
 
 /services/FileService/src/FileService/google-storage-creds.json
+
+# FreeLLMAPI database and local environment
+**/FreeLlmApiService/server/data/
+**/FreeLlmApiService/.env
+**/FreeLlmApiService/.env.local
+*.db
+*.db-wal
+*.db-shm
