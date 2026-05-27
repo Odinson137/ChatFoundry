@@ -37,23 +37,23 @@ Designed with a robust microservice architecture, ChatFoundry scales effortlessl
 
 <!-- Place your workflow editor screenshot here -->
 > 🖼 **Visual Workflow Designer:**  
-> ![img](https://github.com/user-attachments/assets/610ff219-99cc-4876-bfa4-ef8fbf88735c)
+> <img width="1381" height="778" alt="изображение" src="https://github.com/user-attachments/assets/739d99b4-2b2e-406f-b640-3001003026b0" />
 
 <!-- Place your payment settings & balance screenshot here -->
 > 🖼 **Billing & Payment Settings:**  
-> ![img_1](https://github.com/user-attachments/assets/4706a973-fa81-47ad-8734-0e358980ded0)
+> <img width="1386" height="778" alt="изображение" src="https://github.com/user-attachments/assets/663d531e-c6dd-47d6-a24c-348d7b79cb35" />
 
 <!-- Place your live chat screenshot here -->
 > 🖼 **Live Operator Chat:**  
-> ![img_2](https://github.com/user-attachments/assets/d67c594e-a03d-4728-930b-1caa4e6af7f6)
+> <img width="1386" height="773" alt="изображение" src="https://github.com/user-attachments/assets/42152ec0-5e98-4d96-9f3b-7fdd02649e9d" />
 
 <!-- Place your client card screenshot here -->
 > 🖼 **CRM Client Card:**  
-> ![img_3](https://github.com/user-attachments/assets/6abcffbd-3ef8-4fb1-95c8-ddaa3433db27)
+> <img width="1385" height="774" alt="изображение" src="https://github.com/user-attachments/assets/5d10e1cc-e114-4bbd-8f48-f5b66a730413" />
 
 <!-- Place your sessions replay screenshot here -->
 > 🖼 **Session Replay & Analytics:**  
-> ![img_4](https://github.com/user-attachments/assets/4682407e-8faf-442d-b3a0-bff6535055c3)
+> <img width="1384" height="766" alt="изображение" src="https://github.com/user-attachments/assets/a99d5e72-1fec-4ddf-b176-056378fef40c" />
 
 ## 🏗 Architecture
 
