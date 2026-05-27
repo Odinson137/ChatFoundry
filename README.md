@@ -37,23 +37,23 @@ Designed with a robust microservice architecture, ChatFoundry scales effortlessl
 
 <!-- Place your workflow editor screenshot here -->
 > 🖼 **Visual Workflow Designer:**  
-> ![img.png](images/img.png)
+> ![img.png](.github/images/img.png)
 
 <!-- Place your payment settings & balance screenshot here -->
 > 🖼 **Billing & Payment Settings:**  
-> ![img_1.png](images/img_1.png)
+> ![img_1.png](.github/images/img_1.png)
 
 <!-- Place your live chat screenshot here -->
 > 🖼 **Live Operator Chat:**  
-> ![img_2.png](images/img_2.png)
+> ![img_2.png](.github/images/img_2.png)
 
 <!-- Place your client card screenshot here -->
 > 🖼 **CRM Client Card:**  
-> ![img_3.png](images/img_3.png)
+> ![img_3.png](.github/images/img_3.png)
 
 <!-- Place your sessions replay screenshot here -->
 > 🖼 **Session Replay & Analytics:**  
-> ![img_4.png](images/img_4.png)
+> ![img_4.png](.github/images/img_4.png)
 
 ## 🏗 Architecture
 
