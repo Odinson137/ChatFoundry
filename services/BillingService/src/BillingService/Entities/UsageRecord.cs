@@ -8,6 +8,5 @@ public class UsageRecord : EntityBase
     public DateTime PeriodStart { get; set; }
     public DateTime PeriodEnd { get; set; }
     public int ClientsCount { get; set; }
-    public int AiExecutionsUsed { get; set; }
-    public int AiBuilderRequestsUsed { get; set; }
+    public long AiTokensUsed { get; set; }
 }

@@ -10,6 +10,5 @@ public static class BillingPlanConstants
     public const string QuotaClients = "clients";
     public const string QuotaBots = "bots";
     public const string QuotaTeamMembers = "team_members";
-    public const string QuotaAiExecutions = "ai_executions";
-    public const string QuotaAiBuilder = "ai_builder";
+    public const string QuotaAiTokens = "ai_tokens";
 }

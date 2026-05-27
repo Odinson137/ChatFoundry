@@ -43,6 +43,7 @@ public class BillingQuery(IHttpContextAccessor httpContextAccessor) : BaseGraphQ
         }
 
         static int Cap(int v) => v >= int.MaxValue - 1 ? int.MaxValue : v;
+        static long CapLong(long v) => v >= long.MaxValue - 1 ? long.MaxValue : v;
 
         return new BillingOverviewDto(
             plan.Slug,
@@ -53,10 +54,8 @@ public class BillingQuery(IHttpContextAccessor httpContextAccessor) : BaseGraphQ
             plan.MaxClients,
             Cap(plan.MaxBots),
             plan.MaxTeamMembers,
-            usage.AiExecutionsUsed,
-            Cap(plan.MaxAiExecutionsPerMonth),
-            usage.AiBuilderRequestsUsed,
-            Cap(plan.MaxAiBuilderRequestsPerMonth),
+            usage.AiTokensUsed,
+            CapLong(plan.MaxAiTokensPerMonth),
             plan.HasAnalytics,
             plan.HasApiAccess,
             pendingPlanSlug,
@@ -90,6 +89,8 @@ public class BillingQuery(IHttpContextAccessor httpContextAccessor) : BaseGraphQ
     {
         static int Cap(int v) => v >= int.MaxValue - 1 ? int.MaxValue : v;
 
+        static long CapLong(long v) => v >= long.MaxValue - 1 ? long.MaxValue : v;
+
         var rows = await db.SubscriptionPlans.AsNoTracking()
             .Where(p => p.IsActive)
             .OrderBy(p => p.SortOrder)
@@ -103,8 +104,7 @@ public class BillingQuery(IHttpContextAccessor httpContextAccessor) : BaseGraphQ
                 p.MaxClients,
                 Cap(p.MaxBots),
                 p.MaxTeamMembers,
-                p.MaxAiExecutionsPerMonth,
-                Cap(p.MaxAiBuilderRequestsPerMonth),
+                CapLong(p.MaxAiTokensPerMonth),
                 p.HasAnalytics,
                 p.HasApiAccess))
             .ToList();

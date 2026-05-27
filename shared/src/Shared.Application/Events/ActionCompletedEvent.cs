@@ -6,5 +6,5 @@ public record ActionCompletedEvent(
     DefaultChannel Channel,
     string ClientId,
     Guid? CompanyId = null,
-    bool CountAsAiWorkflowExecution = false,
+    int AiTokensUsed = 0,
     bool Success = true);

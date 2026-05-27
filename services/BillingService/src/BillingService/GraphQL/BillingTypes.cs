@@ -9,10 +9,8 @@ public record BillingOverviewDto(
     int MaxClients,
     int MaxBots,
     int MaxTeamMembers,
-    int AiExecutionsUsed,
-    int MaxAiExecutions,
-    int AiBuilderUsed,
-    int MaxAiBuilder,
+    long AiTokensUsed,
+    long MaxAiTokens,
     bool HasAnalytics,
     bool HasApiAccess,
     string? PendingPlanSlug,
@@ -34,8 +32,7 @@ public record SubscriptionPlanDto(
     int MaxClients,
     int MaxBots,
     int MaxTeamMembers,
-    int MaxAiExecutions,
-    int MaxAiBuilder,
+    long MaxAiTokens,
     bool HasAnalytics,
     bool HasApiAccess);
 

@@ -117,7 +117,7 @@ public class ActionCompletedConsumer(
         await actionCompletedProducer.Produce(
             new ActionCompletedEvent(msg.Channel, msg.ClientId,
                 parentSession.Workflow.Bot.CompanyId,
-                msg.CountAsAiWorkflowExecution),
+                AiTokensUsed: msg.AiTokensUsed),
             ct);
     }
 }

@@ -10,10 +10,8 @@ public class BillingOverviewDto
     public int MaxClients { get; set; }
     public int MaxBots { get; set; }
     public int MaxTeamMembers { get; set; }
-    public int AiExecutionsUsed { get; set; }
-    public int MaxAiExecutions { get; set; }
-    public int AiBuilderUsed { get; set; }
-    public int MaxAiBuilder { get; set; }
+    public long AiTokensUsed { get; set; }
+    public long MaxAiTokens { get; set; }
     public bool HasAnalytics { get; set; }
     public bool HasApiAccess { get; set; }
     public string? PendingPlanSlug { get; set; }
@@ -39,8 +37,7 @@ public class SubscriptionPlanDto
     public int MaxClients { get; set; }
     public int MaxBots { get; set; }
     public int MaxTeamMembers { get; set; }
-    public int MaxAiExecutions { get; set; }
-    public int MaxAiBuilder { get; set; }
+    public long MaxAiTokens { get; set; }
     public bool HasAnalytics { get; set; }
     public bool HasApiAccess { get; set; }
 }

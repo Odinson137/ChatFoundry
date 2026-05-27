@@ -52,8 +52,7 @@ public class BillingQuotaGrpcService(
             MaxClients = plan.MaxClients,
             MaxBots = plan.MaxBots,
             MaxTeamMembers = plan.MaxTeamMembers,
-            MaxAiExecutions = plan.MaxAiExecutionsPerMonth,
-            MaxAiBuilderRequests = plan.MaxAiBuilderRequestsPerMonth,
+            MaxAiTokens = plan.MaxAiTokensPerMonth,
             HasAnalytics = plan.HasAnalytics,
             HasApiAccess = plan.HasApiAccess
         };

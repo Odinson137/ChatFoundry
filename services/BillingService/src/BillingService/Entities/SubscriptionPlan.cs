@@ -10,8 +10,7 @@ public class SubscriptionPlan : EntityBase
     public int MaxClients { get; set; }
     public int MaxBots { get; set; }
     public int MaxTeamMembers { get; set; }
-    public int MaxAiExecutionsPerMonth { get; set; }
-    public int MaxAiBuilderRequestsPerMonth { get; set; }
+    public long MaxAiTokensPerMonth { get; set; }
     public bool HasAnalytics { get; set; }
     public bool HasApiAccess { get; set; }
     public int SortOrder { get; set; }

@@ -1,13 +1,13 @@
-namespace WorkflowService.Services;
+namespace WorkflowService.Interfaces;
 
 public interface IOpenAiService
 {
-    Task<string> GetCompletionAsync(
+    Task<AiCompletionResult> GetCompletionAsync(
         string prompt,
         IReadOnlyList<(string Role, string Content)>? chatHistory = null,
         CancellationToken cancellationToken = default);
 
-    Task<string> GetJsonObjectCompletionAsync(
+    Task<AiCompletionResult> GetJsonObjectCompletionAsync(
         string systemInstruction,
         string userContent,
         CancellationToken cancellationToken = default);

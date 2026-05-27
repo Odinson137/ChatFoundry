@@ -98,7 +98,7 @@ public class BillingAccountService(
             .FirstAsync(u => u.CompanyId == companyId && u.PeriodStart == periodStart, ct);
     }
 
-    public async Task<(bool Allowed, int Used, int Limit)> CheckQuotaAsync(
+    public async Task<(bool Allowed, long Used, long Limit)> CheckQuotaAsync(
         Guid companyId,
         string quotaType,
         int reportedUsage,
@@ -122,21 +122,18 @@ public class BillingAccountService(
                 reportedUsage < plan.MaxTeamMembers,
                 reportedUsage,
                 plan.MaxTeamMembers),
-            BillingPlanConstants.QuotaAiExecutions => (
-                usage.AiExecutionsUsed < GetLimit(plan.MaxAiExecutionsPerMonth),
-                usage.AiExecutionsUsed,
-                GetLimit(plan.MaxAiExecutionsPerMonth)),
-            BillingPlanConstants.QuotaAiBuilder => (
-                usage.AiBuilderRequestsUsed < GetLimit(plan.MaxAiBuilderRequestsPerMonth),
-                usage.AiBuilderRequestsUsed,
-                GetLimit(plan.MaxAiBuilderRequestsPerMonth)),
+            BillingPlanConstants.QuotaAiTokens => (
+                usage.AiTokensUsed < GetLimitLong(plan.MaxAiTokensPerMonth),
+                usage.AiTokensUsed,
+                GetLimitLong(plan.MaxAiTokensPerMonth)),
             _ => (true, 0, 0)
         };
     }
 
     private static int GetLimit(int value) => value >= int.MaxValue - 1 ? int.MaxValue : value;
+    private static long GetLimitLong(long value) => value >= long.MaxValue - 1 ? long.MaxValue : value;
 
-    public async Task<bool> IncrementUsageAsync(Guid companyId, string usageType, int amount,
+    public async Task<bool> IncrementUsageAsync(Guid companyId, string usageType, long amount,
         CancellationToken ct = default)
     {
         var (sub, _) = await EnsureCompanyAsync(companyId, ct);
@@ -145,14 +142,11 @@ public class BillingAccountService(
 
         switch (usageType)
         {
-            case BillingPlanConstants.QuotaAiExecutions:
-                usage.AiExecutionsUsed += amount;
-                break;
-            case BillingPlanConstants.QuotaAiBuilder:
-                usage.AiBuilderRequestsUsed += amount;
+            case BillingPlanConstants.QuotaAiTokens:
+                usage.AiTokensUsed += amount;
                 break;
             case BillingPlanConstants.QuotaClients:
-                usage.ClientsCount += amount;
+                usage.ClientsCount += (int)amount;
                 break;
             default:
                 return false;

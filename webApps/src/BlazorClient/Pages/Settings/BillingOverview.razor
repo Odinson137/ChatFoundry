@@ -111,20 +111,11 @@ else
                 </div>
                 <div class="billing-limit-item">
                     <div class="billing-limit-header">
-                        <span class="billing-limit-label">AI в workflow</span>
-                        <span class="billing-limit-value">@_overview.AiExecutionsUsed / @FormatCount(_overview.MaxAiExecutions)</span>
+                        <span class="billing-limit-label">AI Токены</span>
+                        <span class="billing-limit-value">@FormatTokens(_overview.AiTokensUsed) / @FormatTokens(_overview.MaxAiTokens)</span>
                     </div>
                     <div class="billing-progress">
-                        <div class="billing-progress-bar" style="width: @UsagePercent(_overview.AiExecutionsUsed, _overview.MaxAiExecutions)%; background: @UsageColor(_overview.AiExecutionsUsed, _overview.MaxAiExecutions);"></div>
-                    </div>
-                </div>
-                <div class="billing-limit-item">
-                    <div class="billing-limit-header">
-                        <span class="billing-limit-label">AI конструктор</span>
-                        <span class="billing-limit-value">@_overview.AiBuilderUsed / @FormatCount(_overview.MaxAiBuilder)</span>
-                    </div>
-                    <div class="billing-progress">
-                        <div class="billing-progress-bar" style="width: @UsagePercent(_overview.AiBuilderUsed, _overview.MaxAiBuilder)%; background: @UsageColor(_overview.AiBuilderUsed, _overview.MaxAiBuilder);"></div>
+                        <div class="billing-progress-bar" style="width: @UsagePercent(_overview.AiTokensUsed, _overview.MaxAiTokens)%; background: @UsageColor(_overview.AiTokensUsed, _overview.MaxAiTokens);"></div>
                     </div>
                 </div>
             </div>
@@ -240,13 +231,21 @@ else
         _ => status
     };
 
-    private static string FormatCount(int max) => max >= int.MaxValue - 1000 ? "∞" : max.ToString();
+    private static string FormatCount(long max) => max >= long.MaxValue - 1000 || max >= int.MaxValue - 1000 ? "∞" : max.ToString();
 
-    private static string UsagePercent(int used, int max) =>
-        max >= int.MaxValue - 1000 ? "0" : Math.Min(100, (int)((double)used / max * 100)).ToString();
+    private static string FormatTokens(long value) => value switch
+    {
+        >= 1_000_000_000 => $"{value / 1_000_000_000.0:F1}B",
+        >= 1_000_000 => $"{value / 1_000_000.0:F1}M",
+        >= 1_000 => $"{value / 1_000.0:F1}K",
+        _ => value.ToString()
+    };
 
-    private static string UsageColor(int used, int max) =>
-        max >= int.MaxValue - 1000 ? "#6366f1" :
+    private static string UsagePercent(long used, long max) =>
+        max >= long.MaxValue - 1000 || max >= int.MaxValue - 1000 ? "0" : Math.Min(100, (int)((double)used / max * 100)).ToString();
+
+    private static string UsageColor(long used, long max) =>
+        max >= long.MaxValue - 1000 || max >= int.MaxValue - 1000 ? "#6366f1" :
         (double)used / max > 0.9 ? "#ef4444" :
         (double)used / max > 0.7 ? "#f59e0b" : "#6366f1";
 }

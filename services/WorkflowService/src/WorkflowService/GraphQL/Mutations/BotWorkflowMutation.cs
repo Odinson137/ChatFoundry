@@ -142,12 +142,13 @@ public class BotWorkflowMutation
         var jobKey = $"timer:{workflow.Id}";
         var timerNode = FindTimerStartNode(workflow.NodesDefinition);
 
-        // if (!workflow.IsActiveBotWorkflow || timerNode == null || !timerNode.HasValue)
-        // {
-        var test = UnregisterTimerStartAsync(workflow.Id, schedulerClient);
-        // return;
-        // }
+        if (!workflow.IsActiveBotWorkflow || timerNode == null)
+        {
+            await UnregisterTimerStartAsync(workflow.Id, schedulerClient);
+            return;
+        }
 
+        var test = UnregisterTimerStartAsync(workflow.Id, schedulerClient);
         var timerElement = timerNode.Value;
         var data = timerElement.GetProperty("data");
         var scheduleType = data.TryGetProperty("scheduleType", out var st) ? st.GetString() ?? "OneTime" : "OneTime";

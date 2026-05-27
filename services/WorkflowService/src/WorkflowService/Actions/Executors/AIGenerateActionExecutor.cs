@@ -44,7 +44,7 @@ public class AIGenerateActionExecutor(
         try
         {
             await billingQuotaGuard.EnsureQuotaAsync(
-                session.Workflow.Bot.CompanyId, "ai_executions", 0, ct);
+                session.Workflow.Bot.CompanyId, "ai_tokens", 0, ct);
         }
         catch (InvalidOperationException ex)
         {
@@ -69,10 +69,10 @@ public class AIGenerateActionExecutor(
             chatHistory.Insert(0, BuildSystemPrompt(session));
         }
 
-        string result;
+        AiCompletionResult aiResult;
         try
         {
-            result = await openAiService.GetCompletionAsync(resolvedPrompt, chatHistory, ct);
+            aiResult = await openAiService.GetCompletionAsync(resolvedPrompt, chatHistory, ct);
         }
         catch (HttpRequestException ex)
         {
@@ -90,7 +90,7 @@ public class AIGenerateActionExecutor(
             return;
         }
 
-        variableService.SetVariable(session, $"$node.{node.Id}.output", result);
+        variableService.SetVariable(session, $"$node.{node.Id}.output", aiResult.Content);
         variableService.SetVariable(session, $"$node.{node.Id}.statusCode", 200);
         variableService.SetVariable(session, $"$node.{node.Id}.success", true);
 
@@ -98,7 +98,7 @@ public class AIGenerateActionExecutor(
         await sessionRepository.SaveAsync(session, ct);
 
         await producer.Produce(new ActionCompletedEvent(message.Channel, message.ExternalUserId,
-            session.Workflow.Bot.CompanyId, CountAsAiWorkflowExecution: true), ct);
+            session.Workflow.Bot.CompanyId, AiTokensUsed: aiResult.TotalTokens), ct);
     }
 
     private List<(string Role, string Content)> BuildChatHistoryFromActions(

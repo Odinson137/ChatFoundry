@@ -15,7 +15,7 @@ public class OpenAiService : IOpenAiService
         _logger = logger;
     }
 
-    public async Task<string> GetCompletionAsync(
+    public async Task<AiCompletionResult> GetCompletionAsync(
         string prompt,
         IReadOnlyList<(string Role, string Content)>? chatHistory = null,
         CancellationToken cancellationToken = default)
@@ -26,7 +26,7 @@ public class OpenAiService : IOpenAiService
             cancellationToken);
     }
 
-    public async Task<string> GetJsonObjectCompletionAsync(
+    public async Task<AiCompletionResult> GetJsonObjectCompletionAsync(
         string systemInstruction,
         string userContent,
         CancellationToken cancellationToken = default)
@@ -42,8 +42,8 @@ public class OpenAiService : IOpenAiService
             cancellationToken);
     }
 
-    private async Task<string> ExecuteWithFailoverAsync(
-        Func<IAiProvider, Task<string>> execute,
+    private async Task<AiCompletionResult> ExecuteWithFailoverAsync(
+        Func<IAiProvider, Task<AiCompletionResult>> execute,
         CancellationToken cancellationToken)
     {
         var configuredProviders = _providers.Where(p => p.IsConfigured).ToList();
@@ -51,7 +51,7 @@ public class OpenAiService : IOpenAiService
         if (configuredProviders.Count == 0)
         {
             _logger.LogWarning("No AI providers are configured. Request will be skipped.");
-            return string.Empty;
+            return new AiCompletionResult(string.Empty, 0, 0);
         }
 
         Exception? lastException = null;

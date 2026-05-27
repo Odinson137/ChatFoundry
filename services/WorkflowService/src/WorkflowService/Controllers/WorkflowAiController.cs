@@ -38,7 +38,7 @@ public class WorkflowAiController : ControllerBase
 
         try
         {
-            await billing.EnsureQuotaAsync(companyId, "ai_builder", 0, ct);
+            await billing.EnsureQuotaAsync(companyId, "ai_tokens", 0, ct);
         }
         catch (InvalidOperationException ex)
         {
@@ -47,8 +47,8 @@ public class WorkflowAiController : ControllerBase
 
         var result = await gen.GenerateAsync(body.UserPrompt, body.Mode ?? "replace", body.CurrentWorkflow, ct);
 
-        if (result.Success && companyId.HasValue)
-            await billing.IncrementUsageAsync(companyId, "ai_builder", 1, ct);
+        if (result.Success && companyId.HasValue && result.TokensUsed > 0)
+            await billing.IncrementUsageAsync(companyId, "ai_tokens", result.TokensUsed, ct);
 
         return new JsonResult(
             new

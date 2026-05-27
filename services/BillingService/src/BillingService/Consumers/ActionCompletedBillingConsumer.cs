@@ -10,15 +10,15 @@ public class ActionCompletedBillingConsumer(BillingAccountService account, ILogg
     public async Task Consume(ConsumeContext<ActionCompletedEvent> context)
     {
         var msg = context.Message;
-        if (!msg.CountAsAiWorkflowExecution || msg.CompanyId is null || !msg.Success)
+        if (msg.AiTokensUsed <= 0 || msg.CompanyId is null || !msg.Success)
             return;
 
         try
         {
             await account.IncrementUsageAsync(
                 msg.CompanyId.Value,
-                BillingPlanConstants.QuotaAiExecutions,
-                1,
+                BillingPlanConstants.QuotaAiTokens,
+                msg.AiTokensUsed,
                 context.CancellationToken);
         }
         catch (Exception ex)

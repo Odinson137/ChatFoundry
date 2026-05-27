@@ -26,10 +26,8 @@ public class BillingApiClient(HttpClient http) : IBillingApiClient
                 maxClients
                 maxBots
                 maxTeamMembers
-                aiExecutionsUsed
-                maxAiExecutions
-                aiBuilderUsed
-                maxAiBuilder
+                aiTokensUsed
+                maxAiTokens
                 hasAnalytics
                 hasApiAccess
                 pendingPlanSlug
@@ -75,8 +73,7 @@ public class BillingApiClient(HttpClient http) : IBillingApiClient
                 maxClients
                 maxBots
                 maxTeamMembers
-                maxAiExecutions
-                maxAiBuilder
+                maxAiTokens
                 hasAnalytics
                 hasApiAccess
               }

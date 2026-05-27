@@ -1,4 +1,5 @@
 using System.Text.Json;
+using WorkflowService.Interfaces;
 using WorkflowValidation;
 
 namespace WorkflowService.Services;
@@ -27,16 +28,17 @@ public class WorkflowAiGenerationService(
             ? BuildMergeContent(userPrompt, currentWorkflow.Value)
             : BuildReplaceContent(userPrompt);
 
-        string raw;
+        AiCompletionResult aiResult;
         try
         {
-            raw = await openAi.GetJsonObjectCompletionAsync(system, userContent, cancellationToken);
+            aiResult = await openAi.GetJsonObjectCompletionAsync(system, userContent, cancellationToken);
         }
         catch (Exception ex)
         {
             return new WorkflowAiGenerateResult(false, null, [$"Ошибка OpenAI: {ex.Message}"]);
         }
 
+        var raw = aiResult.Content;
         if (string.IsNullOrWhiteSpace(raw))
             return new WorkflowAiGenerateResult(false, null, ["Пустой ответ от AI. Проверьте ключ OpenAI в конфигурации сервиса."]);
 
@@ -55,9 +57,9 @@ public class WorkflowAiGenerationService(
 
         var validationErrors = WorkflowSchemaValidator.Validate(raw);
         if (validationErrors.Count > 0)
-            return new WorkflowAiGenerateResult(false, raw, validationErrors);
+            return new WorkflowAiGenerateResult(false, raw, validationErrors, aiResult.TotalTokens);
 
-        return new WorkflowAiGenerateResult(true, raw, []);
+        return new WorkflowAiGenerateResult(true, raw, [], aiResult.TotalTokens);
     }
 
     private static string BuildReplaceContent(string userPrompt)
@@ -86,4 +88,4 @@ public class WorkflowAiGenerationService(
     }
 }
 
-public record WorkflowAiGenerateResult(bool Success, string? WorkflowJson, IReadOnlyList<string> Errors);
+public record WorkflowAiGenerateResult(bool Success, string? WorkflowJson, IReadOnlyList<string> Errors, int TokensUsed = 0);

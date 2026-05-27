@@ -35,7 +35,7 @@ public class BillingQuotaGuard(
         }
     }
 
-    public async Task IncrementUsageAsync(Guid? companyId, string usageType, int amount,
+    public async Task IncrementUsageAsync(Guid? companyId, string usageType, long amount,
         CancellationToken ct = default)
     {
         if (!Enabled || companyId is null)

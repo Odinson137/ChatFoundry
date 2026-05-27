@@ -36,7 +36,7 @@ public class OpenAiCompatibleProvider : IAiProvider
         _model = model;
     }
 
-    public async Task<string> GetCompletionAsync(
+    public async Task<AiCompletionResult> GetCompletionAsync(
         List<(string Role, string Content)> messages,
         CancellationToken cancellationToken)
     {
@@ -47,7 +47,7 @@ public class OpenAiCompatibleProvider : IAiProvider
         return await SendRequestAsync(client, requestBody, cancellationToken);
     }
 
-    public async Task<string> GetJsonCompletionAsync(
+    public async Task<AiCompletionResult> GetJsonCompletionAsync(
         List<(string Role, string Content)> messages,
         CancellationToken cancellationToken)
     {
@@ -62,7 +62,7 @@ public class OpenAiCompatibleProvider : IAiProvider
         return await SendRequestAsync(client, requestBody, cancellationToken);
     }
 
-    private async Task<string> SendRequestAsync(
+    private async Task<AiCompletionResult> SendRequestAsync(
         HttpClient client,
         ChatCompletionRequest requestBody,
         CancellationToken cancellationToken)
@@ -76,7 +76,10 @@ public class OpenAiCompatibleProvider : IAiProvider
         var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
         var completionResponse = JsonSerializer.Deserialize<ChatCompletionResponse>(responseBody);
 
-        return completionResponse?.Choices?.FirstOrDefault()?.Message?.Content?.Trim() ?? string.Empty;
+        var responseContent = completionResponse?.Choices?.FirstOrDefault()?.Message?.Content?.Trim() ?? string.Empty;
+        var usage = completionResponse?.Usage;
+
+        return new AiCompletionResult(responseContent, usage?.PromptTokens ?? 0, usage?.CompletionTokens ?? 0);
     }
 
     private record ChatCompletionRequest(
@@ -90,7 +93,14 @@ public class OpenAiCompatibleProvider : IAiProvider
         [property: JsonPropertyName("role")] string Role,
         [property: JsonPropertyName("content")] string Content);
 
-    private record ChatCompletionResponse([property: JsonPropertyName("choices")] List<Choice> Choices);
+    private record UsageInfo(
+        [property: JsonPropertyName("prompt_tokens")] int PromptTokens,
+        [property: JsonPropertyName("completion_tokens")] int CompletionTokens,
+        [property: JsonPropertyName("total_tokens")] int TotalTokens);
+
+    private record ChatCompletionResponse(
+        [property: JsonPropertyName("choices")] List<Choice> Choices,
+        [property: JsonPropertyName("usage")] UsageInfo? Usage);
 
     private record Choice([property: JsonPropertyName("message")] ChatMessage Message);
 }
