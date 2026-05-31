@@ -2,11 +2,16 @@ using Shared.Domain.Enums;
 using Workflow.Grpc.Client;
 using WorkflowService.Entities;
 using WorkflowService.Interfaces;
+using WorkflowService.Enums;
+using WorkflowService.Models.Node;
+using WorkflowService.Utils;
 
 namespace WorkflowService.Services;
 
 public class VariableService(
     IClientAttributesGrpcClient grpcClient,
+    WorkflowGraphParser workflowGraphParser,
+    IConfiguration configuration,
     ILogger<VariableService> logger) : IVariableService
 {
     private const string GlobalPrefix = "$global.";
@@ -106,11 +111,74 @@ public class VariableService(
         @"^[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}\.(output|statusCode|error|messageKind)$",
         System.Text.RegularExpressions.RegexOptions.Compiled);
 
+    private string GetBaseUrl()
+    {
+        var configuredBaseUrl = configuration["Gateway:Url"];
+        if (!string.IsNullOrWhiteSpace(configuredBaseUrl))
+        {
+            return configuredBaseUrl.TrimEnd('/');
+        }
+
+        return "http://localhost:8080";
+    }
+
+    private string? TryResolveCallbackUrl(Session session, string key)
+    {
+        if (session.Variables.TryGetValue(key, out var cachedUrl) && !string.IsNullOrWhiteSpace(cachedUrl))
+        {
+            return cachedUrl;
+        }
+
+        var parts = key.Split('.');
+        if (parts.Length == 3 && Guid.TryParse(parts[1], out var nodeId))
+        {
+            var graph = workflowGraphParser.Parse(session.Workflow.NodesDefinition, session.Workflow.EdgesDefinition);
+            var node = graph.Nodes.GetValueOrDefault(nodeId);
+            if (node is { Type: WorkflowNodeType.WebhookWait })
+            {
+                var webhookWaitData = node.Data as WebhookWaitNodeData;
+                var template = webhookWaitData?.CallbackUrlTemplate;
+                if (string.IsNullOrWhiteSpace(template))
+                {
+                    template = "{baseUrl}/workflow/api/webhook/{botId}/{clientId}?channel={channel}";
+                }
+
+                var baseUrl = GetBaseUrl();
+                var botId = session.Workflow.BotId.ToString();
+                var clientId = session.ClientId;
+                var channel = session.Channel.ToString().ToLowerInvariant();
+
+                var resolvedUrl = template
+                    .Replace("{baseUrl}", baseUrl, StringComparison.OrdinalIgnoreCase)
+                    .Replace("{botId}", botId, StringComparison.OrdinalIgnoreCase)
+                    .Replace("{clientId}", clientId, StringComparison.OrdinalIgnoreCase)
+                    .Replace("{channel}", channel, StringComparison.OrdinalIgnoreCase);
+
+                session.Variables[key] = resolvedUrl;
+
+                return resolvedUrl;
+            }
+        }
+        return null;
+    }
+
     public string? GetVariable(Session session, string key)
     {
         if (string.IsNullOrWhiteSpace(key))
             throw new ArgumentException("Variable key cannot be empty", nameof(key));
 
+        var lookupKey = key;
+        if (!lookupKey.StartsWith("$node.", StringComparison.OrdinalIgnoreCase) && lookupKey.EndsWith(".callbackUrl", StringComparison.OrdinalIgnoreCase))
+        {
+            lookupKey = "$node." + lookupKey;
+        }
+
+        if (lookupKey.StartsWith("$node.", StringComparison.OrdinalIgnoreCase) && lookupKey.EndsWith(".callbackUrl", StringComparison.OrdinalIgnoreCase))
+        {
+            var resolvedCallbackUrl = TryResolveCallbackUrl(session, lookupKey);
+            if (resolvedCallbackUrl != null)
+                return resolvedCallbackUrl;
+        }
 
         if (NodeOutputKeyRegex.IsMatch(key))
         {

@@ -43,6 +43,12 @@ public partial class SessionReplay : IDisposable, IReplayDataProvider
     private HashSet<Guid> _expandedNodes = new();
     private string? _modalValue;
     private string? _modalLabel;
+    private bool _isCompleting;
+
+    private bool IsSessionActive => _session != null &&
+                                    !string.Equals(_session.Status, "COMPLETED", StringComparison.OrdinalIgnoreCase) &&
+                                    !string.Equals(_session.Status, "FAILED", StringComparison.OrdinalIgnoreCase) &&
+                                    !string.Equals(_session.Status, "CANCELLED", StringComparison.OrdinalIgnoreCase);
 
     private double _zoomLevel = 1.0;
     private int ZoomPercent => (int)Math.Round(_zoomLevel * 100);
@@ -263,6 +269,36 @@ public partial class SessionReplay : IDisposable, IReplayDataProvider
     private void GoBack()
     {
         Navigation.NavigateTo("/settings/sessions");
+    }
+
+    private async Task CompleteSession()
+    {
+        if (_session == null || _isCompleting) return;
+
+        _isCompleting = true;
+        StateHasChanged();
+
+        try
+        {
+            var success = await ApiClient.CompleteSessionAsync(_session.Id);
+            if (success)
+            {
+                await LoadData();
+            }
+            else
+            {
+                _loadError = "Не удалось завершить сессию.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _loadError = $"Не удалось завершить сессию: {ex.Message}";
+        }
+        finally
+        {
+            _isCompleting = false;
+            StateHasChanged();
+        }
     }
 
     private IEnumerable<KeyValuePair<string, string>> GetFilteredVariables()

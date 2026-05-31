@@ -6,5 +6,6 @@ public enum SessionStatus
     WaitingForSubWorkflow,
     Completed,
     Failed,
-    Cancelled
+    Cancelled,
+    WaitingForWebhook,
 }

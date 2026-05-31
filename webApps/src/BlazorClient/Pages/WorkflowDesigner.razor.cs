@@ -771,6 +771,7 @@ public partial class WorkflowDesigner : IDisposable
             NodeType.Message => "Сообщение",
             NodeType.Ask => "Вопрос",
             NodeType.Wait => "Задержка",
+            NodeType.WebhookWait => "Ожидание вебхука",
             NodeType.SetAttribute => "Атрибут",
             NodeType.HttpRequest => "API запрос",
             NodeType.AIGenerate => "AI Текст",
@@ -789,6 +790,7 @@ public partial class WorkflowDesigner : IDisposable
             NodeType.Media => new MediaNodeData { SourceType = MediaSourceType.Attachment },
             NodeType.SubWorkflow => new SubWorkflowNodeData(),
             NodeType.Wait => new WaitNodeData(),
+            NodeType.WebhookWait => new WebhookWaitNodeData(),
             NodeType.TimerStart => new TimerStartNodeData { Timezone = UserTimezone },
             _ => null
         };
@@ -1422,6 +1424,11 @@ public partial class WorkflowDesigner : IDisposable
             "httprequest" => [($"$node.{id}.output", "Тело ответа (response body)"),
                               ($"$node.{id}.statusCode", "Статус-код (statusCode)"),
                               ($"$node.{id}.success", "Успех запроса (true/false)")],
+            "webhookwait" =>
+            [
+                ($"$node.{id}.callbackUrl", "Ссылка для ответа (Callback URL)"),
+                ($"$node.{id}.output", "Тело ответа вебхука (response body)")
+            ],
             _ => []
         };
     }
@@ -2060,6 +2067,7 @@ public partial class WorkflowDesigner : IDisposable
         new NodeToolItem("Логика", "Старт", NodeType.Start, NodeToolPaletteSvg.Start, "green"),
         new NodeToolItem("Логика", "Таймер", NodeType.TimerStart, NodeToolPaletteSvg.TimerStart, "green"),
         new NodeToolItem("Логика", "Ожидание", NodeType.Wait, NodeToolPaletteSvg.Wait, "blue"),
+        new NodeToolItem("Логика", "Ожидание вебхука", NodeType.WebhookWait, NodeToolPaletteSvg.WebhookWait, "blue"),
         new NodeToolItem("Логика", "Процесс", NodeType.SubWorkflow, NodeToolPaletteSvg.SubWorkflow, "orange"),
         new NodeToolItem("Логика", "Оператор", NodeType.TransferToOperator, NodeToolPaletteSvg.TransferToOperator, "teal"),
         new NodeToolItem("Контент", "Сообщение", NodeType.Message, NodeToolPaletteSvg.Message, "indigo"),

@@ -1,6 +1,7 @@
 using MassTransit;
 using Microsoft.Extensions.Caching.Distributed;
 using Shared.Application.Events;
+using Shared.Domain.Enums;
 using WorkflowService.Entities;
 using WorkflowService.Enums;
 using WorkflowService.Events;
@@ -38,6 +39,10 @@ public class BotMessageConsumer(
             try
             {
                 session = await sessionResolver.ResolveForBotAsync(msg, botId, ct);
+                if (session.Status == SessionStatus.WaitingForWebhook)
+                {
+                    continue;
+                }
 
                 var graph = workflowGraphParser.Parse(session.Workflow.NodesDefinition, session.Workflow.EdgesDefinition);
                 var currentNode = graph.GetNode(session.CurrentNodeId!.Value);

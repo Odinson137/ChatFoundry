@@ -60,6 +60,7 @@ public sealed class NodeDefinitionJsonConverter : JsonConverter<NodeDefinition>
             "subworkflow" => typeof(SubWorkflowNodeData),
             "transfertooperator" => typeof(EmptyNodeData),
             "wait" => typeof(WaitNodeData),
+            "webhookwait" => typeof(WebhookWaitNodeData),
             "timerstart" => typeof(TimerStartNodeData),
             _ => typeof(EmptyNodeData)
         };

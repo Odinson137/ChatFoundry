@@ -435,7 +435,28 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
         return result.Sessions.Nodes.FirstOrDefault();
     }
 
+    public async Task<bool> CompleteSessionAsync(Guid sessionId)
+    {
+        var query = """
+                mutation CompleteSession($input: CompleteSessionInput!) {
+                    completeSession(input: $input) {
+                        session { id status }
+                        error
+                    }
+                }
+                """;
 
+        var variables = new { input = new { sessionId } };
+        try
+        {
+            var result = await ExecuteGraphQl<CompleteSessionResponse>(query, variables);
+            return result.CompleteSession.Session != null && string.IsNullOrEmpty(result.CompleteSession.Error);
+        }
+        catch
+        {
+            return false;
+        }
+    }
 
     public async Task<WorkflowResponse?> GetWorkflowByIdAsync(Guid id)
     {
@@ -836,5 +857,16 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
         public bool HasPreviousPage { get; set; }
         public string? EndCursor { get; set; }
         public string? StartCursor { get; set; }
+    }
+
+    private class CompleteSessionResponse
+    {
+        public CompleteSessionPayload CompleteSession { get; set; } = new();
+    }
+
+    private class CompleteSessionPayload
+    {
+        public SessionDto? Session { get; set; }
+        public string? Error { get; set; }
     }
 }

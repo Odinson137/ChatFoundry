@@ -22,6 +22,7 @@ public interface IWorkflowApiClient
     Task<List<SessionDto>> GetSessionsAsync(string? statusFilter = null);
     Task<SessionsPageResult> GetSessionsPagedAsync(int first, string? after = null, SessionListFilter? filter = null);
     Task<SessionDto?> GetSessionByIdAsync(Guid sessionId);
+    Task<bool> CompleteSessionAsync(Guid sessionId);
 
 
     Task<WorkflowResponse?> GetWorkflowByIdAsync(Guid id);

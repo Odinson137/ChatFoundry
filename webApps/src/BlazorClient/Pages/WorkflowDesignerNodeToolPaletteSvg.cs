@@ -11,6 +11,9 @@ internal static class NodeToolPaletteSvg
     public static readonly string Wait =
         SvgOpen + """<circle cx="12" cy="12" r="10" stroke="#4f46e5" stroke-width="2"/><path d="M12 6v6l4 2" stroke="#6366f1" stroke-width="2" fill="none"/>""" + SvgClose;
 
+    public static readonly string WebhookWait =
+        SvgOpen + """<circle cx="12" cy="12" r="10" stroke="#4f46e5" stroke-width="2"/><path d="M16 16v-1a4 4 0 0 0-4-4H8" stroke="#6366f1" stroke-width="2" fill="none" stroke-linecap="round"/><path d="m11 8-3 3 3 3" stroke="#6366f1" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>""" + SvgClose;
+
     public static readonly string SubWorkflow =
         SvgOpen + """<rect x="3" y="3" width="7" height="7" rx="1" stroke="#ea580c" stroke-width="2" fill="#fff7ed"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="#ea580c" stroke-width="2" fill="#fff7ed"/><rect x="8" y="14" width="8" height="7" rx="1" stroke="#c2410c" stroke-width="2" fill="#ffedd5"/>""" + SvgClose;
 
@@ -56,6 +59,7 @@ internal static class NodeToolPaletteSvg
         "timerstart" => "workflow-designer-node--start",
         "end" => "workflow-designer-node--end",
         "wait" => "workflow-designer-node--wait",
+        "webhookwait" => "workflow-designer-node--wait",
         "message" => "workflow-designer-node--message",
         "ask" => "workflow-designer-node--ask",
         "media" => "workflow-designer-node--media",
@@ -75,6 +79,7 @@ internal static class NodeToolPaletteSvg
         "timerstart" => TimerStart,
         "end" => End,
         "wait" => Wait,
+        "webhookwait" => WebhookWait,
         "message" => Message,
         "ask" => Ask,
         "media" => Media,

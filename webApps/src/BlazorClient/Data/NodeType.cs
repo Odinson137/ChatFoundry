@@ -15,5 +15,6 @@ public enum NodeType
     Media,
     SubWorkflow,
     TransferToOperator,
-    TimerStart
+    TimerStart,
+    WebhookWait
 }

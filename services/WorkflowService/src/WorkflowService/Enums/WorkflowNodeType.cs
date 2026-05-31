@@ -23,6 +23,7 @@ public enum WorkflowNodeType
 
     Condition = 20,
     Wait = 21,
+    WebhookWait = 22,
     SetAttribute = 24,
     HttpRequest = 23,
 

@@ -12,7 +12,8 @@ public sealed class TelegramClient(
     IBotTokenProvider botTokenProvider,
     IFileSignedUrlProvider fileSignedUrlProvider,
     ILogger<TelegramClient> logger,
-    IOptions<TelegramOptions> options)
+    IOptions<TelegramOptions> options,
+    IConfiguration configuration)
     : ITelegramClient
 {
     private async Task<ITelegramBotClient> GetClientAsync(Guid channelId, CancellationToken ct)
@@ -35,7 +36,8 @@ public sealed class TelegramClient(
     public Task SetWebhookAsync(Guid channelId, string token, CancellationToken ct)
     {
         var client = GetClientFromToken(token);
-        var url = $"{options.Value.WebhookUrl}/telegram/hook/{channelId}";
+        var baseUrl = (configuration["Gateway:Url"] ?? string.Empty).TrimEnd('/');
+        var url = $"{baseUrl}/telegram/hook/{channelId}";
         return client.SetWebhook(
             url,
             maxConnections: 40,

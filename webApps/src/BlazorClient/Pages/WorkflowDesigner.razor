@@ -557,6 +557,18 @@
                         </div>
                     }
 
+                    @if (node is WorkflowNodeModel { Data: WebhookWaitNodeData webhookData })
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">Таймаут ожидания (секунды)</label>
+                            <input type="number" class="form-control" min="0"
+                                   value="@webhookData.TimeoutSeconds"
+                                   @oninput="e => { if (int.TryParse(e.Value?.ToString(), out var seconds)) { webhookData.TimeoutSeconds = seconds; } else { webhookData.TimeoutSeconds = 0; } OnWorkflowChanged(); }"
+                                   placeholder="0 = бесконечно" />
+                            <small class="form-text text-muted">Через указанное время сценарий продолжит работу по ветке таймаута.</small>
+                        </div>
+                    }
+
                     @if (node is WorkflowNodeModel { Data: TimerStartNodeData timerData })
                     {
                         <div class="mb-3">

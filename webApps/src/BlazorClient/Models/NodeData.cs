@@ -13,6 +13,7 @@ namespace BlazorClient.Models;
 [JsonDerivedType(typeof(SubWorkflowNodeData), "SubWorkflow")]
 [JsonDerivedType(typeof(WaitNodeData), "Wait")]
 [JsonDerivedType(typeof(TimerStartNodeData), "TimerStart")]
+[JsonDerivedType(typeof(WebhookWaitNodeData), "WebhookWait")]
 
 public abstract class NodeData { }
 
@@ -140,4 +141,10 @@ public class ClientAttributeFilterCondition
     public string Operator { get; set; } = "equals";
     public string Value { get; set; } = "";
     public bool? IgnoreCase { get; set; }
+}
+
+public class WebhookWaitNodeData : NodeData
+{
+    public int TimeoutSeconds { get; set; } = 0;
+    public string CallbackUrlTemplate { get; set; } = string.Empty;
 }

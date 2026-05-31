@@ -68,6 +68,7 @@ services.AddScoped<IActionExecutor, SendMediaActionExecutor>();
 services.AddScoped<IActionExecutor, SubWorkflowActionExecutor>();
 services.AddScoped<IActionExecutor, TransferToOperatorActionExecutor>();
 services.AddScoped<IActionExecutor, WaitActionExecutor>();
+services.AddScoped<IActionExecutor, WebhookWaitActionExecutor>();
 services.AddScoped<IActionExecutor, TimeStartActionExecutor>();
 
 services.AddScoped<IMessageSender, MessageSender>();
@@ -97,7 +98,7 @@ foreach (var provider in llmProviders)
     }
 
     services.AddHttpClient(provider.Name);
-    services.AddSingleton<WorkflowService.Interfaces.IAiProvider>(sp =>
+    services.AddSingleton<IAiProvider>(sp =>
         new WorkflowService.Services.AiProviders.OpenAiCompatibleProvider(
             sp.GetRequiredService<IHttpClientFactory>(),
             provider.Name,
@@ -109,7 +110,7 @@ foreach (var provider in llmProviders)
 
 services.AddHttpClient<FileUrlResolver>((sp, client) =>
 {
-    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<WorkflowService.Configurations.FileServiceOptions>>().Value;
+    var options = sp.GetRequiredService<IOptions<WorkflowService.Configurations.FileServiceOptions>>().Value;
     client.BaseAddress = new Uri(options.BaseUrl.TrimEnd('/') + "/");
 });
 services.AddScoped<IFileUrlResolver>(sp => sp.GetRequiredService<FileUrlResolver>());
@@ -194,7 +195,7 @@ services.AddGrpcClient<SchedulerGrpcService.SchedulerGrpcServiceClient>(o =>
     o.Address = new Uri("http://scheduler-service:8081");
 }).AddStandardResilienceHandler();
 
-services.AddScoped<WorkflowService.Services.BillingQuotaGuard>();
+services.AddScoped<BillingQuotaGuard>();
 
 services.AddRedisCache(builder.Configuration, "CacheSettings");
 services.AddScoped<ClientAttributesGrpcClient>();
@@ -219,6 +220,7 @@ builder.Services
     .AddTypeExtension<BotMutation>()
     .AddTypeExtension<ChannelMutation>()
     .AddTypeExtension<BotWorkflowMutation>()
+    .AddTypeExtension<SessionMutation>()
     .AddType<MessengerChannelType>()
     .AddType<WorkflowService.GraphQL.Types.BotWorkflowType>()
     .AddProjections()

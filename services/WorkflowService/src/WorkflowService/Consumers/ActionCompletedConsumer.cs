@@ -50,6 +50,11 @@ public class ActionCompletedConsumer(
             }
             session.CompletedAt = DateTime.UtcNow;
 
+            if (session.Status == SessionStatus.WaitingForWebhook)
+            {
+                session.Status = SessionStatus.Active;
+            }
+
             var graph = workflowGraphParser.Parse(session.Workflow.NodesDefinition, session.Workflow.EdgesDefinition);
 
             var nextNode = graph.GetNextNode(lastUserAction.NodeId, session, variableService);

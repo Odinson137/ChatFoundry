@@ -65,6 +65,9 @@
                 => "Перевод на оператора",
             WaitNodeData w when string.IsNullOrWhiteSpace(w.Duration) => null,
             WaitNodeData w => $"Ожидание: {w.Duration} {UnitToRu(w.Unit)}",
+            WebhookWaitNodeData ww => ww.TimeoutSeconds > 0
+                ? $"Ожидание вебхука (Таймаут: {ww.TimeoutSeconds} сек)"
+                : "Ожидание вебхука (Бесконечно)",
             TimerStartNodeData ts => ts.ScheduleType?.Equals("Cron", StringComparison.OrdinalIgnoreCase) == true
                 ? $"Таймер: {ts.CronExpression}"
                 : $"Таймер: {ts.FireTimeUtc}",

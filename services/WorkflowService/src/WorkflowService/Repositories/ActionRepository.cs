@@ -14,7 +14,9 @@ public class ActionRepository(WorkflowDbContext db) : IActionRepository
             .Include(c => c.Session)
             .ThenInclude(c => c.Workflow)
             .Where(x => x.Session.Channel == channel && x.Session.ClientId == clientId
-                && (x.Session.Status == SessionStatus.Active || x.Session.Status == SessionStatus.WaitingForSubWorkflow))
+                && (x.Session.Status == SessionStatus.Active 
+                    || x.Session.Status == SessionStatus.WaitingForSubWorkflow
+                    || x.Session.Status == SessionStatus.WaitingForWebhook))
             .OrderByDescending(x => x.CreatedAt)
             .FirstOrDefaultAsync(ct);
     }

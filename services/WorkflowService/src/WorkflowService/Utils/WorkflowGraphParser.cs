@@ -119,6 +119,7 @@ public sealed class WorkflowGraphParser
             WorkflowNodeType.AIGenerate => data.Deserialize<AIGenerateNodeData>(JsonOptions) ?? NodeData.Empty,
             WorkflowNodeType.Media => data.Deserialize<MediaNodeData>(JsonOptions) ?? NodeData.Empty,
             WorkflowNodeType.Wait => data.Deserialize<WaitNodeData>(JsonOptions) ?? NodeData.Empty,
+            WorkflowNodeType.WebhookWait => data.Deserialize<WebhookWaitNodeData>(JsonOptions) ?? NodeData.Empty,
             WorkflowNodeType.TimerStart => data.Deserialize<TimerStartNodeData>(JsonOptions) ?? NodeData.Empty,
             _ => NodeData.Empty
         };
@@ -126,66 +127,59 @@ public sealed class WorkflowGraphParser
 
     private static WorkflowCondition ParseCondition(JsonElement el)
     {
-        static void readBinary(JsonElement bin, out string left, out string right, out bool? ignoreCase)
-        {
-            left = bin.TryGetProperty("left", out var l) ? l.GetString() ?? "" : "";
-            right = bin.TryGetProperty("right", out var r) ? r.GetString() ?? "" : "";
-            ignoreCase = bin.TryGetProperty("ignoreCase", out var ic) ? (ic.ValueKind == JsonValueKind.True) : null;
-        }
-
         if (el.TryGetProperty("equals", out var eq))
         {
-            readBinary(eq, out var l, out var r, out var ic);
+            ReadBinary(eq, out var l, out var r, out var ic);
             return new EqualsCondition { Left = l, Right = r, IgnoreCase = ic };
         }
         if (el.TryGetProperty("notEquals", out var ne))
         {
-            readBinary(ne, out var l, out var r, out var ic);
+            ReadBinary(ne, out var l, out var r, out var ic);
             return new NotEqualsCondition { Left = l, Right = r, IgnoreCase = ic };
         }
         if (el.TryGetProperty("contains", out var c))
         {
-            readBinary(c, out var l, out var r, out var ic);
+            ReadBinary(c, out var l, out var r, out var ic);
             return new ContainsCondition { Left = l, Right = r, IgnoreCase = ic };
         }
         if (el.TryGetProperty("greaterThan", out var gt))
         {
-            readBinary(gt, out var l, out var r, out var ic);
+            ReadBinary(gt, out var l, out var r, out var ic);
             return new GreaterThanCondition { Left = l, Right = r, IgnoreCase = ic };
         }
         if (el.TryGetProperty("lessThan", out var lt))
         {
-            readBinary(lt, out var l, out var r, out var ic);
+            ReadBinary(lt, out var l, out var r, out var ic);
             return new LessThanCondition { Left = l, Right = r, IgnoreCase = ic };
         }
         if (el.TryGetProperty("greaterOrEqual", out var ge))
         {
-            readBinary(ge, out var l, out var r, out var ic);
+            ReadBinary(ge, out var l, out var r, out var ic);
             return new GreaterOrEqualCondition { Left = l, Right = r, IgnoreCase = ic };
         }
         if (el.TryGetProperty("lessOrEqual", out var le))
         {
-            readBinary(le, out var l, out var r, out var ic);
+            ReadBinary(le, out var l, out var r, out var ic);
             return new LessOrEqualCondition { Left = l, Right = r, IgnoreCase = ic };
         }
         if (el.TryGetProperty("startsWith", out var sw))
         {
-            readBinary(sw, out var l, out var r, out var ic);
+            ReadBinary(sw, out var l, out var r, out var ic);
             return new StartsWithCondition { Left = l, Right = r, IgnoreCase = ic };
         }
         if (el.TryGetProperty("endsWith", out var ew))
         {
-            readBinary(ew, out var l, out var r, out var ic);
+            ReadBinary(ew, out var l, out var r, out var ic);
             return new EndsWithCondition { Left = l, Right = r, IgnoreCase = ic };
         }
         if (el.TryGetProperty("regex", out var rx))
         {
-            readBinary(rx, out var l, out var r, out var ic);
+            ReadBinary(rx, out var l, out var r, out var ic);
             return new RegexMatchCondition { Left = l, Right = r, IgnoreCase = ic };
         }
         if (el.TryGetProperty("inList", out var il))
         {
-            readBinary(il, out var l, out var r, out var ic);
+            ReadBinary(il, out var l, out var r, out var ic);
             return new InListCondition { Left = l, Right = r, IgnoreCase = ic };
         }
         if (el.TryGetProperty("isEmpty", out var ie))
@@ -208,6 +202,13 @@ public sealed class WorkflowGraphParser
 
         throw new InvalidOperationException(
             $"Unknown condition: {el}");
+
+        static void ReadBinary(JsonElement bin, out string left, out string right, out bool? ignoreCase)
+        {
+            left = bin.TryGetProperty("left", out var l) ? l.GetString() ?? "" : "";
+            right = bin.TryGetProperty("right", out var r) ? r.GetString() ?? "" : "";
+            ignoreCase = bin.TryGetProperty("ignoreCase", out var ic) ? (ic.ValueKind == JsonValueKind.True) : null;
+        }
     }
 
     public (string Nodes, string Edges) Serialize(WorkflowGraph graph)
