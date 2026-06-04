@@ -16,7 +16,7 @@ public class SessionRepository(WorkflowDbContext db) : ISessionRepository
                 c => c.ChannelId == channelId
                      && c.ClientId == clientId
                      && c.Workflow.BotId == botId
-                     && (c.Status == SessionStatus.Active 
+                     && (c.Status == SessionStatus.Active
                          || c.Status == SessionStatus.WaitingForSubWorkflow
                          || c.Status == SessionStatus.WaitingForWebhook),
                 ct);
@@ -41,7 +41,7 @@ public class SessionRepository(WorkflowDbContext db) : ISessionRepository
             .Include(c => c.Workflow)
             .FirstOrDefaultAsync(
                 c => c.ParentSessionId == parentSessionId
-                     && (c.Status == SessionStatus.Active 
+                     && (c.Status == SessionStatus.Active
                          || c.Status == SessionStatus.WaitingForSubWorkflow
                          || c.Status == SessionStatus.WaitingForWebhook),
                 ct);
