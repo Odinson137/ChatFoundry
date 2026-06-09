@@ -131,6 +131,10 @@ public class BillingApiClient(HttpClient http) : IBillingApiClient
             throw new InvalidOperationException($"Billing HTTP {(int)response.StatusCode}: {jsonString}");
 
         var gql = JsonSerializer.Deserialize<GraphQLResponse<T>>(jsonString, JsonOptions);
+        if (gql?.Errors is { Count: > 0 })
+        {
+            throw new InvalidOperationException(gql.Errors[0].Message ?? "GraphQL Error");
+        }
         return gql!.Data!;
     }
 

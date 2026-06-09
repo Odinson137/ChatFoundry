@@ -30,7 +30,7 @@ Designed with a robust microservice architecture, ChatFoundry scales effortlessl
 * **⚡ Event-Driven Logic:** Advanced node conditions (Regex, Contains, StartsWith, InList) to handle complex routing and data parsing.
 * **👥 Live Operator Chat:** Built-in Live Chat interface for human fallback (`TransferToOperator`). Operators can take over chatbot conversations seamlessly.
 * **📈 Built-in Analytics & Session Replay:** Inspect exactly how a user traversed the workflow graph step-by-step with the Session Replay feature.
-* **🏢 Multi-Tenancy & Billing:** Built-in workspace separation (`CompanyService`), subscription plans, and crypto payment gateway integration (Heleket/USDT).
+* **🏢 Multi-Tenancy & Billing:** Built-in workspace separation (`CompanyService`) and flexible subscription plans (with support for manual invoicing).
 * **🔒 Enterprise Compliance:** Database-per-service architecture allows strict data residency compliance (like 152-FZ in the CIS region).
 
 ### 📸 Interface Previews
@@ -111,21 +111,38 @@ ChatFoundry is built on a modern **Event-Driven Microservices** topology.
 
 To start the entire microservice cluster locally:
 
+#### Standard Cluster (8 PostgreSQL instances + Kafka + Observability)
 ```bash
 cd deployment
 docker-compose up -d
 ```
 
-This will spin up:
-- 8x PostgreSQL databases
-- Redis
-- Kafka & Zookeeper & Kafka UI (`localhost:8080`)
-- Observability Stack: Seq (`localhost:5341`), Jaeger (`localhost:16686`), Grafana (`localhost:3000`)
-- Ngrok (for local webhook tunnels)
-- All .NET Microservices
+#### Consolidated Lite Cluster (1 PostgreSQL instance - highly recommended for local development/low-resource hosting)
+```bash
+cd deployment
+docker-compose -f docker-compose.lite.yml up -d
+```
+This consolidated option runs all 8 service databases in a single Postgres container, saving several gigabytes of RAM.
 
-### Run the Web Client
-Navigate to the Blazor Client project and start the development server:
+Once the containers are running, you can access the web application directly at **`http://localhost:7555`** (no local .NET installation required!).
+
+### 🧠 Using Local LLMs (Ollama)
+You can connect ChatFoundry to a local Ollama instance without requiring an API key. 
+In `services/WorkflowService/src/WorkflowService/appsettings.json`, add your local Ollama configuration under `LlmProviders:OpenAiCompatible`:
+```json
+{
+  "Name": "Ollama",
+  "ApiKey": "",
+  "ApiUrl": "http://host.docker.internal:11434/v1/chat/completions",
+  "Model": "llama3"
+}
+```
+*(Use `http://host.docker.internal:11434` when running services inside Docker so they can route to host services).*
+
+### 🛠 Local Development (Alternative to Docker Client)
+If you want to run the frontend client with hot reload for development instead of using the Docker container:
+1. Stop the Docker client container: `docker-compose stop web-client`
+2. Navigate to the Blazor Client project and start the development server:
 
 ```bash
 cd webApps/src/BlazorClient
@@ -135,7 +152,7 @@ dotnet watch run
 ---
 
 ## 📜 Licensing
-ChatFoundry features a dual-licensing architecture (`Shared.Infrastructure.Licensing`), supporting both **Cloud SaaS** and **Self-Hosted Enterprise** modes out of the box. 
+ChatFoundry is fully open-source and released under the **Apache License 2.0**. You are free to run it self-hosted, modify, and distribute it for private or commercial use.
 
 ---
 <p align="center">

@@ -70,11 +70,11 @@ else
                         <span class="billing-tx-amount" style="color: @AmountColor(t.Amount);">
                             @(t.Amount > 0 ? "+" : "")@t.Amount.ToString("F2")
                         </span>
-                        <span class="billing-tx-currency">@("USDT")</span>
+                        <span class="billing-tx-currency">@("USD")</span>
                     </td>
                     <td>
                         <span class="billing-tx-balance">@t.BalanceAfter.ToString("F2")</span>
-                        <span class="billing-tx-currency">@("USDT")</span>
+                        <span class="billing-tx-currency">@("USD")</span>
                     </td>
                     <td class="billing-tx-desc">
                         @(t.Description ?? "—")

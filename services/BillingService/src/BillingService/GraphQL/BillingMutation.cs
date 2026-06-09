@@ -46,18 +46,11 @@ public class BillingMutation(IHttpContextAccessor httpContextAccessor) : BaseGra
 
     public async Task<TopUpPayload> CreateTopUpInvoice(
         decimal amount,
-        [Service] HeleketPaymentService heleket,
         CancellationToken ct)
     {
         if (!CompanyId.HasValue)
             throw new GraphQLException("company required");
-        if (amount <= 0)
-            return new TopUpPayload(false, null, "Amount must be positive");
 
-        var result = await heleket.CreateTopUpInvoiceAsync(CompanyId.Value, amount, ct);
-        if (result is null)
-            return new TopUpPayload(false, null, "Payment provider unavailable");
-
-        return new TopUpPayload(true, result.PaymentUrl, null);
+        return new TopUpPayload(false, null, "Online top-up is disabled. Please contact the administrator to manually add funds.");
     }
 }

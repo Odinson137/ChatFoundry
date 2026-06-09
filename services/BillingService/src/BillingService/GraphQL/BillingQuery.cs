@@ -49,7 +49,7 @@ public class BillingQuery(IHttpContextAccessor httpContextAccessor) : BaseGraphQ
             plan.Slug,
             sub.Status.ToString(),
             balance?.Amount ?? 0,
-            balance?.Currency ?? "USDT",
+            balance?.Currency ?? "USD",
             sub.CurrentPeriodEnd,
             plan.MaxClients,
             Cap(plan.MaxBots),

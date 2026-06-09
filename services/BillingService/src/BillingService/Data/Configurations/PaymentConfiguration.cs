@@ -13,7 +13,6 @@ public class PaymentConfiguration : BaseEntityTypeConfiguration<Payment>
         builder.ToTable("payments");
         builder.HasIndex(x => x.OrderId).IsUnique();
         builder.HasIndex(x => x.CompanyId);
-        builder.Property(x => x.HeleketUuid).HasMaxLength(128);
         builder.Property(x => x.OrderId).HasMaxLength(128);
         builder.Property(x => x.Amount).HasPrecision(18, 4);
         builder.Property(x => x.AmountUsd).HasPrecision(18, 4);

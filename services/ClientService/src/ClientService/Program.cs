@@ -27,12 +27,12 @@ services.AddGrpc();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = "http://identity-service:8080";
+        options.Authority = builder.Configuration["IdentityService:JwtAuthority"] ?? "http://identity-service:8080";
         options.RequireHttpsMetadata = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = "http://identity-service:8080/",
+            ValidIssuer = builder.Configuration["IdentityService:JwtIssuer"] ?? "http://identity-service:8080/",
             ValidateAudience = false,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true

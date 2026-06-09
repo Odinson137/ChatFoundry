@@ -228,7 +228,7 @@ else
                 case "UpgradeApplied":
                     isSuccess = true;
                     _msg = result.CreditApplied.HasValue
-                        ? $"План изменён на {slug}. Зачислен кредит: {result.CreditApplied.Value:F2} USDT"
+                        ? $"План изменён на {slug}. Зачислен кредит: {result.CreditApplied.Value:F2} USD"
                         : $"План изменён на {slug}";
                     _currentPlan = slug;
                     _pendingPlanSlug = null;

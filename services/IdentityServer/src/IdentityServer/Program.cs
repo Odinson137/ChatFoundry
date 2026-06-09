@@ -78,7 +78,8 @@ services.AddOpenIddict()
         options.AddEncryptionKey(new SymmetricSecurityKey(Convert.FromBase64String(encryptionKeyBase64)));
 
         options.AddDevelopmentSigningCertificate();
-        options.SetIssuer(new Uri("http://identity-service:8080/"));
+        var issuerUrl = builder.Configuration["IdentityService:JwtIssuer"] ?? "http://identity-service:8080/";
+        options.SetIssuer(new Uri(issuerUrl));
 
         options.UseAspNetCore().EnableTokenEndpointPassthrough().DisableTransportSecurityRequirement();
 
@@ -95,12 +96,12 @@ services.AddOpenIddict()
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = "http://identity-service:8080";
+        options.Authority = builder.Configuration["IdentityService:JwtAuthority"] ?? "http://identity-service:8080";
         options.RequireHttpsMetadata = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = "http://identity-service:8080/",
+            ValidIssuer = builder.Configuration["IdentityService:JwtIssuer"] ?? "http://identity-service:8080/",
             ValidateAudience = false,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true

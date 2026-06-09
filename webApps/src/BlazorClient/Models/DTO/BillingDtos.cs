@@ -5,7 +5,7 @@ public class BillingOverviewDto
     public string PlanSlug { get; set; } = "";
     public string SubscriptionStatus { get; set; } = "";
     public decimal Balance { get; set; }
-    public string Currency { get; set; } = "USDT";
+    public string Currency { get; set; } = "USD";
     public DateTime CurrentPeriodEnd { get; set; }
     public int MaxClients { get; set; }
     public int MaxBots { get; set; }

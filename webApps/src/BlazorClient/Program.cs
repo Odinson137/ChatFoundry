@@ -11,6 +11,13 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
+var baseAddress = builder.HostEnvironment.BaseAddress;
+if (!baseAddress.Contains("localhost") && !baseAddress.Contains("127.0.0.1"))
+{
+    var uri = new Uri(baseAddress);
+    BlazorClient.Configuration.ApiEndpoints.Api = $"{uri.Scheme}://api.{uri.Host}";
+}
+
 builder.Services.AddScoped<ITokenRefreshService, TokenRefreshService>();
 builder.Services.AddScoped<AuthErrorHandler>();
 builder.Services.AddScoped(sp =>

@@ -16,12 +16,15 @@ var secretToken = builder.Configuration["Telegram:SecretToken"]
 
 builder.Configuration["ReverseProxy:Routes:telegram-hook-route:Match:Headers:0:Values:0"] = secretToken;
 
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() 
+    ?? new[] { "https://localhost:7555", "http://localhost:7555" };
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: "BlazorClientPolicy",
         policy =>
         {
-            policy.WithOrigins("https://localhost:7555")
+            policy.WithOrigins(allowedOrigins)
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials();
@@ -36,7 +39,8 @@ if (string.IsNullOrEmpty(encryptionKeyBase64))
 builder.Services.AddOpenIddict()
     .AddValidation(options =>
     {
-        options.SetIssuer(new Uri("http://identity-service:8080/"));
+        var issuerUrl = builder.Configuration["IdentityService:JwtIssuer"] ?? "http://identity-service:8080/";
+        options.SetIssuer(new Uri(issuerUrl));
         options.AddEncryptionKey(new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
             Convert.FromBase64String(encryptionKeyBase64)));
         options.UseSystemNetHttp();

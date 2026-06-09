@@ -50,7 +50,7 @@ public class BillingAccountService(
             {
                 CompanyId = companyId,
                 Amount = 0,
-                Currency = "USDT"
+                Currency = "USD"
             };
             db.CompanyBalances.Add(balance);
 
@@ -204,7 +204,7 @@ public class BillingAccountService(
                     BalanceBefore = creditBefore,
                     BalanceAfter = balance.Amount,
                     Description =
-                        $"Upgrade credit: {oldPlan.Slug} -> {newPlan.Slug} ({credit:F2} USDT for unused period)"
+                        $"Upgrade credit: {oldPlan.Slug} -> {newPlan.Slug} ({credit:F2} USD for unused period)"
                 });
             }
 
@@ -221,7 +221,7 @@ public class BillingAccountService(
                     BalanceBefore = chargeBefore,
                     BalanceAfter = balance.Amount,
                     Description =
-                        $"Upgrade charge: {oldPlan.Slug} -> {newPlan.Slug} ({netCost:F2} USDT for remaining period)"
+                        $"Upgrade charge: {oldPlan.Slug} -> {newPlan.Slug} ({netCost:F2} USD for remaining period)"
                 });
             }
 

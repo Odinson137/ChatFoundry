@@ -2,7 +2,6 @@ using BillingService.Consumers;
 using BillingService.Data;
 using BillingService.GraphQL;
 using BillingService.Grpc;
-using BillingService.Options;
 using BillingService.Services;
 using Confluent.Kafka;
 using MassTransit;
@@ -20,17 +19,15 @@ services.AddControllers();
 services.AddHttpContextAccessor();
 services.AddHttpClient();
 
-services.Configure<HeleketOptions>(builder.Configuration.GetSection(HeleketOptions.SectionName));
-
 services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = "http://identity-service:8080";
+        options.Authority = builder.Configuration["IdentityService:JwtAuthority"] ?? "http://identity-service:8080";
         options.RequireHttpsMetadata = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = "http://identity-service:8080/",
+            ValidIssuer = builder.Configuration["IdentityService:JwtIssuer"] ?? "http://identity-service:8080/",
             ValidateAudience = false,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true
@@ -42,7 +39,6 @@ services.AddAuthorization();
 services.AddPostgreSql<BillingDbContext>(builder.Configuration);
 
 services.AddScoped<BillingAccountService>();
-services.AddScoped<HeleketPaymentService>();
 
 services.AddHostedService<BillingCycleService>();
 

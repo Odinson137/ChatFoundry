@@ -17,7 +17,6 @@ public class OpenAiCompatibleProvider : IAiProvider
 
     public string Name => _name;
     public bool IsConfigured =>
-        !string.IsNullOrWhiteSpace(_apiKey) && _apiKey != "YOUR_API_KEY" &&
         !string.IsNullOrWhiteSpace(_apiUrl);
 
     public OpenAiCompatibleProvider(
@@ -41,7 +40,10 @@ public class OpenAiCompatibleProvider : IAiProvider
         CancellationToken cancellationToken)
     {
         var client = _httpClientFactory.CreateClient(_httpClientName);
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+        if (!string.IsNullOrWhiteSpace(_apiKey) && _apiKey != "YOUR_API_KEY")
+        {
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+        }
 
         var model = string.Equals(_model, "auto", StringComparison.OrdinalIgnoreCase) || string.IsNullOrWhiteSpace(_model)
             ? null
@@ -56,7 +58,10 @@ public class OpenAiCompatibleProvider : IAiProvider
         CancellationToken cancellationToken)
     {
         var client = _httpClientFactory.CreateClient(_httpClientName);
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+        if (!string.IsNullOrWhiteSpace(_apiKey) && _apiKey != "YOUR_API_KEY")
+        {
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+        }
 
         var model = string.Equals(_model, "auto", StringComparison.OrdinalIgnoreCase) || string.IsNullOrWhiteSpace(_model)
             ? null
