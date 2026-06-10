@@ -17,6 +17,9 @@
 
 ---
 
+> [!TIP]
+> **Live Demo:** You can access the deployed application at **[https://chatfoundry.dpdns.org](https://chatfoundry.dpdns.org)**.
+
 ## 🚀 About the Project
 
 **ChatFoundry** is an advanced, self-hosted or cloud-ready no-code platform for creating, managing, and analyzing chatbots. It provides a visual drag-and-drop workflow designer, allowing users to build complex conversational logic without writing a single line of code.
