@@ -33,8 +33,34 @@ jobs:
       - name: Verify Formatting
         run: dotnet format ChatFoundry.sln --verify-no-changes --no-restore
 
-  test-services:
-    name: Test ${{ matrix.service.name }}
+  test-unit-services:
+    name: Run C# Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.Build.props') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore Solution
+        run: dotnet restore ChatFoundry.sln
+
+      - name: Run Unit Tests
+        run: dotnet test ChatFoundry.sln --configuration Release --no-restore --filter "FullyQualifiedName!~IntegrationTests"
+
+  test-integration-services:
+    name: Test ${{ matrix.service.name }} (Integration)
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -77,3 +103,53 @@ jobs:
 
       - name: Run Tests
         run: dotnet test ${{ matrix.service.path }} --configuration Release --no-build --no-restore --verbosity normal
+
+  test-node-service:
+    name: Test Node.js LLM Service
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/FreeLlmApiService
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: services/FreeLlmApiService/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Tests
+        run: npm run test -w server
+
+  build-frontend:
+    name: Build Blazor Client Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.Build.props') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore BlazorClient
+        run: dotnet restore webApps/src/BlazorClient/BlazorClient.csproj
+
+      - name: Build BlazorClient
+        run: dotnet build webApps/src/BlazorClient/BlazorClient.csproj --configuration Release --no-restore
+

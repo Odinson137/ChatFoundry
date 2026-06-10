@@ -3,6 +3,7 @@ version: '3.9'
 services:
   web-client:
     container_name: web_client
+    image: ghcr.io/odinson137/chatfoundry/web-client:latest
     build:
       context: ..
       dockerfile: webApps/src/BlazorClient/Dockerfile
@@ -15,6 +16,7 @@ services:
 
   gateway-service:
     container_name: gateway_service
+    image: ghcr.io/odinson137/chatfoundry/gateway:latest
     build:
       context: ..
       dockerfile: services/Gateway/src/Gateway/Dockerfile
@@ -36,6 +38,7 @@ services:
 
   workflow-service:
     container_name: workflow_service
+    image: ghcr.io/odinson137/chatfoundry/workflow-service:latest
     build:
       context: ..
       dockerfile: services/WorkflowService/src/WorkflowService/Dockerfile
@@ -63,6 +66,7 @@ services:
 
   identity-service:
     container_name: identity_service
+    image: ghcr.io/odinson137/chatfoundry/identity-service:latest
     build:
       context: ..
       dockerfile: services/IdentityServer/src/IdentityServer/Dockerfile
@@ -89,6 +93,7 @@ services:
 
   client-service:
     container_name: client_service
+    image: ghcr.io/odinson137/chatfoundry/client-service:latest
     build:
       context: ..
       dockerfile: services/ClientService/src/ClientService/Dockerfile
@@ -114,6 +119,7 @@ services:
 
   company-service:
     container_name: company_service
+    image: ghcr.io/odinson137/chatfoundry/company-service:latest
     build:
       context: ..
       dockerfile: services/CompanyService/src/CompanyService/Dockerfile
@@ -139,6 +145,7 @@ services:
 
   billing-service:
     container_name: billing_service
+    image: ghcr.io/odinson137/chatfoundry/billing-service:latest
     build:
       context: ..
       dockerfile: services/BillingService/src/BillingService/Dockerfile
@@ -165,6 +172,7 @@ services:
 
   telegram-service:
     container_name: telegram_service
+    image: ghcr.io/odinson137/chatfoundry/telegram-service:latest
     build:
       context: ..
       dockerfile: services/TelegramService/src/TelegramService/Dockerfile
@@ -182,6 +190,7 @@ services:
 
   file-service:
     container_name: file_service
+    image: ghcr.io/odinson137/chatfoundry/file-service:latest
     build:
       context: ..
       dockerfile: services/FileService/src/FileService/Dockerfile
@@ -204,6 +213,7 @@ services:
 
   notification-service:
     container_name: notification_service
+    image: ghcr.io/odinson137/chatfoundry/notification-service:latest
     build:
       context: ..
       dockerfile: services/NotificationService/src/NotificationService/Dockerfile
@@ -225,6 +235,7 @@ services:
 
   scheduler-service:
     container_name: scheduler_service
+    image: ghcr.io/odinson137/chatfoundry/scheduler-service:latest
     build:
       context: ..
       dockerfile: services/SchedulerService/src/SchedulerService/Dockerfile
@@ -317,18 +328,18 @@ services:
 #    networks:
 #      - app_network
 
-  ngrok:
-    image: ngrok/ngrok:latest
-    restart: unless-stopped
-    ports:
-      - "4040:4040"
-    depends_on:
-      - gateway-service
-    env_file:
-      - .env
-    command: http "https://gateway-service:8443" --domain probable-dogfish-known.ngrok-free.app
-    networks:
-      - app_network
+#  ngrok:
+#    image: ngrok/ngrok:latest
+#    restart: unless-stopped
+#    ports:
+#      - "4040:4040"
+#    depends_on:
+#      - gateway-service
+#    env_file:
+#      - .env
+#    command: http "https://gateway-service:8443" --domain probable-dogfish-known.ngrok-free.app
+#    networks:
+#      - app_network
 
   seq:
     image: datalust/seq:latest
@@ -389,6 +400,7 @@ services:
 
   freellmapi-service:
     container_name: freellmapi_service
+    image: ghcr.io/odinson137/chatfoundry/freellmapi-service:latest
     build:
       context: ../services/FreeLlmApiService
       dockerfile: Dockerfile
@@ -402,6 +414,18 @@ services:
       - freellmapi_data:/app/server/data
     networks:
       - app_network
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN:-}
+    depends_on:
+      - web-client
+      - gateway-service
+    networks:
+      - app_network
+
 
 volumes:
   seq_data:

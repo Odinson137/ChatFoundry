@@ -16,7 +16,7 @@ var secretToken = builder.Configuration["Telegram:SecretToken"]
 
 builder.Configuration["ReverseProxy:Routes:telegram-hook-route:Match:Headers:0:Values:0"] = secretToken;
 
-var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() 
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
     ?? new[] { "https://localhost:7555", "http://localhost:7555" };
 
 builder.Services.AddCors(options =>

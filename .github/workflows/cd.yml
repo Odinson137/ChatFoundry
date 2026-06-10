@@ -6,6 +6,7 @@ on:
     paths:
       - 'services/**'
       - 'shared/**'
+      - 'webApps/**'
       - '.github/workflows/cd.yml'
   release:
     types: [ published ]
@@ -22,16 +23,18 @@ jobs:
       fail-fast: false
       matrix:
         service: [
-          { name: "gateway", path: "services/Gateway/src/Gateway/Dockerfile" },
-          { name: "workflow-service", path: "services/WorkflowService/src/WorkflowService/Dockerfile" },
-          { name: "identity-service", path: "services/IdentityServer/src/IdentityServer/Dockerfile" },
-          { name: "client-service", path: "services/ClientService/src/ClientService/Dockerfile" },
-          { name: "telegram-service", path: "services/TelegramService/src/TelegramService/Dockerfile" },
-          { name: "company-service", path: "services/CompanyService/src/CompanyService/Dockerfile" },
-          { name: "billing-service", path: "services/BillingService/src/BillingService/Dockerfile" },
-          { name: "file-service", path: "services/FileService/src/FileService/Dockerfile" },
-          { name: "notification-service", path: "services/NotificationService/src/NotificationService/Dockerfile" },
-          { name: "scheduler-service", path: "services/SchedulerService/src/SchedulerService/Dockerfile" }
+          { name: "gateway", path: "services/Gateway/src/Gateway/Dockerfile", context: "." },
+          { name: "workflow-service", path: "services/WorkflowService/src/WorkflowService/Dockerfile", context: "." },
+          { name: "identity-service", path: "services/IdentityServer/src/IdentityServer/Dockerfile", context: "." },
+          { name: "client-service", path: "services/ClientService/src/ClientService/Dockerfile", context: "." },
+          { name: "telegram-service", path: "services/TelegramService/src/TelegramService/Dockerfile", context: "." },
+          { name: "company-service", path: "services/CompanyService/src/CompanyService/Dockerfile", context: "." },
+          { name: "billing-service", path: "services/BillingService/src/BillingService/Dockerfile", context: "." },
+          { name: "file-service", path: "services/FileService/src/FileService/Dockerfile", context: "." },
+          { name: "notification-service", path: "services/NotificationService/src/NotificationService/Dockerfile", context: "." },
+          { name: "scheduler-service", path: "services/SchedulerService/src/SchedulerService/Dockerfile", context: "." },
+          { name: "web-client", path: "webApps/src/BlazorClient/Dockerfile", context: "." },
+          { name: "freellmapi-service", path: "services/FreeLlmApiService/Dockerfile", context: "services/FreeLlmApiService" }
         ]
 
     steps:
@@ -69,10 +72,43 @@ jobs:
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ${{ matrix.service.context }}
           file: ${{ matrix.service.path }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy to VPS
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Copy deployment files to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "deployment/*"
+          target: "/app/ChatFoundry"
+
+      - name: SSH into VPS and restart containers
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /app/ChatFoundry/deployment
+            # Log in to GitHub Container Registry using PAT
+            echo "${{ secrets.GH_PAT_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            # Pull pre-built images and start the stack in lite mode
+            docker compose -f docker-compose.lite.yml pull
+            docker compose -f docker-compose.lite.yml up -d
+
