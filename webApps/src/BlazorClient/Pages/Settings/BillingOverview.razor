@@ -6,13 +6,14 @@
 
 @inject IBillingApiClient Billing
 @inject NavigationManager Nav
+@inject IStringLocalizer<BillingOverview> LBilling
 
-<PageTitle>Настройки — Биллинг — ChatFoundry</PageTitle>
+<PageTitle>@LBilling["PageTitle"] — ChatFoundry</PageTitle>
 
 <div class="settings-page-header">
     <div>
-        <h1 class="settings-page-title">Биллинг</h1>
-        <p class="settings-page-subtitle">Подписка, баланс и использование ресурсов</p>
+        <h1 class="settings-page-title">@LBilling["HeaderTitle"]</h1>
+        <p class="settings-page-subtitle">@LBilling["HeaderSubtitle"]</p>
     </div>
 </div>
 
@@ -35,8 +36,8 @@ else if (_overview == null)
         <div class="settings-empty-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
         </div>
-        <div class="settings-empty-title">Данные биллинга недоступны</div>
-        <div class="settings-empty-desc">Не удалось загрузить информацию о подписке. Попробуйте позже.</div>
+        <div class="settings-empty-title">@LBilling["EmptyTitle"]</div>
+        <div class="settings-empty-desc">@LBilling["EmptyDesc"]</div>
     </div>
 }
 else
@@ -48,7 +49,7 @@ else
                 <div class="settings-stat-icon" style="background: linear-gradient(135deg, #fef3c7, #fde68a);">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
                 </div>
-                <div class="settings-stat-label">Текущий план</div>
+                <div class="settings-stat-label">@LBilling["StatPlan"]</div>
             </div>
             <div class="settings-stat-value billing-plan-name">@PlanDisplayName(_overview.PlanSlug)</div>
         </div>
@@ -57,7 +58,7 @@ else
                 <div class="settings-stat-icon" style="background: #ecfdf5;">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
                 </div>
-                <div class="settings-stat-label">Баланс</div>
+                <div class="settings-stat-label">@LBilling["StatBalance"]</div>
             </div>
             <div class="settings-stat-value">@_overview.Balance.ToString("F2") <span class="billing-currency">@_overview.Currency</span></div>
         </div>
@@ -66,7 +67,7 @@ else
                 <div class="settings-stat-icon" style="background: #eef2ff;">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                 </div>
-                <div class="settings-stat-label">Период до</div>
+                <div class="settings-stat-label">@LBilling["StatPeriodEnd"]</div>
             </div>
             <div class="settings-stat-value billing-date-value">@_overview.CurrentPeriodEnd.ToString("dd MMM yyyy")</div>
         </div>
@@ -75,7 +76,7 @@ else
                 <div class="settings-stat-icon" style="background: #f5f3ff;">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                 </div>
-                <div class="settings-stat-label">Статус</div>
+                <div class="settings-stat-label">@LBilling["StatStatus"]</div>
             </div>
             <div class="settings-stat-value">
                 <span class="settings-badge @StatusBadgeClass(_overview.SubscriptionStatus)">@StatusDisplay(_overview.SubscriptionStatus)</span>
@@ -88,30 +89,30 @@ else
         <div class="settings-card-body">
             <h3 class="billing-section-title">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-                Лимиты использования
+                @LBilling["LimitsTitle"]
             </h3>
             <div class="billing-limits-grid">
                 <div class="billing-limit-item">
                     <div class="billing-limit-header">
-                        <span class="billing-limit-label">Клиенты</span>
+                        <span class="billing-limit-label">@LBilling["LimitClients"]</span>
                         <span class="billing-limit-value">@FormatCount(_overview.MaxClients)</span>
                     </div>
                 </div>
                 <div class="billing-limit-item">
                     <div class="billing-limit-header">
-                        <span class="billing-limit-label">Боты</span>
+                        <span class="billing-limit-label">@LBilling["LimitBots"]</span>
                         <span class="billing-limit-value">@FormatCount(_overview.MaxBots)</span>
                     </div>
                 </div>
                 <div class="billing-limit-item">
                     <div class="billing-limit-header">
-                        <span class="billing-limit-label">Участники команды</span>
+                        <span class="billing-limit-label">@LBilling["LimitTeamMembers"]</span>
                         <span class="billing-limit-value">@_overview.MaxTeamMembers</span>
                     </div>
                 </div>
                 <div class="billing-limit-item">
                     <div class="billing-limit-header">
-                        <span class="billing-limit-label">AI Токены</span>
+                        <span class="billing-limit-label">@LBilling["LimitAiTokens"]</span>
                         <span class="billing-limit-value">@FormatTokens(_overview.AiTokensUsed) / @FormatTokens(_overview.MaxAiTokens)</span>
                     </div>
                     <div class="billing-progress">
@@ -127,7 +128,7 @@ else
         <div class="settings-card-body">
             <h3 class="billing-section-title">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                Возможности плана
+                @LBilling["FeaturesTitle"]
             </h3>
             <div class="billing-features-grid">
                 <div class="billing-feature @(_overview.HasAnalytics ? "billing-feature-on" : "billing-feature-off")">
@@ -141,7 +142,7 @@ else
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                         }
                     </span>
-                    <span>Аналитика</span>
+                    <span>@LBilling["FeatureAnalytics"]</span>
                 </div>
                 <div class="billing-feature @(_overview.HasApiAccess ? "billing-feature-on" : "billing-feature-off")">
                     <span class="billing-feature-icon">
@@ -154,7 +155,7 @@ else
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                         }
                     </span>
-                    <span>API доступ</span>
+                    <span>@LBilling["FeatureApiAccess"]</span>
                 </div>
             </div>
         </div>
@@ -164,19 +165,19 @@ else
     <div class="billing-actions">
         <NavLink class="settings-btn-primary" href="/settings/billing/plans">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-            Сменить план
+            @LBilling["ActionChangePlan"]
         </NavLink>
         <NavLink class="settings-btn-secondary" href="/settings/billing/top-up">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-            Пополнить баланс
+            @LBilling["ActionTopUp"]
         </NavLink>
         <NavLink class="settings-btn-secondary" href="/settings/billing/transactions">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-            Транзакции
+            @LBilling["ActionTransactions"]
         </NavLink>
         <NavLink class="settings-btn-secondary" href="/settings/billing/usage">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-            Использование
+            @LBilling["ActionUsage"]
         </NavLink>
     </div>
 }
@@ -194,7 +195,7 @@ else
         }
         catch (Exception ex)
         {
-            loadError = $"Не удалось загрузить данные биллинга: {ex.Message}";
+            loadError = string.Format(LBilling["LoadError"], ex.Message);
         }
         finally
         {
@@ -221,13 +222,13 @@ else
         _ => "settings-badge-neutral"
     };
 
-    private static string StatusDisplay(string status) => status.ToUpperInvariant() switch
+    private string StatusDisplay(string status) => status.ToUpperInvariant() switch
     {
-        "ACTIVE" => "Активен",
-        "TRIALING" => "Пробный",
-        "PAST_DUE" => "Просрочен",
-        "CANCELLED" => "Отменён",
-        "EXPIRED" => "Истёк",
+        "ACTIVE" => LBilling["StatusActive"],
+        "TRIALING" => LBilling["StatusTrialing"],
+        "PAST_DUE" => LBilling["StatusPastDue"],
+        "CANCELLED" => LBilling["StatusCancelled"],
+        "EXPIRED" => LBilling["StatusExpired"],
         _ => status
     };
 

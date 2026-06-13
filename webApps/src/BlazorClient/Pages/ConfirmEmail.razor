@@ -1,8 +1,9 @@
 @page "/confirm-email"
 @inject HttpClient Http
 @inject NavigationManager Navigation
+@inject IStringLocalizer<ConfirmEmail> LConfirm
 
-<PageTitle>Подтверждение почты — ChatFoundry</PageTitle>
+<PageTitle>@LConfirm["PageTitle"] — ChatFoundry</PageTitle>
 
 <div class="confirm-email-page">
     <div class="confirm-email-bg" aria-hidden="true"></div>
@@ -15,8 +16,8 @@
                     <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
                 </svg>
             </div>
-            <h1 class="confirm-email-title">Проверка ссылки...</h1>
-            <p class="confirm-email-subtitle">Подождите, мы проверяем вашу ссылку</p>
+            <h1 class="confirm-email-title">@LConfirm["CheckingTitle"]</h1>
+            <p class="confirm-email-subtitle">@LConfirm["CheckingSubtitle"]</p>
             <div class="confirm-email-spinner"></div>
         }
         else if (success)
@@ -27,9 +28,9 @@
                     <path d="m9 12 2 2 4-4"/>
                 </svg>
             </div>
-            <h1 class="confirm-email-title">Почта подтверждена</h1>
-            <p class="confirm-email-subtitle">Аккаунт готов к работе. Войдите, чтобы продолжить.</p>
-            <a href="/login?confirmed=1" class="confirm-email-btn">Войти в аккаунт</a>
+            <h1 class="confirm-email-title">@LConfirm["ConfirmedTitle"]</h1>
+            <p class="confirm-email-subtitle">@LConfirm["ConfirmedSubtitle"]</p>
+            <a href="/login?confirmed=1" class="confirm-email-btn">@LConfirm["BtnSignIn"]</a>
         }
         else if (!string.IsNullOrEmpty(errorMessage))
         {
@@ -40,9 +41,9 @@
                     <line x1="12" y1="16" x2="12.01" y2="16"/>
                 </svg>
             </div>
-            <h1 class="confirm-email-title confirm-email-title-error">Ошибка подтверждения</h1>
+            <h1 class="confirm-email-title confirm-email-title-error">@LConfirm["ErrorTitle"]</h1>
             <p class="confirm-email-subtitle">@errorMessage</p>
-            <a href="/login" class="confirm-email-btn confirm-email-btn-secondary">На страницу входа</a>
+            <a href="/login" class="confirm-email-btn confirm-email-btn-secondary">@LConfirm["BtnToLogin"]</a>
         }
         else
         {
@@ -52,9 +53,9 @@
                     <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
                 </svg>
             </div>
-            <h1 class="confirm-email-title">Подтверждение почты</h1>
-            <p class="confirm-email-subtitle">Перейдите по ссылке из письма или вернитесь на страницу входа.</p>
-            <a href="/login" class="confirm-email-btn confirm-email-btn-secondary">На страницу входа</a>
+            <h1 class="confirm-email-title">@LConfirm["DefaultTitle"]</h1>
+            <p class="confirm-email-subtitle">@LConfirm["DefaultSubtitle"]</p>
+            <a href="/login" class="confirm-email-btn confirm-email-btn-secondary">@LConfirm["BtnToLogin"]</a>
         }
     </div>
 </div>
@@ -72,14 +73,14 @@
     {
         if (!string.IsNullOrEmpty(ErrorQuery))
         {
-            errorMessage = "Ссылка недействительна или устарела.";
+            errorMessage = LConfirm["ErrorInvalidLink"];
             loading = false;
             return;
         }
 
         if (string.IsNullOrWhiteSpace(UserId) || string.IsNullOrWhiteSpace(Token))
         {
-            errorMessage = "Не указаны параметры подтверждения.";
+            errorMessage = LConfirm["ErrorNoParameters"];
             loading = false;
             return;
         }
@@ -94,11 +95,11 @@
             if (!success && !string.IsNullOrEmpty(json?.Message))
                 errorMessage = json.Message;
             else if (!success)
-                errorMessage = "Ссылка недействительна или устарела.";
+                errorMessage = LConfirm["ErrorInvalidLink"];
         }
         catch
         {
-            errorMessage = "Не удалось проверить ссылку. Попробуйте позже.";
+            errorMessage = LConfirm["ErrorConnection"];
         }
         finally
         {

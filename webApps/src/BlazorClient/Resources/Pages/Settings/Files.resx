@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="0" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  
+  <data name="PageTitle" xml:space="preserve">
+    <value>Настройки — Файлы</value>
+  </data>
+  <data name="HeaderTitle" xml:space="preserve">
+    <value>Файлы</value>
+  </data>
+  <data name="HeaderSubtitle" xml:space="preserve">
+    <value>Хранилище файлов для использования в workflow</value>
+  </data>
+  <data name="BtnUploadFile" xml:space="preserve">
+    <value>Загрузить файл</value>
+  </data>
+  <data name="NoFilesTitle" xml:space="preserve">
+    <value>Нет файлов</value>
+  </data>
+  <data name="NoFilesDesc" xml:space="preserve">
+    <value>Загрузите первый файл — изображения, документы или медиафайлы для ботов.</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Имя или ID файла</value>
+  </data>
+  <data name="FilterAllTypes" xml:space="preserve">
+    <value>Все типы</value>
+  </data>
+  <data name="FilterImages" xml:space="preserve">
+    <value>Изображения</value>
+  </data>
+  <data name="FilterVideo" xml:space="preserve">
+    <value>Видео</value>
+  </data>
+  <data name="FilterAudio" xml:space="preserve">
+    <value>Аудио</value>
+  </data>
+  <data name="FilterOther" xml:space="preserve">
+    <value>Прочее</value>
+  </data>
+  <data name="TooltipRefresh" xml:space="preserve">
+    <value>Обновить</value>
+  </data>
+  <data name="FilterUploadedLabel" xml:space="preserve">
+    <value>Загружен</value>
+  </data>
+  <data name="FilterEmptyText" xml:space="preserve">
+    <value>Ничего не найдено</value>
+  </data>
+  <data name="FilterEmptyHint" xml:space="preserve">
+    <value>Измените фильтры или поисковый запрос</value>
+  </data>
+  <data name="ThFile" xml:space="preserve">
+    <value>Файл</value>
+  </data>
+  <data name="ThType" xml:space="preserve">
+    <value>Тип</value>
+  </data>
+  <data name="ThSize" xml:space="preserve">
+    <value>Размер</value>
+  </data>
+  <data name="ThDate" xml:space="preserve">
+    <value>Дата</value>
+  </data>
+  <data name="ThUploader" xml:space="preserve">
+    <value>Кто загрузил</value>
+  </data>
+  <data name="ThActions" xml:space="preserve">
+    <value>Действия</value>
+  </data>
+  <data name="TooltipDetails" xml:space="preserve">
+    <value>Подробнее</value>
+  </data>
+  <data name="TooltipDownload" xml:space="preserve">
+    <value>Скачать</value>
+  </data>
+  <data name="TooltipDelete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="PaginationInfo" xml:space="preserve">
+    <value>Показано {0} из {1}</value>
+  </data>
+  <data name="PaginationOnPage" xml:space="preserve">
+    <value>На странице:</value>
+  </data>
+  <data name="PaginationPrev" xml:space="preserve">
+    <value>Назад</value>
+  </data>
+  <data name="PaginationNext" xml:space="preserve">
+    <value>Вперёд</value>
+  </data>
+  <data name="ModalUploadTitle" xml:space="preserve">
+    <value>Загрузить файл</value>
+  </data>
+  <data name="ModalUploadSelectLabel" xml:space="preserve">
+    <value>Выберите файл (макс. 20 МБ)</value>
+  </data>
+  <data name="ModalUploadCancel" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="ModalUploadBtn" xml:space="preserve">
+    <value>Загрузить</value>
+  </data>
+  <data name="ErrorLoad" xml:space="preserve">
+    <value>Ошибка загрузки: {0}</value>
+  </data>
+  <data name="ErrorDownload" xml:space="preserve">
+    <value>Ошибка скачивания: {0}</value>
+  </data>
+  <data name="ErrorDelete" xml:space="preserve">
+    <value>Ошибка удаления: {0}</value>
+  </data>
+  <data name="DeleteConfirm" xml:space="preserve">
+    <value>Удалить файл «{0}»?</value>
+  </data>
+  <data name="ErrorFileTooLarge" xml:space="preserve">
+    <value>Файл превышает 20 МБ.</value>
+  </data>
+  <data name="ErrorUploadFailed" xml:space="preserve">
+    <value>Не удалось загрузить файл.</value>
+  </data>
+  <data name="FormatSizeB" xml:space="preserve">
+    <value>{0} Б</value>
+  </data>
+  <data name="FormatSizeKB" xml:space="preserve">
+    <value>{0:F1} КБ</value>
+  </data>
+  <data name="FormatSizeMB" xml:space="preserve">
+    <value>{0:F1} МБ</value>
+  </data>
+  <data name="FormatSizeGB" xml:space="preserve">
+    <value>{0:F2} ГБ</value>
+  </data>
+  <data name="SourceAdmin" xml:space="preserve">
+    <value>Администратор</value>
+  </data>
+  <data name="SourceClient" xml:space="preserve">
+    <value>Клиент</value>
+  </data>
+</root>

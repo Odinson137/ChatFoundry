@@ -30,7 +30,7 @@
     {
         if (!_mediaResolved)
         {
-            <div class="cd-msg-media-loading">Загрузка...</div>
+            <div class="cd-msg-media-loading">@L["MediaLoading"]</div>
         }
         else if (!string.IsNullOrEmpty(_mediaUrl) && _mediaIsImage)
         {
@@ -55,14 +55,14 @@
         else
         {
             <div class="cd-msg-media-placeholder">
-                <span class="cd-msg-kind">&#x1f5bc; Медиа</span>
+                <span class="cd-msg-kind">&#x1f5bc; @L["MediaLabel"]</span>
                 @if (_mediaError == "size_exceeded")
                 {
-                    <div class="cd-msg-text cd-msg-text-muted">Файл превышает 20 МБ. Превью недоступно.</div>
+                    <div class="cd-msg-text cd-msg-text-muted">@L["MediaErrorSizeExceeded"]</div>
                 }
                 else if (_mediaError == "upload_failed")
                 {
-                    <div class="cd-msg-text cd-msg-text-muted">Превью недоступно (ошибка загрузки).</div>
+                    <div class="cd-msg-text cd-msg-text-muted">@L["MediaErrorUploadFailed"]</div>
                 }
                 else if (!string.IsNullOrWhiteSpace(_mediaCaption))
                 {
@@ -70,7 +70,7 @@
                 }
                 else if (!string.IsNullOrWhiteSpace(Payload) && !Payload.TrimStart().StartsWith("{"))
                 {
-                    <div class="cd-msg-text cd-msg-text-muted">(превью недоступно)</div>
+                    <div class="cd-msg-text cd-msg-text-muted">@L["MediaPreviewUnavailable"]</div>
                 }
             </div>
         }

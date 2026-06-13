@@ -5,17 +5,18 @@
 @attribute [Authorize]
 
 @inject IBillingApiClient Billing
+@inject IStringLocalizer<BillingUsage> LUsage
 
-<PageTitle>Настройки — Использование — ChatFoundry</PageTitle>
+<PageTitle>@LUsage["PageTitle"]</PageTitle>
 
 <div class="settings-page-header">
     <div>
         <a class="billing-back-link" href="/settings/billing">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-            Биллинг
+            @LUsage["BackToBilling"]
         </a>
-        <h1 class="settings-page-title">Использование</h1>
-        <p class="settings-page-subtitle">Детальная статистика по использованию ресурсов</p>
+        <h1 class="settings-page-title">@LUsage["HeaderTitle"]</h1>
+        <p class="settings-page-subtitle">@LUsage["HeaderSubtitle"]</p>
     </div>
 </div>
 
@@ -38,8 +39,8 @@ else if (_overview == null)
         <div class="settings-empty-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
         </div>
-        <div class="settings-empty-title">Нет данных</div>
-        <div class="settings-empty-desc">Не удалось загрузить статистику использования.</div>
+        <div class="settings-empty-title">@LUsage["EmptyTitle"]</div>
+        <div class="settings-empty-desc">@LUsage["EmptyDesc"]</div>
     </div>
 }
 else
@@ -53,14 +54,14 @@ else
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
                     </div>
                     <div>
-                        <div class="billing-usage-detail-title">AI Токены</div>
-                        <div class="billing-usage-detail-sub">Расход токенов нейросети</div>
+                        <div class="billing-usage-detail-title">@LUsage["AiTokensTitle"]</div>
+                        <div class="billing-usage-detail-sub">@LUsage["AiTokensDesc"]</div>
                     </div>
                 </div>
                 <div class="billing-usage-detail-bar-wrap">
                     <div class="billing-usage-detail-bar-info">
                         <span class="billing-usage-detail-used">@FormatTokens(_overview.AiTokensUsed)</span>
-                        <span class="billing-usage-detail-max">из @FormatTokens(_overview.MaxAiTokens)</span>
+                        <span class="billing-usage-detail-max">@LUsage["FromMax", FormatTokens(_overview.MaxAiTokens)]</span>
                     </div>
                     <div class="billing-usage-progress">
                         <div class="billing-usage-progress-bar" style="width: @UsagePercent(_overview.AiTokensUsed, _overview.MaxAiTokens)%; background: @UsageColor(_overview.AiTokensUsed, _overview.MaxAiTokens);"></div>
@@ -68,7 +69,7 @@ else
                 </div>
                 <div class="billing-usage-detail-percent">
                     <span style="color: @UsageColor(_overview.AiTokensUsed, _overview.MaxAiTokens);">@UsagePercent(_overview.AiTokensUsed, _overview.MaxAiTokens)%</span>
-                    использовано
+                    @LUsage["UsedText"]
                 </div>
             </div>
         </div>
@@ -79,7 +80,7 @@ else
         <div class="settings-card-body">
             <h3 class="billing-section-title">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                Лимиты ресурсов
+                @LUsage["ResourceLimitsTitle"]
             </h3>
             <div class="billing-resources-grid">
                 <div class="billing-resource-item">
@@ -87,8 +88,8 @@ else
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
                     </div>
                     <div class="billing-resource-info">
-                        <div class="billing-resource-name">Клиенты</div>
-                        <div class="billing-resource-desc">Максимум клиентов в системе</div>
+                        <div class="billing-resource-name">@LUsage["ClientsTitle"]</div>
+                        <div class="billing-resource-desc">@LUsage["ClientsDesc"]</div>
                     </div>
                     <div class="billing-resource-value">@FormatCount(_overview.MaxClients)</div>
                 </div>
@@ -97,8 +98,8 @@ else
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
                     </div>
                     <div class="billing-resource-info">
-                        <div class="billing-resource-name">Боты</div>
-                        <div class="billing-resource-desc">Максимум ботов</div>
+                        <div class="billing-resource-name">@LUsage["BotsTitle"]</div>
+                        <div class="billing-resource-desc">@LUsage["BotsDesc"]</div>
                     </div>
                     <div class="billing-resource-value">@FormatCount(_overview.MaxBots)</div>
                 </div>
@@ -107,8 +108,8 @@ else
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
                     </div>
                     <div class="billing-resource-info">
-                        <div class="billing-resource-name">Участники</div>
-                        <div class="billing-resource-desc">Максимум участников команды</div>
+                        <div class="billing-resource-name">@LUsage["MembersTitle"]</div>
+                        <div class="billing-resource-desc">@LUsage["MembersDesc"]</div>
                     </div>
                     <div class="billing-resource-value">@_overview.MaxTeamMembers</div>
                 </div>
@@ -118,7 +119,7 @@ else
 
     <div class="settings-alert settings-alert-info" style="margin-top: 1rem;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-        <span>Подробная аналитика по дням будет доступна в следующих версиях.</span>
+        <span>@LUsage["AnalyticsNotice"]</span>
     </div>
 }
 
@@ -135,7 +136,7 @@ else
         }
         catch (Exception ex)
         {
-            loadError = $"Не удалось загрузить статистику: {ex.Message}";
+            loadError = string.Format(LUsage["LoadError"], ex.Message);
         }
         finally
         {

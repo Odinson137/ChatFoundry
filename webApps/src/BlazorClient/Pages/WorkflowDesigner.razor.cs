@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Localization;
 using BlazorClient.Components;
 using BlazorClient.Models.Diagram;
 
@@ -44,35 +45,36 @@ public partial class WorkflowDesigner : IDisposable
     [Inject] private IWorkflowSchemaService SchemaService { get; set; } = null!;
     [Inject] private IFileApiClient FileApiClient { get; set; } = null!;
     [Inject] private IClientApiClient ClientApiClient { get; set; } = null!;
+    [Inject] private IStringLocalizer<WorkflowDesigner> LDesigner { get; set; } = null!;
 
     private List<ChannelDto> AvailableChannels { get; set; } = [];
     private string UserTimezone { get; set; } = "UTC";
     private Dictionary<string, string> TimezoneOffsets { get; set; } = new();
 
-    private static readonly (string Id, string Label)[] CommonTimezones =
+    private (string Id, string Label)[] CommonTimezones =>
     [
         ("UTC", "UTC"),
-        ("Europe/London", "Лондон"), ("Europe/Paris", "Париж"), ("Europe/Berlin", "Берлин"),
-        ("Europe/Madrid", "Мадрид"), ("Europe/Rome", "Рим"), ("Europe/Amsterdam", "Амстердам"),
-        ("Europe/Brussels", "Брюссель"), ("Europe/Vienna", "Вена"), ("Europe/Warsaw", "Варшава"),
-        ("Europe/Prague", "Прага"), ("Europe/Budapest", "Будапешт"), ("Europe/Bucharest", "Бухарест"),
-        ("Europe/Athens", "Афины"), ("Europe/Helsinki", "Хельсинки"),
-        ("Europe/Istanbul", "Стамбул"), ("Europe/Moscow", "Москва"), ("Europe/Minsk", "Минск"), ("Europe/Kiev", "Киев"),
-        ("Asia/Dubai", "Дубай"), ("Asia/Karachi", "Карачи"), ("Asia/Kolkata", "Калькутта"),
-        ("Asia/Dhaka", "Дакка"), ("Asia/Bangkok", "Бангкок"), ("Asia/Singapore", "Сингапур"),
-        ("Asia/Hong_Kong", "Гонконг"), ("Asia/Shanghai", "Шанхай"), ("Asia/Taipei", "Тайбэй"),
-        ("Asia/Tokyo", "Токио"), ("Asia/Seoul", "Сеул"),
-        ("Australia/Sydney", "Сидней"), ("Australia/Melbourne", "Мельбурн"),
-        ("Australia/Perth", "Перт"),
-        ("Pacific/Auckland", "Окленд"),
-        ("America/New_York", "Нью-Йорк"), ("America/Chicago", "Чикаго"),
-        ("America/Denver", "Денвер"), ("America/Los_Angeles", "Лос-Анджелес"),
-        ("America/Toronto", "Торонто"), ("America/Vancouver", "Ванкувер"),
-        ("America/Mexico_City", "Мехико"), ("America/Sao_Paulo", "Сан-Паулу"),
-        ("America/Argentina/Buenos_Aires", "Буэнос-Айрес"), ("America/Bogota", "Богота"),
-        ("America/Lima", "Лима"),
-        ("Africa/Cairo", "Каир"), ("Africa/Lagos", "Лагос"),
-        ("Africa/Johannesburg", "Йоханнесбург"), ("Africa/Nairobi", "Найроби"),
+        ("Europe/London", LDesigner["TzLondon"]), ("Europe/Paris", LDesigner["TzParis"]), ("Europe/Berlin", LDesigner["TzBerlin"]),
+        ("Europe/Madrid", LDesigner["TzMadrid"]), ("Europe/Rome", LDesigner["TzRome"]), ("Europe/Amsterdam", LDesigner["TzAmsterdam"]),
+        ("Europe/Brussels", LDesigner["TzBrussels"]), ("Europe/Vienna", LDesigner["TzVienna"]), ("Europe/Warsaw", LDesigner["TzWarsaw"]),
+        ("Europe/Prague", LDesigner["TzPrague"]), ("Europe/Budapest", LDesigner["TzBudapest"]), ("Europe/Bucharest", LDesigner["TzBucharest"]),
+        ("Europe/Athens", LDesigner["TzAthens"]), ("Europe/Helsinki", LDesigner["TzHelsinki"]),
+        ("Europe/Istanbul", LDesigner["TzIstanbul"]), ("Europe/Moscow", LDesigner["TzMoscow"]), ("Europe/Minsk", LDesigner["TzMinsk"]), ("Europe/Kiev", LDesigner["TzKyiv"]),
+        ("Asia/Dubai", LDesigner["TzDubai"]), ("Asia/Karachi", LDesigner["TzKarachi"]), ("Asia/Kolkata", LDesigner["TzKolkata"]),
+        ("Asia/Dhaka", LDesigner["TzDhaka"]), ("Asia/Bangkok", LDesigner["TzBangkok"]), ("Asia/Singapore", LDesigner["TzSingapore"]),
+        ("Asia/Hong_Kong", LDesigner["TzHongKong"]), ("Asia/Shanghai", LDesigner["TzShanghai"]), ("Asia/Taipei", LDesigner["TzTaipei"]),
+        ("Asia/Tokyo", LDesigner["TzTokyo"]), ("Asia/Seoul", LDesigner["TzSeoul"]),
+        ("Australia/Sydney", LDesigner["TzSydney"]), ("Australia/Melbourne", LDesigner["TzMelbourne"]),
+        ("Australia/Perth", LDesigner["TzPerth"]),
+        ("Pacific/Auckland", LDesigner["TzAuckland"]),
+        ("America/New_York", LDesigner["TzNewYork"]), ("America/Chicago", LDesigner["TzChicago"]),
+        ("America/Denver", LDesigner["TzDenver"]), ("America/Los_Angeles", LDesigner["TzLosAngeles"]),
+        ("America/Toronto", LDesigner["TzToronto"]), ("America/Vancouver", LDesigner["TzVancouver"]),
+        ("America/Mexico_City", LDesigner["TzMexicoCity"]), ("America/Sao_Paulo", LDesigner["TzSaoPaulo"]),
+        ("America/Argentina/Buenos_Aires", LDesigner["TzBuenosAires"]), ("America/Bogota", LDesigner["TzBogota"]),
+        ("America/Lima", LDesigner["TzLima"]),
+        ("Africa/Cairo", LDesigner["TzCairo"]), ("Africa/Lagos", LDesigner["TzLagos"]),
+        ("Africa/Johannesburg", LDesigner["TzJohannesburg"]), ("Africa/Nairobi", LDesigner["TzNairobi"]),
     ];
 
     [Parameter] public Guid WorkflowId { get; set; }
@@ -102,11 +104,11 @@ public partial class WorkflowDesigner : IDisposable
     {
         get
         {
-            if (LastSavedAt == null) return "Не сохранено";
+            if (LastSavedAt == null) return LDesigner["NotSaved"];
             var diff = DateTime.UtcNow - LastSavedAt.Value;
-            if (diff.TotalMinutes < 1) return "Сохранено только что";
-            if (diff.TotalMinutes < 60) return $"Сохранено {(int)diff.TotalMinutes} мин назад";
-            return $"Сохранено {(int)diff.TotalHours} ч назад";
+            if (diff.TotalMinutes < 1) return LDesigner["SavedJustNow"];
+            if (diff.TotalMinutes < 60) return string.Format(LDesigner["SavedMinutesAgo"], (int)diff.TotalMinutes);
+            return string.Format(LDesigner["SavedHoursAgo"], (int)diff.TotalHours);
         }
     }
 
@@ -245,8 +247,8 @@ public partial class WorkflowDesigner : IDisposable
         OnWorkflowChanged();
     }
 
-    private static string GetFilterLogicLabel(string logic) =>
-        logic == "or" ? "Хотя бы одно условие (ИЛИ)" : "Все условия выполняются (И)";
+    private string GetFilterLogicLabel(string logic) =>
+        logic == "or" ? LDesigner["ConditionOrDescription"] : LDesigner["ConditionAndDescription"];
 
     private void SetFilterLogicAnd(TimerStartNodeData timerData)
     {
@@ -258,24 +260,24 @@ public partial class WorkflowDesigner : IDisposable
         if (timerData.ClientFilter != null) { timerData.ClientFilter.Logic = "or"; OnWorkflowChanged(); }
     }
 
-    private static readonly IReadOnlyList<(string Value, string Label)> FilterOperatorOptions = new List<(string, string)>
+    private IReadOnlyList<(string Value, string Label)> FilterOperatorOptions => new List<(string, string)>
     {
-        ("equals", "Равно (==)"),
-        ("notequals", "Не равно (!=)"),
-        ("contains", "Содержит"),
-        ("startswith", "Начинается с"),
-        ("endswith", "Заканчивается на"),
-        ("greaterThan", "Больше (>)"),
-        ("lessThan", "Меньше (<)"),
-        ("greaterOrEqual", "Больше или равно (\u2265)"),
-        ("lessOrEqual", "Меньше или равно (\u2264)"),
-        ("inList", "В списке"),
-        ("regex", "Регулярное выражение"),
-        ("isEmpty", "Пусто"),
-        ("isNotEmpty", "Не пусто"),
+        ("equals", LDesigner["EqualsLabel"]),
+        ("notequals", LDesigner["NotEqualsLabel"]),
+        ("contains", LDesigner["ContainsLabel"]),
+        ("startswith", LDesigner["StartsWithLabel"]),
+        ("endswith", LDesigner["EndsWithLabel"]),
+        ("greaterThan", LDesigner["GreaterThanLabel"]),
+        ("lessThan", LDesigner["LessThanLabel"]),
+        ("greaterOrEqual", LDesigner["GreaterOrEqualLabel"]),
+        ("lessOrEqual", LDesigner["LessOrEqualLabel"]),
+        ("inList", LDesigner["InListLabel"]),
+        ("regex", LDesigner["RegexLabel"]),
+        ("isEmpty", LDesigner["IsEmptyLabel"]),
+        ("isNotEmpty", LDesigner["IsNotEmptyLabel"]),
     };
 
-    private static string GetFilterOperatorLabel(string op) =>
+    private string GetFilterOperatorLabel(string op) =>
         FilterOperatorOptions.FirstOrDefault(o => o.Value == op).Label ?? op;
 
     private static string GetFilterOperatorBadgeClass(string op) => op switch
@@ -296,21 +298,21 @@ public partial class WorkflowDesigner : IDisposable
         _ => "bg-secondary"
     };
 
-    private static string GetFilterOperatorBadgeText(string op) => op switch
+    private string GetFilterOperatorBadgeText(string op) => op switch
     {
-        "equals" => "РАВНО",
-        "notequals" => "НЕ РАВНО",
-        "contains" => "СОДЕРЖИТ",
-        "startswith" => "НАЧИНАЕТСЯ С",
-        "endswith" => "ЗАКАНЧИВАЕТСЯ НА",
-        "greaterThan" => "БОЛЬШЕ (>)",
-        "lessThan" => "МЕНЬШЕ (<)",
-        "greaterOrEqual" => "БОЛЬШЕ ИЛИ РАВНО (\u2265)",
-        "lessOrEqual" => "МЕНЬШЕ ИЛИ РАВНО (\u2264)",
-        "inList" => "В СПИСКЕ",
-        "regex" => "РЕГУЛЯРНОЕ ВЫРАЖЕНИЕ",
-        "isEmpty" => "ПУСТО",
-        "isNotEmpty" => "НЕ ПУСТО",
+        "equals" => LDesigner["BadgeEquals"],
+        "notequals" => LDesigner["BadgeNotEquals"],
+        "contains" => LDesigner["BadgeContains"],
+        "startswith" => LDesigner["BadgeStartsWith"],
+        "endswith" => LDesigner["BadgeEndsWith"],
+        "greaterThan" => LDesigner["BadgeGreaterThan"],
+        "lessThan" => LDesigner["BadgeLessThan"],
+        "greaterOrEqual" => LDesigner["BadgeGreaterOrEqual"],
+        "lessOrEqual" => LDesigner["BadgeLessOrEqual"],
+        "inList" => LDesigner["BadgeInList"],
+        "regex" => LDesigner["BadgeRegex"],
+        "isEmpty" => LDesigner["BadgeIsEmpty"],
+        "isNotEmpty" => LDesigner["BadgeIsNotEmpty"],
         _ => op.ToUpperInvariant()
     };
 
@@ -329,11 +331,11 @@ public partial class WorkflowDesigner : IDisposable
         }
     }
 
-    private static string GetAttributeDisplayName(string key) => key?.ToLowerInvariant() switch
+    private string GetAttributeDisplayName(string key) => key?.ToLowerInvariant() switch
     {
-        "name" => "Имя",
+        "name" => LDesigner["VarNameLabel"],
         "username" => "Username",
-        "phone" => "Телефон",
+        "phone" => LDesigner["VarPhoneLabel"],
         "email" => "Email",
         _ => key ?? ""
     };
@@ -432,7 +434,7 @@ public partial class WorkflowDesigner : IDisposable
         var data = await ApiClient.GetWorkflowByIdAsync(WorkflowId);
         if (data == null)
         {
-            _loadError = "Workflow не найден.";
+            _loadError = LDesigner["WorkflowNotFound"];
             return;
         }
 
@@ -459,7 +461,7 @@ public partial class WorkflowDesigner : IDisposable
         }
         catch (Exception ex)
         {
-            _loadError = $"Не удалось загрузить схему: {ex.Message}";
+            _loadError = string.Format(LDesigner["LoadSchemaError"], ex.Message);
         }
     }
 
@@ -697,7 +699,7 @@ public partial class WorkflowDesigner : IDisposable
         }
         catch (Exception ex)
         {
-            await JSRuntime.InvokeVoidAsync("alert", $"Ошибка загрузки JSON: {ex.Message}");
+            await JSRuntime.InvokeVoidAsync("alert", string.Format(LDesigner["JsonLoadError"], ex.Message));
         }
     }
 
@@ -766,18 +768,18 @@ public partial class WorkflowDesigner : IDisposable
 
         var label = _draggedType.Value switch
         {
-            NodeType.Start => "Старт",
-            NodeType.End => "Конец",
-            NodeType.Message => "Сообщение",
-            NodeType.Ask => "Вопрос",
-            NodeType.Wait => "Задержка",
-            NodeType.WebhookWait => "Ожидание вебхука",
-            NodeType.SetAttribute => "Атрибут",
-            NodeType.HttpRequest => "API запрос",
-            NodeType.AIGenerate => "AI Текст",
-            NodeType.Media => "Медиа",
-            NodeType.SubWorkflow => "Процесс",
-            _ => "Блок"
+            NodeType.Start => LDesigner["NodeLabelStart"],
+            NodeType.End => LDesigner["NodeLabelEnd"],
+            NodeType.Message => LDesigner["NodeLabelMessage"],
+            NodeType.Ask => LDesigner["NodeLabelAsk"],
+            NodeType.Wait => LDesigner["NodeLabelWait"],
+            NodeType.WebhookWait => LDesigner["NodeLabelWebhookWait"],
+            NodeType.SetAttribute => LDesigner["NodeLabelSetAttribute"],
+            NodeType.HttpRequest => LDesigner["NodeLabelHttpRequest"],
+            NodeType.AIGenerate => LDesigner["NodeLabelAIGenerate"],
+            NodeType.Media => LDesigner["NodeLabelMedia"],
+            NodeType.SubWorkflow => LDesigner["NodeLabelSubWorkflow"],
+            _ => LDesigner["NodeLabelDefault"]
         };
 
         NodeData? initialData = _draggedType.Value switch
@@ -1204,11 +1206,11 @@ public partial class WorkflowDesigner : IDisposable
 
     #region Работа с переменными - Обнаружение
 
-    private static readonly List<(string Name, string Description)> GlobalAttributeVariables =
+    private List<(string Name, string Description)> GlobalAttributeVariables =>
     [
-        ("$global.name", "Имя"),
+        ("$global.name", LDesigner["VarNameLabel"]),
         ("$global.username", "Username"),
-        ("$global.phone", "Телефон"),
+        ("$global.phone", LDesigner["VarPhoneLabel"]),
         ("$global.email", "Email")
     ];
 
@@ -1248,7 +1250,7 @@ public partial class WorkflowDesigner : IDisposable
                 {
                     Name = name,
                     Type = VariableType.Custom,
-                    SourceNode = string.IsNullOrWhiteSpace(p.Description) ? "Входной параметр процесса" : p.Description
+                    SourceNode = string.IsNullOrWhiteSpace(p.Description) ? LDesigner["DefaultParamSource"] : p.Description
                 };
             }
         }
@@ -1331,7 +1333,7 @@ public partial class WorkflowDesigner : IDisposable
 
         foreach (var link in Diagram.Links.Cast<WorkflowLinkModel>())
         {
-            const string usageNode = "Условие на линке";
+            string usageNode = LDesigner["LinkConditionUsage"];
 
             TrackConditionVariables(link.Condition, variables, usageNode);
         }
@@ -1401,7 +1403,7 @@ public partial class WorkflowDesigner : IDisposable
         }
     }
 
-    private static IReadOnlyList<(string Key, string Display)> GetAutoVariablesForNode(WorkflowNodeModel node)
+    private IReadOnlyList<(string Key, string Display)> GetAutoVariablesForNode(WorkflowNodeModel node)
     {
         if (!Guid.TryParse(node.Id, out var id))
             return [];
@@ -1410,24 +1412,24 @@ public partial class WorkflowDesigner : IDisposable
         {
             "start" =>
             [
-                ($"$node.{id}.output", "Payload (старт)"),
-                ($"$node.{id}.messageKind", "Тип сообщения")
+                ($"$node.{id}.output", LDesigner["PayloadStart"]),
+                ($"$node.{id}.messageKind", LDesigner["MessageKind"])
             ],
             "ask" =>
             [
-                ($"$node.{id}.output", "Ответ пользователя"),
-                ($"$node.{id}.messageKind", "Тип сообщения")
+                ($"$node.{id}.output", LDesigner["UserResponse"]),
+                ($"$node.{id}.messageKind", LDesigner["MessageKind"])
             ],
-            "aigenerate" => [($"$node.{id}.output", "Результат AI"),
-                              ($"$node.{id}.statusCode", "Статус-код (statusCode)"),
-                              ($"$node.{id}.success", "Успех запроса (true/false)")],
-            "httprequest" => [($"$node.{id}.output", "Тело ответа (response body)"),
-                              ($"$node.{id}.statusCode", "Статус-код (statusCode)"),
-                              ($"$node.{id}.success", "Успех запроса (true/false)")],
+            "aigenerate" => [($"$node.{id}.output", LDesigner["AiResult"]),
+                              ($"$node.{id}.statusCode", LDesigner["StatusCode"]),
+                              ($"$node.{id}.success", LDesigner["RequestSuccess"])],
+            "httprequest" => [($"$node.{id}.output", LDesigner["ResponseBody"]),
+                              ($"$node.{id}.statusCode", LDesigner["StatusCode"]),
+                              ($"$node.{id}.success", LDesigner["RequestSuccess"])],
             "webhookwait" =>
             [
-                ($"$node.{id}.callbackUrl", "Ссылка для ответа (Callback URL)"),
-                ($"$node.{id}.output", "Тело ответа вебхука (response body)")
+                ($"$node.{id}.callbackUrl", LDesigner["CallbackUrl"]),
+                ($"$node.{id}.output", LDesigner["WebhookResponseBody"])
             ],
             _ => []
         };
@@ -1456,7 +1458,7 @@ public partial class WorkflowDesigner : IDisposable
             if (!Guid.TryParse(node.Id, out var id))
                 continue;
 
-            var title = node.Title ?? node.NodeType ?? "Блок";
+            var title = node.Title ?? node.NodeType ?? LDesigner["NodeLabelDefault"];
             _nodeTitleById[id] = title;
             var normalizedTitle = SanitizeNodeTitleForToken(title);
             if (!_nodeIdsByTitle.TryGetValue(normalizedTitle, out var list))
@@ -1601,15 +1603,15 @@ public partial class WorkflowDesigner : IDisposable
         return null;
     }
 
-    private static string SanitizeNodeTitleForToken(string title)
+    private string SanitizeNodeTitleForToken(string title)
     {
         if (string.IsNullOrWhiteSpace(title))
-            return "Блок";
+            return LDesigner["NodeLabelDefault"];
 
         var t = title.Trim();
         t = t.Replace("{", " ").Replace("}", " ").Replace("#", " ").Replace("\r", " ").Replace("\n", " ");
         t = Regex.Replace(t, @"\s+", " ").Trim();
-        return string.IsNullOrWhiteSpace(t) ? "Блок" : t;
+        return string.IsNullOrWhiteSpace(t) ? LDesigner["NodeLabelDefault"] : t;
     }
 
     private static void EnsureVariableExists(Dictionary<string, VariableInfo> variables, string varName)
@@ -1700,11 +1702,11 @@ public partial class WorkflowDesigner : IDisposable
 
         return filtered.GroupBy(v => v.Type switch
         {
-            VariableType.GlobalAttribute => "Атрибуты",
-            VariableType.System => "Системные",
-            VariableType.User => "Пользователь",
-            VariableType.Custom => "Переменные",
-            _ => "Другие"
+            VariableType.GlobalAttribute => LDesigner["VarTypeAttributes"].Value,
+            VariableType.System => LDesigner["VarTypeSystem"].Value,
+            VariableType.User => LDesigner["VarTypeUser"].Value,
+            VariableType.Custom => LDesigner["VarTypeCustom"].Value,
+            _ => LDesigner["VarTypeOther"].Value
         }).ToDictionary(g => g.Key, g => g.ToList());
     }
 
@@ -1717,10 +1719,10 @@ public partial class WorkflowDesigner : IDisposable
 
         return filtered.GroupBy(v => v.Type switch
         {
-            VariableType.System => "Системные",
-            VariableType.User => "Пользователь",
-            VariableType.Custom => "Переменные",
-            _ => "Другие"
+            VariableType.System => LDesigner["VarTypeSystem"].Value,
+            VariableType.User => LDesigner["VarTypeUser"].Value,
+            VariableType.Custom => LDesigner["VarTypeCustom"].Value,
+            _ => LDesigner["VarTypeOther"].Value
         }).ToDictionary(g => g.Key, g => g.ToList());
     }
 
@@ -1896,11 +1898,11 @@ public partial class WorkflowDesigner : IDisposable
 
         return filtered.GroupBy(v => v.Type switch
         {
-            VariableType.GlobalAttribute => "Атрибуты",
-            VariableType.System => "Системные",
-            VariableType.User => "Пользователь",
-            VariableType.Custom => "Параметры",
-            _ => "Другие"
+            VariableType.GlobalAttribute => LDesigner["VarTypeAttributes"].Value,
+            VariableType.System => LDesigner["VarTypeSystem"].Value,
+            VariableType.User => LDesigner["VarTypeUser"].Value,
+            VariableType.Custom => LDesigner["VarTypeParams"].Value,
+            _ => LDesigner["VarTypeOther"].Value
         }).ToDictionary(g => g.Key, g => g.OrderBy(x => x.Name).ToList());
     }
 
@@ -2062,20 +2064,20 @@ public partial class WorkflowDesigner : IDisposable
 
     private void OnDragStart(DragEventArgs e, NodeType type) => _draggedType = type;
 
-    private static readonly List<NodeToolItem> AllNodeTools =
+    private List<NodeToolItem> AllNodeTools =>
     [
-        new NodeToolItem("Логика", "Старт", NodeType.Start, NodeToolPaletteSvg.Start, "green"),
-        new NodeToolItem("Логика", "Таймер", NodeType.TimerStart, NodeToolPaletteSvg.TimerStart, "green"),
-        new NodeToolItem("Логика", "Ожидание", NodeType.Wait, NodeToolPaletteSvg.Wait, "blue"),
-        new NodeToolItem("Логика", "Ожидание вебхука", NodeType.WebhookWait, NodeToolPaletteSvg.WebhookWait, "blue"),
-        new NodeToolItem("Логика", "Процесс", NodeType.SubWorkflow, NodeToolPaletteSvg.SubWorkflow, "orange"),
-        new NodeToolItem("Логика", "Оператор", NodeType.TransferToOperator, NodeToolPaletteSvg.TransferToOperator, "teal"),
-        new NodeToolItem("Контент", "Сообщение", NodeType.Message, NodeToolPaletteSvg.Message, "indigo"),
-        new NodeToolItem("Контент", "Вопрос", NodeType.Ask, NodeToolPaletteSvg.Ask, "indigo"),
-        new NodeToolItem("Контент", "Медиа", NodeType.Media, NodeToolPaletteSvg.Media, "indigo"),
-        new NodeToolItem("AI и интеграции", "API Запрос", NodeType.HttpRequest, NodeToolPaletteSvg.HttpRequest, "violet"),
-        new NodeToolItem("AI и интеграции", "Атрибут", NodeType.SetAttribute, NodeToolPaletteSvg.SetAttribute, "violet"),
-        new NodeToolItem("AI и интеграции", "AI Текст", NodeType.AIGenerate, NodeToolPaletteSvg.AiGenerate, "violet"),
+        new NodeToolItem(LDesigner["SectionLogic"], LDesigner["NodeLabelStart"], NodeType.Start, NodeToolPaletteSvg.Start, "green"),
+        new NodeToolItem(LDesigner["SectionLogic"], LDesigner["NodeLabelTimer"], NodeType.TimerStart, NodeToolPaletteSvg.TimerStart, "green"),
+        new NodeToolItem(LDesigner["SectionLogic"], LDesigner["NodeLabelWait"], NodeType.Wait, NodeToolPaletteSvg.Wait, "blue"),
+        new NodeToolItem(LDesigner["SectionLogic"], LDesigner["NodeLabelWebhookWait"], NodeType.WebhookWait, NodeToolPaletteSvg.WebhookWait, "blue"),
+        new NodeToolItem(LDesigner["SectionLogic"], LDesigner["NodeLabelSubWorkflow"], NodeType.SubWorkflow, NodeToolPaletteSvg.SubWorkflow, "orange"),
+        new NodeToolItem(LDesigner["SectionLogic"], LDesigner["NodeLabelOperator"], NodeType.TransferToOperator, NodeToolPaletteSvg.TransferToOperator, "teal"),
+        new NodeToolItem(LDesigner["SectionContent"], LDesigner["NodeLabelMessage"], NodeType.Message, NodeToolPaletteSvg.Message, "indigo"),
+        new NodeToolItem(LDesigner["SectionContent"], LDesigner["NodeLabelAsk"], NodeType.Ask, NodeToolPaletteSvg.Ask, "indigo"),
+        new NodeToolItem(LDesigner["SectionContent"], LDesigner["NodeLabelMedia"], NodeType.Media, NodeToolPaletteSvg.Media, "indigo"),
+        new NodeToolItem(LDesigner["SectionAiIntegrations"], LDesigner["NodeLabelHttpRequest"], NodeType.HttpRequest, NodeToolPaletteSvg.HttpRequest, "violet"),
+        new NodeToolItem(LDesigner["SectionAiIntegrations"], LDesigner["NodeLabelSetAttribute"], NodeType.SetAttribute, NodeToolPaletteSvg.SetAttribute, "violet"),
+        new NodeToolItem(LDesigner["SectionAiIntegrations"], LDesigner["NodeLabelAIGenerate"], NodeType.AIGenerate, NodeToolPaletteSvg.AiGenerate, "violet"),
     ];
 
     private IEnumerable<NodeToolItem> GetFilteredNodeTools()
@@ -2095,7 +2097,7 @@ public partial class WorkflowDesigner : IDisposable
         if (type == "and")
         {
             link.Condition = new ConditionDefinition { And = [NewEmptyCondition()] };
-            link.Label = "И";
+            link.Label = LDesigner["AndLabel"];
             _conditionTypeDropdownOpen = false;
             StateHasChanged();
             return;
@@ -2103,7 +2105,7 @@ public partial class WorkflowDesigner : IDisposable
         if (type == "or")
         {
             link.Condition = new ConditionDefinition { Or = [NewEmptyCondition()] };
-            link.Label = "ИЛИ";
+            link.Label = LDesigner["OrLabel"];
             _conditionTypeDropdownOpen = false;
             StateHasChanged();
             return;
@@ -2127,19 +2129,19 @@ public partial class WorkflowDesigner : IDisposable
         };
         link.Label = type switch
         {
-            "equals" => "Равно",
-            "notEquals" => "Не равно",
-            "contains" => "Содержит",
-            "startsWith" => "Начинается с",
-            "endsWith" => "Заканчивается на",
-            "greaterThan" => "Больше",
-            "lessThan" => "Меньше",
+            "equals" => LDesigner["BadgeEquals"].Value,
+            "notEquals" => LDesigner["BadgeNotEquals"].Value,
+            "contains" => LDesigner["BadgeContains"].Value,
+            "startsWith" => LDesigner["BadgeStartsWith"].Value,
+            "endsWith" => LDesigner["BadgeEndsWith"].Value,
+            "greaterThan" => LDesigner["BadgeGreaterThan"].Value,
+            "lessThan" => LDesigner["BadgeLessThan"].Value,
             "greaterOrEqual" => "≥",
             "lessOrEqual" => "≤",
-            "inList" => "В списке",
+            "inList" => LDesigner["BadgeInList"].Value,
             "regex" => "Regex",
-            "isEmpty" => "Пусто",
-            "isNotEmpty" => "Не пусто",
+            "isEmpty" => LDesigner["BadgeIsEmpty"].Value,
+            "isNotEmpty" => LDesigner["BadgeIsNotEmpty"].Value,
             _ => ""
         };
         _conditionTypeDropdownOpen = false;
@@ -2193,7 +2195,7 @@ public partial class WorkflowDesigner : IDisposable
         if (link.Condition == null || link.Condition.IsComposite) return;
         var current = CloneCondition(link.Condition);
         link.Condition = new ConditionDefinition { And = [current, NewEmptyCondition()] };
-        link.Label = "И";
+        link.Label = LDesigner["AndLabel"];
         OnWorkflowChanged();
         StateHasChanged();
     }
@@ -2203,7 +2205,7 @@ public partial class WorkflowDesigner : IDisposable
         if (link.Condition == null || link.Condition.IsComposite) return;
         var current = CloneCondition(link.Condition);
         link.Condition = new ConditionDefinition { Or = [current, NewEmptyCondition()] };
-        link.Label = "ИЛИ";
+        link.Label = LDesigner["OrLabel"];
         OnWorkflowChanged();
         StateHasChanged();
     }
@@ -2292,39 +2294,39 @@ public partial class WorkflowDesigner : IDisposable
         return "equals";
     }
 
-    private static string GetConditionTypeDisplayLabel(WorkflowLinkModel link)
+    private string GetConditionTypeDisplayLabel(WorkflowLinkModel link)
     {
-        if (link.Condition == null) return "Без условия (Всегда)";
+        if (link.Condition == null) return LDesigner["AlwaysNoCondition"];
         if (link.Condition.And != null && link.Condition.And.Count > 0)
-            return $"И ({link.Condition.And.Count} условий)";
+            return string.Format(LDesigner["ConditionAndCount"], link.Condition.And.Count);
         if (link.Condition.Or != null && link.Condition.Or.Count > 0)
-            return $"ИЛИ ({link.Condition.Or.Count} условий)";
-        if (link.Condition.Equals != null) return "Равно (==)";
-        if (link.Condition.NotEquals != null) return "Не равно (!=)";
-        if (link.Condition.Contains != null) return "Содержит";
-        if (link.Condition.StartsWith != null) return "Начинается с";
-        if (link.Condition.EndsWith != null) return "Заканчивается на";
-        if (link.Condition.GreaterThan != null) return "Больше (>)";
-        if (link.Condition.LessThan != null) return "Меньше (<)";
-        if (link.Condition.GreaterOrEqual != null) return "Больше или равно (≥)";
-        if (link.Condition.LessOrEqual != null) return "Меньше или равно (≤)";
-        if (link.Condition.InList != null) return "В списке";
-        if (link.Condition.Regex != null) return "Регулярное выражение";
-        if (link.Condition.IsEmpty != null) return "Пусто";
-        if (link.Condition.IsNotEmpty != null) return "Не пусто";
-        return "Без условия (Всегда)";
+            return string.Format(LDesigner["ConditionOrCount"], link.Condition.Or.Count);
+        if (link.Condition.Equals != null) return LDesigner["EqualsLabel"];
+        if (link.Condition.NotEquals != null) return LDesigner["NotEqualsLabel"];
+        if (link.Condition.Contains != null) return LDesigner["ContainsLabel"];
+        if (link.Condition.StartsWith != null) return LDesigner["StartsWithLabel"];
+        if (link.Condition.EndsWith != null) return LDesigner["EndsWithLabel"];
+        if (link.Condition.GreaterThan != null) return LDesigner["GreaterThanLabel"];
+        if (link.Condition.LessThan != null) return LDesigner["LessThanLabel"];
+        if (link.Condition.GreaterOrEqual != null) return LDesigner["GreaterOrEqualLabel"];
+        if (link.Condition.LessOrEqual != null) return LDesigner["LessOrEqualLabel"];
+        if (link.Condition.InList != null) return LDesigner["InListLabel"];
+        if (link.Condition.Regex != null) return LDesigner["RegexLabel"];
+        if (link.Condition.IsEmpty != null) return LDesigner["IsEmptyLabel"];
+        if (link.Condition.IsNotEmpty != null) return LDesigner["IsNotEmptyLabel"];
+        return LDesigner["AlwaysNoCondition"];
     }
 
-    public static readonly IReadOnlyList<(string Value, string Label)> IncomingMessageKindSelectOptions =
+    public IReadOnlyList<(string Value, string Label)> IncomingMessageKindSelectOptions =>
     [
-        ("Text", "Текст"),
-        ("Photo", "Фото"),
-        ("Video", "Видео"),
-        ("Audio", "Аудио"),
-        ("Voice", "Голосовое"),
-        ("Document", "Документ"),
-        ("Sticker", "Стикер"),
-        ("Unknown", "Неизвестно"),
+        ("Text", LDesigner["MediaText"]),
+        ("Photo", LDesigner["MediaPhoto"]),
+        ("Video", LDesigner["MediaVideo"]),
+        ("Audio", LDesigner["MediaAudio"]),
+        ("Voice", LDesigner["MediaVoice"]),
+        ("Document", LDesigner["MediaDocument"]),
+        ("Sticker", LDesigner["MediaSticker"]),
+        ("Unknown", LDesigner["MediaUnknown"]),
     ];
 
     private bool IsMessageKindLeftOperand(string? left)
@@ -2346,24 +2348,24 @@ public partial class WorkflowDesigner : IDisposable
                string.Equals(pm.Groups["key"].Value, "messageKind", StringComparison.OrdinalIgnoreCase);
     }
 
-    private static readonly IReadOnlyList<(string Value, string Label)> ConditionTypeOptions = new List<(string, string)>
+    private IReadOnlyList<(string Value, string Label)> ConditionTypeOptions => new List<(string, string)>
     {
-        ("none", "Без условия (Всегда)"),
-        ("equals", "Равно (==)"),
-        ("notEquals", "Не равно (!=)"),
-        ("contains", "Содержит"),
-        ("startsWith", "Начинается с"),
-        ("endsWith", "Заканчивается на"),
-        ("greaterThan", "Больше (>)"),
-        ("lessThan", "Меньше (<)"),
-        ("greaterOrEqual", "Больше или равно (≥)"),
-        ("lessOrEqual", "Меньше или равно (≤)"),
-        ("inList", "В списке"),
-        ("regex", "Регулярное выражение"),
-        ("isEmpty", "Пусто"),
-        ("isNotEmpty", "Не пусто"),
-        ("and", "И (несколько условий)"),
-        ("or", "ИЛИ (несколько условий)")
+        ("none", LDesigner["AlwaysNoCondition"]),
+        ("equals", LDesigner["EqualsLabel"]),
+        ("notEquals", LDesigner["NotEqualsLabel"]),
+        ("contains", LDesigner["ContainsLabel"]),
+        ("startsWith", LDesigner["StartsWithLabel"]),
+        ("endsWith", LDesigner["EndsWithLabel"]),
+        ("greaterThan", LDesigner["GreaterThanLabel"]),
+        ("lessThan", LDesigner["LessThanLabel"]),
+        ("greaterOrEqual", LDesigner["GreaterOrEqualLabel"]),
+        ("lessOrEqual", LDesigner["LessOrEqualLabel"]),
+        ("inList", LDesigner["InListLabel"]),
+        ("regex", LDesigner["RegexLabel"]),
+        ("isEmpty", LDesigner["IsEmptyLabel"]),
+        ("isNotEmpty", LDesigner["IsNotEmptyLabel"]),
+        ("and", LDesigner["AndOperatorLabel"]),
+        ("or", LDesigner["OrOperatorLabel"])
     };
 
     private void OpenAiModal()

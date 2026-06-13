@@ -5,19 +5,20 @@
 @attribute [Authorize]
 
 @inject ICompanyApiClient CompanyApi
+@inject IStringLocalizer<Members> LMembers
 
-<PageTitle>Настройки — Участники — ChatFoundry</PageTitle>
+<PageTitle>@LMembers["PageTitle"] — ChatFoundry</PageTitle>
 
 <div class="settings-page-header">
     <div>
         <h1 class="settings-page-title">
-            Участники
+            @LMembers["HeaderTitle"]
             @if (!isLoading && members.Any())
             {
                 <span class="members-count">@members.Count</span>
             }
         </h1>
-        <p class="settings-page-subtitle">Управление участниками вашей компании</p>
+        <p class="settings-page-subtitle">@LMembers["HeaderSubtitle"]</p>
     </div>
 </div>
 
@@ -28,7 +29,7 @@
         <span>@loadError</span>
     </div>
 }
-else if (isLoading)
+@if (isLoading)
 {
     <div class="settings-spinner-wrap">
         <div class="settings-spinner"></div>
@@ -40,8 +41,8 @@ else if (!members.Any())
         <div class="settings-empty-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
         </div>
-        <div class="settings-empty-title">Нет участников</div>
-        <div class="settings-empty-desc">Пригласите участников в компанию через раздел «Приглашения».</div>
+        <div class="settings-empty-title">@LMembers["NoMembersTitle"]</div>
+        <div class="settings-empty-desc">@LMembers["NoMembersDesc"]</div>
     </div>
 }
 else
@@ -50,9 +51,9 @@ else
         <table class="settings-table">
             <thead>
             <tr>
-                <th>Участник</th>
-                <th>Роль</th>
-                <th>Статус</th>
+                <th>@LMembers["ThMember"]</th>
+                <th>@LMembers["ThRole"]</th>
+                <th>@LMembers["ThStatus"]</th>
             </tr>
             </thead>
             <tbody>
@@ -75,12 +76,12 @@ else
                         {
                             <span class="member-status member-status-active">
                                 <span class="member-status-dot"></span>
-                                Активен
+                                @LMembers["StatusActive"]
                             </span>
                         }
                         else
                         {
-                            <span class="member-status member-status-inactive">Неактивен</span>
+                            <span class="member-status member-status-inactive">@LMembers["StatusInactive"]</span>
                         }
                     </td>
                 </tr>
@@ -125,11 +126,11 @@ else
         _ => "settings-badge-neutral"
     };
 
-    private static string RoleLabel(string? role) => role?.ToUpperInvariant() switch
+    private string RoleLabel(string? role) => role?.ToUpperInvariant() switch
     {
-        "OWNER" => "Владелец",
-        "ADMIN" => "Админ",
-        "MEMBER" => "Участник",
+        "OWNER" => LMembers["RoleOwner"],
+        "ADMIN" => LMembers["RoleAdmin"],
+        "MEMBER" => LMembers["RoleMember"],
         _ => role ?? "—"
     };
 }

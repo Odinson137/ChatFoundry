@@ -23,6 +23,7 @@ var services = builder.Services;
 
 services.AddHttpContextAccessor();
 services.AddGrpc();
+services.AddLocalization();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -130,6 +131,13 @@ var app = builder.Build();
 app.UseChatFoundryObservability();
 
 app.UseRouting();
+
+var supportedCultures = new[] { "ru-RU", "en-US" };
+app.UseRequestLocalization(new RequestLocalizationOptions()
+    .SetDefaultCulture("ru-RU")
+    .AddSupportedCultures(supportedCultures)
+    .AddSupportedUICultures(supportedCultures));
+
 app.UseAuthentication();
 app.UseAuthorization();
 

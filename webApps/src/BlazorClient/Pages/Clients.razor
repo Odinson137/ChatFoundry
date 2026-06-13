@@ -3,14 +3,15 @@
 @attribute [Authorize]
 @inject IClientApiClient ClientApi
 @inject NavigationManager Navigation
+@inject IStringLocalizer<Clients> LClients
 
-<PageTitle>Клиенты</PageTitle>
+<PageTitle>@LClients["PageTitle"]</PageTitle>
 
 <div class="clients-page">
     <!-- Header -->
     <div class="clients-header">
         <div class="clients-header-left">
-            <h1 class="clients-title">Клиенты</h1>
+            <h1 class="clients-title">@LClients["PageTitle"]</h1>
             @if (!isLoading && totalCount > 0)
             {
                 <span class="clients-count">@totalCount</span>
@@ -27,7 +28,7 @@
             </svg>
             <input type="text"
                    class="clients-search"
-                   placeholder="Поиск по имени, телефону, почте..."
+                   placeholder="@LClients["SearchPlaceholder"]"
                    @bind="searchText"
                    @bind:event="oninput"
                    @bind:after="OnSearchChanged" />
@@ -43,7 +44,7 @@
 
         <div class="clients-filter-wrap">
             <select class="clients-filter" @bind="selectedChannel" @bind:after="OnFilterChanged">
-                <option value="">Все каналы</option>
+                <option value="">@LClients["FilterAllChannels"]</option>
                 <option value="TELEGRAM">Telegram</option>
                 <option value="WEB">Web</option>
                 <option value="WHATSAPP">WhatsApp</option>
@@ -58,14 +59,14 @@
     {
         <div class="clients-loading">
             <div class="clients-spinner"></div>
-            <p>Загрузка клиентов...</p>
+            <p>@LClients["Loading"]</p>
         </div>
     }
     else if (!string.IsNullOrEmpty(error))
     {
         <div class="clients-error">
             <p>@error</p>
-            <button class="clients-btn clients-btn-primary" @onclick="LoadClients">Повторить</button>
+            <button class="clients-btn clients-btn-primary" @onclick="LoadClients">@LClients["Retry"]</button>
         </div>
     }
     else if (clients.Count == 0)
@@ -77,15 +78,15 @@
                 <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
                 <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
             </svg>
-            <p class="clients-empty-title">Клиенты не найдены</p>
+            <p class="clients-empty-title">@LClients["EmptyTitle"]</p>
             <p class="clients-empty-desc">
                 @if (!string.IsNullOrEmpty(searchText) || !string.IsNullOrEmpty(selectedChannel))
                 {
-                    <span>Попробуйте изменить параметры поиска или фильтры</span>
+                    <span>@LClients["EmptyDescFiltered"]</span>
                 }
                 else
                 {
-                    <span>Клиенты появятся здесь после первого взаимодействия с ботом</span>
+                    <span>@LClients["EmptyDescDefault"]</span>
                 }
             </p>
         </div>
@@ -98,25 +99,25 @@
                 <thead>
                     <tr>
                         <th class="clients-th clients-th-sortable" @onclick='() => ToggleSort("displayName")'>
-                            Имя
+                            @LClients["ThName"]
                             @if (sortField == "displayName")
                             {
                                 <span class="clients-sort-arrow">@(sortDirection == "ASC" ? "\u2191" : "\u2193")</span>
                             }
                         </th>
-                        <th class="clients-th">Каналы</th>
-                        <th class="clients-th">Контакт</th>
-                        <th class="clients-th">Телефон</th>
-                        <th class="clients-th">Почта</th>
+                        <th class="clients-th">@LClients["ThChannels"]</th>
+                        <th class="clients-th">@LClients["ThContact"]</th>
+                        <th class="clients-th">@LClients["ThPhone"]</th>
+                        <th class="clients-th">@LClients["ThEmail"]</th>
                         <th class="clients-th clients-th-sortable" @onclick='() => ToggleSort("createdAt")'>
-                            Создан
+                            @LClients["ThCreated"]
                             @if (sortField == "createdAt")
                             {
                                 <span class="clients-sort-arrow">@(sortDirection == "ASC" ? "\u2191" : "\u2193")</span>
                             }
                         </th>
                         <th class="clients-th clients-th-sortable" @onclick='() => ToggleSort("modifiedAt")'>
-                            Активность
+                            @LClients["ThActivity"]
                             @if (sortField == "modifiedAt")
                             {
                                 <span class="clients-sort-arrow">@(sortDirection == "ASC" ? "\u2191" : "\u2193")</span>
@@ -168,12 +169,12 @@
         <div class="clients-pagination">
             <div class="clients-pagination-info">
                 <span class="clients-muted">
-                    Показано @clients.Count из @totalCount
+                    @string.Format(LClients["PaginationShown"].Value, clients.Count, totalCount)
                 </span>
             </div>
 
             <div class="clients-pagination-controls">
-                <label class="clients-muted">Размер:</label>
+                <label class="clients-muted">@LClients["PaginationSize"]</label>
                 <select class="clients-page-size" @bind="pageSize" @bind:after="OnPageSizeChanged">
                     <option value="10">10</option>
                     <option value="25">25</option>
@@ -247,7 +248,7 @@
         }
         catch (Exception ex)
         {
-            error = $"Не удалось загрузить клиентов: {ex.Message}";
+            error = string.Format(LClients["LoadError"].Value, ex.Message);
         }
         finally
         {

@@ -7,8 +7,9 @@
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ILocalStorageService LocalStorage
+@inject IStringLocalizer<Login> LLogin
 
-<PageTitle>Вход — ChatFoundry</PageTitle>
+<PageTitle>@LLogin["PageTitle"] — ChatFoundry</PageTitle>
 
 <div class="login-page">
     <div class="login-card">
@@ -28,13 +29,13 @@
             </svg>
         </div>
 
-        <h1 class="login-title">Войти в ChatFoundry</h1>
-        <p class="login-subtitle">Введите данные для входа в аккаунт</p>
+        <h1 class="login-title">@LLogin["Title"]</h1>
+        <p class="login-subtitle">@LLogin["Subtitle"]</p>
 
         @if (showConfirmedMessage)
         {
             <div class="login-error" style="background: #ecfdf5; border-color: #10b981; color: #065f46;">
-                <span>Почта подтверждена. Войдите в аккаунт.</span>
+                <span>@LLogin["ConfirmedMessage"]</span>
             </div>
         }
 
@@ -53,7 +54,7 @@
             {
                 <div class="login-resend-wrap">
                     <button type="button" class="login-resend-link" @onclick="ResendConfirmation" disabled="@resendSent">
-                        @if (resendSent) { <span>Письмо отправлено</span> } else { <span>Отправить письмо снова</span> }
+                        @if (resendSent) { <span>@LLogin["EmailSent"]</span> } else { <span>@LLogin["ResendEmail"]</span> }
                     </button>
                 </div>
             }
@@ -62,7 +63,7 @@
         <!-- Form -->
         <div class="login-form">
             <div class="login-field">
-                <label class="login-label" for="email">Email</label>
+                <label class="login-label" for="email">@LLogin["LabelEmail"]</label>
                 <div class="login-input-wrap">
                     <svg class="login-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="2" y="4" width="20" height="16" rx="2"/>
@@ -78,7 +79,7 @@
             </div>
 
             <div class="login-field">
-                <label class="login-label" for="password">Пароль</label>
+                <label class="login-label" for="password">@LLogin["LabelPassword"]</label>
                 <div class="login-input-wrap">
                     <svg class="login-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="11" width="18" height="11" rx="2"/>
@@ -87,12 +88,12 @@
                     <input id="password"
                            type="password"
                            class="login-input"
-                           placeholder="Введите пароль"
+                           placeholder="@LLogin["PlaceholderPassword"]"
                            @bind="password"
                            @onkeydown="OnKeyDown" />
                 </div>
                 <div class="login-resend-wrap" style="margin-top: 6px;">
-                    <a href="/forgot-password" class="login-resend-link" style="text-decoration: underline;">Забыли пароль?</a>
+                    <a href="/forgot-password" class="login-resend-link" style="text-decoration: underline;">@LLogin["ForgotPassword"]</a>
                 </div>
             </div>
 
@@ -103,7 +104,7 @@
                 }
                 else
                 {
-                    <span>Войти</span>
+                    <span>@LLogin["BtnSignIn"]</span>
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-left: 6px;">
                         <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
@@ -112,8 +113,8 @@
         </div>
 
         <div class="login-footer">
-            <span>Нет аккаунта?</span>
-            <a href="/register">Зарегистрироваться</a>
+            <span>@LLogin["NoAccount"]</span>
+            <a href="/register">@LLogin["SignUp"]</a>
         </div>
     </div>
 </div>
@@ -182,25 +183,25 @@
                     var errJson = System.Text.Json.JsonSerializer.Deserialize<TokenErrorResponse>(body);
                     if (errJson?.Error == "email_not_confirmed")
                     {
-                        error = errJson.ErrorDescription ?? "Подтвердите адрес почты. Не пришло письмо?";
+                        error = errJson.ErrorDescription ?? LLogin["EmailNotConfirmed"];
                         showResendButton = true;
                     }
                     else
                     {
-                        error = errJson?.ErrorDescription ?? (string.IsNullOrWhiteSpace(body) ? "Ошибка аутентификации. Проверьте логин и пароль." : body);
+                        error = errJson?.ErrorDescription ?? (string.IsNullOrWhiteSpace(body) ? LLogin["AuthError"] : body);
                     }
                 }
                 catch
                 {
                     error = string.IsNullOrWhiteSpace(body)
-                        ? "Ошибка аутентификации. Проверьте логин и пароль."
+                        ? LLogin["AuthError"]
                         : body;
                 }
             }
         }
         catch (Exception ex)
         {
-            error = "Не удалось подключиться к серверу. Пожалуйста, попробуйте позже.";
+            error = LLogin["ConnectionError"];
             Console.WriteLine(ex.Message);
         }
         finally

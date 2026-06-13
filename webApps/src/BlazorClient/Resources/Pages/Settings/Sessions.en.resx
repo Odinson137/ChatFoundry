@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="0" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  
+  <data name="PageTitle" xml:space="preserve">
+    <value>Settings — Sessions</value>
+  </data>
+  <data name="HeaderTitle" xml:space="preserve">
+    <value>Sessions</value>
+  </data>
+  <data name="HeaderSubtitle" xml:space="preserve">
+    <value>View user interactions with bots</value>
+  </data>
+  <data name="NoSessions" xml:space="preserve">
+    <value>No sessions</value>
+  </data>
+  <data name="NoSessionsDesc" xml:space="preserve">
+    <value>Sessions will appear when users start interacting with bots.</value>
+  </data>
+  <data name="ClientIdPlaceholder" xml:space="preserve">
+    <value>Client ID</value>
+  </data>
+  <data name="AllStatuses" xml:space="preserve">
+    <value>All statuses</value>
+  </data>
+  <data name="StatusActive" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="StatusCompleted" xml:space="preserve">
+    <value>Completed</value>
+  </data>
+  <data name="StatusFailed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+  <data name="StatusCancelled" xml:space="preserve">
+    <value>Cancelled</value>
+  </data>
+  <data name="AllBots" xml:space="preserve">
+    <value>All bots</value>
+  </data>
+  <data name="Refresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="Created" xml:space="preserve">
+    <value>Created</value>
+  </data>
+  <data name="CompletedLabel" xml:space="preserve">
+    <value>Completed</value>
+  </data>
+  <data name="NotFound" xml:space="preserve">
+    <value>Nothing found</value>
+  </data>
+  <data name="ChangeFilters" xml:space="preserve">
+    <value>Change filters or search query</value>
+  </data>
+  <data name="ColClient" xml:space="preserve">
+    <value>Client</value>
+  </data>
+  <data name="ColBot" xml:space="preserve">
+    <value>Bot</value>
+  </data>
+  <data name="ColChannel" xml:space="preserve">
+    <value>Channel</value>
+  </data>
+  <data name="ColStatus" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ColSteps" xml:space="preserve">
+    <value>Steps</value>
+  </data>
+  <data name="ColCreated" xml:space="preserve">
+    <value>Created</value>
+  </data>
+  <data name="BtnPath" xml:space="preserve">
+    <value>Path</value>
+  </data>
+  <data name="ShownCountOfTotal" xml:space="preserve">
+    <value>Showing {0} of {1}</value>
+  </data>
+  <data name="OnPage" xml:space="preserve">
+    <value>Items per page:</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="LoadError" xml:space="preserve">
+    <value>Failed to load sessions: {0}</value>
+  </data>
+  <data name="StatusActiveSingular" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="StatusCompletedSingular" xml:space="preserve">
+    <value>Completed</value>
+  </data>
+  <data name="StatusFailedSingular" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+  <data name="StatusCancelledSingular" xml:space="preserve">
+    <value>Cancelled</value>
+  </data>
+</root>

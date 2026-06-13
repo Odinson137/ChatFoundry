@@ -192,14 +192,14 @@ public class NotificationApiClient(HttpClient http) : INotificationApiClient
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         var gqlResponse = JsonSerializer.Deserialize<GraphQLResponse<T>>(jsonString, options);
         if (gqlResponse == null)
-            throw new InvalidOperationException("Сервер вернул пустой ответ.");
+            throw new InvalidOperationException("Server returned an empty response.");
 
         var firstError = gqlResponse.Errors?.Select(e => e.Message).FirstOrDefault(m => !string.IsNullOrWhiteSpace(m));
         if (!string.IsNullOrWhiteSpace(firstError))
             throw new InvalidOperationException(firstError);
 
         if (gqlResponse.Data == null)
-            throw new InvalidOperationException("Не удалось обработать ответ сервера.");
+            throw new InvalidOperationException("Failed to process server response.");
 
         return gqlResponse.Data;
     }

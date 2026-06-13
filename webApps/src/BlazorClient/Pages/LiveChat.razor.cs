@@ -4,6 +4,7 @@ using BlazorClient.Interfaces;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.Extensions.Localization;
 using Microsoft.JSInterop;
 
 namespace BlazorClient.Pages;
@@ -14,6 +15,7 @@ public partial class LiveChat : IDisposable
     [Inject] private IClientApiClient ClientApi { get; set; } = null!;
     [Inject] private IFileApiClient FileApi { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
+    [Inject] private IStringLocalizer<LiveChat> LChat { get; set; } = null!;
     [SupplyParameterFromQuery(Name = "chatId")]
     private Guid? ChatId { get; set; }
 
@@ -119,7 +121,7 @@ public partial class LiveChat : IDisposable
             var msg = ex.Message;
             if (msg.Contains("not in queue", StringComparison.OrdinalIgnoreCase))
             {
-                conflictError = "Этот чат уже обрабатывается другим оператором.";
+                conflictError = LChat["ChatAlreadyTaken"].Value;
                 // Refresh list to reflect current state
                 await LoadChats();
             }
@@ -245,7 +247,7 @@ public partial class LiveChat : IDisposable
 
                 if (uploadResult == null)
                 {
-                    sendError = "Не удалось загрузить файл";
+                    sendError = LChat["FailedToUploadFile"].Value;
                     return;
                 }
 
@@ -281,8 +283,8 @@ public partial class LiveChat : IDisposable
         }
         catch
         {
-            sendError = hasFile ? "Не удалось отправить файл" : "Не удалось отправить сообщение";
-            messages.Add(new ChatMessage("(ошибка отправки)", false, DateTime.UtcNow, "TEXT"));
+            sendError = hasFile ? LChat["FailedToSendFile"].Value : LChat["FailedToSendMessage"].Value;
+            messages.Add(new ChatMessage(LChat["SendErrorLabel"].Value, false, DateTime.UtcNow, "TEXT"));
         }
         finally
         {
@@ -299,7 +301,7 @@ public partial class LiveChat : IDisposable
         const long maxFileSize = 20 * 1024 * 1024;
         if (file.Size > maxFileSize)
         {
-            sendError = "Файл превышает 20 МБ.";
+            sendError = LChat["FileTooLarge"].Value;
             return;
         }
 
@@ -471,12 +473,12 @@ public partial class LiveChat : IDisposable
         return chat.ExternalUserId?.Length > 0 ? chat.ExternalUserId[..1].ToUpper() : "?";
     }
 
-    private static string FormatDateSeparator(DateTime date)
+    private string FormatDateSeparator(DateTime date)
     {
         var localDate = date.ToLocalTime().Date;
         var today = DateTime.Today;
-        if (localDate == today) return "Сегодня";
-        if (localDate == today.AddDays(-1)) return "Вчера";
+        if (localDate == today) return LChat["DateToday"].Value;
+        if (localDate == today.AddDays(-1)) return LChat["DateYesterday"].Value;
         return localDate.ToString("dd MMMM yyyy");
     }
 
@@ -485,16 +487,18 @@ public partial class LiveChat : IDisposable
 
     private static readonly System.Text.RegularExpressions.Regex JsonPayloadRegex = new(@"^\s*\{.*""\s*:\s*""", System.Text.RegularExpressions.RegexOptions.Compiled);
 
-    private static readonly Dictionary<string, string> PreviewTranslations = new(StringComparer.OrdinalIgnoreCase)
-    {
-        { "Transferring to operator...", "Перевод на оператора..." },
-        { "Transferring to operator", "Перевод на оператора" },
-    };
 
-    private static string FormatPreview(string? preview) =>
-        string.IsNullOrWhiteSpace(preview) ? "" :
-        PreviewTranslations.TryGetValue(preview.Trim(), out var translated) ? translated :
-        JsonPayloadRegex.IsMatch(preview) ? "\U0001F4CE Файл" : preview;
+
+    private string FormatPreview(string? preview)
+    {
+        if (string.IsNullOrWhiteSpace(preview)) return "";
+        var trimmed = preview.Trim();
+        if (trimmed.Equals("Transferring to operator...", StringComparison.OrdinalIgnoreCase))
+            return LChat["TransferToOperatorDots"].Value;
+        if (trimmed.Equals("Transferring to operator", StringComparison.OrdinalIgnoreCase))
+            return LChat["TransferToOperator"].Value;
+        return JsonPayloadRegex.IsMatch(preview) ? LChat["FilePreviewLabel"].Value : preview;
+    }
 
     private RenderFragment RenderMessages(List<ChatMessage> msgs, LiveChatSessionDto chat)
     {
@@ -546,7 +550,7 @@ public partial class LiveChat : IDisposable
                 {
                     builder.OpenElement(60, "div");
                     builder.AddAttribute(61, "class", "cd-msg-avatar cd-msg-avatar-bot");
-                    builder.AddAttribute(62, "title", "Оператор");
+                    builder.AddAttribute(62, "title", LChat["OperatorLabel"].Value);
                     builder.AddContent(63, "O");
                     builder.CloseElement();
                 }

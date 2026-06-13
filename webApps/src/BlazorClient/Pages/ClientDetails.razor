@@ -8,29 +8,30 @@
 @inject INotificationApiClient NotificationApi
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
+@inject IStringLocalizer<ClientDetails> LCDetails
 
-<PageTitle>@(client != null ? GetDisplayName(client) : "Клиент")</PageTitle>
+<PageTitle>@(client != null ? GetDisplayName(client) : LCDetails["PageTitleDefault"].Value)</PageTitle>
 
 <div class="cd-page">
     @if (isLoading)
     {
         <div class="cd-loading">
             <div class="cd-spinner"></div>
-            <p>Загрузка...</p>
+            <p>@LCDetails["Loading"]</p>
         </div>
     }
     else if (!string.IsNullOrEmpty(error))
     {
         <div class="cd-error">
             <p>@error</p>
-            <button class="cd-btn cd-btn-primary" @onclick="LoadClient">Повторить</button>
+            <button class="cd-btn cd-btn-primary" @onclick="LoadClient">@LCDetails["Retry"]</button>
         </div>
     }
     else if (client != null)
     {
         <!-- Breadcrumb -->
         <nav class="cd-breadcrumb">
-            <a href="/clients" class="cd-breadcrumb-link">Клиенты</a>
+            <a href="/clients" class="cd-breadcrumb-link">@LCDetails["BreadcrumbList"]</a>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
             <span class="cd-breadcrumb-current">@GetDisplayName(client)</span>
         </nav>
@@ -47,11 +48,11 @@
                     <div class="cd-info-meta">
                         <span class="cd-meta-item">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-                            Создан @client.CreatedAt.ToString("dd.MM.yyyy HH:mm")
+                            @string.Format(LCDetails["CreatedText"].Value, client.CreatedAt.ToString("dd.MM.yyyy HH:mm"))
                         </span>
                         <span class="cd-meta-item">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg>
-                            Обновлён @client.ModifiedAt.ToString("dd.MM.yyyy HH:mm")
+                            @string.Format(LCDetails["ModifiedText"].Value, client.ModifiedAt.ToString("dd.MM.yyyy HH:mm"))
                         </span>
                         @if (!string.IsNullOrWhiteSpace(GetFirstPhone(client)) && GetFirstPhone(client) != "—")
                         {
@@ -74,7 +75,7 @@
 
         <!-- Channels Section -->
         <div class="cd-section">
-            <h2 class="cd-section-title">Каналы <span class="cd-count-badge">@client.ClientChannels.Count</span></h2>
+            <h2 class="cd-section-title">@LCDetails["ChannelsTitle"] <span class="cd-count-badge">@client.ClientChannels.Count</span></h2>
             <div class="cd-channels-grid">
                 @foreach (var ch in client.ClientChannels)
                 {
@@ -84,7 +85,7 @@
                                 <span class="cd-badge cd-badge-@(ch.Channel.ToLowerInvariant())">@ch.Channel</span>
                                 <span class="cd-muted">@ch.ExternalUserId</span>
                             </div>
-                            <button class="cd-channel-edit-btn" @onclick="() => OpenEditChannel(ch)" title="Редактировать атрибуты">
+                            <button class="cd-channel-edit-btn" @onclick="() => OpenEditChannel(ch)" title="@LCDetails["EditChannelTooltip"]">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                             </button>
                         </div>
@@ -92,40 +93,40 @@
                             @if (!string.IsNullOrEmpty(ch.Name) || !string.IsNullOrEmpty(ch.LastName))
                             {
                                 <div class="cd-field">
-                                    <span class="cd-field-label">Имя</span>
+                                    <span class="cd-field-label">@LCDetails["LabelName"]</span>
                                     <span>@ch.Name @ch.LastName</span>
                                 </div>
                             }
                             @if (!string.IsNullOrEmpty(ch.Username))
                             {
                                 <div class="cd-field">
-                                    <span class="cd-field-label">Username</span>
+                                    <span class="cd-field-label">@LCDetails["LabelUsername"]</span>
                                     <span>@@@ch.Username</span>
                                 </div>
                             }
                             @if (!string.IsNullOrEmpty(ch.Phone))
                             {
                                 <div class="cd-field">
-                                    <span class="cd-field-label">Телефон</span>
+                                    <span class="cd-field-label">@LCDetails["LabelPhone"]</span>
                                     <span>@ch.Phone</span>
                                 </div>
                             }
                             @if (!string.IsNullOrEmpty(ch.Email))
                             {
                                 <div class="cd-field">
-                                    <span class="cd-field-label">Email</span>
+                                    <span class="cd-field-label">@LCDetails["LabelEmail"]</span>
                                     <span>@ch.Email</span>
                                 </div>
                             }
                             <div class="cd-field">
-                                <span class="cd-field-label">Подключён</span>
+                                <span class="cd-field-label">@LCDetails["LabelConnected"]</span>
                                 <span>@ch.CreatedAt.ToString("dd.MM.yyyy HH:mm")</span>
                             </div>
                         </div>
                         @if (ch.Attributes.Count > 0)
                         {
                             <div class="cd-attrs">
-                                <span class="cd-field-label">Атрибуты</span>
+                                <span class="cd-field-label">@LCDetails["LabelAttributes"]</span>
                                 <div class="cd-attr-list">
                                     @foreach (var attr in ch.Attributes)
                                     {
@@ -142,7 +143,7 @@
                                 <span class="cd-spinner cd-spinner-sm"></span>
                             }
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                            Открыть чат
+                            @LCDetails["BtnOpenChat"]
                         </button>
                     </div>
                 }
@@ -154,7 +155,7 @@
             <div class="cd-column-right">
         <!-- Chat Section -->
         <div class="cd-section cd-section-chat">
-            <h2 class="cd-section-title">Сообщения</h2>
+            <h2 class="cd-section-title">@LCDetails["MessagesTitle"]</h2>
 
             @if (client.ClientChannels.Count > 1)
             {
@@ -181,7 +182,7 @@
             {
                 <div class="cd-loading cd-loading-sm">
                     <div class="cd-spinner"></div>
-                    <p>Загрузка сообщений...</p>
+                    <p>@LCDetails["LoadingMessages"]</p>
                 </div>
             }
             else if (messages.Count == 0 && selectedChannelId != Guid.Empty)
@@ -190,7 +191,7 @@
                     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/>
                     </svg>
-                    <p>Сообщений пока нет</p>
+                    <p>@LCDetails["NoMessagesYet"]</p>
                 </div>
             }
             else if (selectedChannelId != Guid.Empty)
@@ -202,14 +203,14 @@
                             @if (isLoadingMoreMessages)
                             {
                                 <div class="cd-spinner cd-spinner-sm"></div>
-                                <span class="cd-muted cd-text-sm">Загрузка...</span>
+                                <span class="cd-muted cd-text-sm">@LCDetails["Loading"]</span>
                             }
                             else
                             {
                                 <button type="button" class="cd-btn cd-btn-ghost" @onclick="LoadMoreMessages">
-                                    Загрузить старые сообщения
+                                    @LCDetails["LoadMoreMessages"]
                                 </button>
-                                <span class="cd-muted cd-text-sm">@messageTotalCount сообщений · или прокрутите вверх</span>
+                                <span class="cd-muted cd-text-sm">@string.Format(LCDetails["MessagesCountDesc"].Value, messageTotalCount)</span>
                             }
                         </div>
                     }
@@ -220,10 +221,10 @@
                         var msgDate = msg.CreatedAt.Date;
                         @if (lastDate == null || lastDate != msgDate)
                         {
-                            lastDate = msgDate;
                             <div class="cd-chat-date-sep">
                                 <span>@FormatDateSeparator(msgDate)</span>
                             </div>
+                            lastDate = msgDate;
                         }
 
                         var isOutgoing = msg.Direction.Equals("OUTGOING", StringComparison.OrdinalIgnoreCase);
@@ -238,7 +239,7 @@
                             </div>
                             @if (isOutgoing)
                             {
-                                <div class="cd-msg-avatar cd-msg-avatar-bot" title="Бот">B</div>
+                                <div class="cd-msg-avatar cd-msg-avatar-bot" title="@LCDetails["BotAvatarTooltip"]">B</div>
                             }
                         </div>
                     }
@@ -248,7 +249,7 @@
             else
             {
                 <div class="cd-empty-chat">
-                    <p>Выберите канал для просмотра сообщений</p>
+                    <p>@LCDetails["SelectChannelPrompt"]</p>
                 </div>
             }
         </div>
@@ -357,7 +358,7 @@
 
             if (client == null)
             {
-                error = "Клиент не найден";
+                error = LCDetails["ClientNotFound"].Value;
             }
             else if (client.ClientChannels.Count > 0)
             {
@@ -366,7 +367,7 @@
         }
         catch (Exception ex)
         {
-            error = $"Не удалось загрузить данные: {ex.Message}";
+            error = string.Format(LCDetails["LoadDataError"].Value, ex.Message);
         }
         finally
         {
@@ -405,7 +406,7 @@
         }
         catch (Exception ex)
         {
-            error = $"Не удалось загрузить сообщения: {ex.Message}";
+            error = string.Format(LCDetails["LoadMessagesError"].Value, ex.Message);
         }
         finally
         {
@@ -444,7 +445,7 @@
         }
         catch (Exception ex)
         {
-            error = $"Ошибка загрузки: {ex.Message}";
+            error = string.Format(LCDetails["LoadMoreError"].Value, ex.Message);
         }
         finally
         {
@@ -458,7 +459,7 @@
         }
     }
 
-    private static string GetDisplayName(ClientDto c)
+    private string GetDisplayName(ClientDto c)
     {
         var ch = c.ClientChannels.FirstOrDefault();
         if (ch != null)
@@ -468,7 +469,7 @@
             if (!string.IsNullOrWhiteSpace(ch.Username)) return "@" + ch.Username;
         }
         if (!string.IsNullOrWhiteSpace(c.DisplayName)) return c.DisplayName;
-        return "Без имени";
+        return LCDetails["UnnamedClient"].Value;
     }
 
     private static string GetFirstPhone(ClientDto client)
@@ -498,11 +499,11 @@
         return "?";
     }
 
-    private static string FormatDateSeparator(DateTime date)
+    private string FormatDateSeparator(DateTime date)
     {
         var today = DateTime.UtcNow.Date;
-        if (date == today) return "Сегодня";
-        if (date == today.AddDays(-1)) return "Вчера";
+        if (date == today) return LCDetails["TodayDateSep"].Value;
+        if (date == today.AddDays(-1)) return LCDetails["YesterdayDateSep"].Value;
         return date.ToString("dd MMMM yyyy");
     }
 
@@ -512,9 +513,9 @@
         try
         {
             var sourceChannelId = channel.ChannelId
-                ?? throw new InvalidOperationException("Для выбранного канала не найден source ChannelId.");
+                ?? throw new InvalidOperationException("Source ChannelId not found for the selected channel.");
             if (string.IsNullOrWhiteSpace(channel.ExternalUserId))
-                throw new InvalidOperationException("Для выбранного канала не найден ExternalUserId.");
+                throw new InvalidOperationException("ExternalUserId not found for the selected channel.");
 
             var session = await NotificationApi.StartProactiveChatAsync(
                 channel.ExternalUserId,

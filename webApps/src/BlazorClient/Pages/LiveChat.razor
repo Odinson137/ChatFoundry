@@ -20,15 +20,15 @@
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                 </svg>
-                <p>Нет активных чатов</p>
-                <span class="cf-lc-empty-hint">Новые чаты появятся здесь автоматически</span>
+                <p>@LChat["NoActiveChats"]</p>
+                <span class="cf-lc-empty-hint">@LChat["EmptySidebarHint"]</span>
             </div>
         }
 
         @if (State.QueuedChats.Count > 0)
         {
             <div class="cf-lc-section-label">
-                <span>Очередь</span>
+                <span>@LChat["Queue"]</span>
                 <span class="cf-lc-count-badge">@State.QueuedChats.Count</span>
             </div>
             @foreach (var chat in State.QueuedChats)
@@ -40,12 +40,12 @@
                             <span class="cf-lc-item-name">@(chat.ClientFirstName ?? chat.ClientUserName ?? chat.ExternalUserId)</span>
                             <span class="cf-lc-item-time">@FormatShortTime(chat.CreatedAt)</span>
                         </div>
-                        <div class="cf-lc-item-preview">@(FormatPreview(chat.LastMessagePreview) is "" ? "Новый запрос" : FormatPreview(chat.LastMessagePreview))</div>
+                        <div class="cf-lc-item-preview">@(FormatPreview(chat.LastMessagePreview) is "" ? LChat["NewRequest"].Value : FormatPreview(chat.LastMessagePreview))</div>
                         <div class="cf-lc-item-footer">
                             <span class="cf-lc-badge cf-lc-badge-@(chat.Channel.ToLowerInvariant())">@chat.Channel</span>
                         </div>
                     </div>
-                    <button class="cf-lc-take-btn" title="Взять чат">
+                    <button class="cf-lc-take-btn" title="@LChat["TakeChatTooltip"]">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </button>
                 </div>
@@ -55,7 +55,7 @@
         @if (State.MyChats.Count > 0)
         {
             <div class="cf-lc-section-label">
-                <span>Мои чаты</span>
+                <span>@LChat["MyChats"]</span>
                 <span class="cf-lc-count-badge">@State.MyChats.Count</span>
             </div>
             @foreach (var chat in State.MyChats)
@@ -73,7 +73,7 @@
                             <span class="cf-lc-badge cf-lc-badge-@(chat.Channel.ToLowerInvariant())">@chat.Channel</span>
                             @if (chat.BotName != null)
                             {
-                                <span class="cf-lc-item-bot">бот: @chat.BotName</span>
+                                <span class="cf-lc-item-bot">@string.Format(LChat["BotLabel"].Value, chat.BotName)</span>
                             }
                         </div>
                     </div>
@@ -96,9 +96,9 @@
                             <line x1="12" x2="12.01" y1="16" y2="16"/>
                         </svg>
                     </div>
-                    <h3 class="cf-lc-conflict-title">Чат недоступен</h3>
+                    <h3 class="cf-lc-conflict-title">@LChat["ChatUnavailableTitle"]</h3>
                     <p class="cf-lc-conflict-text">@conflictError</p>
-                    <button class="cf-lc-conflict-btn" @onclick="DismissConflictError">Понятно</button>
+                    <button class="cf-lc-conflict-btn" @onclick="DismissConflictError">@LChat["CloseModal"]</button>
                 </div>
             </div>
         }
@@ -122,14 +122,14 @@
                             <span class="cf-lc-badge cf-lc-badge-@(selectedChat.Channel.ToLowerInvariant()) cf-lc-badge-sm">@selectedChat.Channel</span>
                             @if (selectedChat.BotName != null)
                             {
-                                <span class="cf-lc-header-bot">бот: @selectedChat.BotName</span>
+                                <span class="cf-lc-header-bot">@string.Format(LChat["BotLabel"].Value, selectedChat.BotName)</span>
                             }
                         </div>
                     </div>
                 </div>
                 <button class="cf-lc-close-btn" @onclick="CloseChat">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                    Завершить чат
+                    @LChat["FinishChat"]
                 </button>
             </div>
 
@@ -139,7 +139,7 @@
                 {
                     <div class="cf-lc-loading-messages">
                         <div class="cf-lc-spinner"></div>
-                        <p>Загрузка сообщений...</p>
+                        <p>@LChat["LoadingMessages"]</p>
                     </div>
                 }
                 else if (messages.Count == 0)
@@ -148,7 +148,7 @@
                         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/>
                         </svg>
-                        <p>Начните диалог</p>
+                        <p>@LChat["StartConversation"]</p>
                     </div>
                 }
                 else
@@ -177,7 +177,7 @@
                             </svg>
                             <span class="cf-lc-attachment-name">@_selectedFileName</span>
                         </div>
-                        <button class="cf-lc-attachment-remove" @onclick="ClearAttachment" title="Удалить">
+                        <button class="cf-lc-attachment-remove" @onclick="ClearAttachment" title="@LChat["DeleteTooltip"]">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
                             </svg>
@@ -185,7 +185,7 @@
                     </div>
                 }
                 <div class="cf-lc-input">
-                    <label class="cf-lc-attach-btn" title="Прикрепить файл">
+                    <label class="cf-lc-attach-btn" title="@LChat["AttachFileTooltip"]">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
                         </svg>
@@ -195,7 +195,7 @@
                               @ref="_inputField"
                               @oninput="HandleTextInput"
                               @onkeydown="OnKeyDown"
-                              placeholder="Введите сообщение..."
+                              placeholder="@LChat["InputPlaceholder"]"
                               rows="1"
                               disabled="@isSending" />
                     <button class="cf-lc-send-btn" @onclick="SendMessage"
@@ -221,8 +221,8 @@
                 <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                 </svg>
-                <h3>Выберите чат</h3>
-                <p>Возьмите чат из очереди или выберите из активных</p>
+                <h3>@LChat["SelectChatTitle"]</h3>
+                <p>@LChat["SelectChatDesc"]</p>
             </div>
         }
     </div>

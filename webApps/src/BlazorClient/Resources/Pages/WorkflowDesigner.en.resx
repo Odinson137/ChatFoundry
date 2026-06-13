@@ -1,0 +1,783 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xs:element name="root" ns1:IsDataSet="true">
+      <xs:complexType>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="metadata">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" />
+              </xs:sequence>
+              <xs:attribute name="name" use="required" type="xsd:string" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="assembly">
+            <xs:complexType>
+              <xs:attribute name="alias" type="xsd:string" />
+              <xs:attribute name="name" type="xsd:string" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="0" />
+                <xs:element name="comment" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" ns1:Ordinal="1" />
+              <xs:attribute name="type" type="xsd:string" ns1:Ordinal="3" />
+              <xs:attribute name="mimetype" type="xsd:string" ns1:Ordinal="4" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="resheader">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="0" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="PageTitle" xml:space="preserve">
+    <value>Workflow Designer</value>
+  </data>
+  <data name="SearchNodesPlaceholder" xml:space="preserve">
+    <value>Search nodes...</value>
+  </data>
+  <data name="LogicSectionTitle" xml:space="preserve">
+    <value>Logic</value>
+  </data>
+  <data name="ContentSectionTitle" xml:space="preserve">
+    <value>Content</value>
+  </data>
+  <data name="AiIntegrationsSectionTitle" xml:space="preserve">
+    <value>AI &amp; Integrations</value>
+  </data>
+  <data name="EditorTitle" xml:space="preserve">
+    <value>Workflow Designer</value>
+  </data>
+  <data name="TooltipUndo" xml:space="preserve">
+    <value>Undo</value>
+  </data>
+  <data name="TooltipRedo" xml:space="preserve">
+    <value>Redo</value>
+  </data>
+  <data name="VariablesBtnTooltip" xml:space="preserve">
+    <value>Attributes and parameters</value>
+  </data>
+  <data name="VariablesBtn" xml:space="preserve">
+    <value>Attributes &amp; Parameters</value>
+  </data>
+  <data name="SchemaBtnTooltip" xml:space="preserve">
+    <value>Export / import Schema</value>
+  </data>
+  <data name="SchemaBtn" xml:space="preserve">
+    <value>Schema</value>
+  </data>
+  <data name="DownloadSchema" xml:space="preserve">
+    <value>Download</value>
+  </data>
+  <data name="UploadSchema" xml:space="preserve">
+    <value>Upload</value>
+  </data>
+  <data name="AiGenerateBtnTooltip" xml:space="preserve">
+    <value>Generate schema using AI</value>
+  </data>
+  <data name="SaveBtnTooltip" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="SaveBtn" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="ZoomOutTooltip" xml:space="preserve">
+    <value>Zoom Out</value>
+  </data>
+  <data name="ZoomInTooltip" xml:space="preserve">
+    <value>Zoom In</value>
+  </data>
+  <data name="SettingsHeader" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="LabelTitle" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="LabelMessageText" xml:space="preserve">
+    <value>Message text</value>
+  </data>
+  <data name="VarHintMessage" xml:space="preserve">
+    <value>Enter @ to select a variable. Or {0}</value>
+  </data>
+  <data name="LabelQuestionText" xml:space="preserve">
+    <value>Question text</value>
+  </data>
+  <data name="LabelButtons" xml:space="preserve">
+    <value>Buttons (sent under the message)</value>
+  </data>
+  <data name="PlaceholderBtnText" xml:space="preserve">
+    <value>Button text</value>
+  </data>
+  <data name="TooltipRemove" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="AddBtn" xml:space="preserve">
+    <value>Add button</value>
+  </data>
+  <data name="BtnHintText" xml:space="preserve">
+    <value>When clicked, this text goes into the variable. If there are no buttons, any input is expected.</value>
+  </data>
+  <data name="LabelAttrKey" xml:space="preserve">
+    <value>Attribute key</value>
+  </data>
+  <data name="SelectAttrPlaceholder" xml:space="preserve">
+    <value>— Select attribute —</value>
+  </data>
+  <data name="AttrHintText" xml:space="preserve">
+    <value>List of company attributes (Company → Attributes) and basic ones: name, username, phone, email</value>
+  </data>
+  <data name="LabelValue" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="PlaceholderValTemplate" xml:space="preserve">
+    <value>Text or {0}</value>
+  </data>
+  <data name="AttrValueHint" xml:space="preserve">
+    <value>Variables can be used in the template</value>
+  </data>
+  <data name="LabelMethod" xml:space="preserve">
+    <value>Method</value>
+  </data>
+  <data name="LabelBodyText" xml:space="preserve">
+    <value>Request body (Body)</value>
+  </data>
+  <data name="LabelHeaders" xml:space="preserve">
+    <value>Headers</value>
+  </data>
+  <data name="TooltipHeaderVal" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="TooltipRemoveHeader" xml:space="preserve">
+    <value>Remove header</value>
+  </data>
+  <data name="TooltipInsertVar" xml:space="preserve">
+    <value>Insert variable</value>
+  </data>
+  <data name="AddHeaderBtn" xml:space="preserve">
+    <value>Add header</value>
+  </data>
+  <data name="LabelContinueOnError" xml:space="preserve">
+    <value>Continue on error</value>
+  </data>
+  <data name="HintContinueOnError" xml:space="preserve">
+    <value>If disabled, the session will terminate on request error.</value>
+  </data>
+  <data name="LabelAiPrompt" xml:space="preserve">
+    <value>Prompt for AI</value>
+  </data>
+  <data name="HintAiPrompt" xml:space="preserve">
+    <value>Describe what AI should do. Use {0} variables.</value>
+  </data>
+  <data name="LabelAiContext" xml:space="preserve">
+    <value>Include chat context</value>
+  </data>
+  <data name="HintAiContext" xml:space="preserve">
+    <value>AI will receive the message history of the current dialog.</value>
+  </data>
+  <data name="HintAiContinueOnError" xml:space="preserve">
+    <value>If disabled, the session will terminate on AI request error.</value>
+  </data>
+  <data name="LabelUploadFile" xml:space="preserve">
+    <value>Upload file</value>
+  </data>
+  <data name="HintUploadFile" xml:space="preserve">
+    <value>The file will be uploaded to storage, its ID will be linked to the block.</value>
+  </data>
+  <data name="StoragePickerLink" xml:space="preserve">
+    <value>storage</value>
+  </data>
+  <data name="StoragePickerPrefix" xml:space="preserve">
+    <value>Or choose from</value>
+  </data>
+  <data name="LabelCurrentFileKey" xml:space="preserve">
+    <value>Current key (File ID)</value>
+  </data>
+  <data name="PlaceholderFileId" xml:space="preserve">
+    <value>File ID or {0}</value>
+  </data>
+  <data name="HintFileId" xml:space="preserve">
+    <value>Variables can be used (e.g., {0}).</value>
+  </data>
+  <data name="LabelCaption" xml:space="preserve">
+    <value>Caption</value>
+  </data>
+  <data name="PlaceholderCaption" xml:space="preserve">
+    <value>Optional</value>
+  </data>
+  <data name="LabelCalledProcess" xml:space="preserve">
+    <value>Called process</value>
+  </data>
+  <data name="BtnChange" xml:space="preserve">
+    <value>Change</value>
+  </data>
+  <data name="SelectedProcessText" xml:space="preserve">
+    <value>Process selected</value>
+  </data>
+  <data name="BtnSelectProcess" xml:space="preserve">
+    <value>Select process</value>
+  </data>
+  <data name="LabelInputParams" xml:space="preserve">
+    <value>Input parameters</value>
+  </data>
+  <data name="InputParamsHint" xml:space="preserve">
+    <value>Bind child process parameters to current process variables or values ({0} allowed).</value>
+  </data>
+  <data name="PlaceholderInputParam" xml:space="preserve">
+    <value>{0} or value</value>
+  </data>
+  <data name="EmptyInputParams" xml:space="preserve">
+    <value>The selected process has no input parameters. Set them in the "Parameters" tab in that process settings.</value>
+  </data>
+  <data name="LabelOutputParams" xml:space="preserve">
+    <value>Output parameters</value>
+  </data>
+  <data name="OutputParamsHint" xml:space="preserve">
+    <value>Specify which variable of the current process to write the child process result to (left - variable, right - child parameter).</value>
+  </data>
+  <data name="PlaceholderOutputParamLocal" xml:space="preserve">
+    <value>variable</value>
+  </data>
+  <data name="PlaceholderOutputParamChild" xml:space="preserve">
+    <value>child parameter</value>
+  </data>
+  <data name="EmptyOutputParams" xml:space="preserve">
+    <value>The selected process has no output parameters. Set them in the "Parameters" tab in that process settings.</value>
+  </data>
+  <data name="LabelDuration" xml:space="preserve">
+    <value>Duration</value>
+  </data>
+  <data name="UnitSeconds" xml:space="preserve">
+    <value>Seconds</value>
+  </data>
+  <data name="UnitMinutes" xml:space="preserve">
+    <value>Minutes</value>
+  </data>
+  <data name="UnitHours" xml:space="preserve">
+    <value>Hours</value>
+  </data>
+  <data name="UnitDays" xml:space="preserve">
+    <value>Days</value>
+  </data>
+  <data name="HintDuration" xml:space="preserve">
+    <value>Variables can be used, e.g., {0}</value>
+  </data>
+  <data name="LabelTimeout" xml:space="preserve">
+    <value>Wait timeout (seconds)</value>
+  </data>
+  <data name="PlaceholderInfinite" xml:space="preserve">
+    <value>0 = infinite</value>
+  </data>
+  <data name="HintTimeout" xml:space="preserve">
+    <value>After the specified time, the script will continue along the timeout branch.</value>
+  </data>
+  <data name="WaitWebhookHint" xml:space="preserve">
+    <value>To return to the script, use the address format:</value>
+  </data>
+  <data name="WaitWebhookBaseUrl" xml:space="preserve">
+    <value>[base-url] — base URL of your server</value>
+  </data>
+  <data name="WaitWebhookBotId" xml:space="preserve">
+    <value>botId — unique bot ID</value>
+  </data>
+  <data name="WaitWebhookClientId" xml:space="preserve">
+    <value>clientId — unique external user ID</value>
+  </data>
+  <data name="WaitWebhookChannel" xml:space="preserve">
+    <value>channel — communication channel (e.g., telegram)</value>
+  </data>
+  <data name="LabelScheduleType" xml:space="preserve">
+    <value>Schedule type</value>
+  </data>
+  <data name="OptionOneTime" xml:space="preserve">
+    <value>One-time</value>
+  </data>
+  <data name="OptionCron" xml:space="preserve">
+    <value>By schedule (Cron)</value>
+  </data>
+  <data name="LabelDateTime" xml:space="preserve">
+    <value>Date and time</value>
+  </data>
+  <data name="LabelCronExpr" xml:space="preserve">
+    <value>Cron expression</value>
+  </data>
+  <data name="HintCronExpr" xml:space="preserve">
+    <value>Example: {0} — every day at 10:00</value>
+  </data>
+  <data name="LabelTimezone" xml:space="preserve">
+    <value>Timezone</value>
+  </data>
+  <data name="LabelClientFilter" xml:space="preserve">
+    <value>Client filter</value>
+  </data>
+  <data name="HintClientFilter" xml:space="preserve">
+    <value>Leave empty for all company clients, or add filtering conditions.</value>
+  </data>
+  <data name="HeaderChannels" xml:space="preserve">
+    <value>Channels</value>
+  </data>
+  <data name="LabelAttrConditions" xml:space="preserve">
+    <value>Attribute conditions</value>
+  </data>
+  <data name="LabelConditionIdx" xml:space="preserve">
+    <value>Condition {0}</value>
+  </data>
+  <data name="LabelKey" xml:space="preserve">
+    <value>Key</value>
+  </data>
+  <data name="AttrValLabel" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="AttrValListLabel" xml:space="preserve">
+    <value>Values separated by commas</value>
+  </data>
+  <data name="AttrValRegexLabel" xml:space="preserve">
+    <value>Pattern (regex)</value>
+  </data>
+  <data name="AttrValPlaceholderList" xml:space="preserve">
+    <value>a, b, c</value>
+  </data>
+  <data name="AttrValPlaceholderRegex" xml:space="preserve">
+    <value>\\d+</value>
+  </data>
+  <data name="AttrValPlaceholderNormal" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="HintEnterAt" xml:space="preserve">
+    <value>Enter @ to select a variable</value>
+  </data>
+  <data name="LabelIgnoreCase" xml:space="preserve">
+    <value>Ignore case</value>
+  </data>
+  <data name="BtnAddCondition" xml:space="preserve">
+    <value>Add condition</value>
+  </data>
+  <data name="HeaderTransitionLogic" xml:space="preserve">
+    <value>Transition logic</value>
+  </data>
+  <data name="LabelConditionType" xml:space="preserve">
+    <value>Condition type</value>
+  </data>
+  <data name="ConditionAllTrue" xml:space="preserve">
+    <value>All conditions are met (AND)</value>
+  </data>
+  <data name="ConditionAnyTrue" xml:space="preserve">
+    <value>At least one condition (OR)</value>
+  </data>
+  <data name="LabelType" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="LabelVariable" xml:space="preserve">
+    <value>Variable</value>
+  </data>
+  <data name="BtnAddSubCondition" xml:space="preserve">
+    <value>Add condition</value>
+  </data>
+  <data name="BadgeEquals" xml:space="preserve">
+    <value>EQUALS</value>
+  </data>
+  <data name="BadgeNotEquals" xml:space="preserve">
+    <value>NOT EQUALS</value>
+  </data>
+  <data name="BadgeContains" xml:space="preserve">
+    <value>CONTAINS</value>
+  </data>
+  <data name="BadgeStartsWith" xml:space="preserve">
+    <value>STARTS WITH</value>
+  </data>
+  <data name="BadgeEndsWith" xml:space="preserve">
+    <value>ENDS WITH</value>
+  </data>
+  <data name="BadgeGreaterThan" xml:space="preserve">
+    <value>GREATER THAN (&gt;)</value>
+  </data>
+  <data name="BadgeLessThan" xml:space="preserve">
+    <value>LESS THAN (&lt;)</value>
+  </data>
+  <data name="BadgeInList" xml:space="preserve">
+    <value>IN LIST</value>
+  </data>
+  <data name="BadgeRegex" xml:space="preserve">
+    <value>REGEX</value>
+  </data>
+  <data name="BadgeIsEmpty" xml:space="preserve">
+    <value>EMPTY</value>
+  </data>
+  <data name="BadgeIsNotEmpty" xml:space="preserve">
+    <value>NOT EMPTY</value>
+  </data>
+  <data name="LabelCombineConditions" xml:space="preserve">
+    <value>Combine conditions:</value>
+  </data>
+  <data name="LabelLineText" xml:space="preserve">
+    <value>Text on line</value>
+  </data>
+  <data name="PlaceholderYesNo" xml:space="preserve">
+    <value>Yes / No</value>
+  </data>
+  <data name="BtnDelete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="ModalVariablesTitle" xml:space="preserve">
+    <value>Attributes and parameters</value>
+  </data>
+  <data name="ModalVariablesClose" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="TabAttributes" xml:space="preserve">
+    <value>Attributes</value>
+  </data>
+  <data name="TabParameters" xml:space="preserve">
+    <value>Parameters</value>
+  </data>
+  <data name="EmptyAttributes" xml:space="preserve">
+    <value>Attributes are configured in Company → Attributes.</value>
+  </data>
+  <data name="ParametersHint1" xml:space="preserve">
+    <value>Process parameters are defined here. When calling this process from a "Process" node in another workflow, you can only bind these parameters to variables.</value>
+  </data>
+  <data name="ParametersHint2" xml:space="preserve">
+    <value>In the same process, substitute the parameter value in any node (Message, Question, Variable, Condition, etc.): click the variable selection button next to the field or enter {0} manually (e.g. {1}).</value>
+  </data>
+  <data name="HeaderInputParams" xml:space="preserve">
+    <value>Input parameters</value>
+  </data>
+  <data name="BtnAdd" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="EmptyInputParamsModal" xml:space="preserve">
+    <value>No input parameters. Add parameters with name and description.</value>
+  </data>
+  <data name="PlaceholderParamName" xml:space="preserve">
+    <value>Name (e.g. user_query)</value>
+  </data>
+  <data name="PlaceholderDefaultValue" xml:space="preserve">
+    <value>Default value</value>
+  </data>
+  <data name="PlaceholderDescription" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="HeaderOutputParams" xml:space="preserve">
+    <value>Output parameters</value>
+  </data>
+  <data name="EmptyOutputParamsModal" xml:space="preserve">
+    <value>No output parameters. Add parameters with name and description.</value>
+  </data>
+  <data name="PlaceholderParamNameOutput" xml:space="preserve">
+    <value>Name (e.g. result)</value>
+  </data>
+  <data name="ModalVarPickerTitle" xml:space="preserve">
+    <value>Select Variable</value>
+  </data>
+  <data name="ModalVarPickerClose" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="VarPickerSearchPlaceholder" xml:space="preserve">
+    <value>Search blocks and variables...</value>
+  </data>
+  <data name="VarPickerCategoryBlocks" xml:space="preserve">
+    <value>Blocks</value>
+  </data>
+  <data name="EmptyBlocksTitle" xml:space="preserve">
+    <value>No blocks</value>
+  </data>
+  <data name="EmptyBlocksSub" xml:space="preserve">
+    <value>Add blocks to the schema</value>
+  </data>
+  <data name="BtnBack" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="VarPickerSearchVarsPlaceholder" xml:space="preserve">
+    <value>Search block variables...</value>
+  </data>
+  <data name="EmptyVarsTitle" xml:space="preserve">
+    <value>This block has no variables</value>
+  </data>
+  <data name="EmptyVarsSub" xml:space="preserve">
+    <value>Select another block</value>
+  </data>
+  <data name="VarPickerHint" xml:space="preserve">
+    <value>Click on a variable to insert it into the current node.</value>
+  </data>
+  <data name="ModalStoragePickerTitle" xml:space="preserve">
+    <value>Storage Files</value>
+  </data>
+  <data name="StoragePickerSubtitle" xml:space="preserve">
+    <value>Select a file for the block or search by name and ID</value>
+  </data>
+  <data name="StoragePickerSearchPlaceholder" xml:space="preserve">
+    <value>Search by name or ID...</value>
+  </data>
+  <data name="BtnSearch" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="LoadingList" xml:space="preserve">
+    <value>Loading list...</value>
+  </data>
+  <data name="EmptyStorageTitle" xml:space="preserve">
+    <value>No files in storage</value>
+  </data>
+  <data name="EmptyStorageSub" xml:space="preserve">
+    <value>Upload a file using the "Upload file" field in the block settings</value>
+  </data>
+  <data name="StorageNotFoundTitle" xml:space="preserve">
+    <value>Nothing found</value>
+  </data>
+  <data name="StorageNotFoundSub" xml:space="preserve">
+    <value>Modify your query or reset the filter</value>
+  </data>
+  <data name="ColFileName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ColCreated" xml:space="preserve">
+    <value>Created</value>
+  </data>
+  <data name="BtnSelect" xml:space="preserve">
+    <value>Select</value>
+  </data>
+  <data name="StorageCountLabel" xml:space="preserve">
+    <value>Shown {0} of {1}</value>
+  </data>
+  <data name="TooltipPrevPage" xml:space="preserve">
+    <value>Previous page</value>
+  </data>
+  <data name="TooltipNextPage" xml:space="preserve">
+    <value>Next page</value>
+  </data>
+  <data name="BtnClose" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="ModalProcessPickerTitle" xml:space="preserve">
+    <value>Select Process</value>
+  </data>
+  <data name="ProcessPickerSearchPlaceholder" xml:space="preserve">
+    <value>Search by bot name...</value>
+  </data>
+  <data name="BtnSearchProcess" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="LoadingProcess" xml:space="preserve">
+    <value>Loading...</value>
+  </data>
+  <data name="EmptyProcessesTitle" xml:space="preserve">
+    <value>No processes</value>
+  </data>
+  <data name="EmptyProcessesSub" xml:space="preserve">
+    <value>Add processes in bot settings</value>
+  </data>
+
+  
+  <data name="NotSaved" xml:space="preserve">
+    <value>Not saved</value>
+  </data>
+  <data name="SavedJustNow" xml:space="preserve">
+    <value>Saved just now</value>
+  </data>
+  <data name="SavedMinutesAgo" xml:space="preserve">
+    <value>Saved {0} min ago</value>
+  </data>
+  <data name="SavedHoursAgo" xml:space="preserve">
+    <value>Saved {0} h ago</value>
+  </data>
+  <data name="ConditionOrDescription" xml:space="preserve">
+    <value>At least one condition (OR)</value>
+  </data>
+  <data name="ConditionAndDescription" xml:space="preserve">
+    <value>All conditions are met (AND)</value>
+  </data>
+  <data name="EqualsLabel" xml:space="preserve">
+    <value>Equals (==)</value>
+  </data>
+  <data name="NotEqualsLabel" xml:space="preserve">
+    <value>Not equals (!=)</value>
+  </data>
+  <data name="ContainsLabel" xml:space="preserve">
+    <value>Contains</value>
+  </data>
+  <data name="StartsWithLabel" xml:space="preserve">
+    <value>Starts with</value>
+  </data>
+  <data name="EndsWithLabel" xml:space="preserve">
+    <value>Ends with</value>
+  </data>
+  <data name="GreaterThanLabel" xml:space="preserve">
+    <value>Greater than (&gt;)</value>
+  </data>
+  <data name="LessThanLabel" xml:space="preserve">
+    <value>Less than (&lt;)</value>
+  </data>
+  <data name="GreaterOrEqualLabel" xml:space="preserve">
+    <value>Greater or equal (≥)</value>
+  </data>
+  <data name="LessOrEqualLabel" xml:space="preserve">
+    <value>Less or equal (≤)</value>
+  </data>
+  <data name="InListLabel" xml:space="preserve">
+    <value>In list</value>
+  </data>
+  <data name="RegexLabel" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="IsEmptyLabel" xml:space="preserve">
+    <value>IsEmpty</value>
+  </data>
+  <data name="IsNotEmptyLabel" xml:space="preserve">
+    <value>IsNotEmpty</value>
+  </data>
+  <data name="WorkflowNotFound" xml:space="preserve">
+    <value>Workflow not found.</value>
+  </data>
+  <data name="LoadSchemaError" xml:space="preserve">
+    <value>Failed to load schema: {0}</value>
+  </data>
+  <data name="JsonLoadError" xml:space="preserve">
+    <value>Failed to load JSON: {0}</value>
+  </data>
+  <data name="DefaultParamSource" xml:space="preserve">
+    <value>Process input parameter</value>
+  </data>
+  <data name="LinkConditionUsage" xml:space="preserve">
+    <value>Condition on link</value>
+  </data>
+  <data name="PayloadStart" xml:space="preserve">
+    <value>Payload (start)</value>
+  </data>
+  <data name="MessageKind" xml:space="preserve">
+    <value>Message type</value>
+  </data>
+  <data name="UserResponse" xml:space="preserve">
+    <value>User response</value>
+  </data>
+  <data name="AiResult" xml:space="preserve">
+    <value>AI result</value>
+  </data>
+  <data name="StatusCode" xml:space="preserve">
+    <value>Status code (statusCode)</value>
+  </data>
+  <data name="RequestSuccess" xml:space="preserve">
+    <value>Request success (true/false)</value>
+  </data>
+  <data name="ResponseBody" xml:space="preserve">
+    <value>Response body (response body)</value>
+  </data>
+  <data name="CallbackUrl" xml:space="preserve">
+    <value>Callback URL (Callback URL)</value>
+  </data>
+  <data name="WebhookResponseBody" xml:space="preserve">
+    <value>Webhook response body (response body)</value>
+  </data>
+  <data name="VarTypeAttributes" xml:space="preserve">
+    <value>Attributes</value>
+  </data>
+  <data name="VarTypeSystem" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="VarTypeUser" xml:space="preserve">
+    <value>User</value>
+  </data>
+  <data name="VarTypeCustom" xml:space="preserve">
+    <value>Variables</value>
+  </data>
+  <data name="VarTypeOther" xml:space="preserve">
+    <value>Others</value>
+  </data>
+  <data name="VarTypeParams" xml:space="preserve">
+    <value>Parameters</value>
+  </data>
+  <data name="AlwaysNoCondition" xml:space="preserve">
+    <value>No condition (Always)</value>
+  </data>
+  <data name="ConditionAndCount" xml:space="preserve">
+    <value>AND ({0} conditions)</value>
+  </data>
+  <data name="ConditionOrCount" xml:space="preserve">
+    <value>OR ({0} conditions)</value>
+  </data>
+  <data name="MediaText" xml:space="preserve">
+    <value>Text</value>
+  </data>
+  <data name="MediaPhoto" xml:space="preserve">
+    <value>Photo</value>
+  </data>
+  <data name="MediaVideo" xml:space="preserve">
+    <value>Video</value>
+  </data>
+  <data name="MediaAudio" xml:space="preserve">
+    <value>Audio</value>
+  </data>
+  <data name="MediaVoice" xml:space="preserve">
+    <value>Voice</value>
+  </data>
+  <data name="MediaDocument" xml:space="preserve">
+    <value>Document</value>
+  </data>
+  <data name="MediaSticker" xml:space="preserve">
+    <value>Sticker</value>
+  </data>
+  <data name="MediaUnknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="AndOperatorLabel" xml:space="preserve">
+    <value>AND (multiple conditions)</value>
+  </data>
+  <data name="OrOperatorLabel" xml:space="preserve">
+    <value>OR (multiple conditions)</value>
+  </data>
+  <data name="AndLabel" xml:space="preserve">
+    <value>AND</value>
+  </data>
+  <data name="OrLabel" xml:space="preserve">
+    <value>OR</value>
+  </data>
+  <data name="VarNameLabel" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="VarPhoneLabel" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="BadgeGreaterOrEqual" xml:space="preserve">
+    <value>≥</value>
+  </data>
+  <data name="BadgeLessOrEqual" xml:space="preserve">
+    <value>≤</value>
+  </data>
+  <data name="LabelSubstring" xml:space="preserve">
+    <value>Substring</value>
+  </data>
+  <data name="LabelPrefix" xml:space="preserve">
+    <value>Prefix</value>
+  </data>
+  <data name="LabelSuffix" xml:space="preserve">
+    <value>Suffix</value>
+  </data>
+  <data name="BtnForward" xml:space="preserve">
+    <value>Forward</value>
+  </data>
+<data name="AiDialogTitle" xml:space="preserve"><value>AI: workflow schema</value></data><data name="AiDialogModeLabel" xml:space="preserve"><value>Mode</value></data><data name="AiDialogModeNewBot" xml:space="preserve"><value>New Bot</value></data><data name="AiDialogModeMerge" xml:space="preserve"><value>Extend Current</value></data><data name="AiDialogPromptLabel" xml:space="preserve"><value>Request to AI on the server</value></data><data name="AiDialogPromptPlaceholder" xml:space="preserve"><value>Describe the bot or what to add to the current schema...</value></data><data name="AiDialogGenerating" xml:space="preserve"><value>Generating...</value></data><data name="AiDialogGenerateBtn" xml:space="preserve"><value>Generate</value></data><data name="AiDialogInstructionLabel" xml:space="preserve"><value>Instruction for external AI (stable link, doesn't consume app quota):</value></data><data name="AiDialogCopyLinkBtn" xml:space="preserve"><value>Copy Link</value></data><data name="AiDialogDownloadMdBtn" xml:space="preserve"><value>Download .md</value></data><data name="AiDialogPasteJsonLabel" xml:space="preserve"><value>Paste JSON from another AI</value></data><data name="AiDialogApplyJsonBtn" xml:space="preserve"><value>Apply JSON</value></data><data name="AiDialogDownloadError" xml:space="preserve"><value>Failed to download: {0}</value></data><data name="AiDialogErrorEmptyPrompt" xml:space="preserve"><value>Please enter a description of the bot or customization.</value></data><data name="AiDialogErrorNoNodesForMerge" xml:space="preserve"><value>No nodes found to extend. Select 'New Bot' or add nodes to the scheme.</value></data><data name="AiDialogErrorEmptyResponse" xml:space="preserve"><value>Empty response.</value></data><data name="AiDialogErrorParseSchemaJson" xml:space="preserve"><value>Failed to parse schema JSON.</value></data><data name="AiDialogErrorEmptyJson" xml:space="preserve"><value>Please paste schema JSON.</value></data><data name="AiDialogErrorParseJson" xml:space="preserve"><value>Failed to parse JSON.</value></data><data name="AiDialogErrorFallback" xml:space="preserve"><value>Failed to generate schema. Please try again.</value></data><data name="AiDialogErrorUnknown" xml:space="preserve"><value>Unknown error during schema generation.</value></data><data name="AiDialogErrorQuotaExceededWithDetails" xml:space="preserve"><value>AI generation limit reached: {0} of {1}. Upgrade your plan or wait for the next period.</value></data><data name="AiDialogErrorQuotaExceeded" xml:space="preserve"><value>AI generation limit reached. Upgrade your plan or wait for the next period.</value></data><data name="PageTitleWorkflowEditor" xml:space="preserve"><value>Workflow Editor</value></data><data name="RedoBtnTooltip" xml:space="preserve"><value>Redo</value></data><data name="AttributesParamsBtnTooltip" xml:space="preserve"><value>Attributes and parameters</value></data><data name="AttributesParamsBtn" xml:space="preserve"><value>Attributes and parameters</value></data><data name="DownloadBtn" xml:space="preserve"><value>Download</value></data><data name="UploadBtn" xml:space="preserve"><value>Upload</value></data><data name="GenerateAiBtnTooltip" xml:space="preserve"><value>Generate schema using AI</value></data><data name="LabelMsgText" xml:space="preserve"><value>Message text</value></data><data name="EnterAtToSelectVarOrManual" xml:space="preserve"><value>Type {0} to select a variable. Or {1}</value></data><data name="LabelButtonsUnderMsg" xml:space="preserve"><value>Buttons (sent under the message)</value></data><data name="DeleteBtnTooltip" xml:space="preserve"><value>Delete</value></data><data name="ButtonsHint" xml:space="preserve"><value>When clicked, this text will go into the variable. If there are no buttons, any input is expected.</value></data><data name="LabelAttributeKey" xml:space="preserve"><value>Attribute key</value></data><data name="SelectAttributeOption" xml:space="preserve"><value>Select attribute</value></data><data name="AttributesListHint" xml:space="preserve"><value>List of company attributes (Company → Attributes) and basic: name, username, phone, email</value></data><data name="PlaceholderTextOrVar" xml:space="preserve"><value>Text or {{variable_name}}</value></data><data name="VariablesInTemplateHint" xml:space="preserve"><value>Variables can be used in the template</value></data><data name="LabelRequestBody" xml:space="preserve"><value>Request body (Body)</value></data><data name="DeleteHeaderTooltip" xml:space="preserve"><value>Delete header</value></data><data name="ContinueOnErrorLabel" xml:space="preserve"><value>Continue on error</value></data><data name="ContinueOnErrorHintHttp" xml:space="preserve"><value>If disabled, the session will terminate on request failure.</value></data><data name="AiPromptLabel" xml:space="preserve"><value>AI Prompt</value></data><data name="AiPromptHint" xml:space="preserve"><value>Describe what the AI should do. Use variables {0}.</value></data><data name="AiIncludeContextLabel" xml:space="preserve"><value>Include chat context</value></data><data name="AiIncludeContextHint" xml:space="preserve"><value>The AI will receive the history of the current conversation.</value></data><data name="ContinueOnErrorHintAi" xml:space="preserve"><value>If disabled, the session will terminate on AI request failure.</value></data><data name="UploadFileLabel" xml:space="preserve"><value>Upload file</value></data><data name="UploadFileHint" xml:space="preserve"><value>The file will be uploaded to storage, and the file ID will be linked to the block.</value></data><data name="OrChooseFromStoragePrefix" xml:space="preserve"><value>Or choose from</value></data><data name="StorageLinkText" xml:space="preserve"><value>storage</value></data><data name="CurrentKeyFileId" xml:space="preserve"><value>Current key (file ID)</value></data><data name="PlaceholderFileIdOrVar" xml:space="preserve"><value>File ID or {{variable_name}}</value></data><data name="VariablesSupportedHint" xml:space="preserve"><value>Variables are supported (e.g., {0}).</value></data><data name="CaptionLabel" xml:space="preserve"><value>Caption</value></data><data name="PlaceholderOptional" xml:space="preserve"><value>Optional</value></data><data name="CalledProcessLabel" xml:space="preserve"><value>Called process</value></data><data name="ChangeBtn" xml:space="preserve"><value>Change</value></data><data name="ProcessSelectedLabel" xml:space="preserve"><value>Process selected</value></data><data name="SubProcessInputParamsHint" xml:space="preserve"><value>Bind sub-process parameters to variables or values of the current process ({0} supported).</value></data><data name="PlaceholderVarOrValue" xml:space="preserve"><value>{{variable}} or value</value></data><data name="SubProcessNoInputParamsHint" xml:space="preserve"><value>The selected process has no input parameters. Define them in the "Parameters" tab in the settings of that process.</value></data><data name="SubProcessOutputParamsHint" xml:space="preserve"><value>Specify which variable of the current process to write the sub-process result to (left - variable, right - sub-process parameter).</value></data><data name="PlaceholderVariableOnly" xml:space="preserve"><value>variable</value></data><data name="PlaceholderSubParam" xml:space="preserve"><value>sub-process parameter</value></data><data name="SubProcessNoOutputParamsHint" xml:space="preserve"><value>The selected process has no output parameters. Define them in the "Parameters" tab in the settings of that process.</value></data><data name="DurationLabel" xml:space="preserve"><value>Duration</value></data><data name="WaitDurationVariablesHint" xml:space="preserve"><value>Variables can be used, e.g., {0}</value></data><data name="WaitTimeoutLabel" xml:space="preserve"><value>Wait timeout (seconds)</value></data><data name="WaitDurationPlaceholder" xml:space="preserve"><value>0 = infinite</value></data><data name="WaitTimeoutHint" xml:space="preserve"><value>After the specified time, the script will continue along the timeout branch.</value></data><data name="CallbackUrlDescription" xml:space="preserve"><value>To return to the script, use the address in the following format:</value></data><data name="CallbackUrlBaseUrl" xml:space="preserve"><value>base URL of your server</value></data><data name="CallbackUrlBotId" xml:space="preserve"><value>unique identifier of the bot</value></data><data name="CallbackUrlClientId" xml:space="preserve"><value>unique ID of the external user</value></data><data name="CallbackUrlChannel" xml:space="preserve"><value>communication channel (e.g., &lt;code&gt;telegram&lt;/code&gt;)</value></data><data name="ScheduleTypeLabel" xml:space="preserve"><value>Schedule type</value></data><data name="ScheduleTypeOneTime" xml:space="preserve"><value>Once</value></data><data name="ScheduleTypeCron" xml:space="preserve"><value>Scheduled (Cron)</value></data><data name="DateTimeLabel" xml:space="preserve"><value>Date and time</value></data><data name="CronExpressionLabel" xml:space="preserve"><value>Cron expression</value></data><data name="CronExampleHint" xml:space="preserve"><value>Example: {0} — every day at 10:00</value></data><data name="TimezoneLabel" xml:space="preserve"><value>Timezone</value></data><data name="ClientFilterLabel" xml:space="preserve"><value>Client filter</value></data><data name="ClientFilterHint" xml:space="preserve"><value>Leave blank for all company clients, or add filtering conditions.</value></data><data name="ChannelsLabel" xml:space="preserve"><value>Channels</value></data><data name="AttributeConditionsLabel" xml:space="preserve"><value>Attribute conditions</value></data></root>

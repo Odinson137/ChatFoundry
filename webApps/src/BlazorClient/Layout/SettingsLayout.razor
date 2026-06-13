@@ -11,8 +11,8 @@
                 </svg>
             </div>
             <div class="settings-sidebar-title">
-                <span class="settings-sidebar-name">Настройки</span>
-                <span class="settings-sidebar-sub">Управление компанией</span>
+                <span class="settings-sidebar-name">@L["SettingsTitle"]</span>
+                <span class="settings-sidebar-sub">@L["SettingsSubtitle"]</span>
             </div>
             <button class="settings-mobile-toggle" @onclick="ToggleMobileMenu">
                 @if (MobileMenuOpen)
@@ -36,7 +36,7 @@
                     <svg class="settings-nav-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="6 9 12 15 18 9"/>
                     </svg>
-                    <span>Общее</span>
+                    <span>@L["SettingsSectionGeneral"]</span>
                 </button>
                 @if (_expandedSections.Contains(0))
                 {
@@ -47,7 +47,7 @@
                                     <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
                                 </svg>
                             </span>
-                            <span class="settings-nav-text">Обзор</span>
+                            <span class="settings-nav-text">@L["SettingsOverview"]</span>
                         </NavLink>
                         <NavLink class="settings-nav-link" href="/settings/billing" @onclick="CloseMobileMenu">
                             <span class="settings-nav-icon settings-nav-icon--amber">
@@ -55,7 +55,7 @@
                                     <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
                                 </svg>
                             </span>
-                            <span class="settings-nav-text">Биллинг</span>
+                            <span class="settings-nav-text">@L["SettingsBilling"]</span>
                         </NavLink>
                         <NavLink class="settings-nav-link" href="/settings/members" @onclick="CloseMobileMenu">
                             <span class="settings-nav-icon settings-nav-icon--emerald">
@@ -63,7 +63,7 @@
                                     <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
                                 </svg>
                             </span>
-                            <span class="settings-nav-text">Участники</span>
+                            <span class="settings-nav-text">@L["SettingsMembers"]</span>
                         </NavLink>
                         <NavLink class="settings-nav-link" href="/settings/invitations" @onclick="CloseMobileMenu">
                             <span class="settings-nav-icon settings-nav-icon--violet">
@@ -71,7 +71,7 @@
                                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
                                 </svg>
                             </span>
-                            <span class="settings-nav-text">Приглашения</span>
+                            <span class="settings-nav-text">@L["SettingsInvitations"]</span>
                         </NavLink>
                     </div>
                 }
@@ -82,7 +82,7 @@
                     <svg class="settings-nav-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="6 9 12 15 18 9"/>
                     </svg>
-                    <span>Конфигурация</span>
+                    <span>@L["SettingsSectionConfig"]</span>
                 </button>
                 @if (_expandedSections.Contains(1))
                 {
@@ -93,7 +93,7 @@
                                     <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
                                 </svg>
                             </span>
-                            <span class="settings-nav-text">Каналы</span>
+                            <span class="settings-nav-text">@L["SettingsChannels"]</span>
                         </NavLink>
                         <NavLink class="settings-nav-link" href="/settings/attributes" @onclick="CloseMobileMenu">
                             <span class="settings-nav-icon settings-nav-icon--orange">
@@ -101,7 +101,7 @@
                                     <polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>
                                 </svg>
                             </span>
-                            <span class="settings-nav-text">Атрибуты</span>
+                            <span class="settings-nav-text">@L["SettingsAttributes"]</span>
                         </NavLink>
                         <NavLink class="settings-nav-link" href="/settings/files" @onclick="CloseMobileMenu">
                             <span class="settings-nav-icon settings-nav-icon--rose">
@@ -109,7 +109,7 @@
                                     <path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/>
                                 </svg>
                             </span>
-                            <span class="settings-nav-text">Файлы</span>
+                            <span class="settings-nav-text">@L["SettingsFiles"]</span>
                         </NavLink>
                     </div>
                 }
@@ -120,7 +120,7 @@
                     <svg class="settings-nav-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="6 9 12 15 18 9"/>
                     </svg>
-                    <span>Разработка</span>
+                    <span>@L["SettingsSectionDev"]</span>
                 </button>
                 @if (_expandedSections.Contains(2))
                 {
@@ -142,7 +142,7 @@
                     <svg class="settings-nav-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="6 9 12 15 18 9"/>
                     </svg>
-                    <span>Мониторинг</span>
+                    <span>@L["SettingsSectionMonitoring"]</span>
                 </button>
                 @if (_expandedSections.Contains(3))
                 {
@@ -153,7 +153,7 @@
                                     <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
                                 </svg>
                             </span>
-                            <span class="settings-nav-text">Сессии</span>
+                            <span class="settings-nav-text">@L["SettingsSessions"]</span>
                         </NavLink>
                         <NavLink class="settings-nav-link" href="/settings/analytics" @onclick="CloseMobileMenu">
                             <span class="settings-nav-icon settings-nav-icon--violet">
@@ -161,7 +161,7 @@
                                     <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
                                 </svg>
                             </span>
-                            <span class="settings-nav-text">Аналитика</span>
+                            <span class="settings-nav-text">@L["SettingsAnalytics"]</span>
                         </NavLink>
                     </div>
                 }

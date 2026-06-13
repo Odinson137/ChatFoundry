@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="0" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  
+  <data name="PageTitle" xml:space="preserve">
+    <value>Settings — Attributes</value>
+  </data>
+  <data name="HeaderTitle" xml:space="preserve">
+    <value>Attributes</value>
+  </data>
+  <data name="HeaderSubtitle" xml:space="preserve">
+    <value>Global company attributes available in workflows</value>
+  </data>
+  <data name="BtnAddAttribute" xml:space="preserve">
+    <value>Add Attribute</value>
+  </data>
+  <data name="NoAttributesTitle" xml:space="preserve">
+    <value>No attributes</value>
+  </data>
+  <data name="NoAttributesDesc" xml:space="preserve">
+    <value>Add attributes to use in workflows — name, email, phone, or custom fields.</value>
+  </data>
+  <data name="ThKey" xml:space="preserve">
+    <value>Key</value>
+  </data>
+  <data name="ThName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ThDescription" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="ThActions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="TooltipEdit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="TooltipDelete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="ModalNewAttribute" xml:space="preserve">
+    <value>New Attribute</value>
+  </data>
+  <data name="ModalEditAttribute" xml:space="preserve">
+    <value>Edit Attribute</value>
+  </data>
+  <data name="LabelKey" xml:space="preserve">
+    <value>Key (latin, no spaces)</value>
+  </data>
+  <data name="PlaceholderKey" xml:space="preserve">
+    <value>e.g. email or company_name</value>
+  </data>
+  <data name="KeyHint" xml:space="preserve">
+    <value>Key cannot be changed after creation.</value>
+  </data>
+  <data name="LabelName" xml:space="preserve">
+    <value>Name (display name)</value>
+  </data>
+  <data name="PlaceholderName" xml:space="preserve">
+    <value>e.g. Email</value>
+  </data>
+  <data name="LabelDescription" xml:space="preserve">
+    <value>Description (optional)</value>
+  </data>
+  <data name="PlaceholderDescription" xml:space="preserve">
+    <value>Hint for workflow designer</value>
+  </data>
+  <data name="BtnCancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="BtnCreate" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="BtnSave" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="ErrorSpecifyKey" xml:space="preserve">
+    <value>Please specify attribute key.</value>
+  </data>
+  <data name="DeleteConfirm" xml:space="preserve">
+    <value>Delete attribute "{0}"?</value>
+  </data>
+  <data name="ErrorDeleteFailed" xml:space="preserve">
+    <value>Failed to delete attribute.</value>
+  </data>
+</root>

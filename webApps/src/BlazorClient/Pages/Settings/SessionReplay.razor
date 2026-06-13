@@ -9,18 +9,18 @@
 @inject BlazorClient.Interfaces.IWorkflowSchemaService SchemaService
 @inject NavigationManager Navigation
 
-<PageTitle>Путь пользователя — ChatFoundry</PageTitle>
+<PageTitle>@LReplay["PageTitle"] — ChatFoundry</PageTitle>
 
 <div class="replay-page-container">
     <!-- Левая панель: информация о сессии и шаги -->
     <aside class="replay-sidebar">
         <div class="replay-sidebar-header">
-            <button class="replay-back-btn" @onclick="GoBack" title="Назад к сессиям">
+            <button class="replay-back-btn" @onclick="GoBack" title="@LReplay["BackToSessions"]">
                 <span class="oi oi-arrow-left"></span>
             </button>
             <div>
-                <div class="replay-sidebar-title">Путь пользователя</div>
-                <div class="replay-sidebar-subtitle">Просмотр сессии</div>
+                <div class="replay-sidebar-title">@LReplay["SidebarTitle"]</div>
+                <div class="replay-sidebar-subtitle">@LReplay["SidebarSubtitle"]</div>
             </div>
         </div>
 
@@ -28,29 +28,29 @@
         {
             <div class="replay-session-info">
                 <div class="replay-info-row">
-                    <span class="replay-info-label">Бот</span>
+                    <span class="replay-info-label">@LReplay["Bot"]</span>
                     <span class="replay-info-value">@(_session.Workflow?.Bot?.Name ?? "—")</span>
                 </div>
                 <div class="replay-info-row">
-                    <span class="replay-info-label">Клиент</span>
+                    <span class="replay-info-label">@LReplay["Client"]</span>
                     <span class="replay-info-value"><code>@_session.ClientId</code></span>
                 </div>
                 <div class="replay-info-row">
-                    <span class="replay-info-label">Канал</span>
+                    <span class="replay-info-label">@LReplay["Channel"]</span>
                     <span class="replay-info-value">@FormatChannel(_session.Channel)</span>
                 </div>
                 <div class="replay-info-row">
-                    <span class="replay-info-label">Статус</span>
+                    <span class="replay-info-label">@LReplay["Status"]</span>
                     <span class="badge @StatusBadgeClass(_session.Status)">@StatusLabel(_session.Status)</span>
                 </div>
                 <div class="replay-info-row">
-                    <span class="replay-info-label">Создана</span>
+                    <span class="replay-info-label">@LReplay["Created"]</span>
                     <span class="replay-info-value">@_session.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
                 </div>
                 @if (_session.CompletedAt.HasValue)
                 {
                     <div class="replay-info-row">
-                        <span class="replay-info-label">Завершена</span>
+                        <span class="replay-info-label">@LReplay["Completed"]</span>
                         <span class="replay-info-value">@_session.CompletedAt.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
                     </div>
                 }
@@ -63,12 +63,12 @@
                         @if (_isCompleting)
                         {
                             <span class="spinner-border text-danger" role="status" aria-hidden="true"></span>
-                            <span>Завершение...</span>
+                            <span>@LReplay["Completing"]</span>
                         }
                         else
                         {
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-                            <span>Завершить сессию</span>
+                            <span>@LReplay["CompleteSession"]</span>
                         }
                     </button>
                 </div>
@@ -77,10 +77,10 @@
             <!-- Вкладки -->
             <div class="replay-tabs">
                 <button class="replay-tab @(_activeTab == 0 ? "active" : "")" @onclick="() => _activeTab = 0">
-                    Шаги (@(_session.Actions?.Count ?? 0))
+                    @string.Format(LReplay["TabSteps"], _session.Actions?.Count ?? 0)
                 </button>
                 <button class="replay-tab @(_activeTab == 1 ? "active" : "")" @onclick="() => _activeTab = 1">
-                    Переменные
+                    @LReplay["TabVariables"]
                 </button>
             </div>
 
@@ -129,24 +129,24 @@
                         {
                             <div class="replay-var-search">
                                 <span class="oi oi-magnifying-glass"></span>
-                                <input type="text" placeholder="Поиск..." @bind="_varSearch" @bind:event="oninput"/>
+                                <input type="text" placeholder="@LReplay["SearchPlaceholder"]" @bind="_varSearch" @bind:event="oninput"/>
                             </div>
 
                             @if (globalVariables.Any())
                             {
-                                <div class="replay-var-group-title">Атрибуты ($global)</div>
+                                <div class="replay-var-group-title">@LReplay["AttributesGroup"]</div>
                                 @foreach (var kv in globalVariables)
                                 {
                                     <div class="replay-var-item var-global">
                                         <code class="replay-var-name">@kv.Key</code>
-                                        <pre class="replay-var-value">@(string.IsNullOrEmpty(kv.Value) ? "(пусто)" : kv.Value)</pre>
+                                        <pre class="replay-var-value">@(string.IsNullOrEmpty(kv.Value) ? LReplay["EmptyValue"] : kv.Value)</pre>
                                     </div>
                                 }
                             }
 
                             @if (sessionVariableItems.Any())
                             {
-                                <div class="replay-var-group-title">Переменные сессии</div>
+                                <div class="replay-var-group-title">@LReplay["SessionVariablesGroup"]</div>
                                 @foreach (var item in sessionVariableItems)
                                 {
                                     if (item.NodeId.HasValue)
@@ -166,10 +166,10 @@
                                                         <div class="replay-var-line">
                                                             <span class="replay-var-line-label">@line.Label:</span>
                                                             <pre class="replay-var-line-value">@(line.DisplayValue.Length > 100 ? line.DisplayValue[..100] + "..." : line.DisplayValue)</pre>
-                                                            @if (line.Label == "Вывод")
+                                                            @if (line.Label == LReplay["SuffixOutput"])
                                                             {
                                                                 <button class="replay-var-expand-btn" @onclick="() => OpenValueModal(line.Label, line.FullValue)">
-                                                                    Показать
+                                                                    @LReplay["Show"]
                                                                 </button>
                                                             }
                                                         </div>
@@ -191,7 +191,7 @@
                         else
                         {
                             <div class="replay-empty-state">
-                                Переменные отсутствуют
+                                @LReplay["NoVariables"]
                             </div>
                         }
                     </div>
@@ -204,7 +204,7 @@
     <main class="replay-main">
         <header class="replay-header">
             <div class="replay-header-left">
-                <span class="replay-workflow-title">Просмотр пути</span>
+                <span class="replay-workflow-title">@LReplay["ViewPath"]</span>
                 <span class="replay-badge">Replay</span>
                 @if (_session?.Workflow?.Bot != null)
                 {
@@ -214,10 +214,10 @@
             </div>
             <div class="replay-header-right">
                 <div class="replay-legend">
-                    <span class="replay-legend-item"><span class="replay-legend-dot legend-visited"></span> Пройден</span>
-                    <span class="replay-legend-item"><span class="replay-legend-dot legend-current"></span> Текущий</span>
-                    <span class="replay-legend-item"><span class="replay-legend-dot legend-failed"></span> Ошибка</span>
-                    <span class="replay-legend-item"><span class="replay-legend-dot legend-unvisited"></span> Не пройден</span>
+                    <span class="replay-legend-item"><span class="replay-legend-dot legend-visited"></span> @LReplay["LegendVisited"]</span>
+                    <span class="replay-legend-item"><span class="replay-legend-dot legend-current"></span> @LReplay["LegendCurrent"]</span>
+                    <span class="replay-legend-item"><span class="replay-legend-dot legend-failed"></span> @LReplay["LegendFailed"]</span>
+                    <span class="replay-legend-item"><span class="replay-legend-dot legend-unvisited"></span> @LReplay["LegendUnvisited"]</span>
                 </div>
             </div>
         </header>
@@ -230,7 +230,7 @@
         {
             <div class="d-flex justify-content-center align-items-center" style="flex:1">
                 <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Загрузка...</span>
+                    <span class="visually-hidden">@LReplay["Loading"]</span>
                 </div>
             </div>
         }
@@ -248,11 +248,11 @@
                 </CascadingValue>
 
                 <div class="replay-zoom-controls">
-                    <button class="replay-zoom-btn" @onclick="ZoomOut" title="Уменьшить">
+                    <button class="replay-zoom-btn" @onclick="ZoomOut" title="@LReplay["ZoomOut"]">
                         <span class="oi oi-minus"></span>
                     </button>
                     <span class="replay-zoom-value">@ZoomPercent%</span>
-                    <button class="replay-zoom-btn" @onclick="ZoomIn" title="Увеличить">
+                    <button class="replay-zoom-btn" @onclick="ZoomIn" title="@LReplay["ZoomIn"]">
                         <span class="oi oi-plus"></span>
                     </button>
                 </div>

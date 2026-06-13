@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="0" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="PageTitle" xml:space="preserve">
+    <value>Путь пользователя</value>
+  </data>
+  <data name="BackToSessions" xml:space="preserve">
+    <value>Назад к сессиям</value>
+  </data>
+  <data name="SidebarTitle" xml:space="preserve">
+    <value>Путь пользователя</value>
+  </data>
+  <data name="SidebarSubtitle" xml:space="preserve">
+    <value>Просмотр сессии</value>
+  </data>
+  <data name="Bot" xml:space="preserve">
+    <value>Бот</value>
+  </data>
+  <data name="Client" xml:space="preserve">
+    <value>Клиент</value>
+  </data>
+  <data name="Channel" xml:space="preserve">
+    <value>Канал</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Статус</value>
+  </data>
+  <data name="Created" xml:space="preserve">
+    <value>Создана</value>
+  </data>
+  <data name="Completed" xml:space="preserve">
+    <value>Завершена</value>
+  </data>
+  <data name="Completing" xml:space="preserve">
+    <value>Завершение...</value>
+  </data>
+  <data name="CompleteSession" xml:space="preserve">
+    <value>Завершить сессию</value>
+  </data>
+  <data name="TabSteps" xml:space="preserve">
+    <value>Шаги ({0})</value>
+  </data>
+  <data name="TabVariables" xml:space="preserve">
+    <value>Переменные</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Поиск...</value>
+  </data>
+  <data name="AttributesGroup" xml:space="preserve">
+    <value>Атрибуты ($global)</value>
+  </data>
+  <data name="SessionVariablesGroup" xml:space="preserve">
+    <value>Переменные сессии</value>
+  </data>
+  <data name="Show" xml:space="preserve">
+    <value>Показать</value>
+  </data>
+  <data name="NoVariables" xml:space="preserve">
+    <value>Переменные отсутствуют</value>
+  </data>
+  <data name="ViewPath" xml:space="preserve">
+    <value>Просмотр пути</value>
+  </data>
+  <data name="LegendVisited" xml:space="preserve">
+    <value>Пройден</value>
+  </data>
+  <data name="LegendCurrent" xml:space="preserve">
+    <value>Текущий</value>
+  </data>
+  <data name="LegendFailed" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+  <data name="LegendUnvisited" xml:space="preserve">
+    <value>Не пройден</value>
+  </data>
+  <data name="ZoomOut" xml:space="preserve">
+    <value>Уменьшить</value>
+  </data>
+  <data name="ZoomIn" xml:space="preserve">
+    <value>Увеличить</value>
+  </data>
+  <data name="SessionNotFound" xml:space="preserve">
+    <value>Сессия не найдена.</value>
+  </data>
+  <data name="WorkflowNotFound" xml:space="preserve">
+    <value>Workflow для этой сессии не найден.</value>
+  </data>
+  <data name="LoadError" xml:space="preserve">
+    <value>Ошибка загрузки: {0}</value>
+  </data>
+  <data name="CompleteFailed" xml:space="preserve">
+    <value>Не удалось завершить сессию.</value>
+  </data>
+  <data name="CompleteError" xml:space="preserve">
+    <value>Не удалось завершить сессию: {0}</value>
+  </data>
+  <data name="SuffixStatusCode" xml:space="preserve">
+    <value>Код статуса</value>
+  </data>
+  <data name="SuffixStatus" xml:space="preserve">
+    <value>Статус</value>
+  </data>
+  <data name="SuffixSuccess" xml:space="preserve">
+    <value>Успешно</value>
+  </data>
+  <data name="SuffixError" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+  <data name="SuffixOutput" xml:space="preserve">
+    <value>Вывод</value>
+  </data>
+  <data name="SuffixMessageKind" xml:space="preserve">
+    <value>Тип сообщения</value>
+  </data>
+  <data name="SuffixResponse" xml:space="preserve">
+    <value>Ответ</value>
+  </data>
+  <data name="SuffixRequest" xml:space="preserve">
+    <value>Запрос</value>
+  </data>
+  <data name="SuffixUrl" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="SuffixDuration" xml:space="preserve">
+    <value>Длительность</value>
+  </data>
+  <data name="SuffixInput" xml:space="preserve">
+    <value>Ввод</value>
+  </data>
+  <data name="SuffixResult" xml:space="preserve">
+    <value>Результат</value>
+  </data>
+  <data name="SuffixData" xml:space="preserve">
+    <value>Данные</value>
+  </data>
+  <data name="SuffixHeaders" xml:space="preserve">
+    <value>Заголовки</value>
+  </data>
+  <data name="SuffixBody" xml:space="preserve">
+    <value>Тело запроса</value>
+  </data>
+  <data name="EmptyValue" xml:space="preserve">
+    <value>(пусто)</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Да</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>Нет</value>
+  </data>
+  <data name="MsgKindText" xml:space="preserve">
+    <value>Текст</value>
+  </data>
+  <data name="MsgKindImage" xml:space="preserve">
+    <value>Изображение</value>
+  </data>
+  <data name="MsgKindVideo" xml:space="preserve">
+    <value>Видео</value>
+  </data>
+  <data name="MsgKindAudio" xml:space="preserve">
+    <value>Аудио</value>
+  </data>
+  <data name="MsgKindVoice" xml:space="preserve">
+    <value>Голос</value>
+  </data>
+  <data name="MsgKindFile" xml:space="preserve">
+    <value>Файл</value>
+  </data>
+  <data name="MsgKindDocument" xml:space="preserve">
+    <value>Документ</value>
+  </data>
+  <data name="MsgKindSticker" xml:space="preserve">
+    <value>Стикер</value>
+  </data>
+  <data name="MsgKindLocation" xml:space="preserve">
+    <value>Локация</value>
+  </data>
+  <data name="MsgKindContact" xml:space="preserve">
+    <value>Контакт</value>
+  </data>
+  <data name="MsgKindButton" xml:space="preserve">
+    <value>Кнопка</value>
+  </data>
+  <data name="StatusActive" xml:space="preserve">
+    <value>Активна</value>
+  </data>
+  <data name="StatusCompleted" xml:space="preserve">
+    <value>Завершена</value>
+  </data>
+  <data name="StatusFailed" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+  <data name="StatusCancelled" xml:space="preserve">
+    <value>Отменена</value>
+  </data>
+  <data name="ActionStatusPending" xml:space="preserve">
+    <value>Ожидание</value>
+  </data>
+  <data name="ActionStatusProcessing" xml:space="preserve">
+    <value>В процессе</value>
+  </data>
+  <data name="ActionStatusFailed" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+</root>

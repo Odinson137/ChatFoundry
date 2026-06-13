@@ -1,4 +1,4 @@
-﻿using Blazor.Diagrams.Core.Geometry;
+using Blazor.Diagrams.Core.Geometry;
 using Blazor.Diagrams.Core.Models;
 
 namespace BlazorClient.Models.Diagram
@@ -44,12 +44,12 @@ namespace BlazorClient.Models.Diagram
 
         private static string GetTitle(BotNodeType type) => type switch
         {
-            BotNodeType.Start => "🚀 Старт (Webhook)",
-            BotNodeType.Message => "💬 Сообщение",
-            BotNodeType.Input => "👤 Ждать ответ",
-            BotNodeType.AiProcess => "🤖 AI Обработка",
-            BotNodeType.Condition => "❓ Условие",
-            _ => "Блок"
+            BotNodeType.Start => "🚀 Start (Webhook)",
+            BotNodeType.Message => "💬 Message",
+            BotNodeType.Input => "👤 Wait for response",
+            BotNodeType.AiProcess => "🤖 AI Processing",
+            BotNodeType.Condition => "❓ Condition",
+            _ => "Block"
         };
     }
 }

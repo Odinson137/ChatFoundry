@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="0" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  
+  <data name="PageTitle" xml:space="preserve">
+    <value>Управление ботами</value>
+  </data>
+  <data name="AddBot" xml:space="preserve">
+    <value>Добавить бота</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Загрузка...</value>
+  </data>
+  <data name="NoBotsFound" xml:space="preserve">
+    <value>Боты не найдены</value>
+  </data>
+  <data name="NoBotsDesc" xml:space="preserve">
+    <value>Создайте первого бота, чтобы подключить воркфлоу к каналам.</value>
+  </data>
+  <data name="ThName" xml:space="preserve">
+    <value>Имя</value>
+  </data>
+  <data name="ThChannels" xml:space="preserve">
+    <value>Каналы</value>
+  </data>
+  <data name="ThActiveWorkflow" xml:space="preserve">
+    <value>Активный Workflow</value>
+  </data>
+  <data name="ThCreated" xml:space="preserve">
+    <value>Создан</value>
+  </data>
+  <data name="ThActions" xml:space="preserve">
+    <value>Действия</value>
+  </data>
+  <data name="BtnOpen" xml:space="preserve">
+    <value>Открыть</value>
+  </data>
+  <data name="BtnDelete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="ModalTitleNew" xml:space="preserve">
+    <value>Новый бот</value>
+  </data>
+  <data name="ModalTitleEdit" xml:space="preserve">
+    <value>Редактировать бота</value>
+  </data>
+  <data name="LabelBotName" xml:space="preserve">
+    <value>Имя бота</value>
+  </data>
+  <data name="LabelChannels" xml:space="preserve">
+    <value>Каналы</value>
+  </data>
+  <data name="NoAvailableChannels" xml:space="preserve">
+    <value>Нет доступных каналов. Создайте каналы на странице &lt;a href="/channels"&gt;Каналы&lt;/a&gt;.</value>
+  </data>
+  <data name="BtnCancel" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="BtnSave" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="DeleteConfirmTitle" xml:space="preserve">
+    <value>Удалить бота?</value>
+  </data>
+  <data name="DeleteConfirmText" xml:space="preserve">
+    <value>Вы уверены, что хотите удалить бота &lt;strong&gt;{0}&lt;/strong&gt;? Это действие нельзя отменить.</value>
+  </data>
+  <data name="ChannelsCountBadge" xml:space="preserve">
+    <value>{0} каналов</value>
+  </data>
+  <data name="NoBadge" xml:space="preserve">
+    <value>Нет</value>
+  </data>
+  <data name="LoadError" xml:space="preserve">
+    <value>Ошибка загрузки: {0}</value>
+  </data>
+  <data name="DeleteError" xml:space="preserve">
+    <value>Не удалось удалить: {0}</value>
+  </data>
+  <data name="QuotaExceededDetail" xml:space="preserve">
+    <value>Достигнут лимит по количеству ботов: {0} из {1}. Удалите лишнего бота или перейдите на более высокий тариф.</value>
+  </data>
+  <data name="QuotaExceededGeneral" xml:space="preserve">
+    <value>Достигнут лимит по количеству ботов. Удалите лишнего бота или перейдите на более высокий тариф.</value>
+  </data>
+  <data name="InternalError" xml:space="preserve">
+    <value>Не удалось сохранить бота из-за внутренней ошибки. Обновите страницу и попробуйте снова.</value>
+  </data>
+  <data name="SaveErrorGeneric" xml:space="preserve">
+    <value>Не удалось сохранить бота. {0}</value>
+  </data>
+</root>

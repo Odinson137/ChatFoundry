@@ -3,14 +3,16 @@
 @using WorkflowValidation
 @inject IWorkflowApiClient ApiClient
 @inject IJSRuntime JSRuntime
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<BlazorClient.Pages.WorkflowDesigner> LDesigner
 
 @if (IsOpen)
 {
     <div class="variables-modal-backdrop" @onclick="CloseAsync"></div>
     <div class="variables-modal">
         <div class="variables-modal-header">
-            <h2 class="variables-modal-title">AI: схема workflow</h2>
-            <button type="button" class="variables-modal-close" @onclick="CloseAsync" aria-label="Закрыть" disabled="@AiBusy">
+            <h2 class="variables-modal-title">@LDesigner["AiDialogTitle"]</h2>
+            <button type="button" class="variables-modal-close" @onclick="CloseAsync" aria-label="@LDesigner["CloseLabel"]" disabled="@AiBusy">
                 <span class="oi oi-x"></span>
             </button>
         </div>
@@ -25,41 +27,41 @@
                 </div>
             }
             <div class="mb-3">
-                <div class="text-muted small mb-2">Режим</div>
+                <div class="text-muted small mb-2">@LDesigner["AiDialogModeLabel"]</div>
                 <div class="d-flex flex-wrap gap-2">
-                    <button type="button" class="@(!AiMergeMode ? "designer-btn-primary" : "designer-btn-secondary")" @onclick="() => AiMergeMode = false" disabled="@AiBusy">Новый бот</button>
-                    <button type="button" class="@(AiMergeMode ? "designer-btn-primary" : "designer-btn-secondary")" @onclick="() => AiMergeMode = true" disabled="@AiBusy">Дополнить текущий</button>
+                    <button type="button" class="@(!AiMergeMode ? "designer-btn-primary" : "designer-btn-secondary")" @onclick="() => AiMergeMode = false" disabled="@AiBusy">@LDesigner["AiDialogModeNewBot"]</button>
+                    <button type="button" class="@(AiMergeMode ? "designer-btn-primary" : "designer-btn-secondary")" @onclick="() => AiMergeMode = true" disabled="@AiBusy">@LDesigner["AiDialogModeMerge"]</button>
                 </div>
             </div>
             <div class="mb-3">
-                <label class="form-label">Запрос к AI на сервере</label>
-                <textarea class="form-control workflow-ai-dialog-textarea" rows="6" @bind="AiUserPrompt" @bind:event="oninput" disabled="@AiBusy" placeholder="Опишите бота или что добавить к текущей схеме…"></textarea>
+                <label class="form-label">@LDesigner["AiDialogPromptLabel"]</label>
+                <textarea class="form-control workflow-ai-dialog-textarea" rows="6" @bind="AiUserPrompt" @bind:event="oninput" disabled="@AiBusy" placeholder="@LDesigner["AiDialogPromptPlaceholder"]"></textarea>
             </div>
             <div class="mb-3 d-flex justify-content-end">
                 <button type="button" class="designer-btn-primary" @onclick="GenerateFromAiAsync" disabled="@AiBusy">
                     @if (AiBusy)
                     {
-                        <span>Генерация…</span>
+                        <span>@LDesigner["AiDialogGenerating"]</span>
                     }
                     else
                     {
-                        <span>Сгенерировать</span>
+                        <span>@LDesigner["AiDialogGenerateBtn"]</span>
                     }
                 </button>
             </div>
             <div class="mb-3 small">
-                <div class="text-muted mb-1">Инструкция для внешней нейросети (стабильная ссылка, без расхода квоты в приложении):</div>
+                <div class="text-muted mb-1">@LDesigner["AiDialogInstructionLabel"]</div>
                 <code class="d-block text-break user-select-all mb-2" style="font-size: 0.8rem;">@WorkflowAiPromptUrl</code>
-                <button type="button" class="designer-btn-secondary me-2" @onclick="CopyAiPromptUrlAsync" disabled="@AiBusy">Копировать ссылку</button>
-                <button type="button" class="designer-btn-secondary" @onclick="DownloadAiInstructionAsync" disabled="@AiBusy">Скачать .md</button>
+                <button type="button" class="designer-btn-secondary me-2" @onclick="CopyAiPromptUrlAsync" disabled="@AiBusy">@LDesigner["AiDialogCopyLinkBtn"]</button>
+                <button type="button" class="designer-btn-secondary" @onclick="DownloadAiInstructionAsync" disabled="@AiBusy">@LDesigner["AiDialogDownloadMdBtn"]</button>
             </div>
             <div class="mb-3">
-                <label class="form-label">Вставить JSON от другой нейросети</label>
+                <label class="form-label">@LDesigner["AiDialogPasteJsonLabel"]</label>
                 <textarea class="form-control font-monospace small workflow-ai-dialog-textarea-json" rows="8" @bind="AiPasteJson" @bind:event="oninput" disabled="@AiBusy" placeholder='{ "nodes": [ { "id": "00000000-0000... }'></textarea>
-                <button type="button" class="designer-btn-secondary mt-2" @onclick="ApplyAiPasteJsonAsync" disabled="@AiBusy">Применить JSON</button>
+                <button type="button" class="designer-btn-secondary mt-2" @onclick="ApplyAiPasteJsonAsync" disabled="@AiBusy">@LDesigner["AiDialogApplyJsonBtn"]</button>
             </div>
             <div class="d-flex flex-wrap gap-2 justify-content-end">
-                <button type="button" class="designer-btn-secondary" @onclick="CloseAsync" disabled="@AiBusy">Закрыть</button>
+                <button type="button" class="designer-btn-secondary" @onclick="CloseAsync" disabled="@AiBusy">@LDesigner["CloseLabel"]</button>
             </div>
         </div>
     </div>
@@ -106,7 +108,7 @@
         }
         catch (Exception ex)
         {
-            await JSRuntime.InvokeVoidAsync("alert", $"Не удалось скачать: {ex.Message}");
+            await JSRuntime.InvokeVoidAsync("alert", string.Format(LDesigner["AiDialogDownloadError"].Value, ex.Message));
         }
     }
 
@@ -118,13 +120,13 @@
         {
             if (string.IsNullOrWhiteSpace(AiUserPrompt))
             {
-                AiErrors.Add("Введите описание бота или доработки.");
+                AiErrors.Add(LDesigner["AiDialogErrorEmptyPrompt"].Value);
                 return;
             }
 
             if (AiMergeMode && GetDiagramNodeCount() == 0)
             {
-                AiErrors.Add("Нет узлов для режима «дополнить». Выберите «Новый бот» или добавьте узлы на схему.");
+                AiErrors.Add(LDesigner["AiDialogErrorNoNodesForMerge"].Value);
                 return;
             }
 
@@ -138,7 +140,7 @@
 
             if (string.IsNullOrWhiteSpace(result.WorkflowJson))
             {
-                AiErrors.Add("Пустой ответ.");
+                AiErrors.Add(LDesigner["AiDialogErrorEmptyResponse"].Value);
                 return;
             }
 
@@ -152,7 +154,7 @@
             var schema = JsonSerializer.Deserialize<WorkflowSchema>(result.WorkflowJson, WorkflowJsonOptions);
             if (schema == null)
             {
-                AiErrors.Add("Не удалось разобрать JSON схемы.");
+                AiErrors.Add(LDesigner["AiDialogErrorParseSchemaJson"].Value);
                 return;
             }
 
@@ -173,7 +175,7 @@
         {
             if (string.IsNullOrWhiteSpace(AiPasteJson))
             {
-                AiErrors.Add("Вставьте JSON схемы.");
+                AiErrors.Add(LDesigner["AiDialogErrorEmptyJson"].Value);
                 return;
             }
 
@@ -188,7 +190,7 @@
             var schema = JsonSerializer.Deserialize<WorkflowSchema>(trimmed, WorkflowJsonOptions);
             if (schema == null)
             {
-                AiErrors.Add("Не удалось разобрать JSON.");
+                AiErrors.Add(LDesigner["AiDialogErrorParseJson"].Value);
                 return;
             }
 
@@ -202,7 +204,7 @@
         }
     }
 
-    private static List<string> LocalizeAiErrors(IEnumerable<string>? errors)
+    private List<string> LocalizeAiErrors(IEnumerable<string>? errors)
     {
         var localized = errors?
             .Where(e => !string.IsNullOrWhiteSpace(e))
@@ -211,15 +213,15 @@
             .ToList() ?? [];
 
         if (localized.Count == 0)
-            localized.Add("Не удалось сгенерировать схему. Попробуйте снова.");
+            localized.Add(LDesigner["AiDialogErrorFallback"].Value);
 
         return localized;
     }
 
-    private static string LocalizeAiError(string rawMessage)
+    private string LocalizeAiError(string rawMessage)
     {
         if (string.IsNullOrWhiteSpace(rawMessage))
-            return "Неизвестная ошибка при генерации схемы.";
+            return LDesigner["AiDialogErrorUnknown"].Value;
 
         var normalizedMessage = TryExtractAiServerError(rawMessage) ?? rawMessage;
 
@@ -232,16 +234,16 @@
         {
             var limit = quotaMatch.Groups[1].Value;
             var used = quotaMatch.Groups[2].Value;
-            return $"Достигнут лимит генераций AI: {used} из {limit}. Обновите тариф или дождитесь следующего периода.";
+            return string.Format(LDesigner["AiDialogErrorQuotaExceededWithDetails"].Value, used, limit);
         }
 
         if (normalizedMessage.Contains("Quota exceeded", StringComparison.OrdinalIgnoreCase))
-            return "Достигнут лимит генераций AI. Обновите тариф или дождитесь следующего периода.";
+            return LDesigner["AiDialogErrorQuotaExceeded"].Value;
 
         return normalizedMessage;
     }
 
-    private static string? TryExtractAiServerError(string message)
+    private string? TryExtractAiServerError(string message)
     {
         if (string.IsNullOrWhiteSpace(message))
             return null;

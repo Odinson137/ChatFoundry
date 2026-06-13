@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xs:element name="root" ns1:IsDataSet="true">
+      <xs:complexType>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="metadata">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" />
+              </xs:sequence>
+              <xs:attribute name="name" use="required" type="xsd:string" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="assembly">
+            <xs:complexType>
+              <xs:attribute name="alias" type="xsd:string" />
+              <xs:attribute name="name" type="xsd:string" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="0" />
+                <xs:element name="comment" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" ns1:Ordinal="1" />
+              <xs:attribute name="type" type="xsd:string" ns1:Ordinal="3" />
+              <xs:attribute name="mimetype" type="xsd:string" ns1:Ordinal="4" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="resheader">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="0" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  
+  <data name="Loading" xml:space="preserve">
+    <value>Loading...</value>
+  </data>
+  <data name="NoActiveChats" xml:space="preserve">
+    <value>No active chats</value>
+  </data>
+  <data name="EmptySidebarHint" xml:space="preserve">
+    <value>New chats will appear here automatically</value>
+  </data>
+  <data name="Queue" xml:space="preserve">
+    <value>Queue</value>
+  </data>
+  <data name="MyChats" xml:space="preserve">
+    <value>My Chats</value>
+  </data>
+  <data name="NewRequest" xml:space="preserve">
+    <value>New request</value>
+  </data>
+  <data name="TakeChatTooltip" xml:space="preserve">
+    <value>Take Chat</value>
+  </data>
+  <data name="BotLabel" xml:space="preserve">
+    <value>bot: {0}</value>
+  </data>
+  <data name="ChatUnavailableTitle" xml:space="preserve">
+    <value>Chat Unavailable</value>
+  </data>
+  <data name="CloseModal" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="FinishChat" xml:space="preserve">
+    <value>End Chat</value>
+  </data>
+  <data name="LoadingMessages" xml:space="preserve">
+    <value>Loading messages...</value>
+  </data>
+  <data name="StartConversation" xml:space="preserve">
+    <value>Start a conversation</value>
+  </data>
+  <data name="DeleteTooltip" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="AttachFileTooltip" xml:space="preserve">
+    <value>Attach File</value>
+  </data>
+  <data name="InputPlaceholder" xml:space="preserve">
+    <value>Type a message...</value>
+  </data>
+  <data name="SelectChatTitle" xml:space="preserve">
+    <value>Select Chat</value>
+  </data>
+  <data name="SelectChatDesc" xml:space="preserve">
+    <value>Take a chat from the queue or select from active ones</value>
+  </data>
+  <data name="ChatAlreadyTaken" xml:space="preserve">
+    <value>This chat is already being handled by another agent.</value>
+  </data>
+  <data name="FileTooLarge" xml:space="preserve">
+    <value>File exceeds 20 MB.</value>
+  </data>
+  <data name="FailedToSendFile" xml:space="preserve">
+    <value>Failed to send file</value>
+  </data>
+  <data name="FailedToSendMessage" xml:space="preserve">
+    <value>Failed to send message</value>
+  </data>
+  <data name="SendErrorLabel" xml:space="preserve">
+    <value>(send error)</value>
+  </data>
+<data name="FailedToUploadFile" xml:space="preserve"><value>Failed to upload file</value></data><data name="DateToday" xml:space="preserve"><value>Today</value></data><data name="DateYesterday" xml:space="preserve"><value>Yesterday</value></data><data name="TransferToOperator" xml:space="preserve"><value>Transfer to operator</value></data><data name="TransferToOperatorDots" xml:space="preserve"><value>Transfer to operator...</value></data><data name="FilePreviewLabel" xml:space="preserve"><value>📎 File</value></data><data name="OperatorLabel" xml:space="preserve"><value>Operator</value></data></root>

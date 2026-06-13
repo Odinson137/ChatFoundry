@@ -6,13 +6,14 @@
 
 @inject BlazorClient.Interfaces.IWorkflowApiClient ApiClient
 @inject NavigationManager Navigation
+@inject IStringLocalizer<Sessions> LSessions
 
-<PageTitle>Настройки — Сессии — ChatFoundry</PageTitle>
+<PageTitle>@LSessions["PageTitle"] — ChatFoundry</PageTitle>
 
 <div class="settings-page-header">
     <div>
-        <h1 class="settings-page-title">Сессии</h1>
-        <p class="settings-page-subtitle">Просмотр взаимодействий пользователей с ботами</p>
+        <h1 class="settings-page-title">@LSessions["HeaderTitle"]</h1>
+        <p class="settings-page-subtitle">@LSessions["HeaderSubtitle"]</p>
     </div>
 </div>
 
@@ -38,8 +39,8 @@ else if (!_sessions.Any() && !HasActiveFilters)
         <div class="settings-empty-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
         </div>
-        <div class="settings-empty-title">Нет сессий</div>
-        <div class="settings-empty-desc">Сессии появятся, когда пользователи начнут взаимодействовать с ботами.</div>
+        <div class="settings-empty-title">@LSessions["NoSessions"]</div>
+        <div class="settings-empty-desc">@LSessions["NoSessionsDesc"]</div>
     </div>
 }
 else
@@ -47,31 +48,31 @@ else
     <div class="settings-card sess-card">
         <div class="sess-filters">
             <div class="sess-filters-row">
-                <input type="text" class="sess-input sess-input-search" placeholder="ID клиента" @bind="_searchText" @bind:event="oninput" @bind:after="OnSearchInput" />
+                <input type="text" class="sess-input sess-input-search" placeholder="@LSessions["ClientIdPlaceholder"]" @bind="_searchText" @bind:event="oninput" @bind:after="OnSearchInput" />
                 <select class="settings-select sess-select" @bind="StatusFilter" @bind:after="OnFilterChanged">
-                    <option value="">Все статусы</option>
-                    <option value="ACTIVE">Активные</option>
-                    <option value="COMPLETED">Завершённые</option>
-                    <option value="FAILED">Ошибка</option>
-                    <option value="CANCELLED">Отменённые</option>
+                    <option value="">@LSessions["AllStatuses"]</option>
+                    <option value="ACTIVE">@LSessions["StatusActive"]</option>
+                    <option value="COMPLETED">@LSessions["StatusCompleted"]</option>
+                    <option value="FAILED">@LSessions["StatusFailed"]</option>
+                    <option value="CANCELLED">@LSessions["StatusCancelled"]</option>
                 </select>
                 <select class="settings-select sess-select" @bind="_botIdFilter" @bind:after="OnFilterChanged">
-                    <option value="">Все боты</option>
+                    <option value="">@LSessions["AllBots"]</option>
                     @foreach (var bot in _bots)
                     {
                         <option value="@bot.Id">@bot.Name</option>
                     }
                 </select>
-                <button type="button" class="settings-icon-btn sess-btn-refresh" @onclick="OnRefreshClick" title="Обновить">
+                <button type="button" class="settings-icon-btn sess-btn-refresh" @onclick="OnRefreshClick" title="@LSessions["Refresh"]">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
                 </button>
             </div>
             <div class="sess-filters-row sess-filters-row-dates">
-                <span class="sess-filter-label">Создана</span>
+                <span class="sess-filter-label">@LSessions["Created"]</span>
                 <input type="date" class="sess-input sess-input-date" @bind="_createdFrom" @bind:format="yyyy-MM-dd" @bind:after="OnFilterChanged" />
                 <span class="sess-filter-sep">—</span>
                 <input type="date" class="sess-input sess-input-date" @bind="_createdTo" @bind:format="yyyy-MM-dd" @bind:after="OnFilterChanged" />
-                <span class="sess-filter-label">Завершена</span>
+                <span class="sess-filter-label">@LSessions["CompletedLabel"]</span>
                 <input type="date" class="sess-input sess-input-date" @bind="_completedFrom" @bind:format="yyyy-MM-dd" @bind:after="OnFilterChanged" />
                 <span class="sess-filter-sep">—</span>
                 <input type="date" class="sess-input sess-input-date" @bind="_completedTo" @bind:format="yyyy-MM-dd" @bind:after="OnFilterChanged" />
@@ -80,8 +81,8 @@ else
         @if (!_sessions.Any())
         {
             <div class="sess-filter-empty">
-                <p>Ничего не найдено</p>
-                <small>Измените фильтры или поисковый запрос</small>
+                <p>@LSessions["NotFound"]</p>
+                <small>@LSessions["ChangeFilters"]</small>
             </div>
         }
         else
@@ -89,12 +90,12 @@ else
             <table class="settings-table">
                 <thead>
                 <tr>
-                    <th>Клиент</th>
-                    <th>Бот</th>
-                    <th>Канал</th>
-                    <th>Статус</th>
-                    <th>Шагов</th>
-                    <th>Создана</th>
+                    <th>@LSessions["ColClient"]</th>
+                    <th>@LSessions["ColBot"]</th>
+                    <th>@LSessions["ColChannel"]</th>
+                    <th>@LSessions["ColStatus"]</th>
+                    <th>@LSessions["ColSteps"]</th>
+                    <th>@LSessions["ColCreated"]</th>
                     <th style="text-align: right;"></th>
                 </tr>
                 </thead>
@@ -132,7 +133,7 @@ else
                         <td style="text-align: right;">
                             <button class="settings-btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" @onclick="() => OpenReplay(s.Id)">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-                                Путь
+                                @LSessions["BtnPath"]
                             </button>
                         </td>
                     </tr>
@@ -146,19 +147,19 @@ else
     {
         <div class="sess-pagination">
             <div class="sess-pagination-info">
-                <span class="sess-pagination-muted">Показано @_sessions.Count из @_totalCount</span>
+                <span class="sess-pagination-muted">@string.Format(LSessions["ShownCountOfTotal"], _sessions.Count, _totalCount)</span>
             </div>
             <div class="sess-pagination-controls">
-                <label class="sess-pagination-muted">На странице:</label>
+                <label class="sess-pagination-muted">@LSessions["OnPage"]</label>
                 <select class="sess-page-size" @bind="_pageSize" @bind:after="OnPageSizeChanged">
                     <option value="10">10</option>
                     <option value="25">25</option>
                     <option value="50">50</option>
                 </select>
-                <button class="sess-btn-page" disabled="@(!_hasPreviousPage)" @onclick="GoToPreviousPage" title="Назад">
+                <button class="sess-btn-page" disabled="@(!_hasPreviousPage)" @onclick="GoToPreviousPage" title="@LSessions["Back"]">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
                 </button>
-                <button class="sess-btn-page" disabled="@(!_hasNextPage)" @onclick="GoToNextPage" title="Вперёд">
+                <button class="sess-btn-page" disabled="@(!_hasNextPage)" @onclick="GoToNextPage" title="@LSessions["Next"]">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                 </button>
             </div>
@@ -245,7 +246,7 @@ else
         }
         catch (Exception ex)
         {
-            _error = $"Не удалось загрузить сессии: {ex.Message}";
+            _error = string.Format(LSessions["LoadError"], ex.Message);
         }
         finally
         {
@@ -345,12 +346,12 @@ else
         _ => "settings-badge-neutral"
     };
 
-    private static string StatusLabel(string? status) => status?.ToUpperInvariant() switch
+    private string StatusLabel(string? status) => status?.ToUpperInvariant() switch
     {
-        "ACTIVE" => "Активна",
-        "COMPLETED" => "Завершена",
-        "FAILED" => "Ошибка",
-        "CANCELLED" => "Отменена",
+        "ACTIVE" => LSessions["StatusActiveSingular"],
+        "COMPLETED" => LSessions["StatusCompletedSingular"],
+        "FAILED" => LSessions["StatusFailedSingular"],
+        "CANCELLED" => LSessions["StatusCancelledSingular"],
         _ => status ?? "—"
     };
 }

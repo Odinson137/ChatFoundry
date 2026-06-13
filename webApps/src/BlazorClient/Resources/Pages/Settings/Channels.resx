@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="0" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="PageTitle" xml:space="preserve">
+    <value>Настройки — Каналы — ChatFoundry</value>
+  </data>
+  <data name="HeaderTitle" xml:space="preserve">
+    <value>Каналы</value>
+  </data>
+  <data name="HeaderSubtitle" xml:space="preserve">
+    <value>Подключённые мессенджеры и платформы</value>
+  </data>
+  <data name="AddChannel" xml:space="preserve">
+    <value>Добавить канал</value>
+  </data>
+  <data name="EmptyTitle" xml:space="preserve">
+    <value>Нет каналов</value>
+  </data>
+  <data name="EmptyDesc" xml:space="preserve">
+    <value>Добавьте первый канал, например Telegram, чтобы начать получать сообщения.</value>
+  </data>
+  <data name="TooltipRefreshWebhook" xml:space="preserve">
+    <value>Обновить webhook</value>
+  </data>
+  <data name="TooltipEdit" xml:space="preserve">
+    <value>Редактировать</value>
+  </data>
+  <data name="TooltipDelete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="EditChannelModalTitle" xml:space="preserve">
+    <value>Редактировать канал</value>
+  </data>
+  <data name="NewChannelModalTitle" xml:space="preserve">
+    <value>Новый канал</value>
+  </data>
+  <data name="FieldName" xml:space="preserve">
+    <value>Имя</value>
+  </data>
+  <data name="FieldNamePlaceholder" xml:space="preserve">
+    <value>Мой Telegram</value>
+  </data>
+  <data name="FieldToken" xml:space="preserve">
+    <value>Токен</value>
+  </data>
+  <data name="FieldTokenPlaceholderEdit" xml:space="preserve">
+    <value>Оставьте пустым, чтобы не менять</value>
+  </data>
+  <data name="FieldTokenPlaceholderNew" xml:space="preserve">
+    <value>Токен бота от @BotFather</value>
+  </data>
+  <data name="FieldTokenHint" xml:space="preserve">
+    <value>Оставьте поле пустым, чтобы не менять токен.</value>
+  </data>
+  <data name="FieldChannelType" xml:space="preserve">
+    <value>Тип канала</value>
+  </data>
+  <data name="CancelBtn" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="SaveBtn" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="LoadError" xml:space="preserve">
+    <value>Ошибка загрузки: {0}</value>
+  </data>
+  <data name="SaveError" xml:space="preserve">
+    <value>Ошибка сохранения: {0}</value>
+  </data>
+  <data name="WebhookError" xml:space="preserve">
+    <value>Хук: {0}</value>
+  </data>
+  <data name="DeleteConfirmPrompt" xml:space="preserve">
+    <value>Удалить канал «{0}»?</value>
+  </data>
+</root>

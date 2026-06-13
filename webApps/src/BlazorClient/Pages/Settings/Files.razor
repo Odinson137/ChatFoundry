@@ -9,17 +9,18 @@
 @inject ICompanyApiClient CompanyApi
 @inject NavigationManager Navigation
 @inject IJSRuntime JsRuntime
+@inject IStringLocalizer<Files> LFiles
 
-<PageTitle>Настройки — Файлы — ChatFoundry</PageTitle>
+<PageTitle>@LFiles["PageTitle"] — ChatFoundry</PageTitle>
 
 <div class="settings-page-header">
     <div>
-        <h1 class="settings-page-title">Файлы</h1>
-        <p class="settings-page-subtitle">Хранилище файлов для использования в workflow</p>
+        <h1 class="settings-page-title">@LFiles["HeaderTitle"]</h1>
+        <p class="settings-page-subtitle">@LFiles["HeaderSubtitle"]</p>
     </div>
     <button class="settings-btn-primary" @onclick="() => showUploadModal = true">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        Загрузить файл
+        @LFiles["BtnUploadFile"]
     </button>
 </div>
 
@@ -46,11 +47,11 @@ else if (!_allFiles.Any())
         <div class="settings-empty-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
         </div>
-        <div class="settings-empty-title">Нет файлов</div>
-        <div class="settings-empty-desc">Загрузите первый файл — изображения, документы или медиафайлы для ботов.</div>
+        <div class="settings-empty-title">@LFiles["NoFilesTitle"]</div>
+        <div class="settings-empty-desc">@LFiles["NoFilesDesc"]</div>
         <button class="settings-btn-primary" @onclick="() => showUploadModal = true">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            Загрузить файл
+            @LFiles["BtnUploadFile"]
         </button>
     </div>
 }
@@ -60,20 +61,20 @@ else
     <div class="settings-card files-card">
         <div class="files-filters">
             <div class="files-filters-row">
-                <input type="text" class="files-input files-input-search" placeholder="Имя или ID файла" @bind="_searchText" @bind:event="oninput" @bind:after="OnSearchInput" />
+                <input type="text" class="files-input files-input-search" placeholder="@LFiles["SearchPlaceholder"]" @bind="_searchText" @bind:event="oninput" @bind:after="OnSearchInput" />
                 <select class="settings-select files-select" @bind="_typeFilter" @bind:after="OnFilterChanged">
-                    <option value="">Все типы</option>
-                    <option value="image">Изображения</option>
-                    <option value="video">Видео</option>
-                    <option value="audio">Аудио</option>
-                    <option value="other">Прочее</option>
+                    <option value="">@LFiles["FilterAllTypes"]</option>
+                    <option value="image">@LFiles["FilterImages"]</option>
+                    <option value="video">@LFiles["FilterVideo"]</option>
+                    <option value="audio">@LFiles["FilterAudio"]</option>
+                    <option value="other">@LFiles["FilterOther"]</option>
                 </select>
-                <button type="button" class="settings-icon-btn files-btn-refresh" @onclick="OnRefreshClick" title="Обновить">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+                <button type="button" class="settings-icon-btn files-btn-refresh" @onclick="OnRefreshClick" title="@LFiles["TooltipRefresh"]">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
                 </button>
             </div>
             <div class="files-filters-row files-filters-row-dates">
-                <span class="files-filter-label">Загружен</span>
+                <span class="files-filter-label">@LFiles["FilterUploadedLabel"]</span>
                 <input type="date" class="files-input files-input-date" @bind="_createdFrom" @bind:format="yyyy-MM-dd" @bind:after="OnFilterChanged" />
                 <span class="files-filter-sep">—</span>
                 <input type="date" class="files-input files-input-date" @bind="_createdTo" @bind:format="yyyy-MM-dd" @bind:after="OnFilterChanged" />
@@ -82,8 +83,8 @@ else
         @if (totalFiltered == 0)
         {
             <div class="files-filter-empty">
-                <p>Ничего не найдено</p>
-                <small>Измените фильтры или поисковый запрос</small>
+                <p>@LFiles["FilterEmptyText"]</p>
+                <small>@LFiles["FilterEmptyHint"]</small>
             </div>
         }
         else
@@ -91,12 +92,12 @@ else
         <table class="settings-table">
             <thead>
             <tr>
-                <th>Файл</th>
-                <th>Тип</th>
-                <th>Размер</th>
-                <th>Дата</th>
-                <th>Кто загрузил</th>
-                <th style="text-align: right;">Действия</th>
+                <th>@LFiles["ThFile"]</th>
+                <th>@LFiles["ThType"]</th>
+                <th>@LFiles["ThSize"]</th>
+                <th>@LFiles["ThDate"]</th>
+                <th>@LFiles["ThUploader"]</th>
+                <th style="text-align: right;">@LFiles["ThActions"]</th>
             </tr>
             </thead>
             <tbody>
@@ -129,16 +130,16 @@ else
                     <td><code class="file-type">@(file.ContentType ?? "—")</code></td>
                     <td class="file-size">@FormatSize(file.Size)</td>
                     <td class="file-date">@(file.CreatedAt?.ToString("dd.MM.yyyy") ?? "—")</td>
-                    <td class="file-source">@file.UploadSourceDisplay</td>
+                    <td class="file-source">@(file.UploadedByUserId.HasValue ? LFiles["SourceAdmin"] : LFiles["SourceClient"])</td>
                     <td style="text-align: right;" @onclick:stopPropagation="true">
                         <div class="file-actions">
-                            <button class="settings-icon-btn" @onclick="() => OpenFile(file)" title="Подробнее">
+                            <button class="settings-icon-btn" @onclick="() => OpenFile(file)" title="@LFiles["TooltipDetails"]">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                             </button>
-                            <button class="settings-icon-btn" @onclick="() => DownloadFile(file)" title="Скачать">
+                            <button class="settings-icon-btn" @onclick="() => DownloadFile(file)" title="@LFiles["TooltipDownload"]">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                             </button>
-                            <button class="settings-icon-btn settings-icon-btn-danger" @onclick="() => DeleteFile(file)" title="Удалить">
+                            <button class="settings-icon-btn settings-icon-btn-danger" @onclick="() => DeleteFile(file)" title="@LFiles["TooltipDelete"]">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
                             </button>
                         </div>
@@ -154,19 +155,19 @@ else
     {
         <div class="files-pagination">
             <div class="files-pagination-info">
-                <span class="files-pagination-muted">Показано @(pageItems.Count) из @totalFiltered</span>
+                <span class="files-pagination-muted">@string.Format(LFiles["PaginationInfo"].Value, pageItems.Count, totalFiltered)</span>
             </div>
             <div class="files-pagination-controls">
-                <label class="files-pagination-muted">На странице:</label>
+                <label class="files-pagination-muted">@LFiles["PaginationOnPage"]</label>
                 <select class="files-page-size" @bind="_pageSize" @bind:after="OnPageSizeChanged">
                     <option value="10">10</option>
                     <option value="25">25</option>
                     <option value="50">50</option>
                 </select>
-                <button class="files-btn-page" disabled="@(!HasPrevPage)" @onclick="GoToPreviousPage" title="Назад">
+                <button class="files-btn-page" disabled="@(!HasPrevPage)" @onclick="GoToPreviousPage" title="@LFiles["PaginationPrev"]">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
                 </button>
-                <button class="files-btn-page" disabled="@(!HasNextPage)" @onclick="GoToNextPage" title="Вперёд">
+                <button class="files-btn-page" disabled="@(!HasNextPage)" @onclick="GoToNextPage" title="@LFiles["PaginationNext"]">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                 </button>
             </div>
@@ -179,14 +180,14 @@ else
     <div class="settings-modal-backdrop" @onclick="@(() => { if (!isUploading) CloseUploadModal(); })"></div>
     <div class="settings-modal">
         <div class="settings-modal-header">
-            <h3 class="settings-modal-title">Загрузить файл</h3>
+            <h3 class="settings-modal-title">@LFiles["ModalUploadTitle"]</h3>
             <button class="settings-modal-close" @onclick="CloseUploadModal" disabled="@isUploading">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
         </div>
         <div class="settings-modal-body">
             <div class="settings-field">
-                <label class="settings-label">Выберите файл (макс. 20 МБ)</label>
+                <label class="settings-label">@LFiles["ModalUploadSelectLabel"]</label>
                 <InputFile class="settings-input" OnChange="OnFileSelected" disabled="@isUploading" style="padding: 8px;" />
             </div>
             @if (selectedFile != null)
@@ -199,15 +200,15 @@ else
             @if (!string.IsNullOrEmpty(uploadError))
             {
                 <div class="settings-alert settings-alert-danger" style="margin-bottom: 0;">
-                    <span>@uploadError</span>
+                     <span>@uploadError</span>
                 </div>
             }
         </div>
         <div class="settings-modal-footer">
-            <button class="settings-btn-secondary" @onclick="CloseUploadModal" disabled="@isUploading">Отмена</button>
+            <button class="settings-btn-secondary" @onclick="CloseUploadModal" disabled="@isUploading">@LFiles["ModalUploadCancel"]</button>
             <button class="settings-btn-primary" @onclick="UploadFile" disabled="@(isUploading || selectedFile == null)">
                 @if (isUploading) { <div class="settings-spinner" style="width:16px;height:16px;border-width:2px;"></div> }
-                Загрузить
+                @LFiles["ModalUploadBtn"]
             </button>
         </div>
     </div>
@@ -251,7 +252,7 @@ else
 
     private List<FileInfoDto> ComputeFiltered()
     {
-        IEnumerable<FileInfoDto> q = _allFiles;
+        var q = (IEnumerable<FileInfoDto>)_allFiles;
 
         var search = _searchText.Trim();
         if (!string.IsNullOrEmpty(search))
@@ -354,7 +355,7 @@ else
         }
         catch (Exception ex)
         {
-            error = $"Ошибка загрузки: {ex.Message}";
+            error = string.Format(LFiles["ErrorLoad"].Value, ex.Message);
         }
         finally
         {
@@ -383,13 +384,13 @@ else
         }
         catch (Exception ex)
         {
-            error = $"Ошибка скачивания: {ex.Message}";
+            error = string.Format(LFiles["ErrorDownload"].Value, ex.Message);
         }
     }
 
     private async Task DeleteFile(FileInfoDto file)
     {
-        if (!await JsRuntime.InvokeAsync<bool>("confirm", $"Удалить файл «{file.Name}»?"))
+        if (!await JsRuntime.InvokeAsync<bool>("confirm", string.Format(LFiles["DeleteConfirm"].Value, file.Name)))
             return;
 
         error = null;
@@ -400,7 +401,7 @@ else
         }
         catch (Exception ex)
         {
-            error = $"Ошибка удаления: {ex.Message}";
+            error = string.Format(LFiles["ErrorDelete"].Value, ex.Message);
         }
     }
 
@@ -410,7 +411,7 @@ else
         selectedFile = e.File;
         if (selectedFile.Size > MaxFileSize)
         {
-            uploadError = "Файл превышает 20 МБ.";
+            uploadError = LFiles["ErrorFileTooLarge"];
             selectedFile = null;
         }
     }
@@ -428,7 +429,7 @@ else
             var result = await FileApi.UploadFileAsync(stream, selectedFile.Name, selectedFile.ContentType, company?.Id);
             if (result == null)
             {
-                uploadError = "Не удалось загрузить файл.";
+                uploadError = LFiles["ErrorUploadFailed"];
                 return;
             }
             CloseUploadModal();
@@ -436,7 +437,7 @@ else
         }
         catch (Exception ex)
         {
-            uploadError = $"Ошибка загрузки: {ex.Message}";
+            uploadError = string.Format(LFiles["ErrorLoad"].Value, ex.Message);
         }
         finally
         {
@@ -463,13 +464,13 @@ else
         return "file-icon-default";
     }
 
-    private static string FormatSize(long? bytes)
+    private string FormatSize(long? bytes)
     {
         if (bytes is null) return "—";
         var b = bytes.Value;
-        if (b < 1024) return $"{b} Б";
-        if (b < 1024 * 1024) return $"{b / 1024.0:F1} КБ";
-        if (b < 1024L * 1024 * 1024) return $"{b / (1024.0 * 1024):F1} МБ";
-        return $"{b / (1024.0 * 1024 * 1024):F2} ГБ";
+        if (b < 1024) return string.Format(LFiles["FormatSizeB"].Value, b);
+        if (b < 1024 * 1024) return string.Format(LFiles["FormatSizeKB"].Value, b / 1024.0);
+        if (b < 1024L * 1024 * 1024) return string.Format(LFiles["FormatSizeMB"].Value, b / (1024.0 * 1024));
+        return string.Format(LFiles["FormatSizeGB"].Value, b / (1024.0 * 1024 * 1024));
     }
 }

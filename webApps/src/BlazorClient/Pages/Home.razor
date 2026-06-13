@@ -1,23 +1,22 @@
 @page "/"
+@inject IStringLocalizer<Home> LHome
 
-<PageTitle>ChatFoundry — Визуальный конструктор AI-ботов</PageTitle>
+<PageTitle>@LHome["PageTitle"]</PageTitle>
 
 <!-- Hero -->
 <section class="hero">
     <div class="hero-inner">
         <div class="hero-badge">Open Source / Self-Hosted / SaaS</div>
         <h1 class="hero-title">
-            Создавайте AI-ботов<br/>
-            <span class="hero-accent">без написания кода</span>
+            @LHome["HeroTitlePart1"]<br/>
+            <span class="hero-accent">@LHome["HeroTitleAccent"]</span>
         </h1>
         <p class="hero-subtitle">
-            Визуальный конструктор чат-ботов с интеграцией LLM, мультиканальностью
-            и возможностью развёртывания на своих серверах.
-            Для бизнеса в СНГ и не только.
+            @LHome["HeroSubtitle"]
         </p>
         <div class="hero-actions">
             <a href="/bots" class="btn-hero-primary">
-                Начать бесплатно
+                @LHome["HeroStartFree"]
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-left: 6px;">
                     <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
@@ -48,8 +47,8 @@
 <section class="features">
     <div class="section-inner">
         <div class="section-header">
-            <h2 class="section-title">Всё для создания умных ботов</h2>
-            <p class="section-subtitle">Перетаскивайте блоки, подключайте AI и запускайте в любом мессенджере</p>
+            <h2 class="section-title">@LHome["FeaturesTitle"]</h2>
+            <p class="section-subtitle">@LHome["FeaturesSubtitle"]</p>
         </div>
 
         <div class="features-grid">
@@ -62,8 +61,8 @@
                         <rect x="14" y="14" width="7" height="7" rx="1"/>
                     </svg>
                 </div>
-                <h3 class="feature-title">Визуальный конструктор</h3>
-                <p class="feature-desc">Drag & drop редактор workflow. Создавайте логику бота из готовых блоков: сообщения, условия, переменные, HTTP-запросы.</p>
+                <h3 class="feature-title">@LHome["Feature1Title"]</h3>
+                <p class="feature-desc">@LHome["Feature1Desc"]</p>
             </div>
 
             <div class="feature-card">
@@ -75,8 +74,8 @@
                         <circle cx="12" cy="21" r="1"/>
                     </svg>
                 </div>
-                <h3 class="feature-title">AI-интеграция</h3>
-                <p class="feature-desc">Подключайте LLM (OpenAI, Anthropic) для генерации ответов, фильтрации контента и интеллектуальной маршрутизации диалогов.</p>
+                <h3 class="feature-title">@LHome["Feature2Title"]</h3>
+                <p class="feature-desc">@LHome["Feature2Desc"]</p>
             </div>
 
             <div class="feature-card">
@@ -85,8 +84,8 @@
                         <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
                     </svg>
                 </div>
-                <h3 class="feature-title">Мультиканальность</h3>
-                <p class="feature-desc">Telegram, WhatsApp, веб-виджет и другие каналы. Один workflow — все мессенджеры. Начните с Telegram за несколько минут.</p>
+                <h3 class="feature-title">@LHome["Feature3Title"]</h3>
+                <p class="feature-desc">@LHome["Feature3Desc"]</p>
             </div>
 
             <div class="feature-card">
@@ -97,8 +96,8 @@
                         <path d="M12 17v4"/>
                     </svg>
                 </div>
-                <h3 class="feature-title">Self-Hosted</h3>
-                <p class="feature-desc">Разверните на своих серверах через Docker Compose. Полный контроль над данными — идеально для банков, госструктур и enterprise.</p>
+                <h3 class="feature-title">@LHome["Feature4Title"]</h3>
+                <p class="feature-desc">@LHome["Feature4Desc"]</p>
             </div>
 
             <div class="feature-card">
@@ -107,8 +106,8 @@
                         <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
                     </svg>
                 </div>
-                <h3 class="feature-title">Микросервисы</h3>
-                <p class="feature-desc">Архитектура на .NET с gRPC и Kafka. Каждый сервис масштабируется независимо. Готово к продакшн-нагрузкам.</p>
+                <h3 class="feature-title">@LHome["Feature5Title"]</h3>
+                <p class="feature-desc">@LHome["Feature5Desc"]</p>
             </div>
 
             <div class="feature-card">
@@ -117,8 +116,8 @@
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                     </svg>
                 </div>
-                <h3 class="feature-title">BYOK</h3>
-                <p class="feature-desc">Используйте свои API-ключи для LLM. Никаких скрытых наценок на токены — вы платите только провайдеру напрямую.</p>
+                <h3 class="feature-title">@LHome["Feature6Title"]</h3>
+                <p class="feature-desc">@LHome["Feature6Desc"]</p>
             </div>
         </div>
     </div>
@@ -128,76 +127,28 @@
 <section class="how-it-works">
     <div class="section-inner">
         <div class="section-header">
-            <h2 class="section-title">Как это работает</h2>
-            <p class="section-subtitle">Три шага от идеи до работающего бота</p>
+            <h2 class="section-title">@LHome["HowItWorksTitle"]</h2>
+            <p class="section-subtitle">@LHome["HowItWorksSubtitle"]</p>
         </div>
 
         <div class="steps">
             <div class="step">
                 <div class="step-number">1</div>
-                <h3 class="step-title">Соберите workflow</h3>
-                <p class="step-desc">Перетащите блоки на холст и соедините их. Message, Ask, Condition, AI Generate, HTTP Request — всё, что нужно для любого сценария.</p>
+                <h3 class="step-title">@LHome["Step1Title"]</h3>
+                <p class="step-desc">@LHome["Step1Desc"]</p>
             </div>
             <div class="step-divider"></div>
             <div class="step">
                 <div class="step-number">2</div>
-                <h3 class="step-title">Подключите канал</h3>
-                <p class="step-desc">Привяжите Telegram-бота или встройте веб-виджет на сайт. Один workflow работает сразу во всех каналах.</p>
+                <h3 class="step-title">@LHome["Step2Title"]</h3>
+                <p class="step-desc">@LHome["Step2Desc"]</p>
             </div>
             <div class="step-divider"></div>
             <div class="step">
                 <div class="step-number">3</div>
-                <h3 class="step-title">Запустите</h3>
-                <p class="step-desc">Бот начинает принимать сообщения и обрабатывать их по вашему сценарию. Следите за статистикой в реальном времени.</p>
+                <h3 class="step-title">@LHome["Step3Title"]</h3>
+                <p class="step-desc">@LHome["Step3Desc"]</p>
             </div>
-        </div>
-    </div>
-</section>
-
-<!-- Architecture -->
-<section class="architecture">
-    <div class="section-inner">
-        <div class="section-header">
-            <h2 class="section-title">Архитектура</h2>
-            <p class="section-subtitle">Построено для надёжности и масштабирования</p>
-        </div>
-
-        <div class="arch-grid">
-            <div class="arch-card">
-                <div class="arch-label">Gateway</div>
-                <div class="arch-detail">YARP reverse proxy, JWT, маршрутизация</div>
-            </div>
-            <div class="arch-card">
-                <div class="arch-label">WorkflowService</div>
-                <div class="arch-detail">Движок workflow, GraphQL API, исполнение блоков</div>
-            </div>
-            <div class="arch-card">
-                <div class="arch-label">ClientService</div>
-                <div class="arch-detail">Управление клиентами, атрибутами, командами</div>
-            </div>
-            <div class="arch-card">
-                <div class="arch-label">IdentityServer</div>
-                <div class="arch-detail">OAuth2 / OpenID Connect через OpenIddict</div>
-            </div>
-            <div class="arch-card">
-                <div class="arch-label">TelegramService</div>
-                <div class="arch-detail">Webhook, отправка/получение сообщений</div>
-            </div>
-            <div class="arch-card">
-                <div class="arch-label">BlazorClient</div>
-                <div class="arch-detail">Blazor WASM + визуальный редактор workflow</div>
-            </div>
-        </div>
-
-        <div class="tech-stack">
-            <span class="tech-tag">.NET 10</span>
-            <span class="tech-tag">gRPC</span>
-            <span class="tech-tag">GraphQL</span>
-            <span class="tech-tag">Kafka</span>
-            <span class="tech-tag">PostgreSQL</span>
-            <span class="tech-tag">Docker</span>
-            <span class="tech-tag">Blazor WASM</span>
-            <span class="tech-tag">EF Core</span>
         </div>
     </div>
 </section>
@@ -206,45 +157,45 @@
 <section class="free-tier">
     <div class="section-inner">
         <div class="free-tier-card">
-            <div class="free-tier-badge">Тариф Free</div>
-            <h2 class="free-tier-title">Начните бесплатно уже сейчас</h2>
+            <div class="free-tier-badge">@LHome["FreeTierBadge"]</div>
+            <h2 class="free-tier-title">@LHome["FreeTitle"]</h2>
             <p class="free-tier-subtitle">
-                Попробуйте все возможности визуального конструктора и AI-интеграций без ограничений.
+                @LHome["FreeSubtitle"]
             </p>
             <ul class="free-tier-features">
                 <li>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    10 активных ботов и безлимитные каналы связи
+                    @LHome["FreeItem1"]
                 </li>
                 <li>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    Безлимитная отправка и приём сообщений
+                    @LHome["FreeItem2"]
                 </li>
                 <li>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    1 000 000 AI токенов в месяц для работы с LLM
+                    @LHome["FreeItem3"]
                 </li>
                 <li>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    Команда до 10 участников для совместной работы
+                    @LHome["FreeItem4"]
                 </li>
                 <li>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    До 100 активных клиентов в базе данных ботов
+                    @LHome["FreeItem5"]
                 </li>
             </ul>
             <a href="/bots" class="btn-free-tier">
-                Попробовать все функции
+                @LHome["FreeButton"]
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-left: 8px;">
                     <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
@@ -256,10 +207,10 @@
 <!-- CTA -->
 <section class="cta">
     <div class="section-inner">
-        <h2 class="cta-title">Готовы создать своего бота?</h2>
-        <p class="cta-subtitle">Присоединяйтесь к ChatFoundry и запустите AI-бота за считанные минуты</p>
+        <h2 class="cta-title">@LHome["CtaTitle"]</h2>
+        <p class="cta-subtitle">@LHome["CtaSubtitle"]</p>
         <a href="/bots" class="btn-hero-primary">
-            Начать бесплатно
+            @LHome["HeroStartFree"]
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-left: 6px;">
                 <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>

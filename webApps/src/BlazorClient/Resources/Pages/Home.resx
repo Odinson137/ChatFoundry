@@ -1,0 +1,179 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xs:element name="root" ns1:IsDataSet="true">
+      <xs:complexType>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="metadata">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" />
+              </xs:sequence>
+              <xs:attribute name="name" use="required" type="xsd:string" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="assembly">
+            <xs:complexType>
+              <xs:attribute name="alias" type="xsd:string" />
+              <xs:attribute name="name" type="xsd:string" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="0" />
+                <xs:element name="comment" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" ns1:Ordinal="1" />
+              <xs:attribute name="type" type="xsd:string" ns1:Ordinal="3" />
+              <xs:attribute name="mimetype" type="xsd:string" ns1:Ordinal="4" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="resheader">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="0" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  
+  <data name="PageTitle" xml:space="preserve">
+    <value>ChatFoundry — Визуальный конструктор AI-ботов</value>
+  </data>
+  <data name="HeroTitlePart1" xml:space="preserve">
+    <value>Создавайте AI-ботов</value>
+  </data>
+  <data name="HeroTitleAccent" xml:space="preserve">
+    <value>без написания кода</value>
+  </data>
+  <data name="HeroSubtitle" xml:space="preserve">
+    <value>Визуальный конструктор чат-ботов с интеграцией LLM, мультиканальностью и возможностью развёртывания на своих серверах. Для бизнеса в СНГ и не только.</value>
+  </data>
+  <data name="HeroStartFree" xml:space="preserve">
+    <value>Начать бесплатно</value>
+  </data>
+  <data name="FeaturesTitle" xml:space="preserve">
+    <value>Всё для создания умных ботов</value>
+  </data>
+  <data name="FeaturesSubtitle" xml:space="preserve">
+    <value>Перетаскивайте блоки, подключайте AI и запускайте в любом мессенджере</value>
+  </data>
+  <data name="Feature1Title" xml:space="preserve">
+    <value>Визуальный конструктор</value>
+  </data>
+  <data name="Feature1Desc" xml:space="preserve">
+    <value>Drag &amp; drop редактор workflow. Создавайте логику бота из готовых блоков: сообщения, условия, переменные, HTTP-запросы.</value>
+  </data>
+  <data name="Feature2Title" xml:space="preserve">
+    <value>AI-интеграция</value>
+  </data>
+  <data name="Feature2Desc" xml:space="preserve">
+    <value>Подключайте LLM (OpenAI, Anthropic) для генерации ответов, фильтрации контента и интеллектуальной маршрутизации диалогов.</value>
+  </data>
+  <data name="Feature3Title" xml:space="preserve">
+    <value>Мультиканальность</value>
+  </data>
+  <data name="Feature3Desc" xml:space="preserve">
+    <value>Telegram, WhatsApp, веб-виджет и другие каналы. Один workflow — все мессенджеры. Начните с Telegram за несколько минут.</value>
+  </data>
+  <data name="Feature4Title" xml:space="preserve">
+    <value>Self-Hosted</value>
+  </data>
+  <data name="Feature4Desc" xml:space="preserve">
+    <value>Разверните на своих серверах через Docker Compose. Полный контроль над данными — идеально для банков, госструктур и enterprise.</value>
+  </data>
+  <data name="Feature5Title" xml:space="preserve">
+    <value>Микросервисы</value>
+  </data>
+  <data name="Feature5Desc" xml:space="preserve">
+    <value>Архитектура на .NET с gRPC и Kafka. Каждый сервис масштабируется независимо. Готово к продакшн-нагрузкам.</value>
+  </data>
+  <data name="Feature6Title" xml:space="preserve">
+    <value>BYOK</value>
+  </data>
+  <data name="Feature6Desc" xml:space="preserve">
+    <value>Используйте свои API-ключи для LLM. Никаких скрытых наценок на токены — вы платите только провайдеру напрямую.</value>
+  </data>
+  <data name="HowItWorksTitle" xml:space="preserve">
+    <value>Как это работает</value>
+  </data>
+  <data name="HowItWorksSubtitle" xml:space="preserve">
+    <value>Три шага от идеи до работающего бота</value>
+  </data>
+  <data name="Step1Title" xml:space="preserve">
+    <value>Соберите workflow</value>
+  </data>
+  <data name="Step1Desc" xml:space="preserve">
+    <value>Перетащите блоки на холст и соедините их. Message, Ask, Condition, AI Generate, HTTP Request — всё, что нужно для любого сценария.</value>
+  </data>
+  <data name="Step2Title" xml:space="preserve">
+    <value>Подключите канал</value>
+  </data>
+  <data name="Step2Desc" xml:space="preserve">
+    <value>Привяжите Telegram-бота или встройте веб-виджет на сайт. Один workflow работает сразу во всех каналах.</value>
+  </data>
+  <data name="Step3Title" xml:space="preserve">
+    <value>Запустите</value>
+  </data>
+  <data name="Step3Desc" xml:space="preserve">
+    <value>Бот начинает принимать сообщения и обрабатывать их по вашему сценарию. Следите за статистикой в реальном времени.</value>
+  </data>
+  <data name="ArchTitle" xml:space="preserve">
+    <value>Архитектура</value>
+  </data>
+  <data name="ArchSubtitle" xml:space="preserve">
+    <value>Построено для надёжности и масштабирования</value>
+  </data>
+  <data name="FreeTitle" xml:space="preserve">
+    <value>Начните бесплатно уже сейчас</value>
+  </data>
+  <data name="FreeSubtitle" xml:space="preserve">
+    <value>Попробуйте все возможности визуального конструктора и AI-интеграций без ограничений.</value>
+  </data>
+  <data name="FreeItem1" xml:space="preserve">
+    <value>10 активных ботов и безлимитные каналы связи</value>
+  </data>
+  <data name="FreeItem2" xml:space="preserve">
+    <value>Безлимитная отправка и приём сообщений</value>
+  </data>
+  <data name="FreeItem3" xml:space="preserve">
+    <value>1 000 000 AI токенов в месяц для работы с LLM</value>
+  </data>
+  <data name="FreeItem4" xml:space="preserve">
+    <value>Команда до 10 участников для совместной работы</value>
+  </data>
+  <data name="FreeItem5" xml:space="preserve">
+    <value>До 100 активных клиентов в базе данных ботов</value>
+  </data>
+  <data name="FreeButton" xml:space="preserve">
+    <value>Попробовать все функции</value>
+  </data>
+  <data name="CtaTitle" xml:space="preserve">
+    <value>Готовы создать своего бота?</value>
+  </data>
+  <data name="CtaSubtitle" xml:space="preserve">
+    <value>Присоединяйтесь к ChatFoundry и запустите AI-бота за считанные минуты</value>
+  </data>
+<data name="FreeTierBadge" xml:space="preserve"><value>Тариф Free</value></data></root>

@@ -1,0 +1,56 @@
+@using System.Globalization
+@using Blazored.LocalStorage
+@inject NavigationManager Navigation
+@inject ILocalStorageService LocalStorage
+
+<div class="lang-selector">
+    <button class="lang-btn" @onclick="ToggleDropdown" aria-label="Change language">
+        <svg class="globe-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+        <span class="lang-text">@GetShortLanguageName(CurrentCultureName)</span>
+        <svg class="chevron-icon @(isOpen ? "open" : "")" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+    </button>
+
+    @if (isOpen)
+    {
+        <div class="lang-dropdown">
+            <button class="lang-option @(CurrentCultureName.StartsWith("ru") ? "active" : "")" @onclick='() => ChangeLanguage("ru-RU")'>
+                <span class="flag">🇷🇺</span> Русский
+            </button>
+            <button class="lang-option @(CurrentCultureName.StartsWith("en") ? "active" : "")" @onclick='() => ChangeLanguage("en-US")'>
+                <span class="flag">🇺🇸</span> English
+            </button>
+        </div>
+    }
+</div>
+
+@code {
+    private bool isOpen = false;
+    private string CurrentCultureName => CultureInfo.CurrentCulture.Name;
+
+    private void ToggleDropdown()
+    {
+        isOpen = !isOpen;
+    }
+
+    private string GetShortLanguageName(string cultureName)
+    {
+        if (cultureName.StartsWith("ru", StringComparison.OrdinalIgnoreCase))
+            return "RU";
+        if (cultureName.StartsWith("en", StringComparison.OrdinalIgnoreCase))
+            return "EN";
+        return cultureName.ToUpper();
+    }
+
+    private async Task ChangeLanguage(string cultureName)
+    {
+        isOpen = false;
+        await LocalStorage.SetItemAsync("culture", cultureName);
+        Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+    }
+}

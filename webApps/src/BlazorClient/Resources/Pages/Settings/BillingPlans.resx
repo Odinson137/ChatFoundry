@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="0" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="PageTitle" xml:space="preserve">
+    <value>Настройки — Тарифы</value>
+  </data>
+  <data name="BackToBilling" xml:space="preserve">
+    <value>Биллинг</value>
+  </data>
+  <data name="HeaderTitle" xml:space="preserve">
+    <value>Тарифы</value>
+  </data>
+  <data name="HeaderSubtitle" xml:space="preserve">
+    <value>Выберите подходящий план для вашей компании</value>
+  </data>
+  <data name="UpgradePlan" xml:space="preserve">
+    <value>Повышение плана</value>
+  </data>
+  <data name="UpgradeDesc" xml:space="preserve">
+    <value> — смена происходит немедленно, неиспользованная часть текущего периода возвращается на баланс в виде кредита</value>
+  </data>
+  <data name="DowngradePlan" xml:space="preserve">
+    <value>Понижение плана</value>
+  </data>
+  <data name="DowngradeDesc" xml:space="preserve">
+    <value> — текущий план остаётся активным до конца оплаченного периода, затем автоматически переключается на новый</value>
+  </data>
+  <data name="CreditNote" xml:space="preserve">
+    <value>Кредит за неиспользованный период можно использовать для оплаты будущих подписок</value>
+  </data>
+  <data name="EmptyTitle" xml:space="preserve">
+    <value>Тарифы недоступны</value>
+  </data>
+  <data name="EmptyDesc" xml:space="preserve">
+    <value>Не удалось загрузить список тарифных планов.</value>
+  </data>
+  <data name="BadgeCurrent" xml:space="preserve">
+    <value>Текущий план</value>
+  </data>
+  <data name="BadgePending" xml:space="preserve">
+    <value>Запланирован — {0}</value>
+  </data>
+  <data name="PriceSuffix" xml:space="preserve">
+    <value>/ мес</value>
+  </data>
+  <data name="FeatureClients" xml:space="preserve">
+    <value>До {0} клиентов</value>
+  </data>
+  <data name="FeatureBots" xml:space="preserve">
+    <value>До {0} ботов</value>
+  </data>
+  <data name="FeatureTeam" xml:space="preserve">
+    <value>До {0} участников</value>
+  </data>
+  <data name="FeatureAiTokens" xml:space="preserve">
+    <value>AI токены: {0} / мес</value>
+  </data>
+  <data name="TooltipAiTokens" xml:space="preserve">
+    <value>Общий бюджет токенов нейросети в месяц для выполнения ИИ-действий в ботах и AI конструктора</value>
+  </data>
+  <data name="FeatureAnalytics" xml:space="preserve">
+    <value>Аналитика</value>
+  </data>
+  <data name="FeatureApiAccess" xml:space="preserve">
+    <value>API доступ</value>
+  </data>
+  <data name="BtnCancelChange" xml:space="preserve">
+    <value>Отменить смену</value>
+  </data>
+  <data name="BtnActive" xml:space="preserve">
+    <value>Активен</value>
+  </data>
+  <data name="BtnPending" xml:space="preserve">
+    <value>Ожидает активации</value>
+  </data>
+  <data name="BtnSelect" xml:space="preserve">
+    <value>Выбрать</value>
+  </data>
+  <data name="LoadError" xml:space="preserve">
+    <value>Не удалось загрузить тарифы: {0}</value>
+  </data>
+  <data name="ChangePlanFailed" xml:space="preserve">
+    <value>Не удалось сменить план</value>
+  </data>
+  <data name="UpgradeSuccessCredit" xml:space="preserve">
+    <value>План изменён на {0}. Зачислен кредит: {1:F2} USD</value>
+  </data>
+  <data name="UpgradeSuccess" xml:space="preserve">
+    <value>План изменён на {0}</value>
+  </data>
+  <data name="DowngradeSuccess" xml:space="preserve">
+    <value>Переход на план {0} запланирован на {1:dd MMM yyyy}. Текущий план активен до конца оплаченного периода.</value>
+  </data>
+  <data name="ChangeCancelled" xml:space="preserve">
+    <value>Запланированная смена плана отменена</value>
+  </data>
+  <data name="CurrentPlanSelected" xml:space="preserve">
+    <value>Выбран текущий план</value>
+  </data>
+  <data name="InsufficientBalance" xml:space="preserve">
+    <value>Недостаточно средств на балансе для смены плана. Пополните баланс и попробуйте снова.</value>
+  </data>
+</root>

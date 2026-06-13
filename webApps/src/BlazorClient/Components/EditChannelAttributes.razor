@@ -3,7 +3,7 @@
     <div class="eca-backdrop" @onclick="Cancel"></div>
     <div class="eca-modal">
         <div class="eca-header">
-            <h3 class="eca-title">Редактировать канал</h3>
+            <h3 class="eca-title">@L["EditChannelTitle"]</h3>
             <button class="eca-close" @onclick="Cancel">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
@@ -16,19 +16,19 @@
 
             <div class="eca-grid">
                 <div class="eca-field">
-                    <label class="eca-label">Имя</label>
-                    <input type="text" class="eca-input" @bind="Name" placeholder="Иван" />
+                    <label class="eca-label">@L["LabelFirstName"]</label>
+                    <input type="text" class="eca-input" @bind="Name" placeholder="@L["PlaceholderFirstName"]" />
                 </div>
                 <div class="eca-field">
-                    <label class="eca-label">Фамилия</label>
-                    <input type="text" class="eca-input" @bind="LastName" placeholder="Иванов" />
+                    <label class="eca-label">@L["LabelLastName"]</label>
+                    <input type="text" class="eca-input" @bind="LastName" placeholder="@L["PlaceholderLastName"]" />
                 </div>
                 <div class="eca-field">
                     <label class="eca-label">Username</label>
                     <input type="text" class="eca-input" @bind="Username" placeholder="@username_placeholder" />
                 </div>
                 <div class="eca-field">
-                    <label class="eca-label">Телефон</label>
+                    <label class="eca-label">@L["LabelPhone"]</label>
                     <input type="text" class="eca-input" @bind="Phone" placeholder="+7 999 123-45-67" />
                 </div>
                 <div class="eca-field">
@@ -38,19 +38,19 @@
             </div>
 
             <div class="eca-section">
-                <span class="eca-section-title">Кастомные атрибуты</span>
+                <span class="eca-section-title">@L["CustomAttributesSection"]</span>
                 @if (isLoadingDefinitions)
                 {
                     <div class="eca-loading-attrs">
                         <div class="eca-spinner-sm"></div>
-                        Загрузка...
+                        @L["Loading"]
                     </div>
                 }
                 else if (Definitions.Count == 0)
                 {
                     <div class="eca-empty-attrs">
-                        Нет определённых атрибутов.
-                        <a href="/settings/attributes" target="_blank">Создать</a>
+                        @L["NoDefinedAttributes"]
+                        <a href="/settings/attributes" target="_blank">@L["CreateLinkText"]</a>
                     </div>
                 }
                 else
@@ -86,7 +86,7 @@
                             {
                                 <input type="number" class="eca-input" value="@existing"
                                        @onchange="e => SetAttrValue(def.Key, e.Value?.ToString())"
-                                       placeholder="Число" />
+                                       placeholder="@L["PlaceholderNumber"]" />
                             }
                             else if (isDate)
                             {
@@ -97,7 +97,7 @@
                             {
                                 <input type="text" class="eca-input" value="@existing"
                                        @onchange="e => SetAttrValue(def.Key, e.Value?.ToString())"
-                                       placeholder="Значение" />
+                                       placeholder="@L["PlaceholderValue"]" />
                             }
                         </div>
                     }
@@ -105,13 +105,13 @@
             </div>
         </div>
         <div class="eca-footer">
-            <button class="eca-btn-secondary" @onclick="Cancel">Отмена</button>
+            <button class="eca-btn-secondary" @onclick="Cancel">@L["CancelBtn"]</button>
             <button class="eca-btn-primary" @onclick="Save" disabled="@isSaving">
                 @if (isSaving)
                 {
                     <span class="eca-spinner"></span>
                 }
-                Сохранить
+                @L["SaveBtn"]
             </button>
         </div>
     </div>

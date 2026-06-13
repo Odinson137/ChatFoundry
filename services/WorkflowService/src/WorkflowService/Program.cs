@@ -223,6 +223,7 @@ builder.Services
     .AddTypeExtension<SessionMutation>()
     .AddType<MessengerChannelType>()
     .AddType<WorkflowService.GraphQL.Types.BotWorkflowType>()
+    .AddType<WorkflowService.GraphQL.Types.SessionType>()
     .AddProjections()
     .AddFiltering()
     .AddSorting();

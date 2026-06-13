@@ -10,6 +10,7 @@ using BlazorClient.Models;
 using BlazorClient.Models.Diagram;
 using BlazorClient.Models.DTO;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Localization;
 
 namespace BlazorClient.Pages.Settings;
 
@@ -22,6 +23,8 @@ public interface IReplayDataProvider
 
 public partial class SessionReplay : IDisposable, IReplayDataProvider
 {
+    [Inject] private IStringLocalizer<SessionReplay> LReplay { get; set; } = null!;
+
     private sealed record VariableLine(string Label, string FullValue, string DisplayValue);
 
     private sealed record SessionVariableItem(string DisplayName, List<VariableLine> Lines, Guid? NodeId = null);
@@ -88,7 +91,7 @@ public partial class SessionReplay : IDisposable, IReplayDataProvider
             _session = await ApiClient.GetSessionByIdAsync(SessionId);
             if (_session == null)
             {
-                _loadError = "Сессия не найдена.";
+                _loadError = LReplay["SessionNotFound"];
                 return;
             }
 
@@ -108,12 +111,12 @@ public partial class SessionReplay : IDisposable, IReplayDataProvider
             }
             else
             {
-                _loadError = "Workflow для этой сессии не найден.";
+                _loadError = LReplay["WorkflowNotFound"];
             }
         }
         catch (Exception ex)
         {
-            _loadError = $"Ошибка загрузки: {ex.Message}";
+            _loadError = string.Format(LReplay["LoadError"], ex.Message);
         }
         finally
         {
@@ -287,12 +290,12 @@ public partial class SessionReplay : IDisposable, IReplayDataProvider
             }
             else
             {
-                _loadError = "Не удалось завершить сессию.";
+                _loadError = LReplay["CompleteFailed"];
             }
         }
         catch (Exception ex)
         {
-            _loadError = $"Не удалось завершить сессию: {ex.Message}";
+            _loadError = string.Format(LReplay["CompleteError"], ex.Message);
         }
         finally
         {
@@ -352,9 +355,9 @@ public partial class SessionReplay : IDisposable, IReplayDataProvider
 
             if (!string.IsNullOrEmpty(outputVar.Key))
             {
-                lines.Add(BuildLine("Вывод", outputVar.Value));
+                lines.Add(BuildLine(LReplay["SuffixOutput"], outputVar.Value));
                 if (!string.IsNullOrEmpty(messageKindVar.Key))
-                    lines.Add(new VariableLine("Тип сообщения", messageKindVar.Value, DisplayMessageKindValue(messageKindVar.Value)));
+                    lines.Add(new VariableLine(LReplay["SuffixMessageKind"], messageKindVar.Value, DisplayMessageKindValue(messageKindVar.Value)));
 
                 foreach (var v in vars.Where(v =>
                     !v.Key.Equals("output", StringComparison.OrdinalIgnoreCase) &&
@@ -368,7 +371,7 @@ public partial class SessionReplay : IDisposable, IReplayDataProvider
                 foreach (var v in vars)
                 {
                     if (v.Key.Equals("messageKind", StringComparison.OrdinalIgnoreCase))
-                        lines.Add(new VariableLine("Тип сообщения", v.Value, DisplayMessageKindValue(v.Value)));
+                        lines.Add(new VariableLine(LReplay["SuffixMessageKind"], v.Value, DisplayMessageKindValue(v.Value)));
                     else
                         lines.Add(BuildLine(TranslateSuffix(v.Key), v.Value));
                 }
@@ -387,17 +390,17 @@ public partial class SessionReplay : IDisposable, IReplayDataProvider
         return items;
     }
 
-    private static VariableLine BuildLine(string label, string rawValue)
+    private VariableLine BuildLine(string label, string rawValue)
     {
         if (string.IsNullOrWhiteSpace(rawValue))
-            return new VariableLine(label, "", "(пусто)");
+            return new VariableLine(label, "", LReplay["EmptyValue"]);
 
         var trimmed = rawValue.Trim();
 
         if (trimmed.Equals("true", StringComparison.OrdinalIgnoreCase))
-            return new VariableLine(label, rawValue, "Да");
+            return new VariableLine(label, rawValue, LReplay["Yes"]);
         if (trimmed.Equals("false", StringComparison.OrdinalIgnoreCase))
-            return new VariableLine(label, rawValue, "Нет");
+            return new VariableLine(label, rawValue, LReplay["No"]);
 
         if (IsJson(trimmed))
             return new VariableLine(label, rawValue, FormatJson(trimmed));
@@ -463,32 +466,32 @@ public partial class SessionReplay : IDisposable, IReplayDataProvider
         return true;
     }
 
-    private static string TranslateSuffix(string suffix) => suffix.ToLowerInvariant() switch
+    private string TranslateSuffix(string suffix) => suffix.ToLowerInvariant() switch
     {
-        "statuscode" => "Код статуса",
-        "status" => "Статус",
-        "success" => "Успешно",
-        "error" => "Ошибка",
-        "output" => "Вывод",
-        "messagekind" => "Тип сообщения",
-        "response" => "Ответ",
-        "request" => "Запрос",
-        "url" => "URL",
-        "duration" => "Длительность",
-        "input" => "Ввод",
-        "result" => "Результат",
-        "data" => "Данные",
-        "headers" => "Заголовки",
-        "body" => "Тело запроса",
+        "statuscode" => LReplay["SuffixStatusCode"],
+        "status" => LReplay["SuffixStatus"],
+        "success" => LReplay["SuffixSuccess"],
+        "error" => LReplay["SuffixError"],
+        "output" => LReplay["SuffixOutput"],
+        "messagekind" => LReplay["SuffixMessageKind"],
+        "response" => LReplay["SuffixResponse"],
+        "request" => LReplay["SuffixRequest"],
+        "url" => LReplay["SuffixUrl"],
+        "duration" => LReplay["SuffixDuration"],
+        "input" => LReplay["SuffixInput"],
+        "result" => LReplay["SuffixResult"],
+        "data" => LReplay["SuffixData"],
+        "headers" => LReplay["SuffixHeaders"],
+        "body" => LReplay["SuffixBody"],
         _ => suffix
     };
 
-    private static string DisplayVariableValue(string? value)
+    private string DisplayVariableValue(string? value)
     {
-        if (string.IsNullOrWhiteSpace(value)) return "(пусто)";
+        if (string.IsNullOrWhiteSpace(value)) return LReplay["EmptyValue"];
         var trimmed = value.Trim();
-        if (trimmed.Equals("true", StringComparison.OrdinalIgnoreCase)) return "Да";
-        if (trimmed.Equals("false", StringComparison.OrdinalIgnoreCase)) return "Нет";
+        if (trimmed.Equals("true", StringComparison.OrdinalIgnoreCase)) return LReplay["Yes"];
+        if (trimmed.Equals("false", StringComparison.OrdinalIgnoreCase)) return LReplay["No"];
         return IsJson(trimmed) ? FormatJson(trimmed) : trimmed;
     }
 
@@ -523,24 +526,24 @@ public partial class SessionReplay : IDisposable, IReplayDataProvider
         StateHasChanged();
     }
 
-    private static string DisplayMessageKindValue(string? value)
+    private string DisplayMessageKindValue(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            return "(пусто)";
+            return LReplay["EmptyValue"];
 
         return value.Trim().ToUpperInvariant() switch
         {
-            "TEXT" => "Текст",
-            "IMAGE" => "Изображение",
-            "VIDEO" => "Видео",
-            "AUDIO" => "Аудио",
-            "VOICE" => "Голос",
-            "FILE" => "Файл",
-            "DOCUMENT" => "Документ",
-            "STICKER" => "Стикер",
-            "LOCATION" => "Локация",
-            "CONTACT" => "Контакт",
-            "BUTTON" => "Кнопка",
+            "TEXT" => LReplay["MsgKindText"],
+            "IMAGE" => LReplay["MsgKindImage"],
+            "VIDEO" => LReplay["MsgKindVideo"],
+            "AUDIO" => LReplay["MsgKindAudio"],
+            "VOICE" => LReplay["MsgKindVoice"],
+            "FILE" => LReplay["MsgKindFile"],
+            "DOCUMENT" => LReplay["MsgKindDocument"],
+            "STICKER" => LReplay["MsgKindSticker"],
+            "LOCATION" => LReplay["MsgKindLocation"],
+            "CONTACT" => LReplay["MsgKindContact"],
+            "BUTTON" => LReplay["MsgKindButton"],
             _ => value
         };
     }
@@ -564,12 +567,12 @@ public partial class SessionReplay : IDisposable, IReplayDataProvider
         _ => "bg-secondary"
     };
 
-    private static string StatusLabel(string? status) => status?.ToUpperInvariant() switch
+    private string StatusLabel(string? status) => status?.ToUpperInvariant() switch
     {
-        "ACTIVE" => "Активна",
-        "COMPLETED" => "Завершена",
-        "FAILED" => "Ошибка",
-        "CANCELLED" => "Отменена",
+        "ACTIVE" => LReplay["StatusActive"],
+        "COMPLETED" => LReplay["StatusCompleted"],
+        "FAILED" => LReplay["StatusFailed"],
+        "CANCELLED" => LReplay["StatusCancelled"],
         _ => status ?? "—"
     };
 
@@ -581,12 +584,12 @@ public partial class SessionReplay : IDisposable, IReplayDataProvider
         _ => "action-pending"
     };
 
-    private static string ActionStatusLabel(string? status) => status?.ToUpperInvariant() switch
+    private string ActionStatusLabel(string? status) => status?.ToUpperInvariant() switch
     {
         "COMPLETED" => "OK",
-        "FAILED" => "Ошибка",
-        "PROCESSING" => "В процессе",
-        "PENDING" => "Ожидание",
+        "FAILED" => LReplay["ActionStatusFailed"],
+        "PROCESSING" => LReplay["ActionStatusProcessing"],
+        "PENDING" => LReplay["ActionStatusPending"],
         _ => status ?? "—"
     };
 

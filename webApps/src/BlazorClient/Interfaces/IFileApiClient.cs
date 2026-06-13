@@ -13,7 +13,7 @@ public record FileInfoDto(
     Guid? UploadedClientId = null)
 {
     public string UploadSourceDisplay =>
-        UploadedByUserId.HasValue ? "Администратор" : "Клиент";
+        UploadedByUserId.HasValue ? "Administrator" : "Client";
 }
 
 public interface IFileApiClient

@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="0" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="PageTitle" xml:space="preserve">
+    <value>User Path</value>
+  </data>
+  <data name="BackToSessions" xml:space="preserve">
+    <value>Back to sessions</value>
+  </data>
+  <data name="SidebarTitle" xml:space="preserve">
+    <value>User Path</value>
+  </data>
+  <data name="SidebarSubtitle" xml:space="preserve">
+    <value>View session</value>
+  </data>
+  <data name="Bot" xml:space="preserve">
+    <value>Bot</value>
+  </data>
+  <data name="Client" xml:space="preserve">
+    <value>Client</value>
+  </data>
+  <data name="Channel" xml:space="preserve">
+    <value>Channel</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Created" xml:space="preserve">
+    <value>Created</value>
+  </data>
+  <data name="Completed" xml:space="preserve">
+    <value>Completed</value>
+  </data>
+  <data name="Completing" xml:space="preserve">
+    <value>Completing...</value>
+  </data>
+  <data name="CompleteSession" xml:space="preserve">
+    <value>Complete Session</value>
+  </data>
+  <data name="TabSteps" xml:space="preserve">
+    <value>Steps ({0})</value>
+  </data>
+  <data name="TabVariables" xml:space="preserve">
+    <value>Variables</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Search...</value>
+  </data>
+  <data name="AttributesGroup" xml:space="preserve">
+    <value>Attributes ($global)</value>
+  </data>
+  <data name="SessionVariablesGroup" xml:space="preserve">
+    <value>Session variables</value>
+  </data>
+  <data name="Show" xml:space="preserve">
+    <value>Show</value>
+  </data>
+  <data name="NoVariables" xml:space="preserve">
+    <value>No variables</value>
+  </data>
+  <data name="ViewPath" xml:space="preserve">
+    <value>View Path</value>
+  </data>
+  <data name="LegendVisited" xml:space="preserve">
+    <value>Visited</value>
+  </data>
+  <data name="LegendCurrent" xml:space="preserve">
+    <value>Current</value>
+  </data>
+  <data name="LegendFailed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+  <data name="LegendUnvisited" xml:space="preserve">
+    <value>Unvisited</value>
+  </data>
+  <data name="ZoomOut" xml:space="preserve">
+    <value>Zoom Out</value>
+  </data>
+  <data name="ZoomIn" xml:space="preserve">
+    <value>Zoom In</value>
+  </data>
+  <data name="SessionNotFound" xml:space="preserve">
+    <value>Session not found.</value>
+  </data>
+  <data name="WorkflowNotFound" xml:space="preserve">
+    <value>Workflow for this session not found.</value>
+  </data>
+  <data name="LoadError" xml:space="preserve">
+    <value>Load error: {0}</value>
+  </data>
+  <data name="CompleteFailed" xml:space="preserve">
+    <value>Failed to complete session.</value>
+  </data>
+  <data name="CompleteError" xml:space="preserve">
+    <value>Failed to complete session: {0}</value>
+  </data>
+  <data name="SuffixStatusCode" xml:space="preserve">
+    <value>Status code</value>
+  </data>
+  <data name="SuffixStatus" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="SuffixSuccess" xml:space="preserve">
+    <value>Success</value>
+  </data>
+  <data name="SuffixError" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="SuffixOutput" xml:space="preserve">
+    <value>Output</value>
+  </data>
+  <data name="SuffixMessageKind" xml:space="preserve">
+    <value>Message type</value>
+  </data>
+  <data name="SuffixResponse" xml:space="preserve">
+    <value>Response</value>
+  </data>
+  <data name="SuffixRequest" xml:space="preserve">
+    <value>Request</value>
+  </data>
+  <data name="SuffixUrl" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="SuffixDuration" xml:space="preserve">
+    <value>Duration</value>
+  </data>
+  <data name="SuffixInput" xml:space="preserve">
+    <value>Input</value>
+  </data>
+  <data name="SuffixResult" xml:space="preserve">
+    <value>Result</value>
+  </data>
+  <data name="SuffixData" xml:space="preserve">
+    <value>Data</value>
+  </data>
+  <data name="SuffixHeaders" xml:space="preserve">
+    <value>Headers</value>
+  </data>
+  <data name="SuffixBody" xml:space="preserve">
+    <value>Request body</value>
+  </data>
+  <data name="EmptyValue" xml:space="preserve">
+    <value>(empty)</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="MsgKindText" xml:space="preserve">
+    <value>Text</value>
+  </data>
+  <data name="MsgKindImage" xml:space="preserve">
+    <value>Image</value>
+  </data>
+  <data name="MsgKindVideo" xml:space="preserve">
+    <value>Video</value>
+  </data>
+  <data name="MsgKindAudio" xml:space="preserve">
+    <value>Audio</value>
+  </data>
+  <data name="MsgKindVoice" xml:space="preserve">
+    <value>Voice</value>
+  </data>
+  <data name="MsgKindFile" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="MsgKindDocument" xml:space="preserve">
+    <value>Document</value>
+  </data>
+  <data name="MsgKindSticker" xml:space="preserve">
+    <value>Sticker</value>
+  </data>
+  <data name="MsgKindLocation" xml:space="preserve">
+    <value>Location</value>
+  </data>
+  <data name="MsgKindContact" xml:space="preserve">
+    <value>Contact</value>
+  </data>
+  <data name="MsgKindButton" xml:space="preserve">
+    <value>Button</value>
+  </data>
+  <data name="StatusActive" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="StatusCompleted" xml:space="preserve">
+    <value>Completed</value>
+  </data>
+  <data name="StatusFailed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+  <data name="StatusCancelled" xml:space="preserve">
+    <value>Cancelled</value>
+  </data>
+  <data name="ActionStatusPending" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="ActionStatusProcessing" xml:space="preserve">
+    <value>Processing</value>
+  </data>
+  <data name="ActionStatusFailed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+</root>

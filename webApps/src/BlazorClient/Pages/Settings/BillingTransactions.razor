@@ -5,17 +5,18 @@
 @attribute [Authorize]
 
 @inject IBillingApiClient Billing
+@inject IStringLocalizer<BillingTransactions> LTransactions
 
-<PageTitle>Настройки — Транзакции — ChatFoundry</PageTitle>
+<PageTitle>@LTransactions["PageTitle"] — ChatFoundry</PageTitle>
 
 <div class="settings-page-header">
     <div>
         <a class="billing-back-link" href="/settings/billing">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-            Биллинг
+            @LTransactions["BackToBilling"]
         </a>
-        <h1 class="settings-page-title">Транзакции</h1>
-        <p class="settings-page-subtitle">История операций с балансом</p>
+        <h1 class="settings-page-title">@LTransactions["HeaderTitle"]</h1>
+        <p class="settings-page-subtitle">@LTransactions["HeaderSubtitle"]</p>
     </div>
 </div>
 
@@ -38,8 +39,8 @@ else if (_rows == null || !_rows.Any())
         <div class="settings-empty-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
         </div>
-        <div class="settings-empty-title">Нет транзакций</div>
-        <div class="settings-empty-desc">История операций с балансом пока пуста.</div>
+        <div class="settings-empty-title">@LTransactions["EmptyTitle"]</div>
+        <div class="settings-empty-desc">@LTransactions["EmptyDesc"]</div>
     </div>
 }
 else
@@ -48,11 +49,11 @@ else
         <table class="settings-table">
             <thead>
             <tr>
-                <th>Дата</th>
-                <th>Тип</th>
-                <th>Сумма</th>
-                <th>Баланс после</th>
-                <th>Описание</th>
+                <th>@LTransactions["ColDate"]</th>
+                <th>@LTransactions["ColType"]</th>
+                <th>@LTransactions["ColAmount"]</th>
+                <th>@LTransactions["ColBalanceAfter"]</th>
+                <th>@LTransactions["ColDescription"]</th>
             </tr>
             </thead>
             <tbody>
@@ -99,7 +100,7 @@ else
         }
         catch (Exception ex)
         {
-            loadError = $"Не удалось загрузить транзакции: {ex.Message}";
+            loadError = string.Format(LTransactions["LoadError"], ex.Message);
         }
         finally
         {
@@ -115,13 +116,13 @@ else
         _ => "settings-badge-neutral"
     };
 
-    private static string TypeDisplay(string type) => type.ToUpperInvariant() switch
+    private string TypeDisplay(string type) => type.ToUpperInvariant() switch
     {
-        "TOPUP" => "Пополнение",
-        "DEPOSIT" => "Зачисление",
-        "USAGE" => "Использование",
-        "CHARGE" => "Списание",
-        "REFUND" => "Возврат",
+        "TOPUP" => LTransactions["TypeTopup"],
+        "DEPOSIT" => LTransactions["TypeDeposit"],
+        "USAGE" => LTransactions["TypeUsage"],
+        "CHARGE" => LTransactions["TypeCharge"],
+        "REFUND" => LTransactions["TypeRefund"],
         _ => type
     };
 

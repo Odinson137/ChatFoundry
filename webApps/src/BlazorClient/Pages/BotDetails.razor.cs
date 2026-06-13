@@ -1,6 +1,7 @@
 using BlazorClient.Interfaces;
 using BlazorClient.Models.DTO;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Localization;
 using Microsoft.JSInterop;
 
 namespace BlazorClient.Pages;
@@ -12,6 +13,7 @@ public partial class BotDetails
     [Inject] private IWorkflowApiClient ApiClient { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
     [Inject] private IJSRuntime Js { get; set; } = null!;
+    [Inject] private IStringLocalizer<BotDetails> LDetails { get; set; } = null!;
 
     private BotDto? _bot;
     private bool _isLoading = true;
@@ -35,7 +37,7 @@ public partial class BotDetails
         try
         {
             _bot = await ApiClient.GetBotWithWorkflowsAsync(BotId);
-            if (_bot == null) _error = "Бот не найден.";
+            if (_bot == null) _error = LDetails["BotNotFound"].Value;
         }
         catch (Exception ex)
         {
@@ -57,7 +59,7 @@ public partial class BotDetails
         var success = await ApiClient.AddBotWorkflowAsync(BotId, nextVersion);
 
         if (success) await LoadBotData();
-        else await Js.InvokeVoidAsync("alert", "Ошибка при создании версии");
+        else await Js.InvokeVoidAsync("alert", LDetails["CreateVersionError"].Value);
     }
 
     private async Task CreateWorkflowFromVersion(Guid sourceWorkflowId)
@@ -65,7 +67,7 @@ public partial class BotDetails
         var success = await ApiClient.CopyBotWorkflowAsync(sourceWorkflowId);
 
         if (success) await LoadBotData();
-        else await Js.InvokeVoidAsync("alert", "Ошибка при создании копии версии");
+        else await Js.InvokeVoidAsync("alert", LDetails["CreateCopyError"].Value);
     }
 
     private async Task SetActive(Guid id)
@@ -73,18 +75,18 @@ public partial class BotDetails
         var success = await ApiClient.UpdateBotWorkflowAsync(id, true);
 
         if (success) await LoadBotData();
-        else await Js.InvokeVoidAsync("alert", "Ошибка при активации");
+        else await Js.InvokeVoidAsync("alert", LDetails["ActivateError"].Value);
     }
 
     private async Task DeleteWorkflow(Guid id)
     {
-        var confirmed = await Js.InvokeAsync<bool>("confirm", "Вы уверены, что хотите удалить эту версию? Это действие необратимо.");
+        var confirmed = await Js.InvokeAsync<bool>("confirm", LDetails["DeleteConfirm"].Value);
         if (!confirmed) return;
 
         var success = await ApiClient.DeleteBotWorkflowAsync(id);
 
         if (success) await LoadBotData();
-        else await Js.InvokeVoidAsync("alert", "Ошибка при удалении. Возможно, версия используется в активных сессиях.");
+        else await Js.InvokeVoidAsync("alert", LDetails["DeleteError"].Value);
     }
 
     private async Task OpenEditModal()
@@ -130,7 +132,7 @@ public partial class BotDetails
         }
         catch (Exception ex)
         {
-            await Js.InvokeVoidAsync("alert", $"Ошибка сохранения: {ex.Message}");
+            await Js.InvokeVoidAsync("alert", string.Format(LDetails["SaveError"].Value, ex.Message));
         }
         finally
         {

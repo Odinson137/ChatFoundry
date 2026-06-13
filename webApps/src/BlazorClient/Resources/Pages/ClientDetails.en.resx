@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="0" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  
+  <data name="PageTitleDefault" xml:space="preserve">
+    <value>Client</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Loading...</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Retry</value>
+  </data>
+  <data name="BreadcrumbList" xml:space="preserve">
+    <value>Clients</value>
+  </data>
+  <data name="CreatedText" xml:space="preserve">
+    <value>Created {0}</value>
+  </data>
+  <data name="ModifiedText" xml:space="preserve">
+    <value>Updated {0}</value>
+  </data>
+  <data name="ChannelsTitle" xml:space="preserve">
+    <value>Channels</value>
+  </data>
+  <data name="EditChannelTooltip" xml:space="preserve">
+    <value>Edit Attributes</value>
+  </data>
+  <data name="LabelName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="LabelUsername" xml:space="preserve">
+    <value>Username</value>
+  </data>
+  <data name="LabelPhone" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="LabelEmail" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="LabelConnected" xml:space="preserve">
+    <value>Connected</value>
+  </data>
+  <data name="LabelAttributes" xml:space="preserve">
+    <value>Attributes</value>
+  </data>
+  <data name="BtnOpenChat" xml:space="preserve">
+    <value>Open Chat</value>
+  </data>
+  <data name="MessagesTitle" xml:space="preserve">
+    <value>Messages</value>
+  </data>
+  <data name="LoadingMessages" xml:space="preserve">
+    <value>Loading messages...</value>
+  </data>
+  <data name="NoMessagesYet" xml:space="preserve">
+    <value>No messages yet</value>
+  </data>
+  <data name="LoadMoreMessages" xml:space="preserve">
+    <value>Load older messages</value>
+  </data>
+  <data name="MessagesCountDesc" xml:space="preserve">
+    <value>{0} messages · or scroll up</value>
+  </data>
+  <data name="BotAvatarTooltip" xml:space="preserve">
+    <value>Bot</value>
+  </data>
+  <data name="SelectChannelPrompt" xml:space="preserve">
+    <value>Select a channel to view messages</value>
+  </data>
+  <data name="ClientNotFound" xml:space="preserve">
+    <value>Client not found</value>
+  </data>
+  <data name="LoadDataError" xml:space="preserve">
+    <value>Failed to load data: {0}</value>
+  </data>
+  <data name="LoadMessagesError" xml:space="preserve">
+    <value>Failed to load messages: {0}</value>
+  </data>
+  <data name="LoadMoreError" xml:space="preserve">
+    <value>Load error: {0}</value>
+  </data>
+  <data name="TodayDateSep" xml:space="preserve">
+    <value>Today</value>
+  </data>
+  <data name="YesterdayDateSep" xml:space="preserve">
+    <value>Yesterday</value>
+  </data>
+  <data name="UnnamedClient" xml:space="preserve">
+    <value>Unnamed</value>
+  </data>
+</root>

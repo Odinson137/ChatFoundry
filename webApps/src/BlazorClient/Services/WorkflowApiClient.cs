@@ -41,12 +41,12 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
             if (parsedErrors.Count > 0)
                 return new GenerateWorkflowFromAiResult(false, null, parsedErrors);
 
-            return new GenerateWorkflowFromAiResult(false, null, [$"Ошибка сервера {(int)response.StatusCode}. Попробуйте позже."]);
+            return new GenerateWorkflowFromAiResult(false, null, [$"Server error {(int)response.StatusCode}. Please try again later."]);
         }
 
         var dto = JsonSerializer.Deserialize<GenerateWorkflowFromAiResponseDto>(json, WebJsonOptions);
         if (dto == null)
-            return new GenerateWorkflowFromAiResult(false, null, ["Пустой ответ сервера."]);
+            return new GenerateWorkflowFromAiResult(false, null, ["Empty server response."]);
 
         return new GenerateWorkflowFromAiResult(dto.Success, dto.WorkflowJson, dto.Errors ?? []);
     }
@@ -689,7 +689,7 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         var gqlResponse = JsonSerializer.Deserialize<GraphQLResponse<T>>(jsonString, options);
         if (gqlResponse == null)
-            throw new InvalidOperationException("Сервер вернул пустой ответ.");
+            throw new InvalidOperationException("Server returned an empty response.");
 
         var firstGraphQlError = gqlResponse.Errors?
             .Select(e => e.Message)
@@ -699,7 +699,7 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
             throw new InvalidOperationException(firstGraphQlError);
 
         if (gqlResponse.Data == null)
-            throw new InvalidOperationException("Не удалось обработать ответ сервера.");
+            throw new InvalidOperationException("Failed to process server response.");
 
         return gqlResponse.Data;
     }

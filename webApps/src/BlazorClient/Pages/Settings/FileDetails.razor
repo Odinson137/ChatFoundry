@@ -6,12 +6,13 @@
 @inject IFileApiClient FileApi
 @inject NavigationManager Navigation
 @inject IJSRuntime JsRuntime
+@inject IStringLocalizer<FileDetails> LFileDetails
 
-<PageTitle>Настройки — Файл — ChatFoundry</PageTitle>
+<PageTitle>@LFileDetails["PageTitle"] — ChatFoundry</PageTitle>
 
 <a href="/settings/files" class="fd-back-link">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-    Назад к файлам
+    @LFileDetails["BackLink"]
 </a>
 
 @if (isLoading)
@@ -33,26 +34,26 @@ else if (file == null)
         <div class="settings-empty-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
         </div>
-        <div class="settings-empty-title">Файл не найден</div>
-        <div class="settings-empty-desc">Файл не существует или был удалён.</div>
+        <div class="settings-empty-title">@LFileDetails["FileNotFound"]</div>
+        <div class="settings-empty-desc">@LFileDetails["FileNotFoundDesc"]</div>
     </div>
 }
 else
 {
     <div class="settings-page-header">
         <div>
-            <h1 class="settings-page-title">@(file.Name ?? "Без имени")</h1>
-            <p class="settings-page-subtitle">Детали файла</p>
+            <h1 class="settings-page-title">@(file.Name ?? LFileDetails["Unnamed"].Value)</h1>
+            <p class="settings-page-subtitle">@LFileDetails["Subtitle"]</p>
         </div>
         <div class="fd-actions">
             <button class="settings-btn-secondary" @onclick="DownloadFile">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Скачать
+                @LFileDetails["BtnDownload"]
             </button>
             <button class="settings-btn-secondary fd-btn-danger" @onclick="DeleteFile" disabled="@isDeleting">
                 @if (isDeleting) { <div class="settings-spinner" style="width:14px;height:14px;border-width:2px;"></div> }
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
-                Удалить
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                @LFileDetails["BtnDelete"]
             </button>
         </div>
     </div>
@@ -62,28 +63,28 @@ else
             <div class="settings-stat-icon" style="background: #eef2ff;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
             </div>
-            <div class="settings-stat-label">Имя файла</div>
+            <div class="settings-stat-label">@LFileDetails["LabelName"]</div>
             <div class="settings-stat-value" style="font-size: 1rem;">@(file.Name ?? "—")</div>
         </div>
         <div class="settings-stat-card">
             <div class="settings-stat-icon" style="background: #faf5ff;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
             </div>
-            <div class="settings-stat-label">Тип контента</div>
+            <div class="settings-stat-label">@LFileDetails["LabelContentType"]</div>
             <div class="settings-stat-value" style="font-size: 0.9rem; font-family: 'Courier New', monospace;">@(file.ContentType ?? "—")</div>
         </div>
         <div class="settings-stat-card">
             <div class="settings-stat-icon" style="background: #ecfdf5;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             </div>
-            <div class="settings-stat-label">Размер</div>
+            <div class="settings-stat-label">@LFileDetails["LabelSize"]</div>
             <div class="settings-stat-value" style="font-size: 1rem;">@FormatSize(file.Size)</div>
         </div>
         <div class="settings-stat-card">
             <div class="settings-stat-icon" style="background: #fff7ed;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             </div>
-            <div class="settings-stat-label">Дата загрузки</div>
+            <div class="settings-stat-label">@LFileDetails["LabelDate"]</div>
             <div class="settings-stat-value" style="font-size: 1rem;">@(file.CreatedAt?.ToString("dd.MM.yyyy HH:mm") ?? "—")</div>
         </div>
     </div>
@@ -93,7 +94,7 @@ else
         <div class="settings-card fd-preview-card">
             <div class="fd-preview-header">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                <span>Предпросмотр</span>
+                <span>@LFileDetails["LabelPreview"]</span>
             </div>
             <div class="fd-preview-body">
                 @if (IsImage)
@@ -104,7 +105,7 @@ else
                     }
                     else
                     {
-                        <div class="fd-preview-loading">Загрузка превью...</div>
+                        <div class="fd-preview-loading">@LFileDetails["PreviewLoading"]</div>
                     }
                 }
                 else if (IsVideo)
@@ -117,7 +118,7 @@ else
                     }
                     else
                     {
-                        <div class="fd-preview-loading">Загрузка превью...</div>
+                        <div class="fd-preview-loading">@LFileDetails["PreviewLoading"]</div>
                     }
                 }
                 else if (IsAudio)
@@ -130,7 +131,7 @@ else
                     }
                     else
                     {
-                        <div class="fd-preview-loading">Загрузка превью...</div>
+                        <div class="fd-preview-loading">@LFileDetails["PreviewLoading"]</div>
                     }
                 }
             </div>
@@ -140,8 +141,8 @@ else
     {
         <div class="settings-card fd-no-preview">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
-            <p class="fd-no-preview-text">Предпросмотр недоступен для этого типа файла</p>
-            <p class="fd-no-preview-hint">Нажмите «Скачать» для просмотра</p>
+            <p class="fd-no-preview-text">@LFileDetails["PreviewUnavailable"]</p>
+            <p class="fd-no-preview-hint">@LFileDetails["PreviewUnavailableHint"]</p>
         </div>
     }
 }
@@ -174,7 +175,7 @@ else
             file = await FileApi.GetFileAsync(FileId);
             if (file == null)
             {
-                error = "Файл не найден.";
+                error = LFileDetails["FileNotFound"];
                 return;
             }
 
@@ -185,7 +186,7 @@ else
         }
         catch (Exception ex)
         {
-            error = $"Ошибка загрузки: {ex.Message}";
+            error = string.Format(LFileDetails["ErrorLoad"].Value, ex.Message);
         }
         finally
         {
@@ -204,14 +205,14 @@ else
         }
         catch (Exception ex)
         {
-            error = $"Ошибка скачивания: {ex.Message}";
+            error = string.Format(LFileDetails["ErrorDownload"].Value, ex.Message);
         }
     }
 
     private async Task DeleteFile()
     {
         if (file == null) return;
-        if (!await JsRuntime.InvokeAsync<bool>("confirm", $"Удалить файл «{file.Name}»?"))
+        if (!await JsRuntime.InvokeAsync<bool>("confirm", string.Format(LFileDetails["DeleteConfirm"].Value, file.Name)))
             return;
 
         isDeleting = true;
@@ -223,7 +224,7 @@ else
         }
         catch (Exception ex)
         {
-            error = $"Ошибка удаления: {ex.Message}";
+            error = string.Format(LFileDetails["ErrorDelete"].Value, ex.Message);
         }
         finally
         {
@@ -231,20 +232,20 @@ else
         }
     }
 
-    private static string FormatSize(long? bytes)
+    private string FormatSize(long? bytes)
     {
         if (bytes is null) return "—";
         var b = bytes.Value;
         switch (b)
         {
             case < 1024:
-                return $"{b} Б";
+                return string.Format(LFileDetails["FormatSizeB"].Value, b);
             case < 1024 * 1024:
-                return $"{b / 1024.0:F1} КБ";
+                return string.Format(LFileDetails["FormatSizeKB"].Value, b / 1024.0);
             case < 1024L * 1024 * 1024:
-                return $"{b / (1024.0 * 1024):F1} МБ";
+                return string.Format(LFileDetails["FormatSizeMB"].Value, b / (1024.0 * 1024));
             default:
-                return $"{b / (1024.0 * 1024 * 1024):F2} ГБ";
+                return string.Format(LFileDetails["FormatSizeGB"].Value, b / (1024.0 * 1024 * 1024));
         }
     }
 }

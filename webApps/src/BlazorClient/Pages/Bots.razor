@@ -6,13 +6,14 @@
 @attribute [Authorize]
 
 @inject BlazorClient.Interfaces.IWorkflowApiClient ApiClient
+@inject IStringLocalizer<Bots> LBots
 
-<PageTitle>Управление ботами</PageTitle>
+<PageTitle>@LBots["PageTitle"]</PageTitle>
 
 <div class="bots-page">
     <div class="bots-header">
         <div class="bots-header-left">
-            <h1 class="bots-title">Управление ботами</h1>
+            <h1 class="bots-title">@LBots["PageTitle"]</h1>
             @if (!isLoading && bots.Any())
             {
                 <span class="bots-count">@bots.Count</span>
@@ -20,7 +21,7 @@
         </div>
         <button class="bots-btn-primary" @onclick="OnOpenCreateModal">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Добавить бота
+            @LBots["AddBot"]
         </button>
     </div>
 
@@ -28,7 +29,7 @@
     {
         <div class="bots-loading">
             <div class="bots-spinner"></div>
-            <p>Загрузка...</p>
+            <p>@LBots["Loading"]</p>
         </div>
     }
     else if (!string.IsNullOrEmpty(error))
@@ -47,11 +48,11 @@
                 <path d="M12 2a4 4 0 0 0-4 4v2a4 4 0 0 0 8 0V6a4 4 0 0 0-4-4Z"/>
                 <path d="M4 10a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2"/>
             </svg>
-            <p class="bots-empty-title">Боты не найдены</p>
-            <p class="bots-empty-desc">Создайте первого бота, чтобы подключить воркфлоу к каналам.</p>
+            <p class="bots-empty-title">@LBots["NoBotsFound"]</p>
+            <p class="bots-empty-desc">@LBots["NoBotsDesc"]</p>
             <button class="bots-btn-primary" @onclick="OnOpenCreateModal">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Добавить бота
+                @LBots["AddBot"]
             </button>
         </div>
     }
@@ -61,11 +62,11 @@
             <table class="bots-table">
                 <thead>
                     <tr>
-                        <th class="bots-th">Имя</th>
-                        <th class="bots-th">Каналы</th>
-                        <th class="bots-th">Активный Workflow</th>
-                        <th class="bots-th">Создан</th>
-                        <th class="bots-th bots-th-actions">Действия</th>
+                        <th class="bots-th">@LBots["ThName"]</th>
+                        <th class="bots-th">@LBots["ThChannels"]</th>
+                        <th class="bots-th">@LBots["ThActiveWorkflow"]</th>
+                        <th class="bots-th">@LBots["ThCreated"]</th>
+                        <th class="bots-th bots-th-actions">@LBots["ThActions"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -89,7 +90,7 @@
                                     }
                                     else
                                     {
-                                        <span title="@string.Join(", ", channelNames)">@channelNames.Count каналов</span>
+                                        <span title="@string.Join(", ", channelNames)">@string.Format(LBots["ChannelsCountBadge"].Value, channelNames.Count)</span>
                                     }
                                 }
                             </td>
@@ -102,17 +103,17 @@
                                     }
                                     else
                                     {
-                                        <span class="bots-badge bots-badge-neutral">Нет</span>
+                                        <span class="bots-badge bots-badge-neutral">@LBots["NoBadge"]</span>
                                     }
                                 }
                             </td>
                             <td class="bots-td bots-td-date">@bot.CreatedAt.ToLocalTime().ToString("g")</td>
                             <td class="bots-td bots-td-actions">
-                                <a href="@($"bots/{bot.Id}")" class="bots-btn-link" title="Открыть воркфлоу">
+                                <a href="@($"bots/{bot.Id}")" class="bots-btn-link" title="@LBots["BtnOpen"]">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                                    Открыть
+                                    @LBots["BtnOpen"]
                                 </a>
-                                <button class="bots-btn-icon bots-btn-icon-danger" @onclick="() => OpenDeleteConfirm(bot)" title="Удалить">
+                                <button class="bots-btn-icon bots-btn-icon-danger" @onclick="() => OpenDeleteConfirm(bot)" title="@LBots["BtnDelete"]">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
                                 </button>
                             </td>
@@ -130,7 +131,7 @@
     <div class="bots-modal-backdrop" @onclick="CloseModal"></div>
     <div class="bots-modal">
         <div class="bots-modal-header">
-            <h3 class="bots-modal-title">@(isEditMode ? "Редактировать бота" : "Новый бот")</h3>
+            <h3 class="bots-modal-title">@(isEditMode ? LBots["ModalTitleEdit"] : LBots["ModalTitleNew"])</h3>
             <button type="button" class="bots-modal-close" @onclick="CloseModal">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
@@ -143,14 +144,14 @@
                 </div>
             }
             <div class="bots-field">
-                <label class="bots-label">Имя бота</label>
+                <label class="bots-label">@LBots["LabelBotName"]</label>
                 <input type="text" class="bots-input" @bind="currentBotModel.Name" placeholder="My Super Bot" />
             </div>
             <div class="bots-field">
-                <label class="bots-label">Каналы</label>
+                <label class="bots-label">@LBots["LabelChannels"]</label>
                 @if (availableChannels.Count == 0)
                 {
-                    <p class="bots-hint">Нет доступных каналов. Создайте каналы на странице <a href="/channels">Каналы</a>.</p>
+                    <p class="bots-hint">@((MarkupString)LBots["NoAvailableChannels"].Value)</p>
                 }
                 else
                 {
@@ -167,10 +168,10 @@
             </div>
         </div>
         <div class="bots-modal-footer">
-            <button type="button" class="bots-btn-secondary" @onclick="CloseModal">Отмена</button>
+            <button type="button" class="bots-btn-secondary" @onclick="CloseModal">@LBots["BtnCancel"]</button>
             <button type="button" class="bots-btn-save" @onclick="SaveBot" disabled="@(isSaving || string.IsNullOrWhiteSpace(currentBotModel.Name))">
                 @if (isSaving) { <div class="bots-spinner" style="width:18px;height:18px;border-width:2px;"></div> }
-                Сохранить
+                @LBots["BtnSave"]
             </button>
         </div>
     </div>
@@ -181,19 +182,19 @@
     <div class="bots-modal-backdrop bots-modal-backdrop-confirm" @onclick="CloseDeleteConfirm"></div>
     <div class="bots-modal bots-modal-confirm" role="dialog" aria-modal="true" aria-labelledby="bots-delete-title">
         <div class="bots-modal-header">
-            <h3 class="bots-modal-title" id="bots-delete-title">Удалить бота?</h3>
-            <button type="button" class="bots-modal-close" @onclick="CloseDeleteConfirm" aria-label="Закрыть">
+            <h3 class="bots-modal-title" id="bots-delete-title">@LBots["DeleteConfirmTitle"]</h3>
+            <button type="button" class="bots-modal-close" @onclick="CloseDeleteConfirm" aria-label="@LBots["BtnCancel"]">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
         </div>
         <div class="bots-modal-body">
-            <p class="bots-modal-text">Вы уверены, что хотите удалить бота <strong>@botToDelete.Name</strong>? Это действие нельзя отменить.</p>
+            <p class="bots-modal-text">@((MarkupString)string.Format(LBots["DeleteConfirmText"].Value, botToDelete.Name))</p>
         </div>
         <div class="bots-modal-footer">
-            <button type="button" class="bots-btn-secondary" @onclick="CloseDeleteConfirm" disabled="@isDeleting">Отмена</button>
+            <button type="button" class="bots-btn-secondary" @onclick="CloseDeleteConfirm" disabled="@isDeleting">@LBots["BtnCancel"]</button>
             <button type="button" class="bots-btn-danger" @onclick="ConfirmDeleteAsync" disabled="@isDeleting">
                 @if (isDeleting) { <div class="bots-spinner" style="width:18px;height:18px;border-width:2px;border-top-color:#fff;"></div> }
-                Удалить
+                @LBots["BtnDelete"]
             </button>
         </div>
     </div>
@@ -230,7 +231,7 @@
         }
         catch (Exception ex)
         {
-            error = $"Ошибка загрузки: {ex.Message}";
+            error = string.Format(LBots["LoadError"].Value, ex.Message);
         }
         finally
         {
@@ -314,7 +315,7 @@
         }
         catch (Exception ex)
         {
-            error = $"Не удалось удалить: {ex.Message}";
+            error = string.Format(LBots["DeleteError"].Value, ex.Message);
         }
         finally
         {
@@ -337,7 +338,7 @@
         modalError = null;
     }
 
-    private static string BuildBotSaveErrorMessage(Exception ex)
+    private string BuildBotSaveErrorMessage(Exception ex)
     {
         var rawMessage = ex.Message;
         var normalizedMessage = TryExtractGraphQlErrorMessage(rawMessage) ?? rawMessage;
@@ -351,22 +352,22 @@
         {
             var limit = quotaMatch.Groups[1].Value;
             var used = quotaMatch.Groups[2].Value;
-            return $"Достигнут лимит по количеству ботов: {used} из {limit}. Удалите лишнего бота или перейдите на более высокий тариф.";
+            return string.Format(LBots["QuotaExceededDetail"].Value, used, limit);
         }
 
         if (normalizedMessage.Contains("Quota exceeded", StringComparison.OrdinalIgnoreCase))
         {
-            return "Достигнут лимит по количеству ботов. Удалите лишнего бота или перейдите на более высокий тариф.";
+            return LBots["QuotaExceededGeneral"].Value;
         }
 
         if (normalizedMessage.Contains("Arg_NullReferenceException", StringComparison.OrdinalIgnoreCase) ||
             normalizedMessage.Contains("NullReferenceException", StringComparison.OrdinalIgnoreCase) ||
             normalizedMessage.Contains("Object reference not set", StringComparison.OrdinalIgnoreCase))
         {
-            return "Не удалось сохранить бота из-за внутренней ошибки. Обновите страницу и попробуйте снова.";
+            return LBots["InternalError"].Value;
         }
 
-        return $"Не удалось сохранить бота. {normalizedMessage}";
+        return string.Format(LBots["SaveErrorGeneric"].Value, normalizedMessage);
     }
 
     private static string? TryExtractGraphQlErrorMessage(string message)

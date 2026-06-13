@@ -11,19 +11,19 @@
         <div class="replay-node-badges">
             @if (Stats != null)
             {
-                <span class="replay-badge-pill" title="Посещений: @Stats.Visits">@Stats.Visits</span>
+                <span class="replay-badge-pill" title="@($"{L["ReplayVisits"]}: {Stats.Visits}")">@Stats.Visits</span>
                 @if (Stats.Completed > 0)
                 {
-                    <span class="replay-badge-pill pill-ok" title="Успешно: @Stats.Completed">@Stats.Completed</span>
+                    <span class="replay-badge-pill pill-ok" title="@($"{L["ReplaySuccess"]}: {Stats.Completed}")">@Stats.Completed</span>
                 }
                 @if (Stats.Failed > 0)
                 {
-                    <span class="replay-badge-pill pill-fail" title="Ошибки: @Stats.Failed">@Stats.Failed</span>
+                    <span class="replay-badge-pill pill-fail" title="@($"{L["ReplayErrors"]}: {Stats.Failed}")">@Stats.Failed</span>
                 }
             }
             @if (IsCurrentNode)
             {
-                <span class="replay-badge-pill pill-current" title="Текущий узел">●</span>
+                <span class="replay-badge-pill pill-current" title="@L["ReplayCurrentNode"]">●</span>
             }
         </div>
     }

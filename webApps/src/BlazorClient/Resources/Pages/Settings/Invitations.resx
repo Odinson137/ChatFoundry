@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="0" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  
+  <data name="PageTitle" xml:space="preserve">
+    <value>Настройки — Приглашения</value>
+  </data>
+  <data name="HeaderTitle" xml:space="preserve">
+    <value>Приглашения</value>
+  </data>
+  <data name="HeaderSubtitle" xml:space="preserve">
+    <value>Приглашайте участников в вашу компанию</value>
+  </data>
+  <data name="BtnCreateInvitation" xml:space="preserve">
+    <value>Создать приглашение</value>
+  </data>
+  <data name="NoInvitationsTitle" xml:space="preserve">
+    <value>Нет приглашений</value>
+  </data>
+  <data name="NoInvitationsDesc" xml:space="preserve">
+    <value>Создайте ссылку для приглашения участников в компанию.</value>
+  </data>
+  <data name="ThEmail" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="ThRole" xml:space="preserve">
+    <value>Роль</value>
+  </data>
+  <data name="ThExpires" xml:space="preserve">
+    <value>Истекает</value>
+  </data>
+  <data name="ThStatus" xml:space="preserve">
+    <value>Статус</value>
+  </data>
+  <data name="AnyEmail" xml:space="preserve">
+    <value>Любой email</value>
+  </data>
+  <data name="StatusUsed" xml:space="preserve">
+    <value>Использовано</value>
+  </data>
+  <data name="StatusActive" xml:space="preserve">
+    <value>Активно</value>
+  </data>
+  <data name="ModalTitle" xml:space="preserve">
+    <value>Новое приглашение</value>
+  </data>
+  <data name="LabelEmailOptional" xml:space="preserve">
+    <value>Email (необязательно)</value>
+  </data>
+  <data name="LabelRole" xml:space="preserve">
+    <value>Роль</value>
+  </data>
+  <data name="OptionMember" xml:space="preserve">
+    <value>Участник</value>
+  </data>
+  <data name="OptionAdmin" xml:space="preserve">
+    <value>Админ</value>
+  </data>
+  <data name="OptionOwner" xml:space="preserve">
+    <value>Владелец</value>
+  </data>
+  <data name="LabelExpiresDays" xml:space="preserve">
+    <value>Срок действия (дней)</value>
+  </data>
+  <data name="SuccessAlert" xml:space="preserve">
+    <value>Приглашение создано. Отправьте ссылку приглашённому.</value>
+  </data>
+  <data name="LabelRegisterLink" xml:space="preserve">
+    <value>Ссылка для регистрации</value>
+  </data>
+  <data name="BtnCopy" xml:space="preserve">
+    <value>Копировать</value>
+  </data>
+  <data name="BtnCancel" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="BtnCreate" xml:space="preserve">
+    <value>Создать</value>
+  </data>
+  <data name="BtnDone" xml:space="preserve">
+    <value>Готово</value>
+  </data>
+</root>

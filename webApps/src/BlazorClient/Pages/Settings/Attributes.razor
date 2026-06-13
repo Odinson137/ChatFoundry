@@ -7,17 +7,18 @@
 @inject ICompanyApiClient CompanyApi
 @inject IClientApiClient ClientApi
 @inject IJSRuntime JsRuntime
+@inject IStringLocalizer<Attributes> LAttributes
 
-<PageTitle>Настройки — Атрибуты — ChatFoundry</PageTitle>
+<PageTitle>@LAttributes["PageTitle"] — ChatFoundry</PageTitle>
 
 <div class="settings-page-header">
     <div>
-        <h1 class="settings-page-title">Атрибуты</h1>
-        <p class="settings-page-subtitle">Глобальные атрибуты компании, доступные в workflow</p>
+        <h1 class="settings-page-title">@LAttributes["HeaderTitle"]</h1>
+        <p class="settings-page-subtitle">@LAttributes["HeaderSubtitle"]</p>
     </div>
     <button class="settings-btn-primary" @onclick="OpenCreateAttributeModal">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Добавить атрибут
+        @LAttributes["BtnAddAttribute"]
     </button>
 </div>
 
@@ -28,7 +29,7 @@
         <span>@loadError</span>
     </div>
 }
-else if (isLoading)
+@if (isLoading)
 {
     <div class="settings-spinner-wrap">
         <div class="settings-spinner"></div>
@@ -40,11 +41,11 @@ else if (!attributeDefinitions.Any())
         <div class="settings-empty-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
         </div>
-        <div class="settings-empty-title">Нет атрибутов</div>
-        <div class="settings-empty-desc">Добавьте атрибуты для использования в workflow — имя, почта, телефон или свои поля.</div>
+        <div class="settings-empty-title">@LAttributes["NoAttributesTitle"]</div>
+        <div class="settings-empty-desc">@LAttributes["NoAttributesDesc"]</div>
         <button class="settings-btn-primary" @onclick="OpenCreateAttributeModal">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Добавить атрибут
+            @LAttributes["BtnAddAttribute"]
         </button>
     </div>
 }
@@ -54,10 +55,10 @@ else
         <table class="settings-table">
             <thead>
             <tr>
-                <th>Ключ</th>
-                <th>Название</th>
-                <th>Описание</th>
-                <th style="text-align: right;">Действия</th>
+                <th>@LAttributes["ThKey"]</th>
+                <th>@LAttributes["ThName"]</th>
+                <th>@LAttributes["ThDescription"]</th>
+                <th style="text-align: right;">@LAttributes["ThActions"]</th>
             </tr>
             </thead>
             <tbody>
@@ -75,10 +76,10 @@ else
                     </td>
                     <td style="text-align: right;">
                         <div class="attr-actions">
-                            <button class="settings-icon-btn" @onclick="() => OpenEditAttributeModal(attr)" title="Изменить">
+                            <button class="settings-icon-btn" @onclick="() => OpenEditAttributeModal(attr)" title="@LAttributes["TooltipEdit"]">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                             </button>
-                            <button class="settings-icon-btn settings-icon-btn-danger" @onclick="() => DeleteAttribute(attr)" title="Удалить">
+                            <button class="settings-icon-btn settings-icon-btn-danger" @onclick="() => DeleteAttribute(attr)" title="@LAttributes["TooltipDelete"]">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
                             </button>
                         </div>
@@ -95,34 +96,34 @@ else
     <div class="settings-modal-backdrop" @onclick="CloseAttributeModal"></div>
     <div class="settings-modal">
         <div class="settings-modal-header">
-            <h3 class="settings-modal-title">@(editingAttributeId == null ? "Новый атрибут" : "Редактировать атрибут")</h3>
+            <h3 class="settings-modal-title">@(editingAttributeId == null ? LAttributes["ModalNewAttribute"] : LAttributes["ModalEditAttribute"])</h3>
             <button class="settings-modal-close" @onclick="CloseAttributeModal">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
         </div>
         <div class="settings-modal-body">
             <div class="settings-field">
-                <label class="settings-label">Ключ (латиница, без пробелов)</label>
-                <input type="text" class="settings-input" style="font-family: 'Courier New', monospace;" @bind="attrKey" placeholder="например email или company_name" disabled="@(editingAttributeId != null)" />
+                <label class="settings-label">@LAttributes["LabelKey"]</label>
+                <input type="text" class="settings-input" style="font-family: 'Courier New', monospace;" @bind="attrKey" placeholder="@LAttributes["PlaceholderKey"]" disabled="@(editingAttributeId != null)" />
                 @if (editingAttributeId != null)
                 {
-                    <div class="settings-hint">Ключ нельзя изменить после создания.</div>
+                    <div class="settings-hint">@LAttributes["KeyHint"]</div>
                 }
             </div>
             <div class="settings-field">
-                <label class="settings-label">Название (отображаемое)</label>
-                <input type="text" class="settings-input" @bind="attrDisplayName" placeholder="Например: Email" />
+                <label class="settings-label">@LAttributes["LabelName"]</label>
+                <input type="text" class="settings-input" @bind="attrDisplayName" placeholder="@LAttributes["PlaceholderName"]" />
             </div>
             <div class="settings-field">
-                <label class="settings-label">Описание (необязательно)</label>
-                <textarea class="settings-input" rows="2" @bind="attrDescription" placeholder="Подсказка для дизайнера workflow" style="resize: vertical; min-height: 60px;"></textarea>
+                <label class="settings-label">@LAttributes["LabelDescription"]</label>
+                <textarea class="settings-input" rows="2" @bind="attrDescription" placeholder="@LAttributes["PlaceholderDescription"]" style="resize: vertical; min-height: 60px;"></textarea>
             </div>
         </div>
         <div class="settings-modal-footer">
-            <button class="settings-btn-secondary" @onclick="CloseAttributeModal">Отмена</button>
+            <button class="settings-btn-secondary" @onclick="CloseAttributeModal">@LAttributes["BtnCancel"]</button>
             <button class="settings-btn-primary" @onclick="SaveAttribute" disabled="@isSavingAttribute">
                 @if (isSavingAttribute) { <div class="settings-spinner" style="width:16px;height:16px;border-width:2px;"></div> }
-                @(editingAttributeId == null ? "Создать" : "Сохранить")
+                @(editingAttributeId == null ? LAttributes["BtnCreate"] : LAttributes["BtnSave"])
             </button>
         </div>
     </div>
@@ -209,7 +210,7 @@ else
         if (company == null) return;
         if (string.IsNullOrWhiteSpace(attrKey))
         {
-            loadError = "Укажите ключ атрибута.";
+            loadError = LAttributes["ErrorSpecifyKey"];
             return;
         }
         isSavingAttribute = true;
@@ -239,13 +240,13 @@ else
 
     private async Task DeleteAttribute(AttributeDefinitionDto attr)
     {
-        if (!await JsRuntime.InvokeAsync<bool>("confirm", $"Удалить атрибут «{attr.Key}»?"))
+        if (!await JsRuntime.InvokeAsync<bool>("confirm", string.Format(LAttributes["DeleteConfirm"].Value, attr.Key)))
             return;
         try
         {
             var ok = await ClientApi.DeleteAttributeDefinitionAsync(attr.Id);
             if (ok) await LoadAttributes();
-            else loadError = "Не удалось удалить атрибут.";
+            else loadError = LAttributes["ErrorDeleteFailed"];
         }
         catch (Exception ex)
         {

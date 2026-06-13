@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="0" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  
+  <data name="PageTitle" xml:space="preserve">
+    <value>Регистрация</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Создать аккаунт</value>
+  </data>
+  <data name="Subtitle" xml:space="preserve">
+    <value>Зарегистрируйтесь и создайте своего первого AI-бота</value>
+  </data>
+  <data name="SuccessMessage" xml:space="preserve">
+    <value>Проверьте почту — мы отправили ссылку для подтверждения. Перейдите по ссылке, затем войдите.</value>
+  </data>
+  <data name="LabelEmail" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="LabelPassword" xml:space="preserve">
+    <value>Пароль</value>
+  </data>
+  <data name="PlaceholderPassword" xml:space="preserve">
+    <value>Минимум 2 символа</value>
+  </data>
+  <data name="LabelConfirmPassword" xml:space="preserve">
+    <value>Подтвердите пароль</value>
+  </data>
+  <data name="PlaceholderConfirmPassword" xml:space="preserve">
+    <value>Повторите пароль</value>
+  </data>
+  <data name="LabelCompany" xml:space="preserve">
+    <value>Название компании</value>
+  </data>
+  <data name="PlaceholderCompany" xml:space="preserve">
+    <value>Моя компания</value>
+  </data>
+  <data name="BtnCreateAccount" xml:space="preserve">
+    <value>Создать аккаунт</value>
+  </data>
+  <data name="AlreadyHaveAccount" xml:space="preserve">
+    <value>Уже есть аккаунт?</value>
+  </data>
+  <data name="SignIn" xml:space="preserve">
+    <value>Войти</value>
+  </data>
+  <data name="ErrorEmptyEmail" xml:space="preserve">
+    <value>Введите email.</value>
+  </data>
+  <data name="ErrorShortPassword" xml:space="preserve">
+    <value>Пароль должен содержать минимум 2 символа.</value>
+  </data>
+  <data name="ErrorPasswordMismatch" xml:space="preserve">
+    <value>Пароли не совпадают.</value>
+  </data>
+  <data name="ErrorEmptyCompany" xml:space="preserve">
+    <value>Введите название компании.</value>
+  </data>
+  <data name="ErrorDuplicateUser" xml:space="preserve">
+    <value>Пользователь с таким email уже существует.</value>
+  </data>
+  <data name="ErrorDefault" xml:space="preserve">
+    <value>Ошибка регистрации. Попробуйте другой email или пароль.</value>
+  </data>
+  <data name="ErrorConnection" xml:space="preserve">
+    <value>Не удалось подключиться к серверу. Попробуйте позже.</value>
+  </data>
+</root>

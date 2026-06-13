@@ -7,17 +7,18 @@
 @inject ICompanyApiClient CompanyApi
 @inject NavigationManager Navigation
 @inject IJSRuntime JsRuntime
+@inject IStringLocalizer<Invitations> LInvitations
 
-<PageTitle>Настройки — Приглашения — ChatFoundry</PageTitle>
+<PageTitle>@LInvitations["PageTitle"] — ChatFoundry</PageTitle>
 
 <div class="settings-page-header">
     <div>
-        <h1 class="settings-page-title">Приглашения</h1>
-        <p class="settings-page-subtitle">Приглашайте участников в вашу компанию</p>
+        <h1 class="settings-page-title">@LInvitations["HeaderTitle"]</h1>
+        <p class="settings-page-subtitle">@LInvitations["HeaderSubtitle"]</p>
     </div>
     <button class="settings-btn-primary" @onclick="OpenCreateInviteModal">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Создать приглашение
+        @LInvitations["BtnCreateInvitation"]
     </button>
 </div>
 
@@ -28,7 +29,7 @@
         <span>@loadError</span>
     </div>
 }
-else if (isLoading)
+@if (isLoading)
 {
     <div class="settings-spinner-wrap">
         <div class="settings-spinner"></div>
@@ -40,11 +41,11 @@ else if (!invitations.Any())
         <div class="settings-empty-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
         </div>
-        <div class="settings-empty-title">Нет приглашений</div>
-        <div class="settings-empty-desc">Создайте ссылку для приглашения участников в компанию.</div>
+        <div class="settings-empty-title">@LInvitations["NoInvitationsTitle"]</div>
+        <div class="settings-empty-desc">@LInvitations["NoInvitationsDesc"]</div>
         <button class="settings-btn-primary" @onclick="OpenCreateInviteModal">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Создать приглашение
+            @LInvitations["BtnCreateInvitation"]
         </button>
     </div>
 }
@@ -54,10 +55,10 @@ else
         <table class="settings-table">
             <thead>
             <tr>
-                <th>Email</th>
-                <th>Роль</th>
-                <th>Истекает</th>
-                <th>Статус</th>
+                <th>@LInvitations["ThEmail"]</th>
+                <th>@LInvitations["ThRole"]</th>
+                <th>@LInvitations["ThExpires"]</th>
+                <th>@LInvitations["ThStatus"]</th>
             </tr>
             </thead>
             <tbody>
@@ -65,7 +66,7 @@ else
             {
                 <tr>
                     <td>
-                        <span class="inv-email">@(inv.Email ?? "Любой email")</span>
+                        <span class="inv-email">@(inv.Email ?? LInvitations["AnyEmail"].Value)</span>
                     </td>
                     <td>
                         <span class="settings-badge @InvRoleBadge(inv.Role)">@InvRoleLabel(inv.Role)</span>
@@ -76,11 +77,11 @@ else
                     <td>
                         @if (inv.UsedAt.HasValue)
                         {
-                            <span class="settings-badge settings-badge-success">Использовано</span>
+                            <span class="settings-badge settings-badge-success">@LInvitations["StatusUsed"]</span>
                         }
                         else
                         {
-                            <span class="settings-badge settings-badge-primary">Активно</span>
+                            <span class="settings-badge settings-badge-primary">@LInvitations["StatusActive"]</span>
                         }
                     </td>
                 </tr>
@@ -95,7 +96,7 @@ else
     <div class="settings-modal-backdrop" @onclick="CloseInviteModal"></div>
     <div class="settings-modal">
         <div class="settings-modal-header">
-            <h3 class="settings-modal-title">Новое приглашение</h3>
+            <h3 class="settings-modal-title">@LInvitations["ModalTitle"]</h3>
             <button class="settings-modal-close" @onclick="CloseInviteModal">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
@@ -104,19 +105,19 @@ else
             @if (createdInviteLink == null)
             {
                 <div class="settings-field">
-                    <label class="settings-label">Email (необязательно)</label>
+                    <label class="settings-label">@LInvitations["LabelEmailOptional"]</label>
                     <input type="email" class="settings-input" @bind="inviteEmail" placeholder="user@example.com" />
                 </div>
                 <div class="settings-field">
-                    <label class="settings-label">Роль</label>
+                    <label class="settings-label">@LInvitations["LabelRole"]</label>
                     <select class="settings-select" @bind="inviteRole">
-                        <option value="MEMBER">Участник</option>
-                        <option value="ADMIN">Админ</option>
-                        <option value="OWNER">Владелец</option>
+                        <option value="MEMBER">@LInvitations["OptionMember"]</option>
+                        <option value="ADMIN">@LInvitations["OptionAdmin"]</option>
+                        <option value="OWNER">@LInvitations["OptionOwner"]</option>
                     </select>
                 </div>
                 <div class="settings-field">
-                    <label class="settings-label">Срок действия (дней)</label>
+                    <label class="settings-label">@LInvitations["LabelExpiresDays"]</label>
                     <input type="number" class="settings-input" @bind="inviteExpiresDays" min="1" max="365" />
                 </div>
             }
@@ -124,13 +125,13 @@ else
             {
                 <div class="settings-alert settings-alert-success">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                    <span>Приглашение создано. Отправьте ссылку приглашённому.</span>
+                    <span>@LInvitations["SuccessAlert"]</span>
                 </div>
                 <div class="settings-field">
-                    <label class="settings-label">Ссылка для регистрации</label>
+                    <label class="settings-label">@LInvitations["LabelRegisterLink"]</label>
                     <div class="inv-link-row">
                         <input type="text" class="settings-input" readonly value="@createdInviteLink" />
-                        <button class="settings-btn-secondary" @onclick="CopyInviteLink">Копировать</button>
+                        <button class="settings-btn-secondary" @onclick="CopyInviteLink">@LInvitations["BtnCopy"]</button>
                     </div>
                 </div>
             }
@@ -138,15 +139,15 @@ else
         <div class="settings-modal-footer">
             @if (createdInviteLink == null)
             {
-                <button class="settings-btn-secondary" @onclick="CloseInviteModal">Отмена</button>
+                <button class="settings-btn-secondary" @onclick="CloseInviteModal">@LInvitations["BtnCancel"]</button>
                 <button class="settings-btn-primary" @onclick="CreateInvitation" disabled="@isCreating">
                     @if (isCreating) { <div class="settings-spinner" style="width:16px;height:16px;border-width:2px;"></div> }
-                    Создать
+                    @LInvitations["BtnCreate"]
                 </button>
             }
             else
             {
-                <button class="settings-btn-primary" @onclick="CloseInviteModal">Готово</button>
+                <button class="settings-btn-primary" @onclick="CloseInviteModal">@LInvitations["BtnDone"]</button>
             }
         </div>
     </div>
@@ -247,11 +248,11 @@ else
         _ => "settings-badge-neutral"
     };
 
-    private static string InvRoleLabel(string? role) => role?.ToUpperInvariant() switch
+    private string InvRoleLabel(string? role) => role?.ToUpperInvariant() switch
     {
-        "OWNER" => "Владелец",
-        "ADMIN" => "Админ",
-        "MEMBER" => "Участник",
+        "OWNER" => LInvitations["RoleOwner"],
+        "ADMIN" => LInvitations["RoleAdmin"],
+        "MEMBER" => LInvitations["RoleMember"],
         _ => role ?? "—"
     };
 }

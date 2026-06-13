@@ -6,32 +6,33 @@
 
 @inject IBillingApiClient Billing
 @inject NavigationManager Nav
+@inject IStringLocalizer<BillingPlans> LPlans
 
-<PageTitle>Настройки — Тарифы — ChatFoundry</PageTitle>
+<PageTitle>@LPlans["PageTitle"] — ChatFoundry</PageTitle>
 
 <div class="settings-page-header">
     <div>
         <a class="billing-back-link" href="/settings/billing">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-            Биллинг
+            @LPlans["BackToBilling"]
         </a>
-        <h1 class="settings-page-title">Тарифы</h1>
-        <p class="settings-page-subtitle">Выберите подходящий план для вашей компании</p>
+        <h1 class="settings-page-title">@LPlans["HeaderTitle"]</h1>
+        <p class="settings-page-subtitle">@LPlans["HeaderSubtitle"]</p>
     </div>
 </div>
 
 <div class="billing-plan-info">
     <div class="billing-plan-info-item">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        <span><strong>Повышение плана</strong> — смена происходит немедленно, неиспользованная часть текущего периода возвращается на баланс в виде кредита</span>
+        <span><strong>@LPlans["UpgradePlan"]</strong>@LPlans["UpgradeDesc"]</span>
     </div>
     <div class="billing-plan-info-item">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span><strong>Понижение плана</strong> — текущий план остаётся активным до конца оплаченного периода, затем автоматически переключается на новый</span>
+        <span><strong>@LPlans["DowngradePlan"]</strong>@LPlans["DowngradeDesc"]</span>
     </div>
     <div class="billing-plan-info-item">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-        <span>Кредит за неиспользованный период можно использовать для оплаты будущих подписок</span>
+        <span>@LPlans["CreditNote"]</span>
     </div>
 </div>
 
@@ -54,8 +55,8 @@ else if (_plans == null || !_plans.Any())
         <div class="settings-empty-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
         </div>
-        <div class="settings-empty-title">Тарифы недоступны</div>
-        <div class="settings-empty-desc">Не удалось загрузить список тарифных планов.</div>
+        <div class="settings-empty-title">@LPlans["EmptyTitle"]</div>
+        <div class="settings-empty-desc">@LPlans["EmptyDesc"]</div>
     </div>
 }
 else
@@ -69,12 +70,12 @@ else
             <div class="billing-plan @((isCurrent ? "billing-plan-current" : ""))">
                 @if (isCurrent)
                 {
-                    <div class="billing-plan-badge">Текущий план</div>
+                    <div class="billing-plan-badge">@LPlans["BadgeCurrent"]</div>
                 }
                 else if (isPending && _pendingChangeAt.HasValue)
                 {
                     <div class="billing-plan-badge billing-plan-badge-pending">
-                        Запланирован — @_pendingChangeAt.Value.ToString("dd MMM yyyy")
+                        @string.Format(LPlans["BadgePending"], _pendingChangeAt.Value.ToString("dd MMM yyyy"))
                     </div>
                 }
                 <div class="billing-plan-icon">
@@ -96,42 +97,42 @@ else
                 <h3 class="billing-plan-name">@plan.Name</h3>
                 <div class="billing-plan-price">
                     <span class="billing-plan-amount">$@plan.PricePerMonth</span>
-                    <span class="billing-plan-period">/ мес</span>
+                    <span class="billing-plan-period">@LPlans["PriceSuffix"]</span>
                 </div>
                 <div class="billing-plan-divider"></div>
                 <ul class="billing-plan-features">
                     <li>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                        <span>До @FormatCount(plan.MaxClients) клиентов</span>
+                        <span>@string.Format(LPlans["FeatureClients"], FormatCount(plan.MaxClients))</span>
                     </li>
                     <li>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                        <span>До @FormatCount(plan.MaxBots) ботов</span>
+                        <span>@string.Format(LPlans["FeatureBots"], FormatCount(plan.MaxBots))</span>
                     </li>
                     <li>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                        <span>До @plan.MaxTeamMembers участников</span>
+                        <span>@string.Format(LPlans["FeatureTeam"], plan.MaxTeamMembers)</span>
                     </li>
                     <li>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                        <span>AI токены: @FormatTokens(plan.MaxAiTokens) / мес</span>
+                        <span>@string.Format(LPlans["FeatureAiTokens"], FormatTokens(plan.MaxAiTokens))</span>
                         <span class="billing-tooltip-wrap">
                             <svg class="billing-tooltip-trigger" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                            <span class="billing-tooltip">Общий бюджет токенов нейросети в месяц для выполнения ИИ-действий в ботах и AI конструктора</span>
+                            <span class="billing-tooltip">@LPlans["TooltipAiTokens"]</span>
                         </span>
                     </li>
                     @if (plan.HasAnalytics)
                     {
                         <li>
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span>Аналитика</span>
+                            <span>@LPlans["FeatureAnalytics"]</span>
                         </li>
                     }
                     @if (plan.HasApiAccess)
                     {
                         <li>
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span>API доступ</span>
+                            <span>@LPlans["FeatureApiAccess"]</span>
                         </li>
                     }
                 </ul>
@@ -140,27 +141,27 @@ else
                     @if (_pendingPlanSlug != null)
                     {
                         <button class="billing-plan-btn billing-plan-btn-cancel" @onclick="() => SelectPlan(plan.Slug)" disabled="@_busy">
-                            Отменить смену
+                            @LPlans["BtnCancelChange"]
                         </button>
                     }
                     else
                     {
                         <button class="billing-plan-btn billing-plan-btn-active" disabled>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                            Активен
+                            @LPlans["BtnActive"]
                         </button>
                     }
                 }
                 else if (isPending)
                 {
                     <button class="billing-plan-btn billing-plan-btn-pending" disabled>
-                        Ожидает активации
+                        @LPlans["BtnPending"]
                     </button>
                 }
                 else
                 {
                     <button class="billing-plan-btn" @onclick="() => SelectPlan(plan.Slug)" disabled="@_busy">
-                        Выбрать
+                        @LPlans["BtnSelect"]
                     </button>
                 }
             </div>
@@ -201,7 +202,7 @@ else
         }
         catch (Exception ex)
         {
-            loadError = $"Не удалось загрузить тарифы: {ex.Message}";
+            loadError = string.Format(LPlans["LoadError"], ex.Message);
         }
         finally
         {
@@ -219,7 +220,7 @@ else
             var result = await Billing.ChangeSubscriptionPlanAsync(slug);
             if (result == null)
             {
-                _msg = "Не удалось сменить план";
+                _msg = LPlans["ChangePlanFailed"];
                 return;
             }
 
@@ -228,8 +229,8 @@ else
                 case "UpgradeApplied":
                     isSuccess = true;
                     _msg = result.CreditApplied.HasValue
-                        ? $"План изменён на {slug}. Зачислен кредит: {result.CreditApplied.Value:F2} USD"
-                        : $"План изменён на {slug}";
+                        ? string.Format(LPlans["UpgradeSuccessCredit"], slug, result.CreditApplied.Value)
+                        : string.Format(LPlans["UpgradeSuccess"], slug);
                     _currentPlan = slug;
                     _pendingPlanSlug = null;
                     _pendingChangeAt = null;
@@ -239,26 +240,25 @@ else
                     isSuccess = true;
                     _pendingPlanSlug = slug;
                     _pendingChangeAt = result.PendingChangeAt;
-                    _msg = $"Переход на план {slug} запланирован на {_pendingChangeAt:dd MMM yyyy}. " +
-                           $"Текущий план активен до конца оплаченного периода.";
+                    _msg = string.Format(LPlans["DowngradeSuccess"], slug, _pendingChangeAt);
                     break;
 
                 case "ClearedPending":
                     isSuccess = true;
                     _pendingPlanSlug = null;
                     _pendingChangeAt = null;
-                    _msg = "Запланированная смена плана отменена";
+                    _msg = LPlans["ChangeCancelled"];
                     break;
 
                 default:
-                    _msg = "Выбран текущий план";
+                    _msg = LPlans["CurrentPlanSelected"];
                     break;
             }
         }
         catch (Exception ex)
         {
             _msg = ex.Message.Contains("Insufficient balance", StringComparison.OrdinalIgnoreCase)
-                ? "Недостаточно средств на балансе для смены плана. Пополните баланс и попробуйте снова."
+                ? LPlans["InsufficientBalance"].Value
                 : ex.Message;
         }
         finally

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="0" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  
+  <data name="PageTitle" xml:space="preserve">
+    <value>Настройки — Атрибуты</value>
+  </data>
+  <data name="HeaderTitle" xml:space="preserve">
+    <value>Атрибуты</value>
+  </data>
+  <data name="HeaderSubtitle" xml:space="preserve">
+    <value>Глобальные атрибуты компании, доступные в workflow</value>
+  </data>
+  <data name="BtnAddAttribute" xml:space="preserve">
+    <value>Добавить атрибут</value>
+  </data>
+  <data name="NoAttributesTitle" xml:space="preserve">
+    <value>Нет атрибутов</value>
+  </data>
+  <data name="NoAttributesDesc" xml:space="preserve">
+    <value>Добавьте атрибуты для использования в workflow — имя, почта, телефон или свои поля.</value>
+  </data>
+  <data name="ThKey" xml:space="preserve">
+    <value>Ключ</value>
+  </data>
+  <data name="ThName" xml:space="preserve">
+    <value>Название</value>
+  </data>
+  <data name="ThDescription" xml:space="preserve">
+    <value>Описание</value>
+  </data>
+  <data name="ThActions" xml:space="preserve">
+    <value>Действия</value>
+  </data>
+  <data name="TooltipEdit" xml:space="preserve">
+    <value>Изменить</value>
+  </data>
+  <data name="TooltipDelete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="ModalNewAttribute" xml:space="preserve">
+    <value>Новый атрибут</value>
+  </data>
+  <data name="ModalEditAttribute" xml:space="preserve">
+    <value>Редактировать атрибут</value>
+  </data>
+  <data name="LabelKey" xml:space="preserve">
+    <value>Ключ (латиница, без пробелов)</value>
+  </data>
+  <data name="PlaceholderKey" xml:space="preserve">
+    <value>например email или company_name</value>
+  </data>
+  <data name="KeyHint" xml:space="preserve">
+    <value>Ключ нельзя изменить после создания.</value>
+  </data>
+  <data name="LabelName" xml:space="preserve">
+    <value>Название (отображаемое)</value>
+  </data>
+  <data name="PlaceholderName" xml:space="preserve">
+    <value>Например: Email</value>
+  </data>
+  <data name="LabelDescription" xml:space="preserve">
+    <value>Описание (необязательно)</value>
+  </data>
+  <data name="PlaceholderDescription" xml:space="preserve">
+    <value>Подсказка для дизайнера workflow</value>
+  </data>
+  <data name="BtnCancel" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="BtnCreate" xml:space="preserve">
+    <value>Создать</value>
+  </data>
+  <data name="BtnSave" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="ErrorSpecifyKey" xml:space="preserve">
+    <value>Укажите ключ атрибута.</value>
+  </data>
+  <data name="DeleteConfirm" xml:space="preserve">
+    <value>Удалить атрибут «{0}»?</value>
+  </data>
+  <data name="ErrorDeleteFailed" xml:space="preserve">
+    <value>Не удалось удалить атрибут.</value>
+  </data>
+</root>

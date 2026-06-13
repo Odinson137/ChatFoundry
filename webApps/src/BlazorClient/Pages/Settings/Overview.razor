@@ -6,13 +6,14 @@
 @attribute [Authorize]
 
 @inject ICompanyApiClient CompanyApi
+@inject IStringLocalizer<Overview> LOverview
 
-<PageTitle>Настройки — Обзор — ChatFoundry</PageTitle>
+<PageTitle>@LOverview["PageTitle"] — ChatFoundry</PageTitle>
 
 <div class="settings-page-header">
     <div>
-        <h1 class="settings-page-title">Обзор</h1>
-        <p class="settings-page-subtitle">Основная информация о вашей компании</p>
+        <h1 class="settings-page-title">@LOverview["HeaderTitle"]</h1>
+        <p class="settings-page-subtitle">@LOverview["HeaderSubtitle"]</p>
     </div>
 </div>
 
@@ -23,7 +24,7 @@
         <span>@loadError</span>
     </div>
 }
-else if (isLoading)
+@if (isLoading)
 {
     <div class="settings-spinner-wrap">
         <div class="settings-spinner"></div>
@@ -35,8 +36,8 @@ else if (company == null)
         <div class="settings-empty-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         </div>
-        <div class="settings-empty-title">Компания не найдена</div>
-        <div class="settings-empty-desc">Нет доступа к компании или она ещё не создана.</div>
+        <div class="settings-empty-title">@LOverview["CompanyNotFound"]</div>
+        <div class="settings-empty-desc">@LOverview["CompanyNotFoundDesc"]</div>
     </div>
 }
 else
@@ -46,21 +47,21 @@ else
             <div class="settings-stat-icon" style="background: #eef2ff;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
             </div>
-            <div class="settings-stat-label">Компания</div>
+            <div class="settings-stat-label">@LOverview["StatCompany"]</div>
             <div class="settings-stat-value" style="font-size: 1.25rem;">@company.Name</div>
         </div>
         <div class="settings-stat-card">
             <div class="settings-stat-icon" style="background: #ecfdf5;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
             </div>
-            <div class="settings-stat-label">Участников</div>
+            <div class="settings-stat-label">@LOverview["StatMembers"]</div>
             <div class="settings-stat-value">@membersCount</div>
         </div>
         <div class="settings-stat-card">
             <div class="settings-stat-icon" style="background: #faf5ff;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
             </div>
-            <div class="settings-stat-label">Приглашений</div>
+            <div class="settings-stat-label">@LOverview["StatInvitations"]</div>
             <div class="settings-stat-value">@invitationsCount</div>
         </div>
     </div>
@@ -71,7 +72,7 @@ else
             <div class="settings-card-body">
                 <div class="overview-info-grid">
                     <div class="overview-info-item overview-info-full">
-                        <div class="overview-info-label">Описание</div>
+                        <div class="overview-info-label">@LOverview["LabelDescription"]</div>
                         <div class="overview-info-value">@company.Description</div>
                     </div>
                 </div>

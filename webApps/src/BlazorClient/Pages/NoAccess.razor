@@ -1,8 +1,8 @@
 @page "/no-access"
-
 @inject NavigationManager Navigation
+@inject IStringLocalizer<NoAccess> LNoAccess
 
-<PageTitle>Нет доступа — ChatFoundry</PageTitle>
+<PageTitle>@LNoAccess["PageTitle"] — ChatFoundry</PageTitle>
 
 <div class="no-access-page">
     <div class="no-access-card">
@@ -13,8 +13,8 @@
                 <line x1="12" y1="16" x2="12" y2="16"/>
             </svg>
         </div>
-        <h1 class="no-access-title">Нет доступа</h1>
-        <p class="no-access-text">У вас нет доступа к компании или вы были исключены.</p>
-        <a href="/login" class="no-access-link">Войти в аккаунт</a>
+        <h1 class="no-access-title">@LNoAccess["Title"]</h1>
+        <p class="no-access-text">@LNoAccess["Subtitle"]</p>
+        <a href="/login" class="no-access-link">@LNoAccess["BtnSignIn"]</a>
     </div>
 </div>
