@@ -19,7 +19,9 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
         [Service] ClientDbContext context,
         string? search = null)
     {
-        if (!CompanyId.HasValue) return context.Clients.Where(_ => false);
+        if (!CompanyId.HasValue)
+            throw new GraphQLException("Company ID is required.");
+
         var query = context.Clients
             .Where(c => c.CompanyId != null && c.CompanyId == CompanyId.Value);
 
@@ -45,7 +47,9 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
     [UseSorting]
     public IQueryable<ClientChannel> GetClientChannels([Service] ClientDbContext context)
     {
-        if (!CompanyId.HasValue) return context.ClientChannels.Where(_ => false);
+        if (!CompanyId.HasValue)
+            throw new GraphQLException("Company ID is required.");
+
         return context.ClientChannels.Where(ch => ch.Client.CompanyId != null && ch.Client.CompanyId == CompanyId.Value);
     }
 
@@ -53,18 +57,24 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public DbSet<Message> GetMessages([Service] ClientDbContext context)
+    public IQueryable<Message> GetMessages([Service] ClientDbContext context)
     {
-        return context.Messages;
+        if (!CompanyId.HasValue)
+            throw new GraphQLException("Company ID is required.");
+
+        return context.Messages.Where(m => m.ClientChannel != null && m.ClientChannel.Client.CompanyId == CompanyId.Value);
     }
 
     [UsePaging(IncludeTotalCount = true)]
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public DbSet<AttributeDefinition> GetAttributes([Service] ClientDbContext context)
+    public IQueryable<AttributeDefinition> GetAttributes([Service] ClientDbContext context)
     {
-        return context.AttributeDefinitions;
+        if (!CompanyId.HasValue)
+            throw new GraphQLException("Company ID is required.");
+
+        return context.AttributeDefinitions.Where(a => a.ScopeEntityId == CompanyId.Value);
     }
 
     /// <summary>
@@ -75,7 +85,9 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
         [Service] IAttributeDefinitionRepository repository,
         CancellationToken ct)
     {
-        if (!CompanyId.HasValue) return new List<AttributeDefinition>();
+        if (!CompanyId.HasValue)
+            throw new GraphQLException("Company ID is required.");
+
         return await repository.GetByScopeEntityIdAsync(CompanyId.Value, ct);
     }
 }

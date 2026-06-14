@@ -9,11 +9,21 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
 {
     public async Task<IReadOnlyList<FileEntity>> GetFiles([Service] IFileRepository fileRepository, CancellationToken ct = default)
     {
-        return await fileRepository.ListAsync(CompanyId ?? Guid.Empty, null, ct);
+        if (!CompanyId.HasValue)
+            throw new GraphQLException("Company ID is required.");
+
+        return await fileRepository.ListAsync(CompanyId.Value, null, ct);
     }
 
     public async Task<FileEntity?> GetFile(Guid id, [Service] IFileRepository fileRepository, CancellationToken ct = default)
     {
-        return await fileRepository.GetByIdAsync(id, ct);
+        if (!CompanyId.HasValue)
+            throw new GraphQLException("Company ID is required.");
+
+        var file = await fileRepository.GetByIdAsync(id, ct);
+        if (file == null || file.CompanyId != CompanyId.Value)
+            return null;
+
+        return file;
     }
 }

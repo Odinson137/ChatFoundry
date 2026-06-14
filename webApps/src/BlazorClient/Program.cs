@@ -58,11 +58,11 @@ if (string.IsNullOrEmpty(cultureName))
     {
         var jsRuntime = host.Services.GetRequiredService<IJSRuntime>();
         var languages = await jsRuntime.InvokeAsync<string[]>("eval", "Array.from(navigator.languages || [navigator.language || navigator.userLanguage])");
-        
-        var isRussianOrBelarussian = languages != null && languages.Any(lang => 
-            lang.StartsWith("ru", StringComparison.OrdinalIgnoreCase) || 
+
+        var isRussianOrBelarussian = languages != null && languages.Any(lang =>
+            lang.StartsWith("ru", StringComparison.OrdinalIgnoreCase) ||
             lang.StartsWith("be", StringComparison.OrdinalIgnoreCase));
-            
+
         cultureName = isRussianOrBelarussian ? "ru-RU" : "en-US";
     }
     catch

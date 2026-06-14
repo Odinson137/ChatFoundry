@@ -16,9 +16,10 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
     [UseSorting]
     public IQueryable<Bot> GetBots([Service] WorkflowDbContext context)
     {
-        if (CompanyId.HasValue)
-            return context.Bots.Where(c => c.CompanyId == CompanyId.Value);
-        return context.Bots;
+        if (!CompanyId.HasValue)
+            throw new GraphQLException("Company ID is required.");
+
+        return context.Bots.Where(c => c.CompanyId == CompanyId.Value);
     }
 
     [UsePaging(IncludeTotalCount = true)]
@@ -26,9 +27,10 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
     [UseSorting]
     public IQueryable<MessengerChannel> GetChannels([Service] WorkflowDbContext context)
     {
-        if (CompanyId.HasValue)
-            return context.MessengerChannels.Where(c => c.CompanyId == CompanyId.Value);
-        return context.MessengerChannels.Where(c => c.CreatedUserId == UserId);
+        if (!CompanyId.HasValue)
+            throw new GraphQLException("Company ID is required.");
+
+        return context.MessengerChannels.Where(c => c.CompanyId == CompanyId.Value);
     }
 
     [UsePaging(IncludeTotalCount = true)]
@@ -37,34 +39,35 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
     [UseSorting]
     public IQueryable<Session> GetSessions([Service] WorkflowDbContext context)
     {
-        var query = context.Sessions.AsQueryable();
+        if (!CompanyId.HasValue)
+            throw new GraphQLException("Company ID is required.");
 
-        if (CompanyId.HasValue)
-        {
-            var companyWorkflowIds = context.Workflows
-                .Where(w => w.Bot.CompanyId == CompanyId.Value)
-                .Select(w => w.Id);
-            query = query.Where(s => companyWorkflowIds.Contains(s.WorkflowId));
-        }
-
-        return query.OrderByDescending(s => s.CreatedAt);
+        return context.Sessions
+            .Where(s => s.Workflow.Bot.CompanyId == CompanyId.Value)
+            .OrderByDescending(s => s.CreatedAt);
     }
 
     [UsePaging(IncludeTotalCount = true)]
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public DbSet<BotWorkflow> GetWorkflows([Service] WorkflowDbContext context)
+    public IQueryable<BotWorkflow> GetWorkflows([Service] WorkflowDbContext context)
     {
-        return context.Workflows;
+        if (!CompanyId.HasValue)
+            throw new GraphQLException("Company ID is required.");
+
+        return context.Workflows.Where(w => w.Bot.CompanyId == CompanyId.Value);
     }
 
     [UsePaging(IncludeTotalCount = true)]
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public DbSet<ActionEntity> GetActionEntities([Service] WorkflowDbContext context)
+    public IQueryable<ActionEntity> GetActionEntities([Service] WorkflowDbContext context)
     {
-        return context.Actions;
+        if (!CompanyId.HasValue)
+            throw new GraphQLException("Company ID is required.");
+
+        return context.Actions.Where(a => a.Session.Workflow.Bot.CompanyId == CompanyId.Value);
     }
 }

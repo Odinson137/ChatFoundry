@@ -792,4 +792,364 @@
     </data>
 
 
-<data name="AiDialogTitle" xml:space="preserve"><value>AI: схема workflow</value></data><data name="AiDialogModeLabel" xml:space="preserve"><value>Режим</value></data><data name="AiDialogModeNewBot" xml:space="preserve"><value>Новый бот</value></data><data name="AiDialogModeMerge" xml:space="preserve"><value>Дополнить текущий</value></data><data name="AiDialogPromptLabel" xml:space="preserve"><value>Запрос к AI на сервере</value></data><data name="AiDialogPromptPlaceholder" xml:space="preserve"><value>Опишите бота или что добавить к текущей схеме…</value></data><data name="AiDialogGenerating" xml:space="preserve"><value>Генерация…</value></data><data name="AiDialogGenerateBtn" xml:space="preserve"><value>Сгенерировать</value></data><data name="AiDialogInstructionLabel" xml:space="preserve"><value>Инструкция для внешней нейросети (стабильная ссылка, без расхода квоты в приложении):</value></data><data name="AiDialogCopyLinkBtn" xml:space="preserve"><value>Копировать ссылку</value></data><data name="AiDialogDownloadMdBtn" xml:space="preserve"><value>Скачать .md</value></data><data name="AiDialogPasteJsonLabel" xml:space="preserve"><value>Вставить JSON от другой нейросети</value></data><data name="AiDialogApplyJsonBtn" xml:space="preserve"><value>Применить JSON</value></data><data name="AiDialogDownloadError" xml:space="preserve"><value>Не удалось скачать: {0}</value></data><data name="AiDialogErrorEmptyPrompt" xml:space="preserve"><value>Введите описание бота или доработки.</value></data><data name="AiDialogErrorNoNodesForMerge" xml:space="preserve"><value>Нет узлов для режима «дополнить». Выберите «Новый бот» или добавьте узлы на схему.</value></data><data name="AiDialogErrorEmptyResponse" xml:space="preserve"><value>Пустой ответ.</value></data><data name="AiDialogErrorParseSchemaJson" xml:space="preserve"><value>Не удалось разобрать JSON схемы.</value></data><data name="AiDialogErrorEmptyJson" xml:space="preserve"><value>Вставьте JSON схемы.</value></data><data name="AiDialogErrorParseJson" xml:space="preserve"><value>Не удалось разобрать JSON.</value></data><data name="AiDialogErrorFallback" xml:space="preserve"><value>Не удалось сгенерировать схему. Попробуйте снова.</value></data><data name="AiDialogErrorUnknown" xml:space="preserve"><value>Неизвестная ошибка при генерации схемы.</value></data><data name="AiDialogErrorQuotaExceededWithDetails" xml:space="preserve"><value>Достигнут лимит генераций AI: {0} из {1}. Обновите тариф или дождитесь следующего периода.</value></data><data name="AiDialogErrorQuotaExceeded" xml:space="preserve"><value>Достигнут лимит генераций AI. Обновите тариф или дождитесь следующего периода.</value></data><data name="PageTitleWorkflowEditor" xml:space="preserve"><value>Редактор Workflow</value></data><data name="RedoBtnTooltip" xml:space="preserve"><value>Вперёд</value></data><data name="AttributesParamsBtnTooltip" xml:space="preserve"><value>Атрибуты и параметры</value></data><data name="AttributesParamsBtn" xml:space="preserve"><value>Атрибуты и параметры</value></data><data name="DownloadBtn" xml:space="preserve"><value>Скачать</value></data><data name="UploadBtn" xml:space="preserve"><value>Загрузить</value></data><data name="GenerateAiBtnTooltip" xml:space="preserve"><value>Сгенерировать схему с помощью AI</value></data><data name="LabelMsgText" xml:space="preserve"><value>Текст сообщения</value></data><data name="EnterAtToSelectVarOrManual" xml:space="preserve"><value>Введите {0} для выбора переменной. Или {1}</value></data><data name="LabelButtonsUnderMsg" xml:space="preserve"><value>Кнопки (отправляются под сообщением)</value></data><data name="DeleteBtnTooltip" xml:space="preserve"><value>Удалить</value></data><data name="ButtonsHint" xml:space="preserve"><value>При нажатии в переменную попадёт этот текст. Если кнопок нет — ожидается любой ввод.</value></data><data name="LabelAttributeKey" xml:space="preserve"><value>Ключ атрибута</value></data><data name="SelectAttributeOption" xml:space="preserve"><value>Выберите атрибут</value></data><data name="AttributesListHint" xml:space="preserve"><value>Список из атрибутов компании (Компания → Атрибуты) и базовых: name, username, phone, email</value></data><data name="PlaceholderTextOrVar" xml:space="preserve"><value>Текст или {{variable_name}}</value></data><data name="VariablesInTemplateHint" xml:space="preserve"><value>В шаблоне можно использовать переменные</value></data><data name="LabelRequestBody" xml:space="preserve"><value>Тело запроса (Body)</value></data><data name="DeleteHeaderTooltip" xml:space="preserve"><value>Удалить заголовок</value></data><data name="ContinueOnErrorLabel" xml:space="preserve"><value>При ошибке продолжать работу</value></data><data name="ContinueOnErrorHintHttp" xml:space="preserve"><value>Если выключено — сессия завершится при ошибке запроса.</value></data><data name="AiPromptLabel" xml:space="preserve"><value>Промпт для AI</value></data><data name="AiPromptHint" xml:space="preserve"><value>Опишите, что должен сделать AI. Используйте переменные {0}.</value></data><data name="AiIncludeContextLabel" xml:space="preserve"><value>Учитывать контекст чата</value></data><data name="AiIncludeContextHint" xml:space="preserve"><value>AI получит историю сообщений текущего диалога.</value></data><data name="ContinueOnErrorHintAi" xml:space="preserve"><value>Если выключено — сессия завершится при ошибке AI-запроса.</value></data><data name="UploadFileLabel" xml:space="preserve"><value>Загрузить файл</value></data><data name="UploadFileHint" xml:space="preserve"><value>Файл будет загружен в хранилище, к блоку привяжется ID файла.</value></data><data name="OrChooseFromStoragePrefix" xml:space="preserve"><value>Или выбрать из</value></data><data name="StorageLinkText" xml:space="preserve"><value>хранилища</value></data><data name="CurrentKeyFileId" xml:space="preserve"><value>Текущий ключ (ID файла)</value></data><data name="PlaceholderFileIdOrVar" xml:space="preserve"><value>ID файла или {{variable_name}}</value></data><data name="VariablesSupportedHint" xml:space="preserve"><value>Можно использовать переменные (например, {0}).</value></data><data name="CaptionLabel" xml:space="preserve"><value>Подпись (Caption)</value></data><data name="PlaceholderOptional" xml:space="preserve"><value>Необязательно</value></data><data name="CalledProcessLabel" xml:space="preserve"><value>Вызываемый процесс</value></data><data name="ChangeBtn" xml:space="preserve"><value>Изменить</value></data><data name="ProcessSelectedLabel" xml:space="preserve"><value>Процесс выбран</value></data><data name="SubProcessInputParamsHint" xml:space="preserve"><value>Привяжите параметры дочернего процесса к переменным или значениям текущего (можно {0}).</value></data><data name="PlaceholderVarOrValue" xml:space="preserve"><value>{{variable}} или значение</value></data><data name="SubProcessNoInputParamsHint" xml:space="preserve"><value>У выбранного процесса нет входных параметров. Задайте их во вкладке «Параметры» в настройках того процесса.</value></data><data name="SubProcessOutputParamsHint" xml:space="preserve"><value>Укажите, в какую переменную текущего процесса записать результат дочернего (слева — переменная, справа — параметр дочернего).</value></data><data name="PlaceholderVariableOnly" xml:space="preserve"><value>переменная</value></data><data name="PlaceholderSubParam" xml:space="preserve"><value>параметр дочернего</value></data><data name="SubProcessNoOutputParamsHint" xml:space="preserve"><value>У выбранного процесса нет выходных параметров. Задайте их во вкладке «Параметры» в настройках того процесса.</value></data><data name="DurationLabel" xml:space="preserve"><value>Длительность</value></data><data name="WaitDurationVariablesHint" xml:space="preserve"><value>Можно использовать переменные, например {0}</value></data><data name="WaitTimeoutLabel" xml:space="preserve"><value>Таймаут ожидания (секунды)</value></data><data name="WaitDurationPlaceholder" xml:space="preserve"><value>0 = бесконечно</value></data><data name="WaitTimeoutHint" xml:space="preserve"><value>Через указанное время сценарий продолжит работу по ветке таймаута.</value></data><data name="CallbackUrlDescription" xml:space="preserve"><value>Для возврата в сценарий используйте адрес в формате:</value></data><data name="CallbackUrlBaseUrl" xml:space="preserve"><value>базовый URL вашего сервера</value></data><data name="CallbackUrlBotId" xml:space="preserve"><value>уникальный идентификатор бота</value></data><data name="CallbackUrlClientId" xml:space="preserve"><value>уникальный ID внешнего пользователя</value></data><data name="CallbackUrlChannel" xml:space="preserve"><value>канал общения (например, &lt;code&gt;telegram&lt;/code&gt;)</value></data><data name="ScheduleTypeLabel" xml:space="preserve"><value>Тип расписания</value></data><data name="ScheduleTypeOneTime" xml:space="preserve"><value>Однократно</value></data><data name="ScheduleTypeCron" xml:space="preserve"><value>По расписанию (Cron)</value></data><data name="DateTimeLabel" xml:space="preserve"><value>Дата и время</value></data><data name="CronExpressionLabel" xml:space="preserve"><value>Cron выражение</value></data><data name="CronExampleHint" xml:space="preserve"><value>Пример: {0} — каждый день в 10:00</value></data><data name="TimezoneLabel" xml:space="preserve"><value>Часовой пояс</value></data><data name="ClientFilterLabel" xml:space="preserve"><value>Фильтр клиентов</value></data><data name="ClientFilterHint" xml:space="preserve"><value>Оставьте пустым для всех клиентов компании, или добавьте условия фильтрации.</value></data><data name="ChannelsLabel" xml:space="preserve"><value>Каналы</value></data><data name="AttributeConditionsLabel" xml:space="preserve"><value>Условия по атрибутам</value></data></root>
+<data name="AiDialogTitle" xml:space="preserve"><value>AI: схема workflow</value></data><data name="AiDialogModeLabel" xml:space="preserve"><value>Режим</value></data><data name="AiDialogModeNewBot" xml:space="preserve"><value>Новый бот</value></data><data name="AiDialogModeMerge" xml:space="preserve"><value>Дополнить текущий</value></data><data name="AiDialogPromptLabel" xml:space="preserve"><value>Запрос к AI на сервере</value></data><data name="AiDialogPromptPlaceholder" xml:space="preserve"><value>Опишите бота или что добавить к текущей схеме…</value></data><data name="AiDialogGenerating" xml:space="preserve"><value>Генерация…</value></data><data name="AiDialogGenerateBtn" xml:space="preserve"><value>Сгенерировать</value></data><data name="AiDialogInstructionLabel" xml:space="preserve"><value>Инструкция для внешней нейросети (стабильная ссылка, без расхода квоты в приложении):</value></data><data name="AiDialogCopyLinkBtn" xml:space="preserve"><value>Копировать ссылку</value></data><data name="AiDialogDownloadMdBtn" xml:space="preserve"><value>Скачать .md</value></data><data name="AiDialogPasteJsonLabel" xml:space="preserve"><value>Вставить JSON от другой нейросети</value></data><data name="AiDialogApplyJsonBtn" xml:space="preserve"><value>Применить JSON</value></data><data name="AiDialogDownloadError" xml:space="preserve"><value>Не удалось скачать: {0}</value></data><data name="AiDialogErrorEmptyPrompt" xml:space="preserve"><value>Введите описание бота или доработки.</value></data><data name="AiDialogErrorNoNodesForMerge" xml:space="preserve"><value>Нет узлов для режима «дополнить». Выберите «Новый бот» или добавьте узлы на схему.</value></data><data name="AiDialogErrorEmptyResponse" xml:space="preserve"><value>Пустой ответ.</value></data><data name="AiDialogErrorParseSchemaJson" xml:space="preserve"><value>Не удалось разобрать JSON схемы.</value></data><data name="AiDialogErrorEmptyJson" xml:space="preserve"><value>Вставьте JSON схемы.</value></data><data name="AiDialogErrorParseJson" xml:space="preserve"><value>Не удалось разобрать JSON.</value></data><data name="AiDialogErrorFallback" xml:space="preserve"><value>Не удалось сгенерировать схему. Попробуйте снова.</value></data><data name="AiDialogErrorUnknown" xml:space="preserve"><value>Неизвестная ошибка при генерации схемы.</value></data><data name="AiDialogErrorQuotaExceededWithDetails" xml:space="preserve"><value>Достигнут лимит генераций AI: {0} из {1}. Обновите тариф или дождитесь следующего периода.</value></data><data name="AiDialogErrorQuotaExceeded" xml:space="preserve"><value>Достигнут лимит генераций AI. Обновите тариф или дождитесь следующего периода.</value></data><data name="PageTitleWorkflowEditor" xml:space="preserve"><value>Редактор Workflow</value></data><data name="RedoBtnTooltip" xml:space="preserve"><value>Вперёд</value></data><data name="AttributesParamsBtnTooltip" xml:space="preserve"><value>Атрибуты и параметры</value></data><data name="AttributesParamsBtn" xml:space="preserve"><value>Атрибуты и параметры</value></data><data name="DownloadBtn" xml:space="preserve"><value>Скачать</value></data><data name="UploadBtn" xml:space="preserve"><value>Загрузить</value></data><data name="GenerateAiBtnTooltip" xml:space="preserve"><value>Сгенерировать схему с помощью AI</value></data><data name="LabelMsgText" xml:space="preserve"><value>Текст сообщения</value></data><data name="EnterAtToSelectVarOrManual" xml:space="preserve"><value>Введите {0} для выбора переменной. Или {1}</value></data><data name="LabelButtonsUnderMsg" xml:space="preserve"><value>Кнопки (отправляются под сообщением)</value></data><data name="DeleteBtnTooltip" xml:space="preserve"><value>Удалить</value></data><data name="ButtonsHint" xml:space="preserve"><value>При нажатии в переменную попадёт этот текст. Если кнопок нет — ожидается любой ввод.</value></data><data name="LabelAttributeKey" xml:space="preserve"><value>Ключ атрибута</value></data><data name="SelectAttributeOption" xml:space="preserve"><value>Выберите атрибут</value></data><data name="AttributesListHint" xml:space="preserve"><value>Список из атрибутов компании (Компания → Атрибуты) и базовых: name, username, phone, email</value></data><data name="PlaceholderTextOrVar" xml:space="preserve"><value>Текст или {{variable_name}}</value></data><data name="VariablesInTemplateHint" xml:space="preserve"><value>В шаблоне можно использовать переменные</value></data><data name="LabelRequestBody" xml:space="preserve"><value>Тело запроса (Body)</value></data><data name="DeleteHeaderTooltip" xml:space="preserve"><value>Удалить заголовок</value></data><data name="ContinueOnErrorLabel" xml:space="preserve"><value>При ошибке продолжать работу</value></data><data name="ContinueOnErrorHintHttp" xml:space="preserve"><value>Если выключено — сессия завершится при ошибке запроса.</value></data><data name="AiPromptLabel" xml:space="preserve"><value>Промпт для AI</value></data><data name="AiPromptHint" xml:space="preserve"><value>Опишите, что должен сделать AI. Используйте переменные {0}.</value></data><data name="AiIncludeContextLabel" xml:space="preserve"><value>Учитывать контекст чата</value></data><data name="AiIncludeContextHint" xml:space="preserve"><value>AI получит историю сообщений текущего диалога.</value></data><data name="ContinueOnErrorHintAi" xml:space="preserve"><value>Если выключено — сессия завершится при ошибке AI-запроса.</value></data><data name="UploadFileLabel" xml:space="preserve"><value>Загрузить файл</value></data><data name="UploadFileHint" xml:space="preserve"><value>Файл будет загружен в хранилище, к блоку привяжется ID файла.</value></data><data name="OrChooseFromStoragePrefix" xml:space="preserve"><value>Или выбрать из</value></data><data name="StorageLinkText" xml:space="preserve"><value>хранилища</value></data><data name="CurrentKeyFileId" xml:space="preserve"><value>Текущий ключ (ID файла)</value></data><data name="PlaceholderFileIdOrVar" xml:space="preserve"><value>ID файла или {{variable_name}}</value></data><data name="VariablesSupportedHint" xml:space="preserve"><value>Можно использовать переменные (например, {0}).</value></data><data name="CaptionLabel" xml:space="preserve"><value>Подпись (Caption)</value></data><data name="PlaceholderOptional" xml:space="preserve"><value>Необязательно</value></data><data name="CalledProcessLabel" xml:space="preserve"><value>Вызываемый процесс</value></data><data name="ChangeBtn" xml:space="preserve"><value>Изменить</value></data><data name="ProcessSelectedLabel" xml:space="preserve"><value>Процесс выбран</value></data><data name="SubProcessInputParamsHint" xml:space="preserve"><value>Привяжите параметры дочернего процесса к переменным или значениям текущего (можно {0}).</value></data><data name="PlaceholderVarOrValue" xml:space="preserve"><value>{{variable}} или значение</value></data><data name="SubProcessNoInputParamsHint" xml:space="preserve"><value>У выбранного процесса нет входных параметров. Задайте их во вкладке «Параметры» в настройках того процесса.</value></data><data name="SubProcessOutputParamsHint" xml:space="preserve"><value>Укажите, в какую переменную текущего процесса записать результат дочернего (слева — переменная, справа — параметр дочернего).</value></data><data name="PlaceholderVariableOnly" xml:space="preserve"><value>переменная</value></data><data name="PlaceholderSubParam" xml:space="preserve"><value>параметр дочернего</value></data><data name="SubProcessNoOutputParamsHint" xml:space="preserve"><value>У выбранного процесса нет выходных параметров. Задайте их во вкладке «Параметры» в настройках того процесса.</value></data><data name="DurationLabel" xml:space="preserve"><value>Длительность</value></data><data name="WaitDurationVariablesHint" xml:space="preserve"><value>Можно использовать переменные, например {0}</value></data><data name="WaitTimeoutLabel" xml:space="preserve"><value>Таймаут ожидания (секунды)</value></data><data name="WaitDurationPlaceholder" xml:space="preserve"><value>0 = бесконечно</value></data><data name="WaitTimeoutHint" xml:space="preserve"><value>Через указанное время сценарий продолжит работу по ветке таймаута.</value></data><data name="CallbackUrlDescription" xml:space="preserve"><value>Для возврата в сценарий используйте адрес в формате:</value></data><data name="CallbackUrlBaseUrl" xml:space="preserve"><value>базовый URL вашего сервера</value></data><data name="CallbackUrlBotId" xml:space="preserve"><value>уникальный идентификатор бота</value></data><data name="CallbackUrlClientId" xml:space="preserve"><value>уникальный ID внешнего пользователя</value></data><data name="CallbackUrlChannel" xml:space="preserve"><value>канал общения (например, &lt;code&gt;telegram&lt;/code&gt;)</value></data><data name="ScheduleTypeLabel" xml:space="preserve"><value>Тип расписания</value></data><data name="ScheduleTypeOneTime" xml:space="preserve"><value>Однократно</value></data><data name="ScheduleTypeCron" xml:space="preserve"><value>По расписанию (Cron)</value></data><data name="DateTimeLabel" xml:space="preserve"><value>Дата и время</value></data><data name="CronExpressionLabel" xml:space="preserve"><value>Cron выражение</value></data><data name="CronExampleHint" xml:space="preserve"><value>Пример: {0} — каждый день в 10:00</value></data><data name="TimezoneLabel" xml:space="preserve"><value>Часовой пояс</value></data><data name="ClientFilterLabel" xml:space="preserve"><value>Фильтр клиентов</value></data><data name="ClientFilterHint" xml:space="preserve"><value>Оставьте пустым для всех клиентов компании, или добавьте условия фильтрации.</value></data><data name="ChannelsLabel" xml:space="preserve"><value>Каналы</value></data><data name="AttributeConditionsLabel" xml:space="preserve"><value>Условия по атрибутам</value></data>  <data name="AddCondition" xml:space="preserve">
+    <value>Добавить условие</value>
+  </data>
+  <data name="AddParamBtn" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
+  <data name="AllConditionsMustMatch" xml:space="preserve">
+    <value>Все условия должны совпадать</value>
+  </data>
+  <data name="AnyConditionMustMatch" xml:space="preserve">
+    <value>Любое условие должно совпадать</value>
+  </data>
+  <data name="AttributesEmptyHint" xml:space="preserve">
+    <value>Нет доступных атрибутов. Добавьте их в настройках компании.</value>
+  </data>
+  <data name="BackLabel" xml:space="preserve">
+    <value>Назад</value>
+  </data>
+  <data name="CloseLabel" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+  <data name="ConditionType" xml:space="preserve">
+    <value>Тип условия</value>
+  </data>
+  <data name="DeleteBtn" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="EnterAtToSelectVar" xml:space="preserve">
+    <value>Введите @ для выбора переменной</value>
+  </data>
+  <data name="IgnoreCase" xml:space="preserve">
+    <value>Игнорировать регистр</value>
+  </data>
+  <data name="IncomingMsgTypeHint" xml:space="preserve">
+    <value>Тип входящего сообщения</value>
+  </data>
+  <data name="InputParams" xml:space="preserve">
+    <value>Входные параметры</value>
+  </data>
+  <data name="InsertVariableTooltip" xml:space="preserve">
+    <value>Вставить переменную</value>
+  </data>
+  <data name="JoinConditionsLabel" xml:space="preserve">
+    <value>Соединение условий</value>
+  </data>
+  <data name="LabelCondition" xml:space="preserve">
+    <value>Условие</value>
+  </data>
+  <data name="LabelRegexPattern" xml:space="preserve">
+    <value>Регулярное выражение</value>
+  </data>
+  <data name="LabelValuesCommaSeparated" xml:space="preserve">
+    <value>Значения через запятую</value>
+  </data>
+  <data name="LineLabel" xml:space="preserve">
+    <value>Подпись линии</value>
+  </data>
+  <data name="LineLabelPlaceholder" xml:space="preserve">
+    <value>Введите подпись...</value>
+  </data>
+  <data name="NodeLabelAIGenerate" xml:space="preserve">
+    <value>AI Текст</value>
+  </data>
+  <data name="NodeLabelAsk" xml:space="preserve">
+    <value>Вопрос</value>
+  </data>
+  <data name="NodeLabelDefault" xml:space="preserve">
+    <value>Узел</value>
+  </data>
+  <data name="NodeLabelEnd" xml:space="preserve">
+    <value>Конец</value>
+  </data>
+  <data name="NodeLabelHttpRequest" xml:space="preserve">
+    <value>API Запрос</value>
+  </data>
+  <data name="NodeLabelMedia" xml:space="preserve">
+    <value>Медиа</value>
+  </data>
+  <data name="NodeLabelMessage" xml:space="preserve">
+    <value>Сообщение</value>
+  </data>
+  <data name="NodeLabelOperator" xml:space="preserve">
+    <value>Оператор</value>
+  </data>
+  <data name="NodeLabelSetAttribute" xml:space="preserve">
+    <value>Атрибут</value>
+  </data>
+  <data name="NodeLabelStart" xml:space="preserve">
+    <value>Старт</value>
+  </data>
+  <data name="NodeLabelSubWorkflow" xml:space="preserve">
+    <value>Процесс</value>
+  </data>
+  <data name="NodeLabelTimer" xml:space="preserve">
+    <value>Таймер</value>
+  </data>
+  <data name="NodeLabelWait" xml:space="preserve">
+    <value>Ожидание</value>
+  </data>
+  <data name="NodeLabelWebhookWait" xml:space="preserve">
+    <value>Ожидание вебхука</value>
+  </data>
+  <data name="OutputParams" xml:space="preserve">
+    <value>Выходные параметры</value>
+  </data>
+  <data name="PickerBlocksCategory" xml:space="preserve">
+    <value>Блоки</value>
+  </data>
+  <data name="PickerFooterTip" xml:space="preserve">
+    <value>Нажмите на переменную, чтобы вставить её в текущий узел.</value>
+  </data>
+  <data name="PickerNoBlocks" xml:space="preserve">
+    <value>Нет блоков</value>
+  </data>
+  <data name="PickerNoBlocksHint" xml:space="preserve">
+    <value>Добавьте блоки на схему</value>
+  </data>
+  <data name="PickerNoVars" xml:space="preserve">
+    <value>У этого блока нет переменных</value>
+  </data>
+  <data name="PickerNoVarsHint" xml:space="preserve">
+    <value>Выберите другой блок</value>
+  </data>
+  <data name="PickerSearchBlockVars" xml:space="preserve">
+    <value>Поиск по переменным блока...</value>
+  </data>
+  <data name="PickerSearchPlaceholder" xml:space="preserve">
+    <value>Поиск по блокам и переменным...</value>
+  </data>
+  <data name="PickerTitle" xml:space="preserve">
+    <value>Выбрать переменную</value>
+  </data>
+  <data name="ProcessLoading" xml:space="preserve">
+    <value>Загрузка...</value>
+  </data>
+  <data name="ProcessNextBtn" xml:space="preserve">
+    <value>Вперёд</value>
+  </data>
+  <data name="ProcessNoItems" xml:space="preserve">
+    <value>Нет процессов</value>
+  </data>
+  <data name="ProcessNoItemsHint" xml:space="preserve">
+    <value>Добавьте процессы в настройках бота</value>
+  </data>
+  <data name="ProcessPickerTitle" xml:space="preserve">
+    <value>Выбрать процесс</value>
+  </data>
+  <data name="ProcessPrevBtn" xml:space="preserve">
+    <value>Назад</value>
+  </data>
+  <data name="ProcessSearchBtn" xml:space="preserve">
+    <value>Искать</value>
+  </data>
+  <data name="ProcessSearchPlaceholder" xml:space="preserve">
+    <value>Поиск по названию бота...</value>
+  </data>
+  <data name="SectionAiIntegrations" xml:space="preserve">
+    <value>AI и интеграции</value>
+  </data>
+  <data name="SectionContent" xml:space="preserve">
+    <value>Контент</value>
+  </data>
+  <data name="SectionLogic" xml:space="preserve">
+    <value>Логика</value>
+  </data>
+  <data name="SettingsTitle" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="StorageColDate" xml:space="preserve">
+    <value>Создан</value>
+  </data>
+  <data name="StorageColName" xml:space="preserve">
+    <value>Имя</value>
+  </data>
+  <data name="StorageFindBtn" xml:space="preserve">
+    <value>Найти</value>
+  </data>
+  <data name="StorageLoading" xml:space="preserve">
+    <value>Загрузка списка…</value>
+  </data>
+  <data name="StorageNextPage" xml:space="preserve">
+    <value>Следующая страница</value>
+  </data>
+  <data name="StorageNoFiles" xml:space="preserve">
+    <value>Нет файлов в хранилище</value>
+  </data>
+  <data name="StorageNoFilesHint" xml:space="preserve">
+    <value>Загрузите файл через поле «Загрузить файл» в настройках блока</value>
+  </data>
+  <data name="StorageNotFound" xml:space="preserve">
+    <value>Ничего не найдено</value>
+  </data>
+  <data name="StorageNotFoundHint" xml:space="preserve">
+    <value>Измените запрос или сбросьте фильтр</value>
+  </data>
+  <data name="StoragePickerTitle" xml:space="preserve">
+    <value>Файлы хранилища</value>
+  </data>
+  <data name="StoragePrevPage" xml:space="preserve">
+    <value>Предыдущая страница</value>
+  </data>
+  <data name="StorageSearchPlaceholder" xml:space="preserve">
+    <value>Поиск по имени или ID…</value>
+  </data>
+  <data name="StorageSelectBtn" xml:space="preserve">
+    <value>Выбрать</value>
+  </data>
+  <data name="StorageShowing" xml:space="preserve">
+    <value>Показано {0} из {1}</value>
+  </data>
+  <data name="TransitionLogic" xml:space="preserve">
+    <value>Логика переходов</value>
+  </data>
+  <data name="TzAmsterdam" xml:space="preserve">
+    <value>Амстердам</value>
+  </data>
+  <data name="TzAthens" xml:space="preserve">
+    <value>Афины</value>
+  </data>
+  <data name="TzAuckland" xml:space="preserve">
+    <value>Окленд</value>
+  </data>
+  <data name="TzBangkok" xml:space="preserve">
+    <value>Бангкок</value>
+  </data>
+  <data name="TzBerlin" xml:space="preserve">
+    <value>Берлин</value>
+  </data>
+  <data name="TzBogota" xml:space="preserve">
+    <value>Богота</value>
+  </data>
+  <data name="TzBrussels" xml:space="preserve">
+    <value>Брюссель</value>
+  </data>
+  <data name="TzBucharest" xml:space="preserve">
+    <value>Бухарест</value>
+  </data>
+  <data name="TzBudapest" xml:space="preserve">
+    <value>Будапешт</value>
+  </data>
+  <data name="TzBuenosAires" xml:space="preserve">
+    <value>Буэнос-Айрес</value>
+  </data>
+  <data name="TzCairo" xml:space="preserve">
+    <value>Каир</value>
+  </data>
+  <data name="TzChicago" xml:space="preserve">
+    <value>Чикаго</value>
+  </data>
+  <data name="TzDenver" xml:space="preserve">
+    <value>Денвер</value>
+  </data>
+  <data name="TzDhaka" xml:space="preserve">
+    <value>Дакка</value>
+  </data>
+  <data name="TzDubai" xml:space="preserve">
+    <value>Дубай</value>
+  </data>
+  <data name="TzHelsinki" xml:space="preserve">
+    <value>Хельсинки</value>
+  </data>
+  <data name="TzHongKong" xml:space="preserve">
+    <value>Гонконг</value>
+  </data>
+  <data name="TzIstanbul" xml:space="preserve">
+    <value>Стамбул</value>
+  </data>
+  <data name="TzJohannesburg" xml:space="preserve">
+    <value>Йоханнесбург</value>
+  </data>
+  <data name="TzKarachi" xml:space="preserve">
+    <value>Карачи</value>
+  </data>
+  <data name="TzKolkata" xml:space="preserve">
+    <value>Калькутта</value>
+  </data>
+  <data name="TzKyiv" xml:space="preserve">
+    <value>Киев</value>
+  </data>
+  <data name="TzLagos" xml:space="preserve">
+    <value>Лагос</value>
+  </data>
+  <data name="TzLima" xml:space="preserve">
+    <value>Лима</value>
+  </data>
+  <data name="TzLondon" xml:space="preserve">
+    <value>Лондон</value>
+  </data>
+  <data name="TzLosAngeles" xml:space="preserve">
+    <value>Лос-Анджелес</value>
+  </data>
+  <data name="TzMadrid" xml:space="preserve">
+    <value>Мадрид</value>
+  </data>
+  <data name="TzMelbourne" xml:space="preserve">
+    <value>Мельбурн</value>
+  </data>
+  <data name="TzMexicoCity" xml:space="preserve">
+    <value>Мехико</value>
+  </data>
+  <data name="TzMinsk" xml:space="preserve">
+    <value>Минск</value>
+  </data>
+  <data name="TzMoscow" xml:space="preserve">
+    <value>Москва</value>
+  </data>
+  <data name="TzNairobi" xml:space="preserve">
+    <value>Найроби</value>
+  </data>
+  <data name="TzNewYork" xml:space="preserve">
+    <value>Нью-Йорк</value>
+  </data>
+  <data name="TzParis" xml:space="preserve">
+    <value>Париж</value>
+  </data>
+  <data name="TzPerth" xml:space="preserve">
+    <value>Перт</value>
+  </data>
+  <data name="TzPrague" xml:space="preserve">
+    <value>Прага</value>
+  </data>
+  <data name="TzRome" xml:space="preserve">
+    <value>Рим</value>
+  </data>
+  <data name="TzSaoPaulo" xml:space="preserve">
+    <value>Сан-Паулу</value>
+  </data>
+  <data name="TzSeoul" xml:space="preserve">
+    <value>Сеул</value>
+  </data>
+  <data name="TzShanghai" xml:space="preserve">
+    <value>Шанхай</value>
+  </data>
+  <data name="TzSingapore" xml:space="preserve">
+    <value>Сингапур</value>
+  </data>
+  <data name="TzSydney" xml:space="preserve">
+    <value>Сидней</value>
+  </data>
+  <data name="TzTaipei" xml:space="preserve">
+    <value>Тайбэй</value>
+  </data>
+  <data name="TzTokyo" xml:space="preserve">
+    <value>Токио</value>
+  </data>
+  <data name="TzToronto" xml:space="preserve">
+    <value>Торонто</value>
+  </data>
+  <data name="TzVancouver" xml:space="preserve">
+    <value>Ванкувер</value>
+  </data>
+  <data name="TzVienna" xml:space="preserve">
+    <value>Вена</value>
+  </data>
+  <data name="TzWarsaw" xml:space="preserve">
+    <value>Варшава</value>
+  </data>
+  <data name="VariableLabel" xml:space="preserve">
+    <value>Переменная</value>
+  </data>
+</root>

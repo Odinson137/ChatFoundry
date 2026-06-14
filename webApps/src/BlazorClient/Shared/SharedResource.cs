@@ -1,5 +1,6 @@
-namespace BlazorClient.Shared;
+namespace BlazorClient;
 
 public class SharedResource
 {
 }
+

@@ -1,5 +1,6 @@
 using BillingService.Data;
 using BillingService.Services;
+using HotChocolate;
 using Microsoft.EntityFrameworkCore;
 using Shared.Infrastructure.GraphQl;
 
@@ -14,7 +15,7 @@ public class BillingQuery(IHttpContextAccessor httpContextAccessor) : BaseGraphQ
         CancellationToken ct)
     {
         if (!CompanyId.HasValue)
-            return null;
+            throw new GraphQLException("Company ID is required.");
 
         var sub = await db.CompanySubscriptions
             .Include(x => x.Plan)
@@ -67,7 +68,7 @@ public class BillingQuery(IHttpContextAccessor httpContextAccessor) : BaseGraphQ
         CancellationToken ct)
     {
         if (!CompanyId.HasValue)
-            return [];
+            throw new GraphQLException("Company ID is required.");
 
         return await db.BalanceTransactions.AsNoTracking()
             .Where(t => t.CompanyId == CompanyId.Value)

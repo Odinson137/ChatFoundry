@@ -780,4 +780,364 @@
   <data name="BtnForward" xml:space="preserve">
     <value>Forward</value>
   </data>
-<data name="AiDialogTitle" xml:space="preserve"><value>AI: workflow schema</value></data><data name="AiDialogModeLabel" xml:space="preserve"><value>Mode</value></data><data name="AiDialogModeNewBot" xml:space="preserve"><value>New Bot</value></data><data name="AiDialogModeMerge" xml:space="preserve"><value>Extend Current</value></data><data name="AiDialogPromptLabel" xml:space="preserve"><value>Request to AI on the server</value></data><data name="AiDialogPromptPlaceholder" xml:space="preserve"><value>Describe the bot or what to add to the current schema...</value></data><data name="AiDialogGenerating" xml:space="preserve"><value>Generating...</value></data><data name="AiDialogGenerateBtn" xml:space="preserve"><value>Generate</value></data><data name="AiDialogInstructionLabel" xml:space="preserve"><value>Instruction for external AI (stable link, doesn't consume app quota):</value></data><data name="AiDialogCopyLinkBtn" xml:space="preserve"><value>Copy Link</value></data><data name="AiDialogDownloadMdBtn" xml:space="preserve"><value>Download .md</value></data><data name="AiDialogPasteJsonLabel" xml:space="preserve"><value>Paste JSON from another AI</value></data><data name="AiDialogApplyJsonBtn" xml:space="preserve"><value>Apply JSON</value></data><data name="AiDialogDownloadError" xml:space="preserve"><value>Failed to download: {0}</value></data><data name="AiDialogErrorEmptyPrompt" xml:space="preserve"><value>Please enter a description of the bot or customization.</value></data><data name="AiDialogErrorNoNodesForMerge" xml:space="preserve"><value>No nodes found to extend. Select 'New Bot' or add nodes to the scheme.</value></data><data name="AiDialogErrorEmptyResponse" xml:space="preserve"><value>Empty response.</value></data><data name="AiDialogErrorParseSchemaJson" xml:space="preserve"><value>Failed to parse schema JSON.</value></data><data name="AiDialogErrorEmptyJson" xml:space="preserve"><value>Please paste schema JSON.</value></data><data name="AiDialogErrorParseJson" xml:space="preserve"><value>Failed to parse JSON.</value></data><data name="AiDialogErrorFallback" xml:space="preserve"><value>Failed to generate schema. Please try again.</value></data><data name="AiDialogErrorUnknown" xml:space="preserve"><value>Unknown error during schema generation.</value></data><data name="AiDialogErrorQuotaExceededWithDetails" xml:space="preserve"><value>AI generation limit reached: {0} of {1}. Upgrade your plan or wait for the next period.</value></data><data name="AiDialogErrorQuotaExceeded" xml:space="preserve"><value>AI generation limit reached. Upgrade your plan or wait for the next period.</value></data><data name="PageTitleWorkflowEditor" xml:space="preserve"><value>Workflow Editor</value></data><data name="RedoBtnTooltip" xml:space="preserve"><value>Redo</value></data><data name="AttributesParamsBtnTooltip" xml:space="preserve"><value>Attributes and parameters</value></data><data name="AttributesParamsBtn" xml:space="preserve"><value>Attributes and parameters</value></data><data name="DownloadBtn" xml:space="preserve"><value>Download</value></data><data name="UploadBtn" xml:space="preserve"><value>Upload</value></data><data name="GenerateAiBtnTooltip" xml:space="preserve"><value>Generate schema using AI</value></data><data name="LabelMsgText" xml:space="preserve"><value>Message text</value></data><data name="EnterAtToSelectVarOrManual" xml:space="preserve"><value>Type {0} to select a variable. Or {1}</value></data><data name="LabelButtonsUnderMsg" xml:space="preserve"><value>Buttons (sent under the message)</value></data><data name="DeleteBtnTooltip" xml:space="preserve"><value>Delete</value></data><data name="ButtonsHint" xml:space="preserve"><value>When clicked, this text will go into the variable. If there are no buttons, any input is expected.</value></data><data name="LabelAttributeKey" xml:space="preserve"><value>Attribute key</value></data><data name="SelectAttributeOption" xml:space="preserve"><value>Select attribute</value></data><data name="AttributesListHint" xml:space="preserve"><value>List of company attributes (Company → Attributes) and basic: name, username, phone, email</value></data><data name="PlaceholderTextOrVar" xml:space="preserve"><value>Text or {{variable_name}}</value></data><data name="VariablesInTemplateHint" xml:space="preserve"><value>Variables can be used in the template</value></data><data name="LabelRequestBody" xml:space="preserve"><value>Request body (Body)</value></data><data name="DeleteHeaderTooltip" xml:space="preserve"><value>Delete header</value></data><data name="ContinueOnErrorLabel" xml:space="preserve"><value>Continue on error</value></data><data name="ContinueOnErrorHintHttp" xml:space="preserve"><value>If disabled, the session will terminate on request failure.</value></data><data name="AiPromptLabel" xml:space="preserve"><value>AI Prompt</value></data><data name="AiPromptHint" xml:space="preserve"><value>Describe what the AI should do. Use variables {0}.</value></data><data name="AiIncludeContextLabel" xml:space="preserve"><value>Include chat context</value></data><data name="AiIncludeContextHint" xml:space="preserve"><value>The AI will receive the history of the current conversation.</value></data><data name="ContinueOnErrorHintAi" xml:space="preserve"><value>If disabled, the session will terminate on AI request failure.</value></data><data name="UploadFileLabel" xml:space="preserve"><value>Upload file</value></data><data name="UploadFileHint" xml:space="preserve"><value>The file will be uploaded to storage, and the file ID will be linked to the block.</value></data><data name="OrChooseFromStoragePrefix" xml:space="preserve"><value>Or choose from</value></data><data name="StorageLinkText" xml:space="preserve"><value>storage</value></data><data name="CurrentKeyFileId" xml:space="preserve"><value>Current key (file ID)</value></data><data name="PlaceholderFileIdOrVar" xml:space="preserve"><value>File ID or {{variable_name}}</value></data><data name="VariablesSupportedHint" xml:space="preserve"><value>Variables are supported (e.g., {0}).</value></data><data name="CaptionLabel" xml:space="preserve"><value>Caption</value></data><data name="PlaceholderOptional" xml:space="preserve"><value>Optional</value></data><data name="CalledProcessLabel" xml:space="preserve"><value>Called process</value></data><data name="ChangeBtn" xml:space="preserve"><value>Change</value></data><data name="ProcessSelectedLabel" xml:space="preserve"><value>Process selected</value></data><data name="SubProcessInputParamsHint" xml:space="preserve"><value>Bind sub-process parameters to variables or values of the current process ({0} supported).</value></data><data name="PlaceholderVarOrValue" xml:space="preserve"><value>{{variable}} or value</value></data><data name="SubProcessNoInputParamsHint" xml:space="preserve"><value>The selected process has no input parameters. Define them in the "Parameters" tab in the settings of that process.</value></data><data name="SubProcessOutputParamsHint" xml:space="preserve"><value>Specify which variable of the current process to write the sub-process result to (left - variable, right - sub-process parameter).</value></data><data name="PlaceholderVariableOnly" xml:space="preserve"><value>variable</value></data><data name="PlaceholderSubParam" xml:space="preserve"><value>sub-process parameter</value></data><data name="SubProcessNoOutputParamsHint" xml:space="preserve"><value>The selected process has no output parameters. Define them in the "Parameters" tab in the settings of that process.</value></data><data name="DurationLabel" xml:space="preserve"><value>Duration</value></data><data name="WaitDurationVariablesHint" xml:space="preserve"><value>Variables can be used, e.g., {0}</value></data><data name="WaitTimeoutLabel" xml:space="preserve"><value>Wait timeout (seconds)</value></data><data name="WaitDurationPlaceholder" xml:space="preserve"><value>0 = infinite</value></data><data name="WaitTimeoutHint" xml:space="preserve"><value>After the specified time, the script will continue along the timeout branch.</value></data><data name="CallbackUrlDescription" xml:space="preserve"><value>To return to the script, use the address in the following format:</value></data><data name="CallbackUrlBaseUrl" xml:space="preserve"><value>base URL of your server</value></data><data name="CallbackUrlBotId" xml:space="preserve"><value>unique identifier of the bot</value></data><data name="CallbackUrlClientId" xml:space="preserve"><value>unique ID of the external user</value></data><data name="CallbackUrlChannel" xml:space="preserve"><value>communication channel (e.g., &lt;code&gt;telegram&lt;/code&gt;)</value></data><data name="ScheduleTypeLabel" xml:space="preserve"><value>Schedule type</value></data><data name="ScheduleTypeOneTime" xml:space="preserve"><value>Once</value></data><data name="ScheduleTypeCron" xml:space="preserve"><value>Scheduled (Cron)</value></data><data name="DateTimeLabel" xml:space="preserve"><value>Date and time</value></data><data name="CronExpressionLabel" xml:space="preserve"><value>Cron expression</value></data><data name="CronExampleHint" xml:space="preserve"><value>Example: {0} — every day at 10:00</value></data><data name="TimezoneLabel" xml:space="preserve"><value>Timezone</value></data><data name="ClientFilterLabel" xml:space="preserve"><value>Client filter</value></data><data name="ClientFilterHint" xml:space="preserve"><value>Leave blank for all company clients, or add filtering conditions.</value></data><data name="ChannelsLabel" xml:space="preserve"><value>Channels</value></data><data name="AttributeConditionsLabel" xml:space="preserve"><value>Attribute conditions</value></data></root>
+<data name="AiDialogTitle" xml:space="preserve"><value>AI: workflow schema</value></data><data name="AiDialogModeLabel" xml:space="preserve"><value>Mode</value></data><data name="AiDialogModeNewBot" xml:space="preserve"><value>New Bot</value></data><data name="AiDialogModeMerge" xml:space="preserve"><value>Extend Current</value></data><data name="AiDialogPromptLabel" xml:space="preserve"><value>Request to AI on the server</value></data><data name="AiDialogPromptPlaceholder" xml:space="preserve"><value>Describe the bot or what to add to the current schema...</value></data><data name="AiDialogGenerating" xml:space="preserve"><value>Generating...</value></data><data name="AiDialogGenerateBtn" xml:space="preserve"><value>Generate</value></data><data name="AiDialogInstructionLabel" xml:space="preserve"><value>Instruction for external AI (stable link, doesn't consume app quota):</value></data><data name="AiDialogCopyLinkBtn" xml:space="preserve"><value>Copy Link</value></data><data name="AiDialogDownloadMdBtn" xml:space="preserve"><value>Download .md</value></data><data name="AiDialogPasteJsonLabel" xml:space="preserve"><value>Paste JSON from another AI</value></data><data name="AiDialogApplyJsonBtn" xml:space="preserve"><value>Apply JSON</value></data><data name="AiDialogDownloadError" xml:space="preserve"><value>Failed to download: {0}</value></data><data name="AiDialogErrorEmptyPrompt" xml:space="preserve"><value>Please enter a description of the bot or customization.</value></data><data name="AiDialogErrorNoNodesForMerge" xml:space="preserve"><value>No nodes found to extend. Select 'New Bot' or add nodes to the scheme.</value></data><data name="AiDialogErrorEmptyResponse" xml:space="preserve"><value>Empty response.</value></data><data name="AiDialogErrorParseSchemaJson" xml:space="preserve"><value>Failed to parse schema JSON.</value></data><data name="AiDialogErrorEmptyJson" xml:space="preserve"><value>Please paste schema JSON.</value></data><data name="AiDialogErrorParseJson" xml:space="preserve"><value>Failed to parse JSON.</value></data><data name="AiDialogErrorFallback" xml:space="preserve"><value>Failed to generate schema. Please try again.</value></data><data name="AiDialogErrorUnknown" xml:space="preserve"><value>Unknown error during schema generation.</value></data><data name="AiDialogErrorQuotaExceededWithDetails" xml:space="preserve"><value>AI generation limit reached: {0} of {1}. Upgrade your plan or wait for the next period.</value></data><data name="AiDialogErrorQuotaExceeded" xml:space="preserve"><value>AI generation limit reached. Upgrade your plan or wait for the next period.</value></data><data name="PageTitleWorkflowEditor" xml:space="preserve"><value>Workflow Editor</value></data><data name="RedoBtnTooltip" xml:space="preserve"><value>Redo</value></data><data name="AttributesParamsBtnTooltip" xml:space="preserve"><value>Attributes and parameters</value></data><data name="AttributesParamsBtn" xml:space="preserve"><value>Attributes and parameters</value></data><data name="DownloadBtn" xml:space="preserve"><value>Download</value></data><data name="UploadBtn" xml:space="preserve"><value>Upload</value></data><data name="GenerateAiBtnTooltip" xml:space="preserve"><value>Generate schema using AI</value></data><data name="LabelMsgText" xml:space="preserve"><value>Message text</value></data><data name="EnterAtToSelectVarOrManual" xml:space="preserve"><value>Type {0} to select a variable. Or {1}</value></data><data name="LabelButtonsUnderMsg" xml:space="preserve"><value>Buttons (sent under the message)</value></data><data name="DeleteBtnTooltip" xml:space="preserve"><value>Delete</value></data><data name="ButtonsHint" xml:space="preserve"><value>When clicked, this text will go into the variable. If there are no buttons, any input is expected.</value></data><data name="LabelAttributeKey" xml:space="preserve"><value>Attribute key</value></data><data name="SelectAttributeOption" xml:space="preserve"><value>Select attribute</value></data><data name="AttributesListHint" xml:space="preserve"><value>List of company attributes (Company → Attributes) and basic: name, username, phone, email</value></data><data name="PlaceholderTextOrVar" xml:space="preserve"><value>Text or {{variable_name}}</value></data><data name="VariablesInTemplateHint" xml:space="preserve"><value>Variables can be used in the template</value></data><data name="LabelRequestBody" xml:space="preserve"><value>Request body (Body)</value></data><data name="DeleteHeaderTooltip" xml:space="preserve"><value>Delete header</value></data><data name="ContinueOnErrorLabel" xml:space="preserve"><value>Continue on error</value></data><data name="ContinueOnErrorHintHttp" xml:space="preserve"><value>If disabled, the session will terminate on request failure.</value></data><data name="AiPromptLabel" xml:space="preserve"><value>AI Prompt</value></data><data name="AiPromptHint" xml:space="preserve"><value>Describe what the AI should do. Use variables {0}.</value></data><data name="AiIncludeContextLabel" xml:space="preserve"><value>Include chat context</value></data><data name="AiIncludeContextHint" xml:space="preserve"><value>The AI will receive the history of the current conversation.</value></data><data name="ContinueOnErrorHintAi" xml:space="preserve"><value>If disabled, the session will terminate on AI request failure.</value></data><data name="UploadFileLabel" xml:space="preserve"><value>Upload file</value></data><data name="UploadFileHint" xml:space="preserve"><value>The file will be uploaded to storage, and the file ID will be linked to the block.</value></data><data name="OrChooseFromStoragePrefix" xml:space="preserve"><value>Or choose from</value></data><data name="StorageLinkText" xml:space="preserve"><value>storage</value></data><data name="CurrentKeyFileId" xml:space="preserve"><value>Current key (file ID)</value></data><data name="PlaceholderFileIdOrVar" xml:space="preserve"><value>File ID or {{variable_name}}</value></data><data name="VariablesSupportedHint" xml:space="preserve"><value>Variables are supported (e.g., {0}).</value></data><data name="CaptionLabel" xml:space="preserve"><value>Caption</value></data><data name="PlaceholderOptional" xml:space="preserve"><value>Optional</value></data><data name="CalledProcessLabel" xml:space="preserve"><value>Called process</value></data><data name="ChangeBtn" xml:space="preserve"><value>Change</value></data><data name="ProcessSelectedLabel" xml:space="preserve"><value>Process selected</value></data><data name="SubProcessInputParamsHint" xml:space="preserve"><value>Bind sub-process parameters to variables or values of the current process ({0} supported).</value></data><data name="PlaceholderVarOrValue" xml:space="preserve"><value>{{variable}} or value</value></data><data name="SubProcessNoInputParamsHint" xml:space="preserve"><value>The selected process has no input parameters. Define them in the "Parameters" tab in the settings of that process.</value></data><data name="SubProcessOutputParamsHint" xml:space="preserve"><value>Specify which variable of the current process to write the sub-process result to (left - variable, right - sub-process parameter).</value></data><data name="PlaceholderVariableOnly" xml:space="preserve"><value>variable</value></data><data name="PlaceholderSubParam" xml:space="preserve"><value>sub-process parameter</value></data><data name="SubProcessNoOutputParamsHint" xml:space="preserve"><value>The selected process has no output parameters. Define them in the "Parameters" tab in the settings of that process.</value></data><data name="DurationLabel" xml:space="preserve"><value>Duration</value></data><data name="WaitDurationVariablesHint" xml:space="preserve"><value>Variables can be used, e.g., {0}</value></data><data name="WaitTimeoutLabel" xml:space="preserve"><value>Wait timeout (seconds)</value></data><data name="WaitDurationPlaceholder" xml:space="preserve"><value>0 = infinite</value></data><data name="WaitTimeoutHint" xml:space="preserve"><value>After the specified time, the script will continue along the timeout branch.</value></data><data name="CallbackUrlDescription" xml:space="preserve"><value>To return to the script, use the address in the following format:</value></data><data name="CallbackUrlBaseUrl" xml:space="preserve"><value>base URL of your server</value></data><data name="CallbackUrlBotId" xml:space="preserve"><value>unique identifier of the bot</value></data><data name="CallbackUrlClientId" xml:space="preserve"><value>unique ID of the external user</value></data><data name="CallbackUrlChannel" xml:space="preserve"><value>communication channel (e.g., &lt;code&gt;telegram&lt;/code&gt;)</value></data><data name="ScheduleTypeLabel" xml:space="preserve"><value>Schedule type</value></data><data name="ScheduleTypeOneTime" xml:space="preserve"><value>Once</value></data><data name="ScheduleTypeCron" xml:space="preserve"><value>Scheduled (Cron)</value></data><data name="DateTimeLabel" xml:space="preserve"><value>Date and time</value></data><data name="CronExpressionLabel" xml:space="preserve"><value>Cron expression</value></data><data name="CronExampleHint" xml:space="preserve"><value>Example: {0} — every day at 10:00</value></data><data name="TimezoneLabel" xml:space="preserve"><value>Timezone</value></data><data name="ClientFilterLabel" xml:space="preserve"><value>Client filter</value></data><data name="ClientFilterHint" xml:space="preserve"><value>Leave blank for all company clients, or add filtering conditions.</value></data><data name="ChannelsLabel" xml:space="preserve"><value>Channels</value></data><data name="AttributeConditionsLabel" xml:space="preserve"><value>Attribute conditions</value></data>  <data name="AddCondition" xml:space="preserve">
+    <value>Add condition</value>
+  </data>
+  <data name="AddParamBtn" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="AllConditionsMustMatch" xml:space="preserve">
+    <value>All conditions must match</value>
+  </data>
+  <data name="AnyConditionMustMatch" xml:space="preserve">
+    <value>Any condition must match</value>
+  </data>
+  <data name="AttributesEmptyHint" xml:space="preserve">
+    <value>No attributes available. Add them in company settings.</value>
+  </data>
+  <data name="BackLabel" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="CloseLabel" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="ConditionType" xml:space="preserve">
+    <value>Condition type</value>
+  </data>
+  <data name="DeleteBtn" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="EnterAtToSelectVar" xml:space="preserve">
+    <value>Type @ to select variable</value>
+  </data>
+  <data name="IgnoreCase" xml:space="preserve">
+    <value>Ignore case</value>
+  </data>
+  <data name="IncomingMsgTypeHint" xml:space="preserve">
+    <value>Incoming message type</value>
+  </data>
+  <data name="InputParams" xml:space="preserve">
+    <value>Input Parameters</value>
+  </data>
+  <data name="InsertVariableTooltip" xml:space="preserve">
+    <value>Insert variable</value>
+  </data>
+  <data name="JoinConditionsLabel" xml:space="preserve">
+    <value>Condition join</value>
+  </data>
+  <data name="LabelCondition" xml:space="preserve">
+    <value>Condition</value>
+  </data>
+  <data name="LabelRegexPattern" xml:space="preserve">
+    <value>Regex pattern</value>
+  </data>
+  <data name="LabelValuesCommaSeparated" xml:space="preserve">
+    <value>Values separated by commas</value>
+  </data>
+  <data name="LineLabel" xml:space="preserve">
+    <value>Link label</value>
+  </data>
+  <data name="LineLabelPlaceholder" xml:space="preserve">
+    <value>Enter label...</value>
+  </data>
+  <data name="NodeLabelAIGenerate" xml:space="preserve">
+    <value>AI Text</value>
+  </data>
+  <data name="NodeLabelAsk" xml:space="preserve">
+    <value>Question</value>
+  </data>
+  <data name="NodeLabelDefault" xml:space="preserve">
+    <value>Node</value>
+  </data>
+  <data name="NodeLabelEnd" xml:space="preserve">
+    <value>End</value>
+  </data>
+  <data name="NodeLabelHttpRequest" xml:space="preserve">
+    <value>API Request</value>
+  </data>
+  <data name="NodeLabelMedia" xml:space="preserve">
+    <value>Media</value>
+  </data>
+  <data name="NodeLabelMessage" xml:space="preserve">
+    <value>Message</value>
+  </data>
+  <data name="NodeLabelOperator" xml:space="preserve">
+    <value>Operator</value>
+  </data>
+  <data name="NodeLabelSetAttribute" xml:space="preserve">
+    <value>Attribute</value>
+  </data>
+  <data name="NodeLabelStart" xml:space="preserve">
+    <value>Start</value>
+  </data>
+  <data name="NodeLabelSubWorkflow" xml:space="preserve">
+    <value>Process</value>
+  </data>
+  <data name="NodeLabelTimer" xml:space="preserve">
+    <value>Timer</value>
+  </data>
+  <data name="NodeLabelWait" xml:space="preserve">
+    <value>Wait</value>
+  </data>
+  <data name="NodeLabelWebhookWait" xml:space="preserve">
+    <value>Webhook Wait</value>
+  </data>
+  <data name="OutputParams" xml:space="preserve">
+    <value>Output Parameters</value>
+  </data>
+  <data name="PickerBlocksCategory" xml:space="preserve">
+    <value>Blocks</value>
+  </data>
+  <data name="PickerFooterTip" xml:space="preserve">
+    <value>Click on a variable to insert it into the current node.</value>
+  </data>
+  <data name="PickerNoBlocks" xml:space="preserve">
+    <value>No blocks</value>
+  </data>
+  <data name="PickerNoBlocksHint" xml:space="preserve">
+    <value>Add blocks to the diagram</value>
+  </data>
+  <data name="PickerNoVars" xml:space="preserve">
+    <value>This block has no variables</value>
+  </data>
+  <data name="PickerNoVarsHint" xml:space="preserve">
+    <value>Select another block</value>
+  </data>
+  <data name="PickerSearchBlockVars" xml:space="preserve">
+    <value>Search block variables...</value>
+  </data>
+  <data name="PickerSearchPlaceholder" xml:space="preserve">
+    <value>Search blocks and variables...</value>
+  </data>
+  <data name="PickerTitle" xml:space="preserve">
+    <value>Select Variable</value>
+  </data>
+  <data name="ProcessLoading" xml:space="preserve">
+    <value>Loading...</value>
+  </data>
+  <data name="ProcessNextBtn" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="ProcessNoItems" xml:space="preserve">
+    <value>No processes</value>
+  </data>
+  <data name="ProcessNoItemsHint" xml:space="preserve">
+    <value>Add processes in bot settings</value>
+  </data>
+  <data name="ProcessPickerTitle" xml:space="preserve">
+    <value>Select Process</value>
+  </data>
+  <data name="ProcessPrevBtn" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="ProcessSearchBtn" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="ProcessSearchPlaceholder" xml:space="preserve">
+    <value>Search by bot name...</value>
+  </data>
+  <data name="SectionAiIntegrations" xml:space="preserve">
+    <value>AI &amp; Integrations</value>
+  </data>
+  <data name="SectionContent" xml:space="preserve">
+    <value>Content</value>
+  </data>
+  <data name="SectionLogic" xml:space="preserve">
+    <value>Logic</value>
+  </data>
+  <data name="SettingsTitle" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="StorageColDate" xml:space="preserve">
+    <value>Created</value>
+  </data>
+  <data name="StorageColName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="StorageFindBtn" xml:space="preserve">
+    <value>Find</value>
+  </data>
+  <data name="StorageLoading" xml:space="preserve">
+    <value>Loading list...</value>
+  </data>
+  <data name="StorageNextPage" xml:space="preserve">
+    <value>Next page</value>
+  </data>
+  <data name="StorageNoFiles" xml:space="preserve">
+    <value>No files in storage</value>
+  </data>
+  <data name="StorageNoFilesHint" xml:space="preserve">
+    <value>Upload a file via the 'Upload file' field in the block settings</value>
+  </data>
+  <data name="StorageNotFound" xml:space="preserve">
+    <value>Nothing found</value>
+  </data>
+  <data name="StorageNotFoundHint" xml:space="preserve">
+    <value>Change query or reset filter</value>
+  </data>
+  <data name="StoragePickerTitle" xml:space="preserve">
+    <value>Storage Files</value>
+  </data>
+  <data name="StoragePrevPage" xml:space="preserve">
+    <value>Previous page</value>
+  </data>
+  <data name="StorageSearchPlaceholder" xml:space="preserve">
+    <value>Search by name or ID...</value>
+  </data>
+  <data name="StorageSelectBtn" xml:space="preserve">
+    <value>Select</value>
+  </data>
+  <data name="StorageShowing" xml:space="preserve">
+    <value>Showing {0} of {1}</value>
+  </data>
+  <data name="TransitionLogic" xml:space="preserve">
+    <value>Transition logic</value>
+  </data>
+  <data name="TzAmsterdam" xml:space="preserve">
+    <value>Amsterdam</value>
+  </data>
+  <data name="TzAthens" xml:space="preserve">
+    <value>Athens</value>
+  </data>
+  <data name="TzAuckland" xml:space="preserve">
+    <value>Auckland</value>
+  </data>
+  <data name="TzBangkok" xml:space="preserve">
+    <value>Bangkok</value>
+  </data>
+  <data name="TzBerlin" xml:space="preserve">
+    <value>Berlin</value>
+  </data>
+  <data name="TzBogota" xml:space="preserve">
+    <value>Bogotá</value>
+  </data>
+  <data name="TzBrussels" xml:space="preserve">
+    <value>Brussels</value>
+  </data>
+  <data name="TzBucharest" xml:space="preserve">
+    <value>Bucharest</value>
+  </data>
+  <data name="TzBudapest" xml:space="preserve">
+    <value>Budapest</value>
+  </data>
+  <data name="TzBuenosAires" xml:space="preserve">
+    <value>Buenos Aires</value>
+  </data>
+  <data name="TzCairo" xml:space="preserve">
+    <value>Cairo</value>
+  </data>
+  <data name="TzChicago" xml:space="preserve">
+    <value>Chicago</value>
+  </data>
+  <data name="TzDenver" xml:space="preserve">
+    <value>Denver</value>
+  </data>
+  <data name="TzDhaka" xml:space="preserve">
+    <value>Dhaka</value>
+  </data>
+  <data name="TzDubai" xml:space="preserve">
+    <value>Dubai</value>
+  </data>
+  <data name="TzHelsinki" xml:space="preserve">
+    <value>Helsinki</value>
+  </data>
+  <data name="TzHongKong" xml:space="preserve">
+    <value>Hong Kong</value>
+  </data>
+  <data name="TzIstanbul" xml:space="preserve">
+    <value>Istanbul</value>
+  </data>
+  <data name="TzJohannesburg" xml:space="preserve">
+    <value>Johannesburg</value>
+  </data>
+  <data name="TzKarachi" xml:space="preserve">
+    <value>Karachi</value>
+  </data>
+  <data name="TzKolkata" xml:space="preserve">
+    <value>Kolkata</value>
+  </data>
+  <data name="TzKyiv" xml:space="preserve">
+    <value>Kyiv</value>
+  </data>
+  <data name="TzLagos" xml:space="preserve">
+    <value>Lagos</value>
+  </data>
+  <data name="TzLima" xml:space="preserve">
+    <value>Lima</value>
+  </data>
+  <data name="TzLondon" xml:space="preserve">
+    <value>London</value>
+  </data>
+  <data name="TzLosAngeles" xml:space="preserve">
+    <value>Los Angeles</value>
+  </data>
+  <data name="TzMadrid" xml:space="preserve">
+    <value>Madrid</value>
+  </data>
+  <data name="TzMelbourne" xml:space="preserve">
+    <value>Melbourne</value>
+  </data>
+  <data name="TzMexicoCity" xml:space="preserve">
+    <value>Mexico City</value>
+  </data>
+  <data name="TzMinsk" xml:space="preserve">
+    <value>Minsk</value>
+  </data>
+  <data name="TzMoscow" xml:space="preserve">
+    <value>Moscow</value>
+  </data>
+  <data name="TzNairobi" xml:space="preserve">
+    <value>Nairobi</value>
+  </data>
+  <data name="TzNewYork" xml:space="preserve">
+    <value>New York</value>
+  </data>
+  <data name="TzParis" xml:space="preserve">
+    <value>Paris</value>
+  </data>
+  <data name="TzPerth" xml:space="preserve">
+    <value>Perth</value>
+  </data>
+  <data name="TzPrague" xml:space="preserve">
+    <value>Prague</value>
+  </data>
+  <data name="TzRome" xml:space="preserve">
+    <value>Rome</value>
+  </data>
+  <data name="TzSaoPaulo" xml:space="preserve">
+    <value>São Paulo</value>
+  </data>
+  <data name="TzSeoul" xml:space="preserve">
+    <value>Seoul</value>
+  </data>
+  <data name="TzShanghai" xml:space="preserve">
+    <value>Shanghai</value>
+  </data>
+  <data name="TzSingapore" xml:space="preserve">
+    <value>Singapore</value>
+  </data>
+  <data name="TzSydney" xml:space="preserve">
+    <value>Sydney</value>
+  </data>
+  <data name="TzTaipei" xml:space="preserve">
+    <value>Taipei</value>
+  </data>
+  <data name="TzTokyo" xml:space="preserve">
+    <value>Tokyo</value>
+  </data>
+  <data name="TzToronto" xml:space="preserve">
+    <value>Toronto</value>
+  </data>
+  <data name="TzVancouver" xml:space="preserve">
+    <value>Vancouver</value>
+  </data>
+  <data name="TzVienna" xml:space="preserve">
+    <value>Vienna</value>
+  </data>
+  <data name="TzWarsaw" xml:space="preserve">
+    <value>Warsaw</value>
+  </data>
+  <data name="VariableLabel" xml:space="preserve">
+    <value>Variable</value>
+  </data>
+</root>

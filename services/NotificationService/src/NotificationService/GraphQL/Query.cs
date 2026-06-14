@@ -1,3 +1,4 @@
+using HotChocolate;
 using NotificationService.Data;
 using NotificationService.Entities;
 using Shared.Infrastructure.GraphQl;
@@ -11,8 +12,11 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
     [UseSorting]
     public IQueryable<LiveChatSession> GetLiveChatSessions([Service] NotificationDbContext context)
     {
+        if (!CompanyId.HasValue)
+            throw new GraphQLException("Company ID is required.");
+
         var query = context.LiveChatSessions
-            .Where(s => s.CompanyId == CompanyId!.Value)
+            .Where(s => s.CompanyId == CompanyId.Value)
             .OrderByDescending(s => s.CreatedAt)
             .AsQueryable();
         return query;
@@ -23,6 +27,9 @@ public class Query(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpC
         Guid id,
         [Service] NotificationDbContext context)
     {
-        return context.LiveChatSessions.Where(s => s.Id == id);
+        if (!CompanyId.HasValue)
+            throw new GraphQLException("Company ID is required.");
+
+        return context.LiveChatSessions.Where(s => s.Id == id && s.CompanyId == CompanyId.Value);
     }
 }
