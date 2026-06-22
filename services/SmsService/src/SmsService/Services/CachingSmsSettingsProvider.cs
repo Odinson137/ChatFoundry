@@ -2,28 +2,28 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Shared.Infrastructure.Caching;
 using Shared.Infrastructure.Options;
-using TelegramService.Interfaces;
+using SmsService.Interfaces;
 
-namespace TelegramService.Services;
+namespace SmsService.Services;
 
-public sealed class CachingBotTokenProvider(
-    GrpcBotTokenProvider inner,
+public sealed class CachingSmsSettingsProvider(
+    SmsSettingsProvider inner,
     IDistributedCache cache,
     IOptions<FoundryRedisCacheOptions> cacheOptions,
-    ILogger<CachingBotTokenProvider> logger) : IBotTokenProvider
+    ILogger<CachingSmsSettingsProvider> logger) : ISmsSettingsProvider
 {
-    private const string KeyPrefix = "bot:token:telegram:";
+    private const string KeyPrefix = "bot:token:sms:";
 
     private static string CacheKey(Guid channelId) => $"{KeyPrefix}{channelId}";
 
-    public Task<string> GetByChannelIdAsync(Guid channelId, CancellationToken ct)
+    public Task<string> GetSenderPhoneByChannelIdAsync(Guid channelId, CancellationToken ct)
     {
         var key = CacheKey(channelId);
         var ttl = TimeSpan.FromSeconds(cacheOptions.Value.DefaultTtlSeconds);
 
         return cache.GetOrSetAsync(
             key,
-            () => inner.GetByChannelIdAsync(channelId, ct),
+            () => inner.GetSenderPhoneByChannelIdAsync(channelId, ct),
             ttl,
             logger,
             ct)!;

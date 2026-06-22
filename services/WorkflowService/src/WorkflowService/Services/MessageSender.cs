@@ -63,7 +63,7 @@ public class MessageSender(
         var channelId = session!.ChannelId;
 
         await producer.Produce(
-            new BotOutgoingMessage(channelId, DefaultChannel.Telegram, message.ExternalUserId, messageJson, messageKind, companyId),
+            new BotOutgoingMessage(channelId, session.Channel, message.ExternalUserId, messageJson, messageKind, companyId),
             ct
         );
     }

@@ -1,4 +1,4 @@
-﻿namespace Shared.Domain.Enums;
+namespace Shared.Domain.Enums;
 
 public enum DefaultChannel
 {
@@ -6,5 +6,6 @@ public enum DefaultChannel
     Web,
     WhatsApp,
     Api,
-    Email
+    Email,
+    Sms
 }

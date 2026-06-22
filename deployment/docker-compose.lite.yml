@@ -191,6 +191,24 @@ services:
     networks:
       - app_network
 
+  sms-service:
+    container_name: sms_service
+    image: ghcr.io/odinson137/chatfoundry/sms-service:latest
+    build:
+      context: ..
+      dockerfile: services/SmsService/src/SmsService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+    env_file:
+      - .env
+    ports:
+      - "5045:8080"
+    depends_on:
+      - redis
+    networks:
+      - app_network
+
   file-service:
     container_name: file_service
     image: ghcr.io/odinson137/chatfoundry/file-service:latest
