@@ -105,6 +105,15 @@ else
                 </div>
                 <div class="ch-card-footer">
                     <code class="ch-card-token">@ch.MaskedToken</code>
+                    @if (ch.ChannelType?.ToUpperInvariant() == "SMS")
+                    {
+                        <div class="ch-card-webhook" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 10px;">
+                            <code style="font-size: 0.75rem; color: #475569; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px;" title="@GetWebhookUrl(ch.Id)">@GetWebhookUrl(ch.Id)</code>
+                            <button class="settings-icon-btn" style="padding: 2px; border: none; background: none; cursor: pointer; color: #64748b;" @onclick="() => CopyToClipboard(GetWebhookUrl(ch.Id))" title="Copy Webhook URL">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                            </button>
+                        </div>
+                    }
                 </div>
             </div>
         }
@@ -305,5 +314,23 @@ else
             "SMS" => "SMS",
             _ => channelType ?? "—"
         };
+    }
+
+    private string GetWebhookUrl(Guid channelId)
+    {
+        var baseApi = BlazorClient.Configuration.ApiEndpoints.Api;
+        return $"{baseApi}/sms/hook/{channelId}";
+    }
+
+    private async Task CopyToClipboard(string text)
+    {
+        try
+        {
+            await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", text);
+        }
+        catch (Exception ex)
+        {
+            error = "Не удалось скопировать в буфер обмена: " + ex.Message;
+        }
     }
 }
