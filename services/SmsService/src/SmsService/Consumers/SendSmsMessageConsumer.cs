@@ -33,6 +33,18 @@ public sealed class SendSmsMessageConsumer(
             return;
         }
 
+        senderPhone = senderPhone.Trim();
+        if (!senderPhone.StartsWith("+") && senderPhone.StartsWith("375"))
+        {
+            senderPhone = "+" + senderPhone;
+        }
+
+        var recipientPhone = message.ExternalUserId.Trim();
+        if (!recipientPhone.StartsWith("+") && recipientPhone.StartsWith("375"))
+        {
+            recipientPhone = "+" + recipientPhone;
+        }
+
         string text = ExtractText(message.MessageJson, message.MessageKind);
         if (string.IsNullOrEmpty(text))
         {
@@ -42,7 +54,7 @@ public sealed class SendSmsMessageConsumer(
 
         var requestDto = new SendSmsRequestDto
         {
-            To = message.ExternalUserId,
+            To = recipientPhone,
             Message = text,
             From = senderPhone,
             Channel = "sms"

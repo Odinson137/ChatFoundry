@@ -136,11 +136,11 @@ else
                 <input type="text" class="settings-input" @bind="currentName" placeholder="@LChannels["FieldNamePlaceholder"]" />
             </div>
             <div class="settings-field">
-                <label class="settings-label">@LChannels["FieldToken"]</label>
-                <input type="text" class="settings-input" style="font-family: 'Courier New', monospace;" @bind="currentToken" placeholder="@(isEditMode ? LChannels["FieldTokenPlaceholderEdit"] : LChannels["FieldTokenPlaceholderNew"])" />
+                <label class="settings-label">@(currentChannelType == "SMS" ? "Номер телефона отправителя" : LChannels["FieldToken"])</label>
+                <input type="text" class="settings-input" style="font-family: 'Courier New', monospace;" @bind="currentToken" placeholder="@(isEditMode ? LChannels["FieldTokenPlaceholderEdit"] : (currentChannelType == "SMS" ? "+375256649470" : LChannels["FieldTokenPlaceholderNew"]))" />
                 @if (isEditMode)
                 {
-                    <div class="settings-hint">@LChannels["FieldTokenHint"]</div>
+                    <div class="settings-hint">@(currentChannelType == "SMS" ? "Оставьте поле пустым, чтобы не менять номер телефона." : LChannels["FieldTokenHint"])</div>
                 }
             </div>
             <div class="settings-field">

@@ -16,6 +16,6 @@ public class SendSmsRequestDto
     [JsonProperty("channel")]
     public string Channel { get; set; } = "sms";
 
-    [JsonProperty("externalId")]
+    [JsonProperty("externalId", NullValueHandling = NullValueHandling.Ignore)]
     public string? ExternalId { get; set; }
 }
