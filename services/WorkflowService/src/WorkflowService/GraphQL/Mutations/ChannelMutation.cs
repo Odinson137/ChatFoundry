@@ -64,6 +64,9 @@ public class ChannelMutation(
         if (hasBots)
             return new DeleteChannelPayload(null, "Канал привязан к одному или нескольким ботам. Сначала отвяжите канал от ботов.");
 
+        var sessions = context.Sessions.Where(s => s.ChannelId == input.ChannelId);
+        context.Sessions.RemoveRange(sessions);
+
         context.MessengerChannels.Remove(channel);
         await context.SaveChangesAsync();
 

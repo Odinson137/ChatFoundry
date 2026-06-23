@@ -135,14 +135,28 @@ else
                 <label class="settings-label">@LChannels["FieldName"]</label>
                 <input type="text" class="settings-input" @bind="currentName" placeholder="@LChannels["FieldNamePlaceholder"]" />
             </div>
-            <div class="settings-field">
-                <label class="settings-label">@(currentChannelType == "SMS" ? "Номер телефона отправителя" : LChannels["FieldToken"])</label>
-                <input type="text" class="settings-input" style="font-family: 'Courier New', monospace;" @bind="currentToken" placeholder="@(isEditMode ? LChannels["FieldTokenPlaceholderEdit"] : (currentChannelType == "SMS" ? "+375256649470" : LChannels["FieldTokenPlaceholderNew"]))" />
-                @if (isEditMode)
-                {
-                    <div class="settings-hint">@(currentChannelType == "SMS" ? "Оставьте поле пустым, чтобы не менять номер телефона." : LChannels["FieldTokenHint"])</div>
-                }
-            </div>
+            @if (currentChannelType == "SMS")
+            {
+                <div class="settings-field">
+                    <label class="settings-label">Номер телефона отправителя</label>
+                    <input type="text" class="settings-input" style="font-family: 'Courier New', monospace;" @bind="currentSmsPhone" placeholder="@(isEditMode ? "Оставьте пустым, чтобы не менять" : "+3333333333333")" />
+                </div>
+                <div class="settings-field">
+                    <label class="settings-label">API Key</label>
+                    <input type="text" class="settings-input" style="font-family: 'Courier New', monospace;" @bind="currentSmsApiKey" placeholder="@(isEditMode ? "Оставьте пустым, чтобы не менять" : "Введите API-ключ")" />
+                </div>
+            }
+            else
+            {
+                <div class="settings-field">
+                    <label class="settings-label">@LChannels["FieldToken"]</label>
+                    <input type="text" class="settings-input" style="font-family: 'Courier New', monospace;" @bind="currentToken" placeholder="@(isEditMode ? LChannels["FieldTokenPlaceholderEdit"] : LChannels["FieldTokenPlaceholderNew"])" />
+                    @if (isEditMode)
+                    {
+                        <div class="settings-hint">@LChannels["FieldTokenHint"]</div>
+                    }
+                </div>
+            }
             <div class="settings-field">
                 <label class="settings-label">@LChannels["FieldChannelType"]</label>
                 @if (isEditMode)
@@ -164,7 +178,7 @@ else
         </div>
         <div class="settings-modal-footer">
             <button class="settings-btn-secondary" @onclick="CloseModal">@LChannels["CancelBtn"]</button>
-            <button class="settings-btn-primary" @onclick="SaveChannel" disabled="@(isSaving || string.IsNullOrWhiteSpace(currentName) || (!isEditMode && string.IsNullOrWhiteSpace(currentToken)))">
+            <button class="settings-btn-primary" @onclick="SaveChannel" disabled="@(isSaving || string.IsNullOrWhiteSpace(currentName) || (!isEditMode && IsTokenInvalid()))">
                 @if (isSaving) { <div class="settings-spinner" style="width:16px;height:16px;border-width:2px;"></div> }
                 @LChannels["SaveBtn"]
             </button>
@@ -183,6 +197,8 @@ else
     private Guid? editChannelId;
     private string currentName = "";
     private string currentToken = "";
+    private string currentSmsPhone = "";
+    private string currentSmsApiKey = "";
     private string currentChannelType = "TELEGRAM";
     private Guid? refreshingChannelId;
 
@@ -209,12 +225,50 @@ else
         }
     }
 
+    private bool IsTokenInvalid()
+    {
+        if (currentChannelType == "SMS")
+        {
+            return string.IsNullOrWhiteSpace(currentSmsPhone) || string.IsNullOrWhiteSpace(currentSmsApiKey);
+        }
+        return string.IsNullOrWhiteSpace(currentToken);
+    }
+
     private async Task SaveChannel()
     {
         if (string.IsNullOrWhiteSpace(currentName))
             return;
-        if (!isEditMode && string.IsNullOrWhiteSpace(currentToken))
+        if (!isEditMode && IsTokenInvalid())
             return;
+
+        if (currentChannelType == "SMS")
+        {
+            if (isEditMode)
+            {
+                if (!string.IsNullOrWhiteSpace(currentSmsPhone) || !string.IsNullOrWhiteSpace(currentSmsApiKey))
+                {
+                    if (string.IsNullOrWhiteSpace(currentSmsPhone) || string.IsNullOrWhiteSpace(currentSmsApiKey))
+                    {
+                        error = "Для обновления SMS-канала необходимо указать и номер телефона, и API Key.";
+                        return;
+                    }
+                    currentToken = $"{currentSmsPhone.Trim()};{currentSmsApiKey.Trim()}";
+                }
+                else
+                {
+                    currentToken = "";
+                }
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(currentSmsPhone) || string.IsNullOrWhiteSpace(currentSmsApiKey))
+                {
+                    error = "Необходимо указать номер телефона и API Key.";
+                    return;
+                }
+                currentToken = $"{currentSmsPhone.Trim()};{currentSmsApiKey.Trim()}";
+            }
+        }
 
         isSaving = true;
         error = null;
@@ -282,6 +336,8 @@ else
         isEditMode = false;
         currentName = "";
         currentToken = "";
+        currentSmsPhone = "";
+        currentSmsApiKey = "";
         currentChannelType = "TELEGRAM";
         showModal = true;
     }
@@ -292,6 +348,8 @@ else
         isEditMode = true;
         currentName = ch.Name;
         currentToken = "";
+        currentSmsPhone = "";
+        currentSmsApiKey = "";
         currentChannelType = ch.ChannelType ?? "TELEGRAM";
         showModal = true;
     }

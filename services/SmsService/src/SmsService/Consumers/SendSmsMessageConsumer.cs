@@ -26,14 +26,36 @@ public sealed class SendSmsMessageConsumer(
 
         logger.LogInformation("Sending SMS to {To} via channel {ChannelId}", message.ExternalUserId, message.ChannelId);
 
-        var senderPhone = await smsSettingsProvider.GetSenderPhoneByChannelIdAsync(message.ChannelId, context.CancellationToken);
-        if (string.IsNullOrEmpty(senderPhone))
+        var token = await smsSettingsProvider.GetSenderPhoneByChannelIdAsync(message.ChannelId, context.CancellationToken);
+        if (string.IsNullOrEmpty(token))
         {
-            logger.LogError("Sender phone number not configured (token is empty) for channel {ChannelId}", message.ChannelId);
+            logger.LogError("Channel settings (token) not configured for channel {ChannelId}", message.ChannelId);
             return;
         }
 
-        senderPhone = senderPhone.Trim();
+        string senderPhone;
+        string apiKey;
+
+        var parts = token.Split(';', 2);
+        if (parts.Length == 2)
+        {
+            senderPhone = parts[0].Trim();
+            apiKey = parts[1].Trim();
+        }
+        else
+        {
+            logger.LogError("Invalid SMS channel token format. Expected 'senderPhone;apiKey' for channel {ChannelId}", message.ChannelId);
+            return;
+        }
+
+        string apiUrl = smsOptions.Value.ApiUrl;
+
+        if (string.IsNullOrEmpty(senderPhone) || string.IsNullOrEmpty(apiKey) || string.IsNullOrEmpty(apiUrl))
+        {
+            logger.LogError("Invalid SMS channel settings: senderPhone, apiKey or apiUrl is empty");
+            return;
+        }
+
         if (!senderPhone.StartsWith("+") && senderPhone.StartsWith("375"))
         {
             senderPhone = "+" + senderPhone;
@@ -66,9 +88,9 @@ public sealed class SendSmsMessageConsumer(
         var httpClient = httpClientFactory.CreateClient("SmsGateway");
         
         httpClient.DefaultRequestHeaders.Clear();
-        httpClient.DefaultRequestHeaders.Add("X-API-Key", smsOptions.Value.ApiKey);
+        httpClient.DefaultRequestHeaders.Add("X-API-Key", apiKey);
 
-        var response = await httpClient.PostAsync("https://api.infinireach.io/api/v1/messages", content, context.CancellationToken);
+        var response = await httpClient.PostAsync(apiUrl, content, context.CancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {

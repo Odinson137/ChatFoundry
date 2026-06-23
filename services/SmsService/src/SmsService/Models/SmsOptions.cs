@@ -4,5 +4,5 @@ public class SmsOptions
 {
     public const string SectionName = "Sms";
 
-    public string ApiKey { get; set; } = string.Empty;
+    public string ApiUrl { get; set; } = "https://api.infinireach.io/api/v1/messages";
 }
