@@ -282,6 +282,10 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /app/ChatFoundry/deployment
+            # Clean up old Docker containers, images and builder cache to free up space
+            docker system prune -f
+            docker image prune -a -f
+            docker builder prune -a -f
             # Log in to GitHub Container Registry using PAT
             echo "${{ secrets.GH_PAT_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             # Pull pre-built images and start the stack in lite mode
