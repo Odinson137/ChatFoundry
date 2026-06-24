@@ -1,0 +1,268 @@
+@using BlazorClient.Interfaces
+@using BlazorClient.Models.DTO
+@using Microsoft.Extensions.Localization
+@inject IClientApiClient ClientApi
+@inject IWorkflowApiClient WorkflowApi
+@inject IStringLocalizer<BlazorClient.Pages.Clients> L
+
+@if (IsOpen)
+{
+    <div class="create-client-backdrop" @onclick="Close"></div>
+    <div class="create-client-modal">
+        <div class="create-client-header">
+            <h2 class="create-client-title">@L["CreateClientTitle"]</h2>
+            <button type="button" class="create-client-close" @onclick="Close" aria-label="Close">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <form @onsubmit="HandleSubmit" class="create-client-form">
+            <div class="create-client-body">
+                @if (!string.IsNullOrEmpty(_errorMessage))
+                {
+                    <div class="create-client-error-alert">
+                        <svg class="me-2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                        <span>@_errorMessage</span>
+                    </div>
+                }
+
+                <div class="form-group-row">
+                    <!-- Тип канала -->
+                    <div class="form-group">
+                        <label class="form-label">@L["ChannelTypeLabel"]</label>
+                        <select class="form-select" disabled>
+                            <option value="Sms">SMS</option>
+                        </select>
+                        <span class="form-hint">@L["ChannelTypeHint"]</span>
+                    </div>
+
+                    <!-- Выбор SMS-канала -->
+                    <div class="form-group">
+                        <label class="form-label">@L["SmsChannelLabel"]</label>
+                        @if (_isLoadingChannels)
+                        {
+                            <div class="form-select-loading">
+                                <div class="spinner-border spinner-border-sm text-muted" role="status"></div>
+                                <span class="ms-2">@L["LoadingChannels"]</span>
+                            </div>
+                        }
+                        else if (!string.IsNullOrEmpty(_channelLoadError))
+                        {
+                            <div class="text-danger small">@_channelLoadError</div>
+                        }
+                        else if (_smsChannels.Count == 0)
+                        {
+                            <div class="create-client-warning-alert text-wrap">
+                                @L["NoSmsChannelsWarning"]
+                            </div>
+                        }
+                        else
+                        {
+                            <select class="form-select" @bind="_model.ChannelId">
+                                @foreach (var ch in _smsChannels)
+                                {
+                                    <option value="@ch.Id">@ch.Name</option>
+                                }
+                            </select>
+                        }
+                    </div>
+                </div>
+
+                <div class="form-group-row">
+                    <!-- Имя -->
+                    <div class="form-group">
+                        <label class="form-label" for="client-name">@L["FirstNameLabel"]</label>
+                        <input type="text" id="client-name" class="form-input" 
+                               value="@_model.Name" @oninput="(e) => OnNameChanged(e.Value?.ToString())" 
+                               placeholder="@L["FirstNamePlaceholder"]" />
+                    </div>
+
+                    <!-- Фамилия -->
+                    <div class="form-group">
+                        <label class="form-label" for="client-lastname">@L["LastNameLabel"]</label>
+                        <input type="text" id="client-lastname" class="form-input" 
+                               value="@_model.LastName" @oninput="(e) => OnLastNameChanged(e.Value?.ToString())" 
+                               placeholder="@L["LastNamePlaceholder"]" />
+                    </div>
+                </div>
+
+                <!-- Телефон -->
+                <div class="form-group">
+                    <label class="form-label" for="client-phone">@L["PhoneLabel"] <span class="text-danger">*</span></label>
+                    <input type="text" id="client-phone" class="form-input" 
+                           @bind="_model.Phone" required 
+                           placeholder="@L["PhonePlaceholder"]" />
+                </div>
+
+                <!-- Отображаемое имя -->
+                <div class="form-group">
+                    <label class="form-label" for="client-displayname">@L["DisplayNameLabel"] <span class="text-danger">*</span></label>
+                    <input type="text" id="client-displayname" class="form-input" 
+                           value="@_model.DisplayName" @oninput="(e) => OnDisplayNameInput(e.Value?.ToString())" 
+                           placeholder="@L["DisplayNamePlaceholder"]" required />
+                    <span class="form-hint">@L["DisplayNameHint"]</span>
+                </div>
+            </div>
+
+            <div class="create-client-footer">
+                <button type="button" class="create-client-btn create-client-btn-secondary" @onclick="Close" disabled="@_isSaving">
+                    @L["BtnCancel"]
+                </button>
+                <button type="submit" class="create-client-btn create-client-btn-primary" 
+                        disabled="@(_isSaving || _smsChannels.Count == 0)">
+                    @if (_isSaving)
+                    {
+                        <div class="spinner-border spinner-border-sm text-light me-2" role="status"></div>
+                        <span>@L["BtnSaving"]</span>
+                    }
+                    else
+                    {
+                        <span>@L["BtnCreate"]</span>
+                    }
+                </button>
+            </div>
+        </form>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback<ClientDto> OnClientCreated { get; set; }
+
+    private CreateClientRequest _model = new();
+    private bool _isAutoDisplayName = true;
+    private string? _errorMessage;
+    private bool _isSaving = false;
+
+    private List<ChannelDto> _smsChannels = new();
+    private bool _isLoadingChannels = false;
+    private string? _channelLoadError;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (IsOpen)
+        {
+            _model = new CreateClientRequest();
+            _isAutoDisplayName = true;
+            _errorMessage = null;
+            _channelLoadError = null;
+            await LoadSmsChannels();
+        }
+    }
+
+    private async Task LoadSmsChannels()
+    {
+        _isLoadingChannels = true;
+        _channelLoadError = null;
+        StateHasChanged();
+        try
+        {
+            var channels = await WorkflowApi.GetChannelsAsync();
+            _smsChannels = channels.Where(c => string.Equals(c.ChannelType, "Sms", StringComparison.OrdinalIgnoreCase)).ToList();
+            if (_smsChannels.Count > 0)
+            {
+                _model.ChannelId = _smsChannels[0].Id;
+            }
+        }
+        catch (Exception ex)
+        {
+            _channelLoadError = L["ErrorLoadChannels"] + ": " + ex.Message;
+        }
+        finally
+        {
+            _isLoadingChannels = false;
+            StateHasChanged();
+        }
+    }
+
+    private void OnNameChanged(string? value)
+    {
+        _model.Name = value;
+        UpdateAutoDisplayName();
+    }
+
+    private void OnLastNameChanged(string? value)
+    {
+        _model.LastName = value;
+        UpdateAutoDisplayName();
+    }
+
+    private void UpdateAutoDisplayName()
+    {
+        if (_isAutoDisplayName)
+        {
+            var parts = new[] { _model.Name, _model.LastName }
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .ToArray();
+            _model.DisplayName = string.Join(" ", parts);
+        }
+    }
+
+    private void OnDisplayNameInput(string? value)
+    {
+        _model.DisplayName = value ?? "";
+        _isAutoDisplayName = string.IsNullOrWhiteSpace(_model.DisplayName);
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (string.IsNullOrWhiteSpace(_model.Phone))
+        {
+            _errorMessage = L["ErrorPhoneRequired"];
+            return;
+        }
+
+        if (!_model.ChannelId.HasValue || _model.ChannelId == Guid.Empty)
+        {
+            _errorMessage = L["ErrorChannelRequired"];
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(_model.DisplayName))
+        {
+            _errorMessage = L["ErrorDisplayNameRequired"];
+            return;
+        }
+
+        _isSaving = true;
+        _errorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            _model.ExternalUserId = _model.Phone.Trim();
+            _model.Phone = _model.Phone.Trim();
+            _model.Channel = "Sms";
+
+            var client = await ClientApi.CreateClientAsync(_model);
+            if (client != null)
+            {
+                await OnClientCreated.InvokeAsync(client);
+                await Close();
+            }
+            else
+            {
+                _errorMessage = L["ErrorCreateFailed"];
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = L["ErrorCreateException"] + ": " + ex.Message;
+        }
+        finally
+        {
+            _isSaving = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task Close()
+    {
+        await OnClose.InvokeAsync();
+    }
+}

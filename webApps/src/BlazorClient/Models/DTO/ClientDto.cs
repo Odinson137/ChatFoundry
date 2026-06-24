@@ -65,3 +65,16 @@ public class MessagesPageResult
     public bool HasNextPage { get; set; }
     public string? EndCursor { get; set; }
 }
+
+public class CreateClientRequest
+{
+    public string DisplayName { get; set; } = "";
+    public string Channel { get; set; } = "SMS";
+    public Guid? ChannelId { get; set; }
+    public string ExternalUserId { get; set; } = "";
+    public string? Phone { get; set; }
+    public string? Email { get; set; }
+    public string? Name { get; set; }
+    public string? LastName { get; set; }
+    public string? Username { get; set; }
+}

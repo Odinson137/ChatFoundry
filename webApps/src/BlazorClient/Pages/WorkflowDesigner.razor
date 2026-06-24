@@ -5,6 +5,7 @@
 @using Blazor.Diagrams.Core.Models
 @using BlazorClient.Models.Diagram
 @using Microsoft.AspNetCore.Authorization
+@using BlazorClient.Components
 @layout DesignerLayout
 
 <PageTitle>@LDesigner["PageTitleWorkflowEditor"]</PageTitle>
@@ -188,6 +189,43 @@
                                 @((MarkupString)string.Format(LDesigner["EnterAtToSelectVarOrManual"].Value, "<kbd>@@</kbd>", "<code>{{variable_name}}</code>"))
                             </small>
                         </div>
+                        <div class="mb-3 border-top pt-3 mt-3">
+                            <label class="form-label d-block fw-bold">@LDesigner["LabelRecipientTitle"]</label>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="recipientType_@node.Id" id="recipientSession_@node.Id" 
+                                       checked="@(!msgData.SendToCustomRecipient)" 
+                                       @onclick="() => SetRecipientToSession(msgData)" />
+                                <label class="form-check-label" for="recipientSession_@node.Id">
+                                    @LDesigner["RecipientCurrentSession"]
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="recipientType_@node.Id" id="recipientCustom_@node.Id" 
+                                       checked="@msgData.SendToCustomRecipient" 
+                                       @onclick="() => OpenClientPicker(msgData)" />
+                                <label class="form-check-label" for="recipientCustom_@node.Id">
+                                    @LDesigner["RecipientCustomClient"]
+                                </label>
+                            </div>
+                            @if (msgData.SendToCustomRecipient)
+                            {
+                                <div class="p-2 border rounded bg-light d-flex justify-content-between align-items-center mt-2">
+                                    <span class="small">
+                                        @if (msgData.CustomRecipientClientChannelId.HasValue && _recipientDetailsCache.TryGetValue(msgData.CustomRecipientClientChannelId.Value, out var details))
+                                        {
+                                            <strong>@details.ClientDisplayName</strong> <span class="text-muted">(@details.Channel.Channel: @(details.Channel.Username ?? details.Channel.Phone ?? details.Channel.Email ?? details.Channel.ExternalUserId))</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-danger">@LDesigner["RecipientNotSelected"]</span>
+                                        }
+                                    </span>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" @onclick="() => OpenClientPicker(msgData)">
+                                        @LDesigner["BtnSelect"]
+                                    </button>
+                                </div>
+                            }
+                        </div>
                     }
 
                     @if (node is WorkflowNodeModel { Data: AskNodeData askData })
@@ -232,6 +270,43 @@
                             <small class="form-text text-muted d-block mt-1">
                                 @LDesigner["ButtonsHint"]
                             </small>
+                        </div>
+                        <div class="mb-3 border-top pt-3 mt-3">
+                            <label class="form-label d-block fw-bold">@LDesigner["LabelRecipientTitle"]</label>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="recipientType_@node.Id" id="recipientSession_@node.Id" 
+                                       checked="@(!askData.SendToCustomRecipient)" 
+                                       @onclick="() => SetRecipientToSession(askData)" />
+                                <label class="form-check-label" for="recipientSession_@node.Id">
+                                    @LDesigner["RecipientCurrentSession"]
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="recipientType_@node.Id" id="recipientCustom_@node.Id" 
+                                       checked="@askData.SendToCustomRecipient" 
+                                       @onclick="() => OpenClientPicker(askData)" />
+                                <label class="form-check-label" for="recipientCustom_@node.Id">
+                                    @LDesigner["RecipientCustomClient"]
+                                </label>
+                            </div>
+                            @if (askData.SendToCustomRecipient)
+                            {
+                                <div class="p-2 border rounded bg-light d-flex justify-content-between align-items-center mt-2">
+                                    <span class="small">
+                                        @if (askData.CustomRecipientClientChannelId.HasValue && _recipientDetailsCache.TryGetValue(askData.CustomRecipientClientChannelId.Value, out var details))
+                                        {
+                                            <strong>@details.ClientDisplayName</strong> <span class="text-muted">(@details.Channel.Channel: @(details.Channel.Username ?? details.Channel.Phone ?? details.Channel.Email ?? details.Channel.ExternalUserId))</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-danger">@LDesigner["RecipientNotSelected"]</span>
+                                        }
+                                    </span>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" @onclick="() => OpenClientPicker(askData)">
+                                        @LDesigner["BtnSelect"]
+                                    </button>
+                                </div>
+                            }
                         </div>
                     }
 
@@ -450,6 +525,43 @@
                                       @oninput="e => { mediaData.Caption = FromDisplayText(e.Value?.ToString() ?? string.Empty); OnWorkflowChanged(); }"
                                       placeholder="@LDesigner["PlaceholderOptional"]"></textarea>
                             <small class="form-text text-muted">@((MarkupString)string.Format(LDesigner["VariablesSupportedHint"].Value, "<code>{{variable_name}}</code>"))</small>
+                        </div>
+                        <div class="mb-3 border-top pt-3 mt-3">
+                            <label class="form-label d-block fw-bold">@LDesigner["LabelRecipientTitle"]</label>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="recipientType_@node.Id" id="recipientSession_@node.Id" 
+                                       checked="@(!mediaData.SendToCustomRecipient)" 
+                                       @onclick="() => SetRecipientToSession(mediaData)" />
+                                <label class="form-check-label" for="recipientSession_@node.Id">
+                                    @LDesigner["RecipientCurrentSession"]
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="recipientType_@node.Id" id="recipientCustom_@node.Id" 
+                                       checked="@mediaData.SendToCustomRecipient" 
+                                       @onclick="() => OpenClientPicker(mediaData)" />
+                                <label class="form-check-label" for="recipientCustom_@node.Id">
+                                    @LDesigner["RecipientCustomClient"]
+                                </label>
+                            </div>
+                            @if (mediaData.SendToCustomRecipient)
+                            {
+                                <div class="p-2 border rounded bg-light d-flex justify-content-between align-items-center mt-2">
+                                    <span class="small">
+                                        @if (mediaData.CustomRecipientClientChannelId.HasValue && _recipientDetailsCache.TryGetValue(mediaData.CustomRecipientClientChannelId.Value, out var details))
+                                        {
+                                            <strong>@details.ClientDisplayName</strong> <span class="text-muted">(@details.Channel.Channel: @(details.Channel.Username ?? details.Channel.Phone ?? details.Channel.Email ?? details.Channel.ExternalUserId))</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-danger">@LDesigner["RecipientNotSelected"]</span>
+                                        }
+                                    </span>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" @onclick="() => OpenClientPicker(mediaData)">
+                                        @LDesigner["BtnSelect"]
+                                    </button>
+                                </div>
+                            }
                         </div>
                     }
 
@@ -1384,6 +1496,10 @@
                     GetDiagramNodeCount="GetDiagramNodeCountForAi"
                     OnSchemaApplied="HandleAiSchemaApplied" />
 </div>
+
+<ClientChannelPickerDialog IsOpen="IsClientPickerOpen"
+                            OnClose="() => IsClientPickerOpen = false"
+                            OnChannelSelected="HandleChannelSelected" />
 
 <!-- Модальное окно «Атрибуты и параметры» (2 вкладки) -->
 @if (IsVariablesModalOpen)

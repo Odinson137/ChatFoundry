@@ -384,4 +384,26 @@ public sealed class ClientAttributesGrpcService(
             ? query.Where(c => c.Attributes.Any(a => a.Key == key && items.Any(item => EF.Functions.ILike(a.Value, item))))
             : query.Where(c => c.Attributes.Any(a => a.Key == key && items.Contains(a.Value)));
     }
+
+    public override async Task<GetClientChannelResponse> GetClientChannel(
+        GetClientChannelRequest request,
+        ServerCallContext context)
+    {
+        if (!Guid.TryParse(request.ClientChannelId, out var clientChannelId))
+            throw new RpcException(new Status(StatusCode.InvalidArgument, $"Invalid ClientChannelId: {request.ClientChannelId}"));
+
+        var clientChannel = await db.ClientChannels
+            .FirstOrDefaultAsync(c => c.Id == clientChannelId, context.CancellationToken);
+
+        if (clientChannel == null)
+            throw new RpcException(new Status(StatusCode.NotFound, "Client channel not found"));
+
+        return new GetClientChannelResponse
+        {
+            Id = clientChannel.Id.ToString(),
+            Channel = clientChannel.Channel.ToString(),
+            ChannelId = clientChannel.ChannelId?.ToString() ?? string.Empty,
+            ExternalUserId = clientChannel.ExternalUserId
+        };
+    }
 }

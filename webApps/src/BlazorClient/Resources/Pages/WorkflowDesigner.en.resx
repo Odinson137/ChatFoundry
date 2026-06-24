@@ -1140,4 +1140,34 @@
   <data name="VariableLabel" xml:space="preserve">
     <value>Variable</value>
   </data>
+  <data name="LabelRecipientTitle" xml:space="preserve">
+    <value>Message Recipient</value>
+  </data>
+  <data name="RecipientCurrentSession" xml:space="preserve">
+    <value>User from current session (default)</value>
+  </data>
+  <data name="RecipientCustomClient" xml:space="preserve">
+    <value>Select specific client</value>
+  </data>
+  <data name="RecipientNotSelected" xml:space="preserve">
+    <value>Recipient not selected</value>
+  </data>
+  <data name="SelectRecipientTitle" xml:space="preserve">
+    <value>Select Message Recipient</value>
+  </data>
+  <data name="SearchClientPlaceholder" xml:space="preserve">
+    <value>Search client by name, phone, email...</value>
+  </data>
+  <data name="LoadingClients" xml:space="preserve">
+    <value>Loading clients...</value>
+  </data>
+  <data name="NoClientsFound" xml:space="preserve">
+    <value>No clients found</value>
+  </data>
+  <data name="ChannelsCountText" xml:space="preserve">
+    <value>channel(s)</value>
+  </data>
+  <data name="NoChannelsConnected" xml:space="preserve">
+    <value>No channels connected</value>
+  </data>
 </root>

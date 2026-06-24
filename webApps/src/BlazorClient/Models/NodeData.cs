@@ -28,10 +28,14 @@ public class HttpRequestNodeData : NodeData
     public bool ContinueOnError { get; set; }
 }
 
-public class MessageNodeData : NodeData
+public class MessageNodeData : NodeData, IHasRecipient
 {
 
     public string Text { get; set; } = string.Empty;
+    public bool SendToCustomRecipient { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public Guid? CustomRecipientClientChannelId { get; set; }
 }
 
 public class SetVariableNodeData : NodeData
@@ -61,12 +65,16 @@ public class AskUiData
     public List<AskButtonData> Buttons { get; set; } = new();
 }
 
-public class AskNodeData : NodeData
+public class AskNodeData : NodeData, IHasRecipient
 {
     public string Text { get; set; } = string.Empty;
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public AskUiData? Ui { get; set; }
+    public bool SendToCustomRecipient { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public Guid? CustomRecipientClientChannelId { get; set; }
 }
 
 public class AIGenerateNodeData : NodeData
@@ -91,7 +99,7 @@ public enum MediaSourceType
     Attachment
 }
 
-public class MediaNodeData : NodeData
+public class MediaNodeData : NodeData, IHasRecipient
 {
     public MediaKind MediaKind { get; set; } = MediaKind.Image;
 
@@ -101,6 +109,10 @@ public class MediaNodeData : NodeData
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Caption { get; set; }
+    public bool SendToCustomRecipient { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public Guid? CustomRecipientClientChannelId { get; set; }
 }
 
 public class SubWorkflowNodeData : NodeData

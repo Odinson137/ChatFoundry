@@ -3,6 +3,7 @@ using ClientService.Entities;
 using HotChocolate;
 using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
+using Shared.Domain.Enums;
 using Shared.Infrastructure.GraphQl;
 
 namespace ClientService.GraphQL.Mutations;
@@ -65,6 +66,39 @@ public class ClientMutation(IHttpContextAccessor httpContextAccessor) : BaseGrap
         await context.Entry(channel).Collection(ch => ch.Attributes).LoadAsync(ct);
         return channel;
     }
+
+    public async Task<Client> CreateClientAsync(
+        CreateClientInput input,
+        [Service] ClientDbContext context,
+        CancellationToken ct)
+    {
+        if (!CompanyId.HasValue)
+            throw new UnauthorizedAccessException("Нет доступа.");
+
+        var client = new Client
+        {
+            CompanyId = CompanyId.Value,
+            DisplayName = input.DisplayName
+        };
+
+        var clientChannel = new ClientChannel
+        {
+            Channel = input.Channel,
+            ChannelId = input.ChannelId,
+            ExternalUserId = input.ExternalUserId,
+            Phone = input.Phone,
+            Email = input.Email,
+            Name = input.Name,
+            LastName = input.LastName,
+            Username = input.Username
+        };
+
+        client.ClientChannels.Add(clientChannel);
+        context.Clients.Add(client);
+        await context.SaveChangesAsync(ct);
+
+        return client;
+    }
 }
 
 public record UpdateClientInput(Guid ClientId, string DisplayName);
@@ -79,3 +113,14 @@ public record SetClientChannelAttributesInput(
     string? Phone,
     string? Email,
     List<AttributeInput>? CustomAttributes);
+
+public record CreateClientInput(
+    string DisplayName,
+    DefaultChannel Channel,
+    Guid? ChannelId,
+    string ExternalUserId,
+    string? Phone,
+    string? Email,
+    string? Name,
+    string? LastName,
+    string? Username);

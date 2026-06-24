@@ -137,6 +137,43 @@ public class ClientApiClient(HttpClient http) : IClientApiClient
         return result.Clients.Nodes.FirstOrDefault()?.Id;
     }
 
+    public async Task<ClientChannelWithClientDto?> GetClientChannelDetailsAsync(Guid clientChannelId)
+    {
+        var query = """
+            query GetClientDetailsByChannelId($channelId: UUID!) {
+                clients(first: 1, where: { clientChannels: { some: { id: { eq: $channelId } } } }) {
+                    nodes {
+                        id
+                        displayName
+                        clientChannels {
+                            id
+                            channelId
+                            channel
+                            externalUserId
+                            phone
+                            email
+                            username
+                            name
+                            lastName
+                        }
+                    }
+                }
+            }
+            """;
+
+        var variables = new Dictionary<string, object?> { ["channelId"] = clientChannelId };
+        var result = await ExecuteGraphQl<ClientsConnectionResponse>(query, variables);
+        var client = result.Clients.Nodes.FirstOrDefault();
+        var channel = client?.ClientChannels.FirstOrDefault(c => c.Id == clientChannelId);
+        if (client == null || channel == null) return null;
+
+        return new ClientChannelWithClientDto
+        {
+            Channel = channel,
+            ClientDisplayName = client.DisplayName ?? "Клиент"
+        };
+    }
+
     public async Task<MessagesPageResult> GetMessagesAsync(Guid clientChannelId, int first, string? after = null)
     {
         var varDecls = new List<string> { "$clientChannelId: UUID!", "$first: Int!" };
@@ -325,6 +362,51 @@ public class ClientApiClient(HttpClient http) : IClientApiClient
         return result.SetClientChannelAttributes;
     }
 
+    public async Task<ClientDto?> CreateClientAsync(CreateClientRequest request, CancellationToken ct = default)
+    {
+        var query = """
+            mutation CreateClient($input: CreateClientInput!) {
+                createClient(input: $input) {
+                    id
+                    displayName
+                    createdAt
+                    modifiedAt
+                    clientChannels {
+                        id
+                        channelId
+                        channel
+                        externalUserId
+                        phone
+                        email
+                        username
+                        name
+                        lastName
+                        createdAt
+                    }
+                }
+            }
+            """;
+
+        var variables = new
+        {
+            input = new
+            {
+                request.DisplayName,
+                channel = request.Channel.ToUpperInvariant(),
+                request.ChannelId,
+                request.ExternalUserId,
+                request.Phone,
+                request.Email,
+                request.Name,
+                request.LastName,
+                request.Username
+            }
+        };
+
+        var result = await ExecuteGraphQl<CreateClientResponse>(query, variables, ct);
+        return result.CreateClient;
+    }
+
 
 
     private async Task<T> ExecuteGraphQl<T>(string query, object? variables = null, CancellationToken ct = default)
@@ -409,5 +491,10 @@ public class ClientApiClient(HttpClient http) : IClientApiClient
     private class SetClientChannelAttributesResponse
     {
         public ClientChannelDto? SetClientChannelAttributes { get; set; }
+    }
+
+    private class CreateClientResponse
+    {
+        public ClientDto CreateClient { get; set; } = new();
     }
 }

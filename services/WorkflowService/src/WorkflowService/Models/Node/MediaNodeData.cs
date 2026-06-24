@@ -14,10 +14,12 @@ public enum MediaSourceType
     Attachment = 1
 }
 
-public sealed class MediaNodeData : NodeData
+public sealed class MediaNodeData : NodeData, IHasRecipient
 {
     public MediaKind MediaKind { get; init; }
     public MediaSourceType SourceType { get; init; }
     public string Value { get; init; } = "";
     public string? Caption { get; init; }
+    public bool SendToCustomRecipient { get; set; }
+    public Guid? CustomRecipientClientChannelId { get; set; }
 }

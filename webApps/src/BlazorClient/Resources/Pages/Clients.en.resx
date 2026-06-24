@@ -108,9 +108,84 @@
     <value>Showing {0} of {1}</value>
   </data>
   <data name="PaginationSize" xml:space="preserve">
-    <value>Size:</value>
+     <value>Size:</value>
+   </data>
+   <data name="LoadError" xml:space="preserve">
+     <value>Failed to load clients: {0}</value>
+   </data>
+  <data name="CreateClientTitle" xml:space="preserve">
+    <value>Create Client</value>
   </data>
-  <data name="LoadError" xml:space="preserve">
-    <value>Failed to load clients: {0}</value>
+  <data name="ChannelTypeLabel" xml:space="preserve">
+    <value>Channel Type</value>
+  </data>
+  <data name="ChannelTypeHint" xml:space="preserve">
+    <value>Only SMS clients can be created manually</value>
+  </data>
+  <data name="SmsChannelLabel" xml:space="preserve">
+    <value>SMS Channel</value>
+  </data>
+  <data name="LoadingChannels" xml:space="preserve">
+    <value>Loading channels...</value>
+  </data>
+  <data name="NoSmsChannelsWarning" xml:space="preserve">
+    <value>Warning: your company does not have configured SMS channels. Please add one in settings first.</value>
+  </data>
+  <data name="FirstNameLabel" xml:space="preserve">
+    <value>First Name</value>
+  </data>
+  <data name="FirstNamePlaceholder" xml:space="preserve">
+    <value>John</value>
+  </data>
+  <data name="LastNameLabel" xml:space="preserve">
+    <value>Last Name</value>
+  </data>
+  <data name="LastNamePlaceholder" xml:space="preserve">
+    <value>Doe</value>
+  </data>
+  <data name="PhoneLabel" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="PhonePlaceholder" xml:space="preserve">
+    <value>+1234567890</value>
+  </data>
+  <data name="DisplayNameLabel" xml:space="preserve">
+    <value>Display Name</value>
+  </data>
+  <data name="DisplayNamePlaceholder" xml:space="preserve">
+    <value>John Doe</value>
+  </data>
+  <data name="DisplayNameHint" xml:space="preserve">
+    <value>The name that will be displayed in the client list</value>
+  </data>
+  <data name="BtnCancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="BtnCreate" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="BtnSaving" xml:space="preserve">
+    <value>Creating...</value>
+  </data>
+  <data name="ErrorLoadChannels" xml:space="preserve">
+    <value>Failed to load channels list</value>
+  </data>
+  <data name="ErrorPhoneRequired" xml:space="preserve">
+    <value>Phone is required for SMS client.</value>
+  </data>
+  <data name="ErrorChannelRequired" xml:space="preserve">
+    <value>Please select a company SMS channel.</value>
+  </data>
+  <data name="ErrorDisplayNameRequired" xml:space="preserve">
+    <value>Display name is required.</value>
+  </data>
+  <data name="ErrorCreateFailed" xml:space="preserve">
+    <value>Failed to create client. Please try again later.</value>
+  </data>
+  <data name="ErrorCreateException" xml:space="preserve">
+    <value>Error occurred during client creation</value>
+  </data>
+  <data name="BtnAddClient" xml:space="preserve">
+    <value>Add Client</value>
   </data>
 </root>

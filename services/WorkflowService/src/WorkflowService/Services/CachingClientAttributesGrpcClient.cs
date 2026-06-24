@@ -69,6 +69,40 @@ public sealed class CachingClientAttributesGrpcClient(
         return response;
     }
 
+    private const string ChannelKeyPrefix = "client:channel:";
+
+    public async Task<GetClientChannelResponse> GetClientChannelAsync(GetClientChannelRequest request, CancellationToken cancellationToken = default)
+    {
+        var key = $"{ChannelKeyPrefix}{request.ClientChannelId}";
+        try
+        {
+            var cached = await cache.GetStringAsync(key, cancellationToken);
+            if (cached != null)
+            {
+                var dto = Newtonsoft.Json.JsonConvert.DeserializeObject<GetClientChannelResponse>(cached);
+                if (dto != null)
+                    return dto;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Redis get failed for key {Key}, calling gRPC", key);
+        }
+
+        var response = await inner.GetClientChannelAsync(request, cancellationToken);
+        try
+        {
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(response, JsonSettings);
+            var ttlSeconds = cacheOptions.Value.DefaultTtlSeconds;
+            await cache.SetStringAsync(key, json, new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(ttlSeconds) }, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Redis set failed for key {Key}", key);
+        }
+        return response;
+    }
+
     private static ClientAttributesCacheDto ToDto(GetClientAttributesResponse response)
     {
         var attrs = response.BaseAttributes;

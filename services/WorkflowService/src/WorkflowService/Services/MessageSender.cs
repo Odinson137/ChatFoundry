@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Shared.Application.Events;
 using Shared.Domain.Enums;
 using Shared.Domain.Models;
+using Workflow.Grpc.Client;
 using WorkflowService.Entities;
 using WorkflowService.Enums;
 using WorkflowService.Events;
@@ -19,7 +20,8 @@ public class MessageSender(
     IWorkflowRepository workflowRepository,
     ISessionRepository sessionRepository,
     WorkflowTextRenderer workflowTextRenderer,
-    IFileUrlResolver fileUrlResolver
+    IFileUrlResolver fileUrlResolver,
+    IClientAttributesGrpcClient clientAttributesGrpcClient
 ) : IMessageSender
 {
     public async Task SendAsync(ActionEntity action, ExecuteActionCommand message, CancellationToken ct)
@@ -61,9 +63,29 @@ public class MessageSender(
 
         var companyId = workflow.Bot?.CompanyId;
         var channelId = session!.ChannelId;
+        var channel = session.Channel;
+        var externalUserId = message.ExternalUserId;
+
+        if (node.Data is IHasRecipient recipientNode && recipientNode.SendToCustomRecipient && recipientNode.CustomRecipientClientChannelId.HasValue)
+        {
+            var clientChannelResponse = await clientAttributesGrpcClient.GetClientChannelAsync(
+                new GetClientChannelRequest { ClientChannelId = recipientNode.CustomRecipientClientChannelId.Value.ToString() },
+                ct
+            );
+
+            if (Enum.TryParse<DefaultChannel>(clientChannelResponse.Channel, true, out var customChannel))
+            {
+                channel = customChannel;
+                externalUserId = clientChannelResponse.ExternalUserId;
+                if (Guid.TryParse(clientChannelResponse.ChannelId, out var customChannelId) && customChannelId != Guid.Empty)
+                {
+                    channelId = customChannelId;
+                }
+            }
+        }
 
         await producer.Produce(
-            new BotOutgoingMessage(channelId, session.Channel, message.ExternalUserId, messageJson, messageKind, companyId),
+            new BotOutgoingMessage(channelId, channel, externalUserId, messageJson, messageKind, companyId),
             ct
         );
     }

@@ -1,4 +1,4 @@
-﻿namespace WorkflowService.Models.Node;
+namespace WorkflowService.Models.Node;
 
 public abstract class NodeData
 {

@@ -14,6 +14,7 @@ public interface IClientApiClient
 
     Task<ClientDto?> GetClientByIdAsync(Guid clientId);
     Task<Guid?> GetClientIdByChannelIdAsync(Guid clientChannelId);
+    Task<ClientChannelWithClientDto?> GetClientChannelDetailsAsync(Guid clientChannelId);
 
     Task<MessagesPageResult> GetMessagesAsync(Guid clientChannelId, int first, string? after = null);
 
@@ -25,6 +26,7 @@ public interface IClientApiClient
     Task<bool> DeleteAttributeDefinitionAsync(Guid id, CancellationToken ct = default);
 
     Task<ClientChannelDto?> SetClientChannelAttributesAsync(SetClientChannelAttributesRequest request, CancellationToken ct = default);
+    Task<ClientDto?> CreateClientAsync(CreateClientRequest request, CancellationToken ct = default);
 }
 
 public enum AttributeScope { Company, Bot }

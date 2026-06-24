@@ -83,6 +83,10 @@ public partial class WorkflowDesigner : IDisposable
     private NodeType? _draggedType;
     private Model? SelectedModel { get; set; }
 
+    private Dictionary<Guid, ClientChannelWithClientDto> _recipientDetailsCache = new();
+    private bool IsClientPickerOpen { get; set; }
+    private IHasRecipient? _activeNodeForPicker;
+
     private List<AttributeDefinitionDto> CompanyAttributeDefinitions { get; set; } = new();
 
     private bool IsVariablesModalOpen { get; set; }
@@ -2014,6 +2018,34 @@ public partial class WorkflowDesigner : IDisposable
         _conditionTypeDropdownOpen = false;
         ApplyNodeDragLocks();
         StateHasChanged();
+
+        if (model.Selected && model is NodeModel nodeModel && nodeModel is WorkflowNodeModel wfNode)
+        {
+            if (wfNode.Data is IHasRecipient recipientNode && recipientNode.SendToCustomRecipient && recipientNode.CustomRecipientClientChannelId.HasValue)
+            {
+                var recipientChannelId = recipientNode.CustomRecipientClientChannelId.Value;
+                if (!_recipientDetailsCache.ContainsKey(recipientChannelId))
+                {
+                    _ = Task.Run(async () =>
+                    {
+                        try
+                        {
+                            var details = await ClientApiClient.GetClientChannelDetailsAsync(recipientChannelId);
+                            if (details != null)
+                            {
+                                _recipientDetailsCache[recipientChannelId] = details;
+                                await InvokeAsync(StateHasChanged);
+                            }
+                        }
+                        catch
+                        {
+                            // Ignore
+                        }
+                    });
+                }
+            }
+        }
+
         if (model.Selected)
         {
             _ = InvokeAsync(async () =>
@@ -2403,6 +2435,32 @@ public partial class WorkflowDesigner : IDisposable
 
     private void OnDragOver(DragEventArgs e)
     {
+    }
+
+    private void OpenClientPicker(IHasRecipient data)
+    {
+        _activeNodeForPicker = data;
+        IsClientPickerOpen = true;
+    }
+
+    private void HandleChannelSelected(ClientChannelWithClientDto details)
+    {
+        if (_activeNodeForPicker != null)
+        {
+            _activeNodeForPicker.SendToCustomRecipient = true;
+            _activeNodeForPicker.CustomRecipientClientChannelId = details.Channel.Id;
+            _recipientDetailsCache[details.Channel.Id] = details;
+            OnWorkflowChanged();
+        }
+        IsClientPickerOpen = false;
+        _activeNodeForPicker = null;
+    }
+
+    private void SetRecipientToSession(IHasRecipient data)
+    {
+        data.SendToCustomRecipient = false;
+        data.CustomRecipientClientChannelId = null;
+        OnWorkflowChanged();
     }
 
     public void Dispose()

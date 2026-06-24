@@ -113,4 +113,79 @@
   <data name="LoadError" xml:space="preserve">
     <value>Не удалось загрузить клиентов: {0}</value>
   </data>
+  <data name="CreateClientTitle" xml:space="preserve">
+    <value>Создать клиента</value>
+  </data>
+  <data name="ChannelTypeLabel" xml:space="preserve">
+    <value>Тип канала</value>
+  </data>
+  <data name="ChannelTypeHint" xml:space="preserve">
+    <value>Вручную можно создавать только SMS клиентов</value>
+  </data>
+  <data name="SmsChannelLabel" xml:space="preserve">
+    <value>SMS-канал</value>
+  </data>
+  <data name="LoadingChannels" xml:space="preserve">
+    <value>Загрузка каналов...</value>
+  </data>
+  <data name="NoSmsChannelsWarning" xml:space="preserve">
+    <value>Внимание: у вашей компании нет настроенных SMS-каналов. Сначала добавьте канал в настройках.</value>
+  </data>
+  <data name="FirstNameLabel" xml:space="preserve">
+    <value>Имя</value>
+  </data>
+  <data name="FirstNamePlaceholder" xml:space="preserve">
+    <value>Иван</value>
+  </data>
+  <data name="LastNameLabel" xml:space="preserve">
+    <value>Фамилия</value>
+  </data>
+  <data name="LastNamePlaceholder" xml:space="preserve">
+    <value>Иванов</value>
+  </data>
+  <data name="PhoneLabel" xml:space="preserve">
+    <value>Телефон</value>
+  </data>
+  <data name="PhonePlaceholder" xml:space="preserve">
+    <value>+79991234567</value>
+  </data>
+  <data name="DisplayNameLabel" xml:space="preserve">
+    <value>Отображаемое имя</value>
+  </data>
+  <data name="DisplayNamePlaceholder" xml:space="preserve">
+    <value>Иван Иванов</value>
+  </data>
+  <data name="DisplayNameHint" xml:space="preserve">
+    <value>Имя, которое будет отображаться в списке клиентов</value>
+  </data>
+  <data name="BtnCancel" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="BtnCreate" xml:space="preserve">
+    <value>Создать</value>
+  </data>
+  <data name="BtnSaving" xml:space="preserve">
+    <value>Создание...</value>
+  </data>
+  <data name="ErrorLoadChannels" xml:space="preserve">
+    <value>Не удалось загрузить список каналов</value>
+  </data>
+  <data name="ErrorPhoneRequired" xml:space="preserve">
+    <value>Телефон является обязательным полем для SMS-клиента.</value>
+  </data>
+  <data name="ErrorChannelRequired" xml:space="preserve">
+    <value>Необходимо выбрать SMS-канал компании.</value>
+  </data>
+  <data name="ErrorDisplayNameRequired" xml:space="preserve">
+    <value>Отображаемое имя обязательно для заполнения.</value>
+  </data>
+  <data name="ErrorCreateFailed" xml:space="preserve">
+    <value>Не удалось создать клиента. Пожалуйста, попробуйте позже.</value>
+  </data>
+  <data name="ErrorCreateException" xml:space="preserve">
+    <value>Ошибка при создании клиента</value>
+  </data>
+  <data name="BtnAddClient" xml:space="preserve">
+    <value>Добавить клиента</value>
+  </data>
 </root>

@@ -1,5 +1,6 @@
 @page "/clients"
 @using Microsoft.AspNetCore.Authorization
+@using BlazorClient.Components
 @attribute [Authorize]
 @inject IClientApiClient ClientApi
 @inject NavigationManager Navigation
@@ -17,6 +18,12 @@
                 <span class="clients-count">@totalCount</span>
             }
         </div>
+        <button class="clients-btn clients-btn-primary" @onclick="OpenCreateDialog">
+            <svg class="me-2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            @LClients["BtnAddClient"]
+        </button>
     </div>
 
     <!-- Toolbar: Search + Filter -->
@@ -198,10 +205,30 @@
             </div>
         </div>
     }
+
+    <CreateClientDialog IsOpen="@_isCreateDialogOpen" OnClose="CloseCreateDialog" OnClientCreated="OnClientCreated" />
 </div>
 
 @code {
     private List<ClientDto> clients = [];
+    private bool _isCreateDialogOpen;
+
+    private void OpenCreateDialog()
+    {
+        _isCreateDialogOpen = true;
+    }
+
+    private void CloseCreateDialog()
+    {
+        _isCreateDialogOpen = false;
+    }
+
+    private async Task OnClientCreated(ClientDto newClient)
+    {
+        _isCreateDialogOpen = false;
+        ResetPagination();
+        await LoadClients();
+    }
     private bool isLoading = true;
     private string? error;
 

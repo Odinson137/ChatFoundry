@@ -1,0 +1,189 @@
+@using BlazorClient.Interfaces
+@using BlazorClient.Models.DTO
+@using Microsoft.Extensions.Localization
+@inject IClientApiClient ClientApi
+@inject IStringLocalizer<BlazorClient.Pages.WorkflowDesigner> L
+
+@if (IsOpen)
+{
+    <div class="client-picker-backdrop" @onclick="Close"></div>
+    <div class="client-picker-modal">
+        <div class="client-picker-header">
+            <h2 class="client-picker-title">@L["SelectRecipientTitle"]</h2>
+            <button type="button" class="client-picker-close" @onclick="Close" aria-label="Close">
+                <span class="oi oi-x"></span>
+            </button>
+        </div>
+        <div class="client-picker-body">
+            <div class="client-picker-search">
+                <span class="oi oi-magnifying-glass"></span>
+                <input type="text" 
+                       placeholder="@L["SearchClientPlaceholder"]" 
+                       value="@_searchText" 
+                       @oninput="OnSearchInput" />
+            </div>
+
+            @if (_isLoading)
+            {
+                <div class="client-picker-loading">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <span class="ms-2">@L["LoadingClients"]</span>
+                </div>
+            }
+            else if (_clients.Count == 0)
+            {
+                <div class="client-picker-empty">
+                    @L["NoClientsFound"]
+                </div>
+            }
+            else
+            {
+                <div class="client-picker-list">
+                    @foreach (var client in _clients)
+                    {
+                        <div class="client-picker-item @(_expandedClientId == client.Id ? "expanded" : "")">
+                            <div class="client-picker-item-summary" @onclick="() => ToggleExpand(client.Id)">
+                                <div class="client-name">
+                                    <span class="oi @(_expandedClientId == client.Id ? "oi-chevron-bottom" : "oi-chevron-right") me-2 small text-muted"></span>
+                                    @client.DisplayName
+                                </div>
+                                <div class="client-channels-count text-muted small">
+                                    @client.ClientChannels.Count @L["ChannelsCountText"]
+                                </div>
+                            </div>
+                            @if (_expandedClientId == client.Id)
+                            {
+                                <div class="client-picker-item-details">
+                                    @if (client.ClientChannels.Count == 0)
+                                    {
+                                        <div class="p-2 text-muted small">@L["NoChannelsConnected"]</div>
+                                    }
+                                    else
+                                    {
+                                        <div class="list-group list-group-flush mt-1">
+                                            @foreach (var ch in client.ClientChannels)
+                                            {
+                                                <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+                                                    <div>
+                                                        <span class="badge bg-secondary me-2">@ch.Channel</span>
+                                                        <span class="small font-monospace text-dark">
+                                                            @(ch.Username ?? ch.Phone ?? ch.Email ?? ch.ExternalUserId)
+                                                        </span>
+                                                    </div>
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-primary" 
+                                                            @onclick="() => SelectChannel(client, ch)">
+                                                        @L["BtnSelect"]
+                                                    </button>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback<ClientChannelWithClientDto> OnChannelSelected { get; set; }
+
+    private string _searchText = "";
+    private bool _isLoading;
+    private List<ClientDto> _clients = new();
+    private Guid? _expandedClientId;
+    private System.Timers.Timer? _debounceTimer;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (IsOpen && _clients.Count == 0 && string.IsNullOrEmpty(_searchText))
+        {
+            await SearchClients();
+        }
+    }
+
+    private void OnSearchInput(ChangeEventArgs e)
+    {
+        _searchText = e.Value?.ToString() ?? "";
+        
+        _debounceTimer?.Stop();
+        _debounceTimer?.Dispose();
+        
+        _debounceTimer = new System.Timers.Timer(500);
+        _debounceTimer.AutoReset = false;
+        _debounceTimer.Elapsed += async (s, ev) =>
+        {
+            await InvokeAsync(async () =>
+            {
+                await SearchClients();
+            });
+        };
+        _debounceTimer.Start();
+    }
+
+    private async Task SearchClients()
+    {
+        _isLoading = true;
+        StateHasChanged();
+        try
+        {
+            var result = await ClientApi.GetClientsAsync(
+                first: 20,
+                search: string.IsNullOrWhiteSpace(_searchText) ? null : _searchText
+            );
+            _clients = result.Items;
+            
+            if (_expandedClientId.HasValue && !_clients.Any(c => c.Id == _expandedClientId.Value))
+            {
+                _expandedClientId = null;
+            }
+        }
+        catch
+        {
+            _clients = new();
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ToggleExpand(Guid clientId)
+    {
+        if (_expandedClientId == clientId)
+        {
+            _expandedClientId = null;
+        }
+        else
+        {
+            _expandedClientId = clientId;
+        }
+    }
+
+    private async Task SelectChannel(ClientDto client, ClientChannelDto channel)
+    {
+        var details = new ClientChannelWithClientDto
+        {
+            Channel = channel,
+            ClientDisplayName = client.DisplayName ?? "Клиент"
+        };
+        await OnChannelSelected.InvokeAsync(details);
+        Close();
+    }
+
+    private void Close()
+    {
+        _searchText = "";
+        _expandedClientId = null;
+        OnClose.InvokeAsync();
+    }
+}

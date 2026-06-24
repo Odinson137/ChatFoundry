@@ -1,18 +1,18 @@
 version: '3.9'
 
 services:
-  web-client:
-    container_name: web_client
-    image: ghcr.io/odinson137/chatfoundry/web-client:latest
-    build:
-      context: ..
-      dockerfile: webApps/src/BlazorClient/Dockerfile
-    ports:
-      - "7555:80"
-    depends_on:
-      - gateway-service
-    networks:
-      - app_network
+#  web-client:
+#    container_name: web_client
+#    image: ghcr.io/odinson137/chatfoundry/web-client:latest
+#    build:
+#      context: ..
+#      dockerfile: webApps/src/BlazorClient/Dockerfile
+#    ports:
+#      - "7555:80"
+#    depends_on:
+#      - gateway-service
+#    networks:
+#      - app_network
 
   gateway-service:
     container_name: gateway_service

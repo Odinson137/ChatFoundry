@@ -31,6 +31,7 @@ Designed with a robust microservice architecture, ChatFoundry scales effortlessl
 * **🎨 Visual Workflow Designer:** Build chatbots using a seamless drag-and-drop Blazor WebAssembly interface.
 * **🧠 AI-Powered Nodes:** Native integration with LLM providers (OpenAI, GLM, with a failover system) directly inside your workflows via the `AIGenerate` node.
 * **⚡ Event-Driven Logic:** Advanced node conditions (Regex, Contains, StartsWith, InList) to handle complex routing and data parsing.
+* **💬 Multi-Channel Communication:** Native support for Telegram and SMS (via Infinireach provider) integration. Workflows and operators can message users directly on their preferred channel.
 * **👥 Live Operator Chat:** Built-in Live Chat interface for human fallback (`TransferToOperator`). Operators can take over chatbot conversations seamlessly.
 * **📈 Built-in Analytics & Session Replay:** Inspect exactly how a user traversed the workflow graph step-by-step with the Session Replay feature.
 * **🏢 Multi-Tenancy & Billing:** Built-in workspace separation (`CompanyService`) and flexible subscription plans (with support for manual invoicing).
@@ -96,6 +97,7 @@ ChatFoundry is built on a modern **Event-Driven Microservices** topology.
 | **IdentityServer** | `5020 / 5021` | Handles authentication, JWT issuance, and users. |
 | **ClientService** | `5030 / 5031` | CRM component. Stores bot subscribers, attributes, and tags. |
 | **TelegramService** | `5040` | Webhook receiver and message sender for Telegram channel. |
+| **SmsService** | `5045` | Outbound SMS provider integration (Infinireach) for messages and notifications. |
 | **CompanyService** | `5050 / 5051` | Tenant (workspace) management and team invitations. |
 | **BillingService** | `5060 / 5061` | Subscription tiers, usage quotas, and payment processing. |
 | **FileService** | `5070 / 5071` | S3-compatible media upload and attachment processing. |

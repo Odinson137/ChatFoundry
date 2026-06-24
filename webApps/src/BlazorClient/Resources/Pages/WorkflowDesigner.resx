@@ -1152,4 +1152,34 @@
   <data name="VariableLabel" xml:space="preserve">
     <value>Переменная</value>
   </data>
+  <data name="LabelRecipientTitle" xml:space="preserve">
+    <value>Получатель сообщения</value>
+  </data>
+  <data name="RecipientCurrentSession" xml:space="preserve">
+    <value>Пользователь из текущей сессии (по умолчанию)</value>
+  </data>
+  <data name="RecipientCustomClient" xml:space="preserve">
+    <value>Выбрать конкретного клиента</value>
+  </data>
+  <data name="RecipientNotSelected" xml:space="preserve">
+    <value>Получатель не выбран</value>
+  </data>
+  <data name="SelectRecipientTitle" xml:space="preserve">
+    <value>Выбор получателя сообщения</value>
+  </data>
+  <data name="SearchClientPlaceholder" xml:space="preserve">
+    <value>Поиск клиента по имени, телефону, email...</value>
+  </data>
+  <data name="LoadingClients" xml:space="preserve">
+    <value>Загрузка клиентов...</value>
+  </data>
+  <data name="NoClientsFound" xml:space="preserve">
+    <value>Клиенты не найдены</value>
+  </data>
+  <data name="ChannelsCountText" xml:space="preserve">
+    <value>канал(ов)</value>
+  </data>
+  <data name="NoChannelsConnected" xml:space="preserve">
+    <value>Нет подключенных каналов</value>
+  </data>
 </root>
