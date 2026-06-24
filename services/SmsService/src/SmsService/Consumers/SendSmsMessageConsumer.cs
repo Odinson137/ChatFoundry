@@ -86,7 +86,7 @@ public sealed class SendSmsMessageConsumer(
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         var httpClient = httpClientFactory.CreateClient("SmsGateway");
-        
+
         httpClient.DefaultRequestHeaders.Clear();
         httpClient.DefaultRequestHeaders.Add("X-API-Key", apiKey);
 
