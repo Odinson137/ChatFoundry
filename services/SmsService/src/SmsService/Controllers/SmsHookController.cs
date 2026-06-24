@@ -47,7 +47,8 @@ public class SmsHookController(
             Parameters: new Dictionary<MessageParameter, string>
             {
                 [MessageParameter.FirstName] = smsData.From,
-                [MessageParameter.UserName] = smsData.From
+                [MessageParameter.UserName] = smsData.From,
+                [MessageParameter.Phone] = smsData.From
             }
         );
 

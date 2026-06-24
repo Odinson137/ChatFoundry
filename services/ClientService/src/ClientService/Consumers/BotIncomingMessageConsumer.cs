@@ -93,6 +93,11 @@ public class BotIncomingMessageConsumer(
             {
                 client.DisplayName = userName;
             }
+
+            if (channel == DefaultChannel.Sms && string.IsNullOrWhiteSpace(clientChannel.Phone))
+            {
+                clientChannel.Phone = msg.ExternalUserId;
+            }
         }
 
         var message = new Message

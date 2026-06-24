@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   web-client:
     container_name: web_client
