@@ -1,18 +1,18 @@
 version: '3.9'
 
 services:
-#  web-client:
-#    container_name: web_client
-#    image: ghcr.io/odinson137/chatfoundry/web-client:latest
-#    build:
-#      context: ..
-#      dockerfile: webApps/src/BlazorClient/Dockerfile
-#    ports:
-#      - "7555:80"
-#    depends_on:
-#      - gateway-service
-#    networks:
-#      - app_network
+  web-client:
+    container_name: web_client
+    image: ghcr.io/odinson137/chatfoundry/web-client:latest
+    build:
+      context: ..
+      dockerfile: webApps/src/BlazorClient/Dockerfile
+    ports:
+      - "7555:80"
+    depends_on:
+      - gateway-service
+    networks:
+      - app_network
 
   gateway-service:
     container_name: gateway_service
@@ -349,18 +349,18 @@ services:
 #    networks:
 #      - app_network
 
-  ngrok:
-    image: ngrok/ngrok:latest
-    restart: unless-stopped
-    ports:
-      - "4040:4040"
-    depends_on:
-      - gateway-service
-    env_file:
-      - .env
-    command: http "https://gateway-service:8443" --domain probable-dogfish-known.ngrok-free.app
-    networks:
-      - app_network
+#  ngrok:
+#    image: ngrok/ngrok:latest
+#    restart: unless-stopped
+#    ports:
+#      - "4040:4040"
+#    depends_on:
+#      - gateway-service
+#    env_file:
+#      - .env
+#    command: http "https://gateway-service:8443" --domain probable-dogfish-known.ngrok-free.app
+#    networks:
+#      - app_network
 
   seq:
     image: datalust/seq:latest
@@ -435,17 +435,17 @@ services:
       - freellmapi_data:/app/server/data
     networks:
       - app_network
-#
-#  cloudflared:
-#    image: cloudflare/cloudflared:latest
-#    container_name: cloudflared
-#    restart: unless-stopped
-#    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN:-}
-#    depends_on:
-#      - web-client
-#      - gateway-service
-#    networks:
-#      - app_network
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN:-}
+    depends_on:
+      - web-client
+      - gateway-service
+    networks:
+      - app_network
 
 
 volumes:

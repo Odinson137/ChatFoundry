@@ -194,6 +194,7 @@ jobs:
           { name: "file-service", path: "services/FileService/src/FileService/Dockerfile", context: "." },
           { name: "notification-service", path: "services/NotificationService/src/NotificationService/Dockerfile", context: "." },
           { name: "scheduler-service", path: "services/SchedulerService/src/SchedulerService/Dockerfile", context: "." },
+          { name: "sms-service", path: "services/SmsService/src/SmsService/Dockerfile", context: "." },
           { name: "web-client", path: "webApps/src/BlazorClient/Dockerfile", context: "." },
           { name: "freellmapi-service", path: "services/FreeLlmApiService/Dockerfile", context: "services/FreeLlmApiService" }
         ]
