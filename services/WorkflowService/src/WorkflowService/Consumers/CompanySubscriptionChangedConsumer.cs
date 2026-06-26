@@ -10,11 +10,11 @@ public class CompanySubscriptionChangedConsumer(IGraphQlCacheService cacheServic
     public async Task Consume(ConsumeContext<CompanySubscriptionChangedEvent> context)
     {
         var companyId = context.Message.CompanyId;
-        
-        await cacheService.EvictByTagsAsync(new[] 
-        { 
-            $"company:{companyId}:bots", 
-            $"company:{companyId}:workflows" 
+
+        await cacheService.EvictByTagsAsync(new[]
+        {
+            $"company:{companyId}:bots",
+            $"company:{companyId}:workflows"
         }, context.CancellationToken);
     }
 }
