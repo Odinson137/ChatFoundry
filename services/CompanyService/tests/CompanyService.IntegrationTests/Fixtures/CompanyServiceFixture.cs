@@ -8,7 +8,7 @@ namespace CompanyService.IntegrationTests.Fixtures;
 public class CompanyServiceFixture : BaseServiceFactory<Program, CompanyDbContext>
 {
     protected override bool NeedsKafka => false;
-    protected override bool NeedsRedis => false;
+    protected override bool NeedsRedis => true;
 
     protected override void ConfigureGrpcMocks(IServiceCollection services)
     {
