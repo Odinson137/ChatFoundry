@@ -179,7 +179,7 @@ public class NotificationApiClient(HttpClient http) : INotificationApiClient
 
     private async Task<T> ExecuteGraphQl<T>(string query, object? variables = null)
     {
-        return await http.PostGraphQlAsync<T>($"{ApiEndpoints.Api}/notification/graphql", query, variables);
+        return await http.PostGraphQlAsync<T>($"{ApiEndpoints.Api}/notification/graphql", query, variables, useApq: false);
     }
 
     private class LiveChatSessionsResponse

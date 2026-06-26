@@ -18,12 +18,13 @@ public static class HttpClientGraphQlExtensions
         string endpoint,
         string query,
         object? variables = null,
-        CancellationToken ct = default)
+        CancellationToken ct = default,
+        bool useApq = true)
     {
         var queryHash = ComputeSha256(query);
 
         var isMutation = query.TrimStart().StartsWith("mutation", StringComparison.OrdinalIgnoreCase);
-        if (isMutation)
+        if (isMutation || !useApq)
         {
             return await ExecuteGraphQlPostAsync<T>(http, endpoint, query, queryHash, variables, ct);
         }
