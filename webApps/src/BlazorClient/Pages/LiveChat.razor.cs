@@ -69,15 +69,48 @@ public partial class LiveChat : IDisposable
     private async Task TryAutoSelectChat()
     {
         var chatIdToSelect = ChatId ?? State.SelectedChatId;
-        var chatExists = State.QueuedChats.Any(c => c.Id == chatIdToSelect)
-                         || State.MyChats.Any(c => c.Id == chatIdToSelect);
-        if (chatIdToSelect.HasValue && chatExists)
-        {
-            await SelectChat(chatIdToSelect.Value);
-        }
-        else if (!chatIdToSelect.HasValue)
+        if (!chatIdToSelect.HasValue)
         {
             State.SelectedChatId = null;
+            return;
+        }
+
+        var chatExists = State.QueuedChats.Any(c => c.Id == chatIdToSelect)
+                         || State.MyChats.Any(c => c.Id == chatIdToSelect);
+
+        if (!chatExists)
+        {
+            try
+            {
+                var chat = await ApiClient.GetLiveChatSessionAsync(chatIdToSelect.Value);
+                if (chat != null)
+                {
+                    if (chat.Status == "Queued")
+                    {
+                        if (!State.QueuedChats.Any(c => c.Id == chat.Id))
+                        {
+                            State.QueuedChats.Insert(0, chat);
+                        }
+                    }
+                    else
+                    {
+                        if (!State.MyChats.Any(c => c.Id == chat.Id))
+                        {
+                            State.MyChats.Insert(0, chat);
+                        }
+                    }
+                    chatExists = true;
+                }
+            }
+            catch
+            {
+                // Ignored: if chat is not found or fails to load, we can't select it
+            }
+        }
+
+        if (chatExists)
+        {
+            await SelectChat(chatIdToSelect.Value);
         }
     }
 

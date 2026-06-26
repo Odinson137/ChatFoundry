@@ -26,7 +26,7 @@ public static class HttpClientGraphQlExtensions
         var isMutation = query.TrimStart().StartsWith("mutation", StringComparison.OrdinalIgnoreCase);
         if (isMutation || !useApq)
         {
-            return await ExecuteGraphQlPostAsync<T>(http, endpoint, query, queryHash, variables, ct);
+            return await ExecuteGraphQlPostAsync<T>(http, endpoint, query, queryHash, variables, ct, includeExtensions: useApq && !isMutation);
         }
 
         var extensions = new
@@ -78,21 +78,34 @@ public static class HttpClientGraphQlExtensions
         string query,
         string hash,
         object? variables,
-        CancellationToken ct)
+        CancellationToken ct,
+        bool includeExtensions = true)
     {
-        var payload = new
+        object payload;
+        if (includeExtensions)
         {
-            query = query,
-            variables = variables,
-            extensions = new
+            payload = new
             {
-                persistedQuery = new
+                query = query,
+                variables = variables,
+                extensions = new
                 {
-                    version = 1,
-                    sha256Hash = hash
+                    persistedQuery = new
+                    {
+                        version = 1,
+                        sha256Hash = hash
+                    }
                 }
-            }
-        };
+            };
+        }
+        else
+        {
+            payload = new
+            {
+                query = query,
+                variables = variables
+            };
+        }
 
         var response = await http.PostAsJsonAsync(endpoint, payload, ct);
         var jsonString = await response.Content.ReadAsStringAsync(ct);
