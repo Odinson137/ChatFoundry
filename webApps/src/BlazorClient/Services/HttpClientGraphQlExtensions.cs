@@ -22,6 +22,12 @@ public static class HttpClientGraphQlExtensions
     {
         var queryHash = ComputeSha256(query);
 
+        var isMutation = query.TrimStart().StartsWith("mutation", StringComparison.OrdinalIgnoreCase);
+        if (isMutation)
+        {
+            return await ExecuteGraphQlPostAsync<T>(http, endpoint, query, queryHash, variables, ct);
+        }
+
         var extensions = new
         {
             persistedQuery = new
@@ -51,7 +57,7 @@ public static class HttpClientGraphQlExtensions
 
             if (gqlResponse?.Errors != null && gqlResponse.Errors.Any(e => e.Message == "PersistedQueryNotFound"))
             {
-                return await ExecuteGraphQlFallback<T>(http, endpoint, query, queryHash, variables, ct);
+                return await ExecuteGraphQlPostAsync<T>(http, endpoint, query, queryHash, variables, ct);
             }
 
             if (gqlResponse?.Errors != null && gqlResponse.Errors.Count > 0)
@@ -65,7 +71,7 @@ public static class HttpClientGraphQlExtensions
         throw new Exception($"Http Error {response.StatusCode}: {jsonString}");
     }
 
-    private static async Task<T> ExecuteGraphQlFallback<T>(
+    private static async Task<T> ExecuteGraphQlPostAsync<T>(
         HttpClient http,
         string endpoint,
         string query,
