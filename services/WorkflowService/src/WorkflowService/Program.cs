@@ -136,6 +136,7 @@ services.AddMassTransit(x =>
         rider.AddConsumer<BotMessageConsumer>();
         rider.AddConsumer<ExecuteActionConsumer>();
         rider.AddConsumer<ActionCompletedConsumer>();
+        rider.AddConsumer<CompanySubscriptionChangedConsumer>();
         rider.AddProducer<TelegramSetWebhookEvent>("telegram.set-webhook");
 
         rider.AddProducer<BotIncomingMessage>("bot.message.incoming");
@@ -147,6 +148,15 @@ services.AddMassTransit(x =>
         rider.UsingKafka((context, cfg) =>
         {
             cfg.Host(kafkaConnectionString);
+
+            cfg.TopicEndpoint<CompanySubscriptionChangedEvent>(
+                "company.subscription.changed",
+                "workflow-service",
+                e =>
+                {
+                    e.CreateIfMissing();
+                    e.ConfigureConsumer<CompanySubscriptionChangedConsumer>(context);
+                });
 
             cfg.TopicEndpoint<BotIncomingMessage>(
                 "bot.message.incoming",
@@ -198,6 +208,7 @@ services.AddGrpcClient<SchedulerGrpcService.SchedulerGrpcServiceClient>(o =>
 services.AddScoped<BillingQuotaGuard>();
 
 services.AddRedisCache(builder.Configuration, "CacheSettings");
+services.AddGraphQlCaching(builder.Configuration);
 services.AddScoped<ClientAttributesGrpcClient>();
 services.AddScoped<IClientAttributesGrpcClient>(sp => new CachingClientAttributesGrpcClient(
     sp.GetRequiredService<ClientAttributesGrpcClient>(),
@@ -207,6 +218,9 @@ services.AddScoped<IClientAttributesGrpcClient>(sp => new CachingClientAttribute
 
 services.AddScoped<Query>();
 services.AddScoped<BotMutation>();
+services.AddScoped<BotWorkflowMutation>();
+services.AddScoped<ChannelMutation>();
+services.AddScoped<SessionMutation>();
 
 builder.Services
     .AddGraphQLServer()
@@ -244,6 +258,7 @@ app.MapGet("/", () => "Workflow Service is running");
 app.MapGet("/run", () => "Workflow executed")
     .RequireAuthorization();
 
+app.UseGraphQlCaching();
 app.MapGraphQL();
 
 app.Run();

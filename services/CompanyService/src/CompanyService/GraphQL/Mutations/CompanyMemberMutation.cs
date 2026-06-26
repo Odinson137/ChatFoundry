@@ -16,7 +16,8 @@ public class CompanyMemberMutation(
     IHttpContextAccessor httpContextAccessor,
     UserCompanyService.UserCompanyServiceClient identityGrpc,
     IConfiguration configuration,
-    global::Billing.Grpc.BillingQuotaService.BillingQuotaServiceClient billingClient) : BaseGraphQl(httpContextAccessor)
+    global::Billing.Grpc.BillingQuotaService.BillingQuotaServiceClient billingClient,
+    IGraphQlCacheService cacheService) : BaseGraphQl(httpContextAccessor)
 {
     public async Task<CompanyMember> AddMember(
         Guid companyId,
@@ -56,6 +57,8 @@ public class CompanyMemberMutation(
         context.CompanyMembers.Add(member);
         await context.SaveChangesAsync(ct);
 
+        await cacheService.EvictByTagsAsync(new[] { $"company:{companyId}:members" }, ct);
+
         return member;
     }
 
@@ -73,6 +76,8 @@ public class CompanyMemberMutation(
         member.Role = role;
         member.ModifiedAt = DateTime.UtcNow;
         await context.SaveChangesAsync(ct);
+
+        await cacheService.EvictByTagsAsync(new[] { $"company:{companyId}:members" }, ct);
 
         return member;
     }
@@ -108,6 +113,9 @@ public class CompanyMemberMutation(
         await context.SaveChangesAsync(ct);
 
         await identityGrpc.ClearUserCompanyAsync(new ClearUserCompanyRequest { UserId = userId.ToString() }, cancellationToken: ct);
+
+        await cacheService.EvictByTagsAsync(new[] { $"company:{companyId}:members" }, ct);
+
         return true;
     }
 }

@@ -9,7 +9,9 @@ using WorkflowService.Entities;
 namespace WorkflowService.GraphQL.Mutations;
 
 [ExtendObjectType(typeof(Mutation))]
-public class SessionMutation(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpContextAccessor)
+public class SessionMutation(
+    IHttpContextAccessor httpContextAccessor,
+    IGraphQlCacheService cacheService) : BaseGraphQl(httpContextAccessor)
 {
     public async Task<CompleteSessionPayload> CompleteSessionAsync(
         CompleteSessionInput input,
@@ -32,6 +34,8 @@ public class SessionMutation(IHttpContextAccessor httpContextAccessor) : BaseGra
             session.Status = SessionStatus.Completed;
             session.CompletedAt = DateTime.UtcNow;
             await context.SaveChangesAsync(ct);
+
+            await cacheService.EvictByTagsAsync(new[] { $"company:{CompanyId.Value}:sessions", $"session:{session.Id}" }, ct);
         }
 
         return new CompleteSessionPayload(session);

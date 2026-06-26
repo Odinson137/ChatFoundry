@@ -9,14 +9,15 @@ using Shared.Infrastructure.GraphQl;
 namespace ClientService.GraphQL.Mutations;
 
 [ExtendObjectType(typeof(Mutation))]
-public class ClientMutation(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpContextAccessor)
+public class ClientMutation(
+    IHttpContextAccessor httpContextAccessor,
+    IGraphQlCacheService cacheService) : BaseGraphQl(httpContextAccessor)
 {
     public async Task<OkPayload> UpdateClientAsync(
         UpdateClientInput input,
         [Service] ClientDbContext context)
     {
-
-
+        await cacheService.EvictByTagsAsync(new[] { $"client:{input.ClientId}", $"company:{CompanyId.Value}:clients" });
 
         return new OkPayload("Data has successfully updated.");
     }
@@ -64,6 +65,9 @@ public class ClientMutation(IHttpContextAccessor httpContextAccessor) : BaseGrap
 
         // Reload to get clean state
         await context.Entry(channel).Collection(ch => ch.Attributes).LoadAsync(ct);
+
+        await cacheService.EvictByTagsAsync(new[] { $"client:{channel.ClientId}", $"company:{CompanyId.Value}:clients", $"company:{CompanyId.Value}:channels" }, ct);
+
         return channel;
     }
 
@@ -96,6 +100,8 @@ public class ClientMutation(IHttpContextAccessor httpContextAccessor) : BaseGrap
         client.ClientChannels.Add(clientChannel);
         context.Clients.Add(client);
         await context.SaveChangesAsync(ct);
+
+        await cacheService.EvictByTagsAsync(new[] { $"company:{CompanyId.Value}:clients", $"company:{CompanyId.Value}:channels" }, ct);
 
         return client;
     }

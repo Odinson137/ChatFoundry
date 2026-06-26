@@ -3,11 +3,16 @@ using BillingService.Enums;
 using BillingService.Services;
 using Microsoft.EntityFrameworkCore;
 using Shared.Infrastructure.GraphQl;
+using MassTransit;
+using Shared.Application.Events;
 
 namespace BillingService.GraphQL;
 
 [ExtendObjectType(typeof(Mutation))]
-public class BillingMutation(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpContextAccessor)
+public class BillingMutation(
+    IHttpContextAccessor httpContextAccessor,
+    IGraphQlCacheService cacheService,
+    ITopicProducer<CompanySubscriptionChangedEvent> producer) : BaseGraphQl(httpContextAccessor)
 {
     public async Task<ChangePlanResultDto> ChangeSubscriptionPlan(
         string planSlug,
@@ -25,6 +30,13 @@ public class BillingMutation(IHttpContextAccessor httpContextAccessor) : BaseGra
 
         if (result == ChangePlanResult.InsufficientBalance)
             throw new GraphQLException("Insufficient balance for this plan change");
+
+        await cacheService.EvictByTagsAsync(new[] { $"company:{CompanyId.Value}:billing-overview" }, ct);
+
+        if (result != ChangePlanResult.NoChange)
+        {
+            await producer.Produce(new CompanySubscriptionChangedEvent(CompanyId.Value), ct);
+        }
 
         DateTime? pendingAt = null;
         decimal? credit = null;

@@ -17,6 +17,8 @@ services.AddEndpointsApiExplorer();
 services.AddPostgreSql<CompanyDbContext>(builder.Configuration);
 
 services.AddHttpContextAccessor();
+services.AddRedisCache(builder.Configuration, "CacheSettings");
+services.AddGraphQlCaching(builder.Configuration);
 
 services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -70,6 +72,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseGraphQlCaching();
 app.MapGraphQL();
 app.MapGrpcService<CompanyService.Grpc.CompanyRegistrationGrpcService>();
 

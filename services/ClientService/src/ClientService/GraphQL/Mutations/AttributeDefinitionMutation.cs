@@ -8,7 +8,9 @@ using Shared.Infrastructure.GraphQl;
 namespace ClientService.GraphQL.Mutations;
 
 [ExtendObjectType(typeof(Mutation))]
-public class AttributeDefinitionMutation(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpContextAccessor)
+public class AttributeDefinitionMutation(
+    IHttpContextAccessor httpContextAccessor,
+    IGraphQlCacheService cacheService) : BaseGraphQl(httpContextAccessor)
 {
     public async Task<AttributeDefinition> CreateCompanyAttributeDefinition(
         string key,
@@ -30,6 +32,8 @@ public class AttributeDefinitionMutation(IHttpContextAccessor httpContextAccesso
         };
 
         await attributeDefinitionRepository.AddAsync(attributeDefinition, ct);
+
+        await cacheService.EvictByTagsAsync(new[] { $"company:{CompanyId.Value}:attributes" }, ct);
 
         return attributeDefinition;
     }
@@ -57,6 +61,11 @@ public class AttributeDefinitionMutation(IHttpContextAccessor httpContextAccesso
 
         await attributeDefinitionRepository.AddAsync(attributeDefinition, ct);
 
+        if (scope == AttributeScope.Company)
+        {
+            await cacheService.EvictByTagsAsync(new[] { $"company:{CompanyId.Value}:attributes" }, ct);
+        }
+
         return attributeDefinition;
     }
 
@@ -76,6 +85,7 @@ public class AttributeDefinitionMutation(IHttpContextAccessor httpContextAccesso
         if (description != null) existing.Description = description;
         if (type.HasValue) existing.Type = type.Value;
         await attributeDefinitionRepository.UpdateAsync(existing, ct);
+        await cacheService.EvictByTagsAsync(new[] { $"company:{CompanyId.Value}:attributes" }, ct);
         return existing;
     }
 
@@ -89,6 +99,7 @@ public class AttributeDefinitionMutation(IHttpContextAccessor httpContextAccesso
         if (existing == null || existing.Scope != AttributeScope.Company || existing.ScopeEntityId != CompanyId.Value)
             return false;
         await attributeDefinitionRepository.DeleteAsync(existing, ct);
+        await cacheService.EvictByTagsAsync(new[] { $"company:{CompanyId.Value}:attributes" }, ct);
         return true;
     }
 }

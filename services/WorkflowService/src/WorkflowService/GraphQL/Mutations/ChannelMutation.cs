@@ -13,7 +13,8 @@ namespace WorkflowService.GraphQL.Mutations;
 [ExtendObjectType(typeof(Mutation))]
 public class ChannelMutation(
     IHttpContextAccessor httpContextAccessor,
-    ITopicProducer<TelegramSetWebhookEvent> producer) : BaseGraphQl(httpContextAccessor)
+    ITopicProducer<TelegramSetWebhookEvent> producer,
+    IGraphQlCacheService cacheService) : BaseGraphQl(httpContextAccessor)
 {
     public async Task<AddChannelPayload> AddChannelAsync(
         AddChannelInput input,
@@ -31,6 +32,8 @@ public class ChannelMutation(
         context.MessengerChannels.Add(channel);
         await context.SaveChangesAsync();
 
+        await cacheService.EvictByTagsAsync(new[] { $"company:{CompanyId.Value}:channels" });
+
         return new AddChannelPayload(channel);
     }
 
@@ -47,6 +50,8 @@ public class ChannelMutation(
             channel.Token = input.Token;
         channel.ChannelType = input.ChannelType;
         await context.SaveChangesAsync();
+
+        await cacheService.EvictByTagsAsync(new[] { $"company:{CompanyId.Value}:channels" });
 
         return new UpdateChannelPayload(channel);
     }
@@ -69,6 +74,8 @@ public class ChannelMutation(
 
         context.MessengerChannels.Remove(channel);
         await context.SaveChangesAsync();
+
+        await cacheService.EvictByTagsAsync(new[] { $"company:{CompanyId.Value}:channels" });
 
         return new DeleteChannelPayload(channel, null);
     }

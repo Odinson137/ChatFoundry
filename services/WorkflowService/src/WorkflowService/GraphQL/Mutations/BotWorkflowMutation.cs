@@ -10,7 +10,9 @@ using WorkflowService.Entities;
 namespace WorkflowService.GraphQL.Mutations;
 
 [ExtendObjectType(typeof(Mutation))]
-public class BotWorkflowMutation
+public class BotWorkflowMutation(
+    IHttpContextAccessor httpContextAccessor,
+    IGraphQlCacheService cacheService) : BaseGraphQl(httpContextAccessor)
 {
     public async Task<AddBotWorkflowPayload> AddBotWorkflowAsync(
         AddBotWorkflowInput input,
@@ -36,6 +38,8 @@ public class BotWorkflowMutation
 
         if (workflow.IsActiveBotWorkflow)
             await SyncTimerStartScheduleAsync(workflow, context, schedulerClient);
+
+        await cacheService.EvictByTagsAsync(new[] { $"company:{CompanyId.Value}:workflows", $"bot:{input.BotId}:workflows" });
 
         return new AddBotWorkflowPayload(workflow);
     }
@@ -74,6 +78,8 @@ public class BotWorkflowMutation
 
         await SyncTimerStartScheduleAsync(workflow, context, schedulerClient);
 
+        await cacheService.EvictByTagsAsync(new[] { $"company:{CompanyId.Value}:workflows", $"bot:{workflow.BotId}:workflows", $"workflow:{workflow.Id}" });
+
         return new UpdateBotWorkflowPayload(workflow);
     }
 
@@ -93,6 +99,8 @@ public class BotWorkflowMutation
 
         context.Workflows.Remove(workflow);
         await context.SaveChangesAsync();
+
+        await cacheService.EvictByTagsAsync(new[] { $"company:{CompanyId.Value}:workflows", $"bot:{workflow.BotId}:workflows", $"workflow:{workflow.Id}" });
 
         return new DeleteBotWorkflowPayload(workflow);
     }
@@ -127,6 +135,8 @@ public class BotWorkflowMutation
 
         context.Workflows.Add(copy);
         await context.SaveChangesAsync();
+
+        await cacheService.EvictByTagsAsync(new[] { $"company:{CompanyId.Value}:workflows", $"bot:{copy.BotId}:workflows" });
 
         return new CopyBotWorkflowPayload(copy);
     }

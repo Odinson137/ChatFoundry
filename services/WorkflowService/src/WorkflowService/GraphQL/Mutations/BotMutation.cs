@@ -11,7 +11,9 @@ using WorkflowService.Services;
 namespace WorkflowService.GraphQL.Mutations;
 
 [ExtendObjectType(typeof(Mutation))]
-public class BotMutation(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpContextAccessor)
+public class BotMutation(
+    IHttpContextAccessor httpContextAccessor,
+    IGraphQlCacheService cacheService) : BaseGraphQl(httpContextAccessor)
 {
     public async Task<AddBotPayload> AddBotAsync(
         AddBotInput input,
@@ -54,6 +56,8 @@ public class BotMutation(IHttpContextAccessor httpContextAccessor) : BaseGraphQl
             await SetWebhooksForBotChannelsAsync(context, bot.Id, input.ChannelIds, producer);
         }
 
+        await cacheService.EvictByTagsAsync(new[] { $"company:{CompanyId.Value}:bots" }, ct);
+
         return new AddBotPayload(bot);
     }
 
@@ -92,6 +96,8 @@ public class BotMutation(IHttpContextAccessor httpContextAccessor) : BaseGraphQl
         if (toAdd.Count > 0)
             await SetWebhooksForBotChannelsAsync(context, bot.Id, toAdd.ToArray(), producer);
 
+        await cacheService.EvictByTagsAsync(new[] { $"company:{CompanyId.Value}:bots", $"bot:{bot.Id}" });
+
         return new UpdateBotPayload(bot);
     }
 
@@ -126,6 +132,8 @@ public class BotMutation(IHttpContextAccessor httpContextAccessor) : BaseGraphQl
         context.BotChannels.RemoveRange(bot.BotChannels);
         context.Bots.Remove(bot);
         await context.SaveChangesAsync();
+
+        await cacheService.EvictByTagsAsync(new[] { $"company:{CompanyId.Value}:bots", $"bot:{bot.Id}" });
 
         return new DeleteBotPayload(bot);
     }

@@ -8,7 +8,9 @@ using Shared.Infrastructure.GraphQl;
 namespace CompanyService.GraphQL.Mutations;
 
 [ExtendObjectType(typeof(Mutation))]
-public class CompanyMutation(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpContextAccessor)
+public class CompanyMutation(
+    IHttpContextAccessor httpContextAccessor,
+    IGraphQlCacheService cacheService) : BaseGraphQl(httpContextAccessor)
 {
     public async Task<Company> CreateCompany(
         string name,
@@ -38,6 +40,8 @@ public class CompanyMutation(IHttpContextAccessor httpContextAccessor) : BaseGra
         company.ModifiedAt = DateTime.UtcNow;
         await context.SaveChangesAsync(ct);
 
+        await cacheService.EvictByTagsAsync(new[] { $"company:{id}" }, ct);
+
         return company;
     }
 
@@ -51,6 +55,8 @@ public class CompanyMutation(IHttpContextAccessor httpContextAccessor) : BaseGra
 
         context.Companies.Remove(company);
         await context.SaveChangesAsync(ct);
+
+        await cacheService.EvictByTagsAsync(new[] { $"company:{id}" }, ct);
 
         return true;
     }

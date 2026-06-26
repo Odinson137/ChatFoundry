@@ -48,6 +48,7 @@ builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IAttributeDefinitionRepository, AttributeDefinitionRepository>();
 builder.Services.AddScoped<BotCompanyResolver>();
 builder.Services.AddRedisCache(builder.Configuration, "CacheSettings");
+builder.Services.AddGraphQlCaching(builder.Configuration);
 builder.Services.AddScoped<IBotCompanyResolver>(sp => new CachingBotCompanyResolver(
     sp.GetRequiredService<BotCompanyResolver>(),
     sp.GetRequiredService<IDistributedCache>(),
@@ -140,6 +141,8 @@ app.UseRequestLocalization(new RequestLocalizationOptions()
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseGraphQlCaching();
 
 app.MapGraphQL();
 app.MapGrpcService<ClientService.Grpc.ClientAttributesGrpcService>();

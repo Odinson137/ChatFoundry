@@ -54,6 +54,7 @@ if (!string.IsNullOrEmpty(kafkaConnectionString))
         x.AddRider(rider =>
         {
             rider.AddConsumer<ActionCompletedBillingConsumer>();
+            rider.AddProducer<CompanySubscriptionChangedEvent>("company.subscription.changed");
 
             rider.UsingKafka((context, cfg) =>
             {
@@ -76,6 +77,8 @@ services.AddGrpc();
 
 services.AddScoped<BillingQuery>();
 services.AddScoped<BillingMutation>();
+services.AddRedisCache(builder.Configuration, "CacheSettings");
+services.AddGraphQlCaching(builder.Configuration);
 
 services
     .AddGraphQLServer()
@@ -102,6 +105,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapGrpcService<BillingQuotaGrpcService>();
+app.UseGraphQlCaching();
 app.MapGraphQL();
 
 app.MapGet("/", () => "Billing Service is running");

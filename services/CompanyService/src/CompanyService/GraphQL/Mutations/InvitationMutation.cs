@@ -9,7 +9,9 @@ using Shared.Infrastructure.GraphQl;
 namespace CompanyService.GraphQL.Mutations;
 
 [ExtendObjectType(typeof(Mutation))]
-public class InvitationMutation(IHttpContextAccessor httpContextAccessor) : BaseGraphQl(httpContextAccessor)
+public class InvitationMutation(
+    IHttpContextAccessor httpContextAccessor,
+    IGraphQlCacheService cacheService) : BaseGraphQl(httpContextAccessor)
 {
     public async Task<InvitationResult> CreateInvitation(
         string? email,
@@ -43,6 +45,8 @@ public class InvitationMutation(IHttpContextAccessor httpContextAccessor) : Base
         };
         context.Invitations.Add(invitation);
         await context.SaveChangesAsync(ct);
+
+        await cacheService.EvictByTagsAsync(new[] { $"company:{companyId}:invitations" }, ct);
 
         var link = $"{baseUrl.TrimEnd('/')}/register?invite={invitation.Id}";
         return new InvitationResult(invitation.Id, link, invitation.ExpiresAt);
