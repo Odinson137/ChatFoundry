@@ -1,12 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Shared.Domain.Enums;
+using Shared.Infrastructure.GraphQl;
 using WorkflowService.Data;
 using WorkflowService.Entities;
 using WorkflowService.Interfaces;
 
 namespace WorkflowService.Repositories;
 
-public class SessionRepository(WorkflowDbContext db) : ISessionRepository
+public class SessionRepository(WorkflowDbContext db, IGraphQlCacheService cacheService) : ISessionRepository
 {
     public Task<Session?> FindActiveAsync(Guid channelId, string clientId, Guid botId, CancellationToken ct)
     {
@@ -67,10 +68,30 @@ public class SessionRepository(WorkflowDbContext db) : ISessionRepository
     {
         await db.Sessions.AddAsync(session, ct);
         await db.SaveChangesAsync(ct);
+
+        var companyId = await db.Bots
+            .Where(b => b.Workflows.Any(w => w.Id == session.WorkflowId))
+            .Select(b => b.CompanyId)
+            .FirstOrDefaultAsync(ct);
+
+        if (companyId.HasValue)
+        {
+            await cacheService.EvictByTagsAsync(new[] { $"company:{companyId.Value}:sessions" }, ct);
+        }
     }
 
     public async Task SaveAsync(Session session, CancellationToken ct = default)
     {
         await db.SaveChangesAsync(ct);
+
+        var companyId = await db.Bots
+            .Where(b => b.Workflows.Any(w => w.Id == session.WorkflowId))
+            .Select(b => b.CompanyId)
+            .FirstOrDefaultAsync(ct);
+
+        if (companyId.HasValue)
+        {
+            await cacheService.EvictByTagsAsync(new[] { $"company:{companyId.Value}:sessions", $"session:{session.Id}" }, ct);
+        }
     }
 }
