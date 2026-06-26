@@ -88,7 +88,16 @@ public class ChannelMutation(
         if (channel is null)
             return new RefreshChannelWebhookPayload(null);
 
-        await producer.Produce(new TelegramSetWebhookEvent(channel.Id, channel.Token));
+        try
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            await producer.Produce(new TelegramSetWebhookEvent(channel.Id, channel.Token), cts.Token);
+        }
+        catch
+        {
+            throw new GraphQLException("Queue service is temporarily unavailable. Please try again later.");
+        }
+
         return new RefreshChannelWebhookPayload(channel);
     }
 }
