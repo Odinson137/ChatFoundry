@@ -70,19 +70,7 @@ public class CompanyApiClient(HttpClient http) : ICompanyApiClient
 
     private async Task<T> ExecuteGraphQl<T>(string query, object? variables, CancellationToken ct)
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{ApiEndpoints.Api}/company/graphql");
-        var payload = new { query, variables };
-        request.Content = JsonContent.Create(payload);
-
-        var response = await http.SendAsync(request, ct);
-        var jsonString = await response.Content.ReadAsStringAsync(ct);
-
-        if (!response.IsSuccessStatusCode)
-            throw new Exception($"HTTP {response.StatusCode}: {jsonString}");
-
-        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-        var gqlResponse = JsonSerializer.Deserialize<GraphQLResponse<T>>(jsonString, options);
-        return gqlResponse!.Data!;
+        return await http.PostGraphQlAsync<T>($"{ApiEndpoints.Api}/company/graphql", query, variables, ct);
     }
 
     private class CompaniesResponse

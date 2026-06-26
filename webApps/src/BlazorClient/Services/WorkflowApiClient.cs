@@ -674,34 +674,7 @@ public class WorkflowApiClient(HttpClient http) : IWorkflowApiClient
 
     private async Task<T> ExecuteGraphQl<T>(string query, object? variables = null)
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{ApiEndpoints.Api}/workflow/graphql");
-        var payload = new { query, variables };
-        request.Content = JsonContent.Create(payload);
-
-        var response = await http.SendAsync(request);
-        var jsonString = await response.Content.ReadAsStringAsync();
-
-        if (!response.IsSuccessStatusCode)
-        {
-            throw new Exception($"Http Error {response.StatusCode}: {jsonString}");
-        }
-
-        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-        var gqlResponse = JsonSerializer.Deserialize<GraphQLResponse<T>>(jsonString, options);
-        if (gqlResponse == null)
-            throw new InvalidOperationException("Server returned an empty response.");
-
-        var firstGraphQlError = gqlResponse.Errors?
-            .Select(e => e.Message)
-            .FirstOrDefault(m => !string.IsNullOrWhiteSpace(m));
-
-        if (!string.IsNullOrWhiteSpace(firstGraphQlError))
-            throw new InvalidOperationException(firstGraphQlError);
-
-        if (gqlResponse.Data == null)
-            throw new InvalidOperationException("Failed to process server response.");
-
-        return gqlResponse.Data;
+        return await http.PostGraphQlAsync<T>($"{ApiEndpoints.Api}/workflow/graphql", query, variables);
     }
 
     public async Task RefreshChannelWebhookAsync(Guid channelId)

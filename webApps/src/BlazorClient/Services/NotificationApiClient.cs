@@ -179,29 +179,7 @@ public class NotificationApiClient(HttpClient http) : INotificationApiClient
 
     private async Task<T> ExecuteGraphQl<T>(string query, object? variables = null)
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{ApiEndpoints.Api}/notification/graphql");
-        var payload = new { query, variables };
-        request.Content = JsonContent.Create(payload);
-
-        var response = await http.SendAsync(request);
-        var jsonString = await response.Content.ReadAsStringAsync();
-
-        if (!response.IsSuccessStatusCode)
-            throw new Exception($"Http Error {response.StatusCode}: {jsonString}");
-
-        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-        var gqlResponse = JsonSerializer.Deserialize<GraphQLResponse<T>>(jsonString, options);
-        if (gqlResponse == null)
-            throw new InvalidOperationException("Server returned an empty response.");
-
-        var firstError = gqlResponse.Errors?.Select(e => e.Message).FirstOrDefault(m => !string.IsNullOrWhiteSpace(m));
-        if (!string.IsNullOrWhiteSpace(firstError))
-            throw new InvalidOperationException(firstError);
-
-        if (gqlResponse.Data == null)
-            throw new InvalidOperationException("Failed to process server response.");
-
-        return gqlResponse.Data;
+        return await http.PostGraphQlAsync<T>($"{ApiEndpoints.Api}/notification/graphql", query, variables);
     }
 
     private class LiveChatSessionsResponse

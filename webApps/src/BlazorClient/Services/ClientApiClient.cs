@@ -411,22 +411,7 @@ public class ClientApiClient(HttpClient http) : IClientApiClient
 
     private async Task<T> ExecuteGraphQl<T>(string query, object? variables = null, CancellationToken ct = default)
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{ApiEndpoints.Api}/client/graphql");
-        var payload = new { query, variables };
-        request.Content = JsonContent.Create(payload);
-
-        var response = await http.SendAsync(request, ct);
-        var jsonString = await response.Content.ReadAsStringAsync(ct);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            throw new Exception($"Http Error {response.StatusCode}: {jsonString}");
-        }
-
-        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-        var gqlResponse = JsonSerializer.Deserialize<GraphQLResponse<T>>(jsonString, options);
-
-        return gqlResponse!.Data!;
+        return await http.PostGraphQlAsync<T>($"{ApiEndpoints.Api}/client/graphql", query, variables, ct);
     }
 
 

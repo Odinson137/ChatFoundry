@@ -123,19 +123,7 @@ public class BillingApiClient(HttpClient http) : IBillingApiClient
     private async Task<T> ExecuteGraphQl<T>(string query, object? variables,
         CancellationToken cancellationToken)
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{ApiEndpoints.Api}/billing/graphql");
-        request.Content = JsonContent.Create(new { query, variables }, options: JsonOptions);
-        var response = await http.SendAsync(request, cancellationToken);
-        var jsonString = await response.Content.ReadAsStringAsync(cancellationToken);
-        if (!response.IsSuccessStatusCode)
-            throw new InvalidOperationException($"Billing HTTP {(int)response.StatusCode}: {jsonString}");
-
-        var gql = JsonSerializer.Deserialize<GraphQLResponse<T>>(jsonString, JsonOptions);
-        if (gql?.Errors is { Count: > 0 })
-        {
-            throw new InvalidOperationException(gql.Errors[0].Message ?? "GraphQL Error");
-        }
-        return gql!.Data!;
+        return await http.PostGraphQlAsync<T>($"{ApiEndpoints.Api}/billing/graphql", query, variables, cancellationToken);
     }
 
     private sealed class BillingOverviewData

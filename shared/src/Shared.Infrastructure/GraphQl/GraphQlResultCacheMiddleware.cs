@@ -95,24 +95,84 @@ public class GraphQlResultCacheMiddleware
             }
         }
 
-        if (query != null && string.IsNullOrEmpty(operationName))
-        {
-            operationName = ExtractOperationName(query);
-        }
+        var db = redis.GetDatabase();
 
-        if (hash == null && query != null)
+        if (hash != null && query != null)
+        {
+            await db.StringSetAsync($"cf:apq:query:{hash}", query, TimeSpan.FromDays(30));
+            if (string.IsNullOrEmpty(operationName))
+            {
+                operationName = ExtractOperationName(query);
+            }
+            if (!string.IsNullOrEmpty(operationName))
+            {
+                await db.StringSetAsync($"cf:apq:opname:{hash}", operationName, TimeSpan.FromDays(30));
+            }
+        }
+        else if (hash != null && query == null)
+        {
+            query = await db.StringGetAsync($"cf:apq:query:{hash}");
+            if (query == null)
+            {
+                context.Response.ContentType = "application/json";
+                context.Response.StatusCode = 200;
+                await context.Response.WriteAsync(
+                    "{\"errors\":[{\"message\":\"PersistedQueryNotFound\",\"extensions\":{\"code\":\"PERSISTED_QUERY_NOT_FOUND\"}}]}",
+                    Encoding.UTF8
+                );
+                return;
+            }
+
+            if (HttpMethods.IsGet(method))
+            {
+                var queryItems = context.Request.Query.ToDictionary(x => x.Key, x => x.Value);
+                queryItems["query"] = query;
+                context.Request.Query = new QueryCollection(queryItems.ToDictionary(
+                    k => k.Key,
+                    v => new Microsoft.Extensions.Primitives.StringValues(v.Value.ToArray())
+                ));
+            }
+            else if (HttpMethods.IsPost(method))
+            {
+                var payload = new
+                {
+                    query = query,
+                    variables = variables,
+                    extensions = new
+                    {
+                        persistedQuery = new
+                        {
+                            version = 1,
+                            sha256Hash = hash
+                        }
+                    }
+                };
+                var newBodyBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(payload));
+                context.Request.Body = new MemoryStream(newBodyBytes);
+                context.Request.ContentLength = newBodyBytes.Length;
+            }
+
+            if (string.IsNullOrEmpty(operationName))
+            {
+                operationName = await db.StringGetAsync($"cf:apq:opname:{hash}");
+                if (string.IsNullOrEmpty(operationName))
+                {
+                    operationName = ExtractOperationName(query);
+                }
+            }
+        }
+        else if (hash == null && query != null)
         {
             hash = ComputeSha256(query);
-        }
-
-        var db = redis.GetDatabase();
-        if (hash != null && !string.IsNullOrEmpty(operationName))
-        {
-            await db.StringSetAsync($"cf:apq:opname:{hash}", operationName, TimeSpan.FromDays(1));
-        }
-        else if (hash != null && string.IsNullOrEmpty(operationName))
-        {
-            operationName = await db.StringGetAsync($"cf:apq:opname:{hash}");
+            if (string.IsNullOrEmpty(operationName))
+            {
+                operationName = ExtractOperationName(query);
+            }
+            if (!string.IsNullOrEmpty(operationName))
+            {
+                await db.StringSetAsync($"cf:apq:opname:{hash}", operationName, TimeSpan.FromDays(30));
+            }
+            await db.StringSetAsync($"cf:apq:query:{hash}", query, TimeSpan.FromDays(30));
         }
 
         var options = cacheOptions.Value;
