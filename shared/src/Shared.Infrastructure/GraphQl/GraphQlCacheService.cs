@@ -1,6 +1,6 @@
-using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
 using StackExchange.Redis;
-using System.Text.Json;
+using Shared.Infrastructure.Options;
 
 namespace Shared.Infrastructure.GraphQl;
 
@@ -13,49 +13,49 @@ public interface IGraphQlCacheService
 
 public class GraphQlCacheService : IGraphQlCacheService
 {
-    private readonly IDistributedCache _cache;
     private readonly IConnectionMultiplexer _redis;
     private readonly string _prefix;
+    private readonly string _keyPrefix;
 
-    public GraphQlCacheService(IDistributedCache cache, IConnectionMultiplexer redis)
+    public GraphQlCacheService(IConnectionMultiplexer redis, IOptions<FoundryRedisCacheOptions> redisOptions)
     {
-        _cache = cache;
         _redis = redis;
+        _keyPrefix = redisOptions.Value.KeyPrefix ?? string.Empty;
         _prefix = "cf:graphql:";
     }
 
     public async Task<string?> GetAsync(string key, CancellationToken ct = default)
     {
-        return await _cache.GetStringAsync(_prefix + "result:" + key, ct);
+        var db = _redis.GetDatabase();
+        var fullKey = _keyPrefix + _prefix + "result:" + key;
+        return await db.StringGetAsync(fullKey);
     }
 
     public async Task SetAsync(string key, string value, IEnumerable<string> tags, TimeSpan ttl, CancellationToken ct = default)
     {
-        var resultKey = _prefix + "result:" + key;
-
-        var options = new DistributedCacheEntryOptions
-        {
-            AbsoluteExpirationRelativeToNow = ttl
-        };
-        await _cache.SetStringAsync(resultKey, value, options, ct);
-
         var db = _redis.GetDatabase();
+        var resultKey = _prefix + "result:" + key;
+        var fullResultKey = _keyPrefix + resultKey;
+
         var batch = db.CreateBatch();
+
+        _ = batch.StringSetAsync(fullResultKey, value, ttl);
 
         foreach (var tag in tags)
         {
-            var tagKey = _prefix + "tag:" + tag.ToLower().Trim();
-            _ = batch.SetAddAsync(tagKey, resultKey);
+            var tagKey = _keyPrefix + _prefix + "tag:" + tag.ToLower().Trim();
+            _ = batch.SetAddAsync(tagKey, fullResultKey);
             _ = batch.KeyExpireAsync(tagKey, ttl.Add(TimeSpan.FromHours(1)));
         }
 
         batch.Execute();
+        await Task.CompletedTask;
     }
 
     public async Task EvictByTagsAsync(IEnumerable<string> tags, CancellationToken ct = default)
     {
         var db = _redis.GetDatabase();
-        var tagKeys = tags.Select(t => (RedisKey)(_prefix + "tag:" + t.ToLower().Trim())).ToArray();
+        var tagKeys = tags.Select(t => (RedisKey)(_keyPrefix + _prefix + "tag:" + t.ToLower().Trim())).ToArray();
 
         foreach (var tagKey in tagKeys)
         {

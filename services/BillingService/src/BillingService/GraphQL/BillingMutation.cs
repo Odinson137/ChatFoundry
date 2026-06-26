@@ -35,7 +35,13 @@ public class BillingMutation(
 
         if (result != ChangePlanResult.NoChange)
         {
-            await producer.Produce(new CompanySubscriptionChangedEvent(CompanyId.Value), ct);
+            try
+            {
+                await producer.Produce(new CompanySubscriptionChangedEvent(CompanyId.Value), ct);
+            }
+            catch
+            {
+            }
         }
 
         DateTime? pendingAt = null;

@@ -53,7 +53,13 @@ public class BotMutation(
             }
             await context.SaveChangesAsync();
 
-            await SetWebhooksForBotChannelsAsync(context, bot.Id, input.ChannelIds, producer);
+            try
+            {
+                await SetWebhooksForBotChannelsAsync(context, bot.Id, input.ChannelIds, producer);
+            }
+            catch
+            {
+            }
         }
 
         await cacheService.EvictByTagsAsync(new[] { $"company:{CompanyId.Value}:bots" }, ct);
@@ -94,7 +100,15 @@ public class BotMutation(
         await context.SaveChangesAsync();
 
         if (toAdd.Count > 0)
-            await SetWebhooksForBotChannelsAsync(context, bot.Id, toAdd.ToArray(), producer);
+        {
+            try
+            {
+                await SetWebhooksForBotChannelsAsync(context, bot.Id, toAdd.ToArray(), producer);
+            }
+            catch
+            {
+            }
+        }
 
         await cacheService.EvictByTagsAsync(new[] { $"company:{CompanyId.Value}:bots", $"bot:{bot.Id}" });
 
